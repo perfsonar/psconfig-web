@@ -1,0 +1,28 @@
+<div class="container">
+    <h2 class="page-header">Settings</h2>
+    <div class="row">
+        <div class="col-md-3">
+            <ul class="nav nav-pills nav-stacked nav-pills-stacked-example">
+                <li role="presentation" class="active"><a href="">Public Profile</a></li>
+                <li role="presentation"><a href="">Account</a></li>
+                <li role="presentation"><a href="">TODO</a></li>
+            </ul>
+        </div><!--col-md-3-->
+        <div class="col-md-9">
+            <!--<h3 class="page-header">Public Profile</h3>-->
+            <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+            <form ng-submit="submit_profile();">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" class="form-control" ng-model="form_profile.fullname" name="fullname" placeholder="Your full name" required/>
+                </div>
+                <div class="form-group">
+                    <label>Biograph</label>
+                    <textarea class="form-control" ng-model="form_profile.bio" name="bio" placeholder="Please enter a brief introduction about yourself"></textarea>
+                </div>
+                <input type="submit" class="btn" value="Update"/>
+            </form><!--profile form-->
+        </div><!--col-md-10-->
+    </div><!--row-->
+</div><!--container-->
+

@@ -1,5 +1,5 @@
 {
-  "name": "sca-profile",
+  "name": "sca-auth",
   "version": "0.0.1",
   "authors": [
     "Soichi Hayashi <hayashis@iu.edu>"
@@ -24,8 +24,5 @@
     "angularjs-toaster": "~0.4.14",
     "angular-cookies": "~1.4.0",
     "angular-loading-bar": "~0.7.1"
-  },
-  "resolutions": {
-    "angular": "~1.4.0"
   }
 }

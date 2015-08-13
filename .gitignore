@@ -1,3 +1,5 @@
 node_modules
 ui/bower_components
 barn
+config
+ui/config.js
