@@ -1,14 +1,46 @@
+'use strict';
 
+//contrib
+var winston = require('winston');
 var Sequelize = require('sequelize');
 
-var config = require('./config/config').config;
+//mine
+var config = require('./config/config');
+var logger = new winston.Logger(config.logger.winston);
 
 var sequelize = new Sequelize('database', 'username', 'password', config.db);
 
 var Profile = sequelize.define('Profile', {
     user_id: Sequelize.INTEGER, //for auth service user id
+    
+    //public profile (settings that user don't mind publishing to public) stored as JSON
+    public: {
+        type: Sequelize.TEXT,
+        defaultValue: '{}',
+        get: function () { 
+            return JSON.parse(this.getDataValue('public'));
+        },
+        set: function (value) {
+            return this.setDataValue('public', JSON.stringify(value));
+        }
+    },
+
+    //private profile (that user wants to share with other users)
+    private: {
+        type: Sequelize.TEXT,
+        defaultValue: '{}',
+        get: function () { 
+            return JSON.parse(this.getDataValue('public'));
+        },
+        set: function (value) {
+            return this.setDataValue('public', JSON.stringify(value));
+        }
+    },
+    
+    /*
     fullname: Sequelize.STRING,
     bio: Sequelize.TEXT
+    */
 }, {
     classMethods: {
         /*

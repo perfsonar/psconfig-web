@@ -9,7 +9,6 @@ var app = angular.module('app', [
     'toaster',
     'angular-loading-bar',
     'angular-jwt',
-    'profileControllers' //contains searchControllers - others?
 ]);
 
 
@@ -18,10 +17,10 @@ app.config(['cfpLoadingBarProvider', function(cfpLoadingBarProvider) {
     cfpLoadingBarProvider.includeSpinner = false;
 }]);
 
+/*
 //configure route
 app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
     $routeProvider.
-    /*
     when('/login', {
         templateUrl: 't/login.html',
         controller: 'LoginController'
@@ -38,14 +37,13 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         templateUrl: 't/register.html',
         controller: 'RegisterController'
     })
-    */
-    when('/user', {
-        templateUrl: 't/user.html',
-        controller: 'UserController',
+    when('/', {
+        templateUrl: 't/settings.html',
+        controller: 'SettingsController',
         requiresLogin: true
     })
     .otherwise({
-        redirectTo: '/user'
+        redirectTo: '/'
     });
     
     //console.dir($routeProvider);
@@ -66,6 +64,7 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         }
     });
 }]);
+*/
 
 //configure httpProvider to send jwt unless skipAuthorization is set in config (not tested yet..)
 app.config(['appconf', '$httpProvider', 'jwtInterceptorProvider', 

@@ -1,54 +1,62 @@
 #!/usr/bin/node
 
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var expressValidator = require('express-validator');
+//node
 var fs = require('fs');
+var path = require('path');
 
-var Sequelize = require('sequelize');
+//contrib
+var express = require('express');
+//var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+//var expressValidator = require('express-validator');
+//var Sequelize = require('sequelize');
+var winston = require('winston');
+var expressWinston = require('express-winston');
 
+//mine
 var config = require('./config/config');
-
+var logger = new winston.Logger(config.logger.winston);
 var models = require('./models');
 
+//init express
 var app = express();
-
-app.use(config.logger.express);
 app.use(bodyParser.json()); //parse application/json
-app.use(bodyParser.urlencoded({extended: false})); //parse application/x-www-form-urlencoded
-app.use(cookieParser());
+//app.use(bodyParser.urlencoded({extended: false})); //parse application/x-www-form-urlencoded
+app.use(expressWinston.logger(config.logger.winston));
+//app.use(cookieParser());
 
 //app.use(jwtTokenParser());
 
-app.use('/', require('./router'));
-
+//setup routes
+app.use('/', require('./controllers'));
 app.get('/health', function(req, res) {
     res.json({status: 'ok'});
 });
 
-app.use(function(req, res, next) {
-    // catch 404 and forward to error handler
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
-});
-
+//error handling
+app.use(expressWinston.errorLogger(config.logger.winston)); 
 app.use(function(err, req, res, next) {
-    console.dir(err);
+    logger.error(err);
+    logger.error(err.stack);
     res.status(err.status || 500);
-    res.json({message: err.message});
+    res.json({message: err.message, /*stack: err.stack*/}); //let's hide callstack for now
 });
 
-function start() {
-    models.sequelize.sync(/*{force: true}*/).then(function() {
-        var port = process.env.PORT || '8080';
-        app.listen(port);
-        console.log("Express server listening on port %d in %s mode", port, app.settings.env);
+process.on('uncaughtException', function (err) {
+    //TODO report this to somewhere!
+    logger.error((new Date).toUTCString() + ' uncaughtException:', err.message)
+    logger.error(err.stack)
+    //process.exit(1); //some people think we should do this.. but I am not so sure..
+})
+
+exports.app = app;
+exports.start = function() {
+    models.sequelize.sync({force: true}).then(function() {
+        var port = process.env.PORT || config.express.port || '8080';
+        var host = process.env.HOST || config.express.host || 'localhost';
+        app.listen(port, host, function() {
+            console.log("Profile service running on %s:%d in %s mode", host, port, app.settings.env);
+        });
     });
 }
-
-exports.start = start;
-exports.app = app;
 
