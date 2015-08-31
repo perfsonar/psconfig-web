@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('app', [
+var app = angular.module('sca', [
     'app.config',
     'ngSanitize',
     'ngRoute',

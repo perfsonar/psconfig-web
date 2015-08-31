@@ -34,7 +34,7 @@ router.put('/public', jwt({secret: config.express.jwt.public_key}), function(req
         profile.public = req.body;
 
         profile.save().then(function() {
-            res.json({message: "Updated!"});
+            res.json({message: "Public profile updated!"});
         });
     });
 });
