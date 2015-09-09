@@ -1,21 +1,10 @@
-'use strict';
 
-/*
- * Right now, we are going to have a single module for our app which contains
- * all controllers. In the future, we should refactor into multiple modules. When I do, don't forget
- * to add it to app.js's module list
- * */
 
-/*
-var controllers = angular.module('profileControllers', [
-    'ui.bootstrap',
-]);
-*/
+app.controller('SettingsController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper',
+function($scope, appconf, $route, toaster, $http, jwtHelper) {
+    $scope.form_profile = {}; //to be loaded later
 
-app.controller('SettingsController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', '$cookies', '$location',
-function($scope, appconf, $route, toaster, $http, jwtHelper, $cookies, $location) {
-    $scope.form_profile  = null; //to be loaded later
-
+    /* now performed via router config
     //forward to auth page if jwt is missing
     var jwt = localStorage.getItem(appconf.jwt_id);
     if(jwt == null || jwtHelper.isTokenExpired(jwt)) {
@@ -23,19 +12,22 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, $cookies, $location
         window.location = appconf.auth_url;
         return;
     }
+    */
+    var jwt = localStorage.getItem(appconf.jwt_id);
+    var user = jwtHelper.decodeToken(jwt);
 
-    $http.get(appconf.api+'/public')
+    $http.get(appconf.api+'/public/'+user.sub)
     .success(function(profile, status, headers, config) {
-        //console.dir(profile);
-        $scope.form_profile  = profile;
+        $scope.form_profile = profile;
     })
     .error(function(data, status, headers, config) {
         if(data && data.message) {
             toaster.error(data.message);
         }
     }); 
+
     $scope.submit_profile = function() {
-        $http.put(appconf.api+'/public', $scope.form_profile)
+        $http.put(appconf.api+'/public/'+user.sub, $scope.form_profile)
         .success(function(data, status, headers, config) {
             toaster.success(data.message);
         })
@@ -44,14 +36,45 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, $cookies, $location
         });         
     }
 
+    /*
+    function findMenuItem(id, ms) {
+        for(var i = 0;i< ms.length;++i) {
+            var m = ms[i]; 
+            if(m.id == id) return m;
+            if(m.submenu) {
+                var found = findMenuItem(id, m.submenu); //recurse into submenu
+                if(found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+    */
+    
     //load menu
-    //$scope.curpage = $location.path();
     $http.get(appconf.shared_api+'/menu')
     .success(function(menu) {
         $scope.menu = menu;
-        $scope.settings_menu = menu[0];
+
+        /*
+        //massage menu before setting
+        var user_menu = findMenuItem('user', menu);
+        //user_menu.label = $scope.form_profile.fullname;
+        user_menu.label = function() { return "yoo";};
+        */
+
+        //split menu into each menues
+        menu.forEach(function(m) {
+            switch(m.id) {
+            case 'top': 
+                $scope.top_menu = m;
+                break;
+            case 'settings':
+                $scope.settings_menu = m;
+                break;
+            }
+        });
     });
 }]);
-
-
 

@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('sca', [
+var app = angular.module('app', [
     'app.config',
     'ngSanitize',
     'ngRoute',
@@ -9,18 +9,21 @@ var app = angular.module('sca', [
     'toaster',
     'angular-loading-bar',
     'angular-jwt',
+    'sca',
 ]);
 
-
 //show loading bar at the top
-app.config(['cfpLoadingBarProvider', function(cfpLoadingBarProvider) {
+app.config(['cfpLoadingBarProvider', '$logProvider', function(cfpLoadingBarProvider, $logProvider) {
+    //console.log("bar provider");
     cfpLoadingBarProvider.includeSpinner = false;
+    //$logProvider.debugEnabled(true); //I read it's enabled by default
 }]);
 
-/*
 //configure route
 app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
+    //console.log("router provider");
     $routeProvider.
+    /*
     when('/login', {
         templateUrl: 't/login.html',
         controller: 'LoginController'
@@ -37,13 +40,14 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         templateUrl: 't/register.html',
         controller: 'RegisterController'
     })
-    when('/', {
+    */
+    when('/settings', {
         templateUrl: 't/settings.html',
         controller: 'SettingsController',
         requiresLogin: true
     })
     .otherwise({
-        redirectTo: '/'
+        redirectTo: '/settings'
     });
     
     //console.dir($routeProvider);
@@ -64,7 +68,6 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         }
     });
 }]);
-*/
 
 //configure httpProvider to send jwt unless skipAuthorization is set in config (not tested yet..)
 app.config(['appconf', '$httpProvider', 'jwtInterceptorProvider', 
@@ -76,6 +79,10 @@ function(appconf, $httpProvider, jwtInterceptorProvider) {
         }
         var jwt = localStorage.getItem(appconf.jwt_id);
         if(!jwt) return null; //not jwt
+
+        //TODO - I should probably put this in $interval instead so that jwt will be renewed regardless
+        //of if user access server or not.. (as long as the page is opened?)
+        //(also, make it part of shared or auth module?)
         var expdate = jwtHelper.getTokenExpirationDate(jwt);
         var ttl = expdate - Date.now();
         if(ttl < 0) {
@@ -101,5 +108,4 @@ function(appconf, $httpProvider, jwtInterceptorProvider) {
     }
     $httpProvider.interceptors.push('jwtInterceptor');
 }]);
-
 

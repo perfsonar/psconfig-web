@@ -25,7 +25,7 @@ var Profile = sequelize.define('Profile', {
         }
     },
 
-    //private profile (that user wants to share with other users)
+    //private profile
     private: {
         type: Sequelize.TEXT,
         defaultValue: '{}',

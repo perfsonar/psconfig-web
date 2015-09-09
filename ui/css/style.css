@@ -20,7 +20,13 @@ body {
   margin-bottom: 0px;
 }
 .header {
-  padding: 15px;
-  padding-left: 25px;
+  padding: 10px;
+  padding-left: 20px;
+  background-color: #eee;
+}
+.header h2 {
+  margin: 5px;
+}
+.settings li.heading {
   background-color: #eee;
 }
