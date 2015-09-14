@@ -11,7 +11,7 @@ var models = require('./models');
 
 //for retrieving public profile
 //since it's *public* profile, no access control is performend on this
-router.get('/public/:id', /*jwt({secret: config.express.jwt.public_key}),*/ function(req, res, next) {
+router.get('/public/:id', /*jwt({secret: config.express.jwt.secret}),*/ function(req, res, next) {
     /*
     if(req.user.scopes.common.indexOf("user") === -1) {
         return res.send(401, {message: "Unauthorized"});
@@ -29,7 +29,7 @@ router.get('/public/:id', /*jwt({secret: config.express.jwt.public_key}),*/ func
 })
 
 //for updating public profile
-router.put('/public/:id', jwt({secret: config.express.jwt.public_key}), function(req, res, next) {
+router.put('/public/:id', jwt({secret: config.express.jwt.secret}), function(req, res, next) {
 
     //needs to have user scope
     if(req.user.scopes.common.indexOf("user") == -1) {
@@ -53,7 +53,7 @@ router.put('/public/:id', jwt({secret: config.express.jwt.public_key}), function
 });
 
 //retreieve private profile
-router.get('/private/:id', jwt({secret: config.express.jwt.public_key}), function(req, res, next) {
+router.get('/private/:id', jwt({secret: config.express.jwt.secret}), function(req, res, next) {
 
     //needs to have user scope
     if(req.user.scopes.common.indexOf("user") == -1) {
@@ -75,7 +75,7 @@ router.get('/private/:id', jwt({secret: config.express.jwt.public_key}), functio
 })
 
 //for updating private profile
-router.put('/public/:id', jwt({secret: config.express.jwt.public_key}), function(req, res, next) {
+router.put('/public/:id', jwt({secret: config.express.jwt.secret}), function(req, res, next) {
 
     //needs to have user scope
     if(req.user.scopes.common.indexOf("user") == -1) {
