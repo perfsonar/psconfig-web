@@ -1,23 +1,82 @@
 
+//TODO - I am not sure if this is really worth existing
+app.factory('profile', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
+    var jwt = localStorage.getItem(appconf.jwt_id);
+    var user = jwtHelper.decodeToken(jwt);
+    var pub = {fullname: null};
 
+    $http.get(appconf.profile_api+'/public/'+user.sub)
+    .success(function(profile, status, headers, config) {
+        for(var k in profile) {
+            pub[k] = profile[k];
+        }
+    });
+    return {
+        pub: pub,
+    }
+}]);
+
+/*
+//TODO - I am not sure if this is really worth existing
+app.factory('menu', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
+    var menu = [];
+
+    function getMenu = function() {
+        return $http.get(appconf.shared_api+'/menu')
+    }
+    return {
+        getMenu: getMenu
+    }
+}]);
+*/
+
+app.controller('HeaderController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper',
+function($scope, appconf, $route, toaster, $http, jwtHelper) {
+    $scope.title = appconf.title;
+}]);
+
+app.controller('AboutController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'profile', 
+function($scope, appconf, $route, toaster, $http, jwtHelper, profile) {
+    $scope.profile = profile.pub;
+
+    $http.get(appconf.shared_api+'/menu', {cache: true})
+    .then(function(res) {
+        if(res.status != 200) return toaster.error("Failed to load menu");
+        res.data.forEach(function(m) {
+            switch(m.id) {
+            case 'top':
+                console.dir(m);
+                $scope.top_menu = m;
+                break;
+            /*
+            case 'topright':
+                $scope.topright_menu = m;
+                break;
+            */
+            case 'settings':
+                $scope.settings_menu = m;
+                break;
+            }
+        });
+    });
+
+}]);
+
+app.controller('DashboardController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper',
+function($scope, appconf, $route, toaster, $http, jwtHelper) {
+    //nothing yet.
+}]);
+
+/*
 app.controller('SettingsController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper',
 function($scope, appconf, $route, toaster, $http, jwtHelper) {
     $scope.form_profile = {}; //to be loaded later
     $scope.user = null;
 
-    /* now performed via router config
-    //forward to auth page if jwt is missing
-    var jwt = localStorage.getItem(appconf.jwt_id);
-    if(jwt == null || jwtHelper.isTokenExpired(jwt)) {
-        localStorage.setItem('post_auth_redirect', window.location.toString());
-        window.location = appconf.auth_url;
-        return;
-    }
-    */
     var jwt = localStorage.getItem(appconf.jwt_id);
     var user = jwtHelper.decodeToken(jwt);
 
-    $http.get(appconf.api+'/public/'+user.sub)
+    $http.get(appconf.profile_api+'/public/'+user.sub)
     .success(function(profile, status, headers, config) {
         $scope.form_profile = profile;
     })
@@ -37,13 +96,6 @@ function($scope, appconf, $route, toaster, $http, jwtHelper) {
     $http.get(appconf.shared_api+'/menu')
     .success(function(menu) {
         $scope.menu = menu;
-
-        /*
-        //massage menu before setting
-        var user_menu = findMenuItem('user', menu);
-        //user_menu.label = $scope.form_profile.fullname;
-        user_menu.label = function() { return "yoo";};
-        */
 
         //split menu into each menues
         menu.forEach(function(m) {
@@ -67,22 +119,6 @@ function($scope, appconf, $route, toaster, $http, jwtHelper) {
             toaster.error(data.message);
         });         
     }
-
-    /*
-    function findMenuItem(id, ms) {
-        for(var i = 0;i< ms.length;++i) {
-            var m = ms[i]; 
-            if(m.id == id) return m;
-            if(m.submenu) {
-                var found = findMenuItem(id, m.submenu); //recurse into submenu
-                if(found != null) {
-                    return found;
-                }
-            }
-        }
-        return null;
-    }
-    */
     
 }]);
-
+*/

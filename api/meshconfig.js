@@ -3,7 +3,8 @@
 
 //var winston = require('winston');
 var server = require('./server');
-server.start(function() {
+server.start(function(err) {
+    if(err) throw err;
     console.log("waiting for incoming connections...");
 });
 

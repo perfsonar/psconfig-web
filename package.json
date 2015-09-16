@@ -1,7 +1,7 @@
 {
-  "name": "profile",
+  "name": "perfsonar-meshconfig-admin",
   "version": "0.0.0",
-  "description": "",
+  "description": "Tools to generate / publish meshconfig",
   "scripts": {
     "test": "mocha"
   },
@@ -12,10 +12,12 @@
     "express-jwt": "~3.0.1",
     "express-validator": "~2.14.2",
     "express-winston": "~0.3.1",
-    "morgan": "~1.6.1",
     "sequelize": "~3.5.1",
     "body-parser": "~1.13.3",
     "sqlite3": "~3.0.10",
     "winston": "~1.0.1"
+  },
+  "devDependencies": {
+    "assert": "~1.3.0"
   }
 }

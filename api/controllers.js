@@ -4,21 +4,18 @@
 var express = require('express');
 var router = express.Router();
 var jwt = require('express-jwt');
+var winston = require('winston');
 
 //mine
 var config = require('./config/config');
-var models = require('./models');
+var logger = new winston.Logger(config.logger.winston);
+var db = require('./models');
 
+/*
 //for retrieving public profile
 //since it's *public* profile, no access control is performend on this
-router.get('/public/:id', /*jwt({secret: config.express.jwt.secret}),*/ function(req, res, next) {
-    /*
-    if(req.user.scopes.common.indexOf("user") === -1) {
-        return res.send(401, {message: "Unauthorized"});
-    }
-    */
-    
-    models.Profile.findOne({where: {user_id: /*req.user.sub*/req.params.id}}).then(function(profile) {
+router.get('/public/:id', function(req, res, next) {
+    models.Profile.findOne({where: {user_id: req.params.id}}).then(function(profile) {
         if(profile) {
             res.json(profile.public);
         } else {
@@ -27,10 +24,12 @@ router.get('/public/:id', /*jwt({secret: config.express.jwt.secret}),*/ function
         }
     });
 })
+*/
 
+
+/*
 //for updating public profile
 router.put('/public/:id', jwt({secret: config.express.jwt.secret}), function(req, res, next) {
-
     //needs to have user scope
     if(req.user.scopes.common.indexOf("user") == -1) {
         return res.send(401, {message: "Unauthorized"});
@@ -51,7 +50,9 @@ router.put('/public/:id', jwt({secret: config.express.jwt.secret}), function(req
         });
     });
 });
+*/
 
+/*
 //retreieve private profile
 router.get('/private/:id', jwt({secret: config.express.jwt.secret}), function(req, res, next) {
 
@@ -64,7 +65,7 @@ router.get('/private/:id', jwt({secret: config.express.jwt.secret}), function(re
         if(req.params.id != req.user.sub) return res.send(401, {message: "Unauthorized"});
     }
     
-    models.Profile.findOne({where: {user_id: /*req.user.sub*/req.params.id}}).then(function(profile) {
+    models.Profile.findOne({where: {user_id: req.params.id}}).then(function(profile) {
         if(profile) {
             res.json(profile.private);
         } else {
@@ -73,7 +74,9 @@ router.get('/private/:id', jwt({secret: config.express.jwt.secret}), function(re
         }
     });
 })
+*/
 
+/*
 //for updating private profile
 router.put('/public/:id', jwt({secret: config.express.jwt.secret}), function(req, res, next) {
 
@@ -97,5 +100,6 @@ router.put('/public/:id', jwt({secret: config.express.jwt.secret}), function(req
         });
     });
 });
+*/
 
 module.exports = router;

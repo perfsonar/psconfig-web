@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html ng-app="app">
-<head>
+<head ng-controller="HeaderController">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="initial-scale=1, width=device-width">
-    <title>SCA Profile Service</title>
+    <title ng-bind="title">Loading..</title>
 
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
     <!--<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css">-->
@@ -18,19 +18,13 @@
     <link rel="stylesheet" href="bower_components/angularjs-toaster/toaster.min.css">
     <link rel="stylesheet" href="bower_components/angular/angular-csp.css">
 
-    <!-- TODO make this configurable? don't forget the shared/css/style.css -->
-    <link rel="stylesheet" href="https://soichi7.ppa.iu.edu/shared/css/style.css">
+    <link rel="stylesheet" href="/shared/css/style.css">
 
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body ng-cloak>
     <toaster-container toaster-options="{'position-class': 'toast-bottom-full-width'}"></toaster-container>
     <ng-view></ng-view>
-
-    <!--
-    <div ng-include="'t/settings.html'"></div>
-    -->
-
     <script src="bower_components/jquery/dist/jquery.min.js"></script><!--bootstrap requires jquery-->
     <script src="bower_components/angular/angular.min.js"></script>
     <script src="bower_components/angular-route/angular-route.min.js"></script>
@@ -48,32 +42,30 @@
     <script>
     'use strict';
     angular.module('app.config', []).constant('appconf', {
-        title: 'Profile Service',
-        admin_email: 'hayashis@iu.edu',
-        version: '0.0.1',
+        //title to display
+        title: 'MeshConfig Administrator',
 
-        //url base for sca-profile api
-        api: 'https://soichi7.ppa.iu.edu/api/profile',
+        //url base for meshconfig api
+        api: '/api/meshconfig',
+
+        profile_api: '/api/profile',
+        profile_url: '/profile',
 
         //shared servive api and ui urls (for menus and stuff)
-        shared_api: 'https://soichi7.ppa.iu.edu/api/shared',
-        shared_url: 'https://soichi7.ppa.iu.edu/shared',
+        shared_api: '/api/shared',
+        shared_url: '/shared',
 
         //authentcation service API to refresh token, etc.
-        auth_api: 'https://soichi7.ppa.iu.edu/api/auth',
+        auth_api: '/api/auth',
         //authentication service URL to jump if user needs to login
-        auth_url: 'https://soichi7.ppa.iu.edu/auth',
+        auth_url: '/auth',
 
         jwt_id: 'jwt'
     });
-
-    //load shared.js (doesn't work!)
-    //var script = document.createElement('script');
-    //script.src = "https://soichi7.ppa.iu.edu/shared/shared.js";
     </script>
 
     <!-- TODO make this configurable? don't forget the shared/css/style.css -->
-    <script src="https://soichi7.ppa.iu.edu/shared/shared.js"></script>
+    <script src="/shared/shared.js"></script>
 
     <script src="js/app.js"></script>
     <script src="js/controllers.js"></script>

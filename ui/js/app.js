@@ -14,15 +14,17 @@ var app = angular.module('app', [
 
 //show loading bar at the top
 app.config(['cfpLoadingBarProvider', '$logProvider', function(cfpLoadingBarProvider, $logProvider) {
-    //console.log("bar provider");
     cfpLoadingBarProvider.includeSpinner = false;
-    //$logProvider.debugEnabled(true); //I read it's enabled by default
 }]);
 
 //configure route
 app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
     //console.log("router provider");
     $routeProvider.
+    when('/about', {
+        templateUrl: 't/about.html',
+        controller: 'AboutController'
+    })
     /*
     when('/login', {
         templateUrl: 't/login.html',
@@ -36,18 +38,14 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         templateUrl: 't/resetpass.html',
         controller: 'ResetpassController'
     })
-    .when('/register', {
-        templateUrl: 't/register.html',
-        controller: 'RegisterController'
-    })
     */
-    when('/settings', {
-        templateUrl: 't/settings.html',
-        controller: 'SettingsController',
+    .when('/dashboard', {
+        templateUrl: 't/dashboard.html',
+        controller: 'DashboardController',
         requiresLogin: true
     })
     .otherwise({
-        redirectTo: '/settings'
+        redirectTo: '/about'
     });
     
     //console.dir($routeProvider);
