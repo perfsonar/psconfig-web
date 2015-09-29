@@ -1,3 +1,8 @@
+#sidebar-wrapper {
+  background-color: #333;
+  box-shadow: inset 0px 3px 2px 0px #222;
+}
+
 body {
   font-family: 'Lato', serif;
 }
@@ -29,4 +34,12 @@ body {
 }
 .settings li.heading {
   background-color: #eee;
+}
+.table.clickable tr:hover {
+  cursor: pointer;
+  background-color: #eee;
+}
+span.email {
+  color: #666;
+  font-family: Monaco, Menlo, Consolas, 'Courier New', monospace;
 }

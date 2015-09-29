@@ -9,7 +9,8 @@ var app = angular.module('app', [
     'toaster',
     'angular-loading-bar',
     'angular-jwt',
-    'sca',
+    'ui.select',
+    'sca-shared',
 ]);
 
 //show loading bar at the top
@@ -25,6 +26,21 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         templateUrl: 't/about.html',
         controller: 'AboutController'
     })
+    .when('/home', {
+        templateUrl: 't/home.html',
+        controller: 'HomeController',
+        requiresLogin: true,
+    })
+    .when('/testspecs', {
+        templateUrl: 't/testspecs.html',
+        controller: 'TestspecsController',
+        requiresLogin: true,
+    })
+    .when('/testspec/:id', {
+        templateUrl: 't/testspec.html',
+        controller: 'TestspecController',
+        requiresLogin: true,
+    })
     /*
     when('/login', {
         templateUrl: 't/login.html',
@@ -39,11 +55,6 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         controller: 'ResetpassController'
     })
     */
-    .when('/dashboard', {
-        templateUrl: 't/dashboard.html',
-        controller: 'DashboardController',
-        requiresLogin: true
-    })
     .otherwise({
         redirectTo: '/about'
     });
@@ -56,9 +67,7 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         if(next.requiresLogin) {
             var jwt = localStorage.getItem(appconf.jwt_id);
             if(jwt == null || jwtHelper.isTokenExpired(jwt)) {
-                //TODO - use $cookies.set("messages") to send messages to user service
-                //toaster.warning("Please login first");
-                //localStorage.setItem('post_auth_redirect', next.originalPath);
+                //TODO - use $cookies.set("messages") to send messages to user service ("please login first" or such..)
                 localStorage.setItem('post_auth_redirect', window.location.toString());
                 window.location = appconf.auth_url;
                 event.preventDefault();

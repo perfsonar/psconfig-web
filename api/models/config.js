@@ -15,7 +15,7 @@ var logger = new winston.Logger(config.logger.winston);
 
 module.exports = function(sequelize, DataTypes) {
     return sequelize.define('Config', {
-        //nothing on its own
+        desc: Sequelize.STRING,
     }, {
         classMethods: {
         },

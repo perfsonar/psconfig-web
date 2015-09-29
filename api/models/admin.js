@@ -15,7 +15,7 @@ var logger = new winston.Logger(config.logger.winston);
 
 module.exports = function(sequelize, DataTypes) {
     return sequelize.define('Admin', {
-        user_id: Sequelize.STRING, //as presented by auth service (jwt.sid)
+        sub: Sequelize.STRING, //as presented by auth service user id (jwt.sub)
     }, {
         classMethods: {
         },

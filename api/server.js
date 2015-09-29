@@ -21,10 +21,7 @@ app.use(bodyParser.json()); //parse application/json
 app.use(expressWinston.logger(config.logger.winston));
 
 //setup routes
-app.use('/', require('./controllers'));
-app.get('/health', function(req, res) {
-    res.json({status: 'ok'});
-});
+app.use('/', require('./router'));
 
 //error handling
 app.use(expressWinston.errorLogger(config.logger.winston)); 

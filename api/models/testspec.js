@@ -17,7 +17,7 @@ module.exports = function(sequelize, DataTypes) {
     return sequelize.define('Testspec', {
         service_type: Sequelize.STRING, 
         
-        //array of host ids (client-uuid in sLS)
+        desc: Sequelize.STRING,
         specs: {
             type: Sequelize.TEXT,
             defaultValue: '{}',

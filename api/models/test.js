@@ -18,6 +18,7 @@ module.exports = function(sequelize, DataTypes) {
         service_type: Sequelize.STRING, 
         mesh_type: Sequelize.STRING, 
         enabled: { type: Sequelize.BOOLEAN, defaultValue: true },
+        desc: Sequelize.STRING,
     }, {
         classMethods: {
         },

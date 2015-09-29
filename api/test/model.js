@@ -3,11 +3,12 @@ var assert = require("assert");
 var db = require('../models');
 
 describe('models', function() {
+    var testspec = null;
     var admins = [];
     describe('#Admin', function () {
         it('create/find admin test1', function (done) {
-            db.Admin.create({user_id: "test1"}).then(function(new_a) {
-                db.Admin.findOne({where: {user_id: new_a.user_id}}).then(function(a) {
+            db.Admin.create({sub: "test1"}).then(function(new_a) {
+                db.Admin.findOne({where: {sub: new_a.sub}}).then(function(a) {
                     admins.push(a);
                     if(a) done();
                     else done(new Error("couldn't create admin test1"));
@@ -15,11 +16,36 @@ describe('models', function() {
             });
         });
         it('create/find admin test2', function (done) {
-            db.Admin.create({user_id: "test2"}).then(function(new_a) {
-                db.Admin.findOne({where: {user_id: new_a.user_id}}).then(function(a) {
+            db.Admin.create({sub: "test2"}).then(function(new_a) {
+                db.Admin.findOne({where: {sub: new_a.sub}}).then(function(a) {
                     admins.push(a);
                     if(a) done();
                     else done(new Error("couldn't create admin test2"));
+                });
+            });
+        });
+
+        //permanent test data
+        var pa;
+        it('create/find admin', function (done) {
+            db.Admin.create({sub: "1"}).then(function(_a) {
+                db.Admin.findOne({where: {sub: _a.sub}}).then(function(a) {
+                    pa = a;
+                    done();
+                });
+            });
+        });
+        it('create testspec2', function (done) {
+            db.Testspec.create({service_type: "bwctl", specs: {some: 'value', another: 'stuff'}}).then(function(new_t) {
+                new_t.setAdmins([pa]).then(function() {
+                    done();
+                });
+            });
+        });
+        it('create testspec2', function (done) {
+            db.Testspec.create({service_type: "bwctl", specs: {some: 'value2', another: 'stuff2'}}).then(function(new_t) {
+                new_t.setAdmins([pa]).then(function() {
+                    done();
                 });
             });
         });
@@ -27,7 +53,7 @@ describe('models', function() {
     describe('#Hostgroup', function () {
         var test_hostgroup = null
         it('create/find hostgroup', function (done) {
-            db.Hostgroup.create({service_type: "test_service", hosts: ["host1", "host2","host3"]}).then(function(new_h) {
+            db.Hostgroup.create({service_type: "test", hosts: ["host1", "host2","host3"]}).then(function(new_h) {
                 db.Hostgroup.findOne({where: {id: new_h.id}}).then(function(h) {
                     test_hostgroup = h;
                     if(h) {
@@ -41,7 +67,7 @@ describe('models', function() {
             test_hostgroup.setAdmins(admins).then(function() {
                 test_hostgroup.getAdmins().then(function(admins) {
                     for(var i in admins) {
-                        console.log(admins[i].user_id);
+                        console.log(admins[i].sub);
                     }
                     console.log("added admin");
                     done();
@@ -55,24 +81,46 @@ describe('models', function() {
             });
         });
     });
+    describe('#testspecs', function () {
+        it('create/find testspecs', function (done) {
+            db.Testspec.create({service_type: "test", specs: {some: 'value', another: 'stuff'}}).then(function(new_t) {
+                db.Testspec.findOne({where: {id: new_t.id}}).then(function(_testspec) {
+                    _testspec.setAdmins(admins).then(function() {
+                        testspec = _testspec;
+                        if(testspec) {
+                            assert.deepEqual(testspec.specs, {some: 'value', another: 'stuff'});
+                            done();
+                        }
+                        else done(new Error("couldn't find testspec with id:"+new_t.id));
+                    });
+                });
+            });
+        });
+    });
 
     describe('#cleanup', function () {
         it('remove hostgroups', function (done) {
-            db.Hostgroup.destroy({where: {service_type: "test_service"}}).then(function(i) {
+            db.Hostgroup.destroy({where: {service_type: "test"}}).then(function(i) {
                 if(i == 1) done();
                 else done(new Error("couldn't destroy exactly 1 test host group.. got "+i));
             });
         });
         it('remove test admin1', function (done) {
-            db.Admin.destroy({where: {user_id: "test1"}}).then(function(i) {
+            db.Admin.destroy({where: {sub: "test1"}}).then(function(i) {
                 if(i == 1) done();
                 else done(new Error("couldn't destroy exactly 1 test admin"));
             });
         });
         it('remove test admin2', function (done) {
-            db.Admin.destroy({where: {user_id: "test2"}}).then(function(i) {
+            db.Admin.destroy({where: {sub: "test2"}}).then(function(i) {
                 if(i == 1) done();
                 else done(new Error("couldn't destroy exactly 1 test admin"));
+            });
+        });
+        it('remove testspec', function (done) {
+            db.Testspec.destroy({where: {id: testspec.id}}).then(function(i) {
+                if(i == 1) done();
+                else done(new Error("couldn't destroy exactly 1 testspec"));
             });
         });
     });
