@@ -1,0 +1,44 @@
+<sca-menubar menu="menu.top" active="'meshconfig'" profile="profile"></sca-menubar>
+<sca-menutab menu="menu.meshconfig" active="'testspecs'"></sca-menutab>
+<div class="container-fluid">
+    <!--<h3>test specs</h3>-->
+    <div class="panel panel-default" ng-repeat="service_type in serverconf.service_types">
+    <div class="panel-heading">
+        {{service_type.label}}
+    </div>
+    <div class="panel-body">
+        <button class="btn btn-sm pull-right" ng-click="create(service_type.id)">Add New <!--{{service_type.label}} Test Spec--></button>
+        TODO.. info about testspecs on this service types
+    </div><!--panel-body-->
+    <table class="table">
+    <thead>
+        <tr><th>ID</th><th>Name</th><th>Specs</th><th>Admins</th></tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="spec in testspecs[service_type.id]" ng-class="{clickable: spec.canedit == true, disabled: spec.canedit == false}" ng-click="edit(spec)">
+            <th>{{spec.id}}</th>
+            <td>{{spec.desc}}</td>
+            <td>
+                <pre> {{spec.specs}} </pre>
+            </td>
+            <td>
+                <ul>
+                    <li ng-repeat="id in spec.admins">
+                        {{users[id]}}
+                    </li>
+                </ul>
+            </td>
+            <!--
+            <td class="record-control">
+                <div class="btn-group" role="group" aria-label="...">
+                    <button type="button" class="btn btn-sm btn-default">Delete</button>
+                    <button type="button" class="btn btn-sm btn-default">Edit</button>
+                </div> 
+            </td>
+            -->
+        </tr>
+    </tbody>
+    </div><!--panel-->
+</div>
+
+
