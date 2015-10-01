@@ -16,16 +16,24 @@ var logger = new winston.Logger(config.logger.winston);
 module.exports = function(sequelize, DataTypes) {
     return sequelize.define('Testspec', {
         service_type: Sequelize.STRING, 
-        
         desc: Sequelize.STRING,
         specs: {
             type: Sequelize.TEXT,
-            defaultValue: '{}',
+            //defaultValue: '{}',
             get: function () { 
                 return JSON.parse(this.getDataValue('specs'));
             },
             set: function (specs) {
                 return this.setDataValue('specs', JSON.stringify(specs));
+            }
+        },
+        admins: {
+            type: Sequelize.TEXT,
+            get: function () { 
+                return JSON.parse(this.getDataValue('admins'));
+            },
+            set: function (admins) {
+                return this.setDataValue('admins', JSON.stringify(admins));
             }
         },
     }, {

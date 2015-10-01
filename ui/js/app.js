@@ -13,6 +13,24 @@ var app = angular.module('app', [
     'sca-shared',
 ]);
 
+//http://plnkr.co/edit/YWr6o2?p=preview
+app.directive('ngConfirmClick', [
+    function() {
+        return {
+            link: function (scope, element, attr) {
+                var msg = attr.ngConfirmClick || "Are you sure?";
+                var clickAction = attr.confirmedClick;
+                element.bind('click',function (event) {
+                    if ( window.confirm(msg) ) {
+                        scope.$eval(clickAction)
+                    }
+                });
+            }
+        };
+    }
+])
+
+
 //show loading bar at the top
 app.config(['cfpLoadingBarProvider', '$logProvider', function(cfpLoadingBarProvider, $logProvider) {
     cfpLoadingBarProvider.includeSpinner = false;
@@ -37,6 +55,11 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         requiresLogin: true,
     })
     .when('/testspec/:id', {
+        templateUrl: 't/testspec.html',
+        controller: 'TestspecController',
+        requiresLogin: true,
+    })
+    .when('/newtestspec/:service_type', {
         templateUrl: 't/testspec.html',
         controller: 'TestspecController',
         requiresLogin: true,

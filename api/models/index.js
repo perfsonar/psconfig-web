@@ -30,12 +30,24 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 //relationships
-db.Hostgroup.hasMany(db.Admin);
-db.Testspec.hasMany(db.Admin);
-db.Test.hasMany(db.Hostgroup);
-db.Test.hasOne(db.Testspec);
-db.Config.hasMany(db.Admin);
-db.Config.hasMany(db.Test);
+/*
+db.Hostgroup.belongsToMany(db.Admin, {through: 'AdminHostgroup'});
+db.Admin.belongsToMany(db.Hostgroup, {through: 'AdminHostgroup'});
+
+db.Testspec.belongsToMany(db.Admin, {through: 'AdminTestspec'});
+db.Admin.belongsToMany(db.Testspec, {through: 'AdminTestspec'});
+*/
+db.Test.belongsToMany(db.Hostgroup, {through: 'HostgroupToTest'});
+db.Hostgroup.belongsToMany(db.Test, {through: 'HostgroupToTest'});
+
+/*
+db.Config.belongsToMany(db.Admin, {through: 'AdminConfig'});
+db.Admin.belongsToMany(db.Config, {through: 'AdminConfig'});
+*/
+db.Config.belongsToMany(db.Test, {through: 'TestConfig'});
+db.Test.belongsToMany(db.Config, {through: 'TestConfig'});
+
+//db.Test.hasOne(db.Testspec);
 db.Test.hasOne(db.Testspec, {as: 'agroup'}); //Test.getAgroup, Test.setAgroup
 db.Test.hasOne(db.Testspec, {as: 'bgroup'}); //Test.getBgroup, Test.setBgroup
 

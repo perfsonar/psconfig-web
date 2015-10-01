@@ -23,8 +23,8 @@
     "angular-ui": "angular-ui/ui-select",
     "angularjs-toaster": "~0.4.14",
     "bootstrap": "~3.3.2",
-    "fontawesome": "~4.3.0",
-    "simple-sidebar": "IronSummitMedia/startbootstrap-simple-sidebar"
+    "simple-sidebar": "IronSummitMedia/startbootstrap-simple-sidebar",
+    "font-awesome": "fontawesome#~4.4.0"
   },
   "overrides": {
     "simple-sidebar": {

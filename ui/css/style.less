@@ -38,12 +38,14 @@ body {
     }
 }
 
-.table.clickable {
-    tr:hover {
-        cursor: pointer;
-        background-color: #eee;
-    }
+tr.clickable:hover {
+    cursor: pointer;
+    background-color: #eee;
 }
+tr.disabled {
+    background-color: #ccc;
+}
+
 span.email {
     color: #666;
     font-family: Monaco, Menlo, Consolas, 'Courier New', monospace;

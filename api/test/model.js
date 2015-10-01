@@ -5,7 +5,8 @@ var db = require('../models');
 describe('models', function() {
     var testspec = null;
     var admins = [];
-    describe('#Admin', function () {
+    describe('#test data', function () {
+    /*
         it('create/find admin test1', function (done) {
             db.Admin.create({sub: "test1"}).then(function(new_a) {
                 db.Admin.findOne({where: {sub: new_a.sub}}).then(function(a) {
@@ -49,6 +50,17 @@ describe('models', function() {
                 });
             });
         });
+        */
+        it('create testspec', function (done) {
+            db.Testspec.create({desc: "testspec 1", service_type: "bwctl", specs: {some: 'value', another: 'stuff'}, admins: ["1", "2"]}).then(function(new_t) {
+                if(new_t) done();
+            });
+        });
+        it('create testspec', function (done) {
+            db.Testspec.create({desc: "testspec 2", service_type: "bwctl", specs: {some: 'value', another: 'stuff2'}, admins: ["1"]}).then(function(new_t) {
+                if(new_t) done();
+            });
+        });
     });
     describe('#Hostgroup', function () {
         var test_hostgroup = null
@@ -63,6 +75,7 @@ describe('models', function() {
                 });
             });
         });
+        /*
         it('adding hostgroup / admin relation', function (done) {
             test_hostgroup.setAdmins(admins).then(function() {
                 test_hostgroup.getAdmins().then(function(admins) {
@@ -80,19 +93,19 @@ describe('models', function() {
                 else done(new Error("couldn't find admin relationship"));
             });
         });
+        */
     });
     describe('#testspecs', function () {
         it('create/find testspecs', function (done) {
             db.Testspec.create({service_type: "test", specs: {some: 'value', another: 'stuff'}}).then(function(new_t) {
                 db.Testspec.findOne({where: {id: new_t.id}}).then(function(_testspec) {
-                    _testspec.setAdmins(admins).then(function() {
-                        testspec = _testspec;
-                        if(testspec) {
-                            assert.deepEqual(testspec.specs, {some: 'value', another: 'stuff'});
-                            done();
-                        }
-                        else done(new Error("couldn't find testspec with id:"+new_t.id));
-                    });
+                    //_testspec.setAdmins(admins).then(function() {
+                    testspec = _testspec;
+                    if(testspec) {
+                        assert.deepEqual(testspec.specs, {some: 'value', another: 'stuff'});
+                        done();
+                    } else done(new Error("couldn't find testspec with id:"+new_t.id));
+                    //);
                 });
             });
         });
@@ -105,6 +118,7 @@ describe('models', function() {
                 else done(new Error("couldn't destroy exactly 1 test host group.. got "+i));
             });
         });
+        /*
         it('remove test admin1', function (done) {
             db.Admin.destroy({where: {sub: "test1"}}).then(function(i) {
                 if(i == 1) done();
@@ -117,6 +131,7 @@ describe('models', function() {
                 else done(new Error("couldn't destroy exactly 1 test admin"));
             });
         });
+        */
         it('remove testspec', function (done) {
             db.Testspec.destroy({where: {id: testspec.id}}).then(function(i) {
                 if(i == 1) done();

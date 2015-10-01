@@ -21,7 +21,6 @@ app.factory('serverconf', ['appconf', '$http', 'jwtHelper', function(appconf, $h
 
 //just a service to load all users from auth service
 app.factory('users', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
-    var users = [];
     /*
     var jwt = localStorage.getItem(appconf.jwt_id);
     if(jwt) {
@@ -92,32 +91,41 @@ function($scope, appconf, $route, toaster, $http, jwtHelper) {
 
 app.controller('AboutController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'profile', 'menu',
 function($scope, appconf, $route, toaster, $http, jwtHelper, profile, menu) {
-    profile.then(function(_profile) {
-        $scope.profile = _profile;
-    });
+    if(profile) {
+        profile.then(function(_profile) { $scope.profile = _profile; });
+    }
     $scope.menu = menu;
 }]);
 
 app.controller('HomeController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'profile', 'menu', 
 function($scope, appconf, $route, toaster, $http, jwtHelper, profile, menu) {
-    profile.then(function(_profile) {
-        $scope.profile = _profile;
-    });
+    profile.then(function(_profile) { $scope.profile = _profile; });
     $scope.menu = menu;
 }]);
 
 //show all testsspecs
 app.controller('TestspecsController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'profile', 'menu', '$location', 'serverconf', 'users',
 function($scope, appconf, $route, toaster, $http, jwtHelper, profile, menu, $location, serverconf, users) {
-    profile.then(function(_profile) {
-        $scope.profile = _profile;
+    profile.then(function(_profile) { $scope.profile = _profile; });
+    /*
+    profile.then(function(_profile) { 
+        $scope.profiles = {};
+        _profile.forEach(function(profile) {
+            $scope.profiles[profile.sub] = profile.public;
+        });
     });
+    */
     $scope.menu = menu;
     serverconf.then(function(_serverconf) {
         $scope.serverconf = _serverconf;
     });
 
     users.then(function(_users) {
+        $scope.users = {};
+        _users.forEach(function(user) {
+            $scope.users[user.sub] = user.public;
+        });
+
         $http.get(appconf.api+'/testspecs' /*,{cache: true}*/)
         .then(function(res) {
             //sort based on service_types
@@ -128,22 +136,29 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, profile, menu, $loc
                     $scope.testspecs[type] = [];
                 }
                 
+                /*
                 //add user profile for each Admins
-                testspec.Admins.forEach(function(admin) {
+                var admins = {};
+                testspec.admins.forEach(function(sub) {
                     //look for the profile
                     _users.forEach(function(user) {
-                        if(admin.sub == user.sub) admin.public = user.public;
+                        if(sub == user.sub) admin[sub] = user.public;
                     });
                 });
+                testspec.admins = admins;
+                */
+
                 $scope.testspecs[type].push(testspec);
             });
         });
     });
 
+    $scope.edit = function(spec) {
+        if(spec.canedit) $location.path('/testspec/'+spec.id);
+    }
 
-    $scope.edit = function(id) {
-        //console.log("opening "+id);
-        $location.path('/testspec/'+id);
+    $scope.create = function(service_type) {
+        $location.path('/newtestspec/'+service_type);
     }
 }]);
 
@@ -161,21 +176,44 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, profile, menu, $loc
 
     $scope.users = []; //not yet loaded
     users.then(function(_users) {
-        $scope.users = _users;
-        $http.get(appconf.api+'/testspecs/'+$routeParams.id /*,{cache: true}*/)
-        .then(function(res) {
-            var testspec = res.data;
-            //convert to user object - so that select2 will recognize as already selected item
-            var admins = [];
-            testspec.Admins.forEach(function(admin) {
-                //look for the profile
-                _users.forEach(function(user) {
-                    if(admin.sub == user.sub) admins.push(user);
+        $scope.users = _users; //for admin selector
+
+        if($routeParams.id) {
+            //update
+            $http.get(appconf.api+'/testspecs/'+$routeParams.id /*,{cache: true}*/)
+            .then(function(res) {
+                var testspec = res.data;
+                //convert to user object - so that select2 will recognize as already selected item
+                var admins = [];
+                testspec.admins.forEach(function(id) {
+                    //look for the profile
+                    _users.forEach(function(user) {
+                        if(id == user.sub) admins.push(user);
+                    });
                 });
+                testspec.admins = admins;
+                $scope.testspec = testspec;
             });
-            testspec.Admins = admins;
-            $scope.testspec = testspec;
-        });
+            $scope.submit_type = "update";
+        }
+        if($routeParams.service_type) {
+            var jwt = localStorage.getItem(appconf.jwt_id);
+            var user = jwtHelper.decodeToken(jwt);
+            var admins = [];
+            //find user's profile
+            //console.dir(user);
+            //console.dir(_users);
+            _users.forEach(function(u) {
+                if(u.sub == user.sub) admins.push(u);
+            });
+            $scope.testspec = {
+                service_type:  $routeParams.service_type,
+                admins: admins,
+                specs: {},
+                desc: "",
+            };
+            $scope.submit_type = "create";
+        }
     });
 
     /*
@@ -193,12 +231,54 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, profile, menu, $loc
     ];
     */
 
-    $scope.submit = function() {
-        console.log("TODO - submit test spec");
+    function getdata() {
+        //create a copy so that UI doesn't break while saving..
+        var data = {
+            service_type: $scope.testspec.service_type,
+            desc: $scope.testspec.desc,
+            specs: {todo: "I need to convert form into spec that I can pass to server"},
+            admins: []
+        };
+        $scope.testspec.admins.forEach(function(admin) {
+            data.admins.push(admin.sub);
+        });
+        return data;
+    }
+
+    $scope.update = function() {
+        $http.put(appconf.api+'/testspecs/'+$routeParams.id, getdata())
+        .success(function(data, status, headers, config) {
+            $location.path("/testspecs");
+            toaster.success("Updated Successfully!");
+        })
+        .error(function(data, status, headers, config) {
+            toaster.error("Update failed!");
+        });         
+    }
+    $scope.create = function() {
+        $http.post(appconf.api+'/testspecs/', getdata())
+        .success(function(data, status, headers, config) {
+            $location.path("/testspecs");
+            toaster.success("Testspec created successfully!");
+        })
+        .error(function(data, status, headers, config) {
+            toaster.error("Creation failed!");
+        });           
     }
     $scope.cancel = function() {
         $location.path("/testspecs");
     }
+    $scope.remove = function() {
+        $http.delete(appconf.api+'/testspecs/'+$routeParams.id, getdata())
+        .success(function(data, status, headers, config) {
+            $location.path("/testspecs");
+            toaster.success("Deleted Successfully!");
+        })
+        .error(function(data, status, headers, config) {
+            toaster.error("Deletion failed!");
+        });       
+    }
+
 }]);
 
 /*
