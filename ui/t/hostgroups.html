@@ -1,0 +1,16 @@
+<sca-menubar menu="menu.top" active="'meshconfig'" profile="profile"></sca-menubar>
+<sca-menutab menu="menu.meshconfig" active="'hostgroups'"></sca-menutab>
+<div class="container-fluid">
+    hostgroups
+
+    <ui-select multiple ng-model="hosts" ng-disabled="disabled">
+        <ui-select-match placeholder="Enter city name">{{$item.formatted_address}}</ui-select-match>
+        <ui-select-choices repeat="address in addresses track by $index"
+             refresh="refreshAddresses($select.search)"
+             refresh-delay="0">
+            {{address.formatted_address}}
+        </ui-select-choices>
+    </ui-select>
+</div>
+
+

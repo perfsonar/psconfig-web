@@ -23,10 +23,10 @@ router.get('/', jwt({secret: config.express.jwt.secret, credentialsRequired: fal
             testspec.canedit = false;
             if(req.user) {
                 //if(~req.user.scopes.common.indexOf('admin') || db.Admin.isAdmin(testspec.Admins, req.user.sub)) {
-                console.dir(req.user);
-                console.dir(testspec.admins);
+                //console.dir(req.user);
+                //console.dir(testspec.admins);
                 if(~req.user.scopes.common.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
-                    logger.debug("can edit~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                    //logger.debug("can edit~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                     testspec.canedit = true;
                 }
             }
@@ -71,6 +71,7 @@ router.delete('/:id', jwt({secret: config.express.jwt.secret}), function(req, re
 
 router.put('/:id', jwt({secret: config.express.jwt.secret}), function(req, res, next) {
     var id = parseInt(req.params.id);
+    console.log("updating "+id);
     db.Testspec.findOne({where: {id: id}/*, include: [{
         model: db.Admin
     }]*/}).then(function(testspec) {
@@ -80,9 +81,9 @@ router.put('/:id', jwt({secret: config.express.jwt.secret}), function(req, res, 
         if(~req.user.scopes.common.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
             //TODO - should validate?
             testspec.desc = req.body.desc;
-            testspec.spec = req.body.spec;
+            testspec.specs = req.body.specs;
             testspec.admins = req.body.admins;
-            //console.dir(req.body);
+            console.dir(testspec);
             testspec.save().then(function() {
                 /*
                 //first I need to recreate all admin records

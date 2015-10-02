@@ -2,7 +2,6 @@
 
 var app = angular.module('app', [
     'app.config',
-    'ngSanitize',
     'ngRoute',
     'ngAnimate',
     'ngCookies',
@@ -11,6 +10,7 @@ var app = angular.module('app', [
     'angular-jwt',
     'ui.select',
     'sca-shared',
+    'ui.bootstrap',
 ]);
 
 //http://plnkr.co/edit/YWr6o2?p=preview
@@ -54,14 +54,9 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         controller: 'TestspecsController',
         requiresLogin: true,
     })
-    .when('/testspec/:id', {
-        templateUrl: 't/testspec.html',
-        controller: 'TestspecController',
-        requiresLogin: true,
-    })
-    .when('/newtestspec/:service_type', {
-        templateUrl: 't/testspec.html',
-        controller: 'TestspecController',
+    .when('/hostgroups', {
+        templateUrl: 't/hostgroups.html',
+        controller: 'HostgroupsController',
         requiresLogin: true,
     })
     /*
@@ -107,6 +102,13 @@ function(appconf, $httpProvider, jwtInterceptorProvider) {
         if (config.url.substr(config.url.length - 5) == '.html') {
             return null;
         }
+
+        //TODO - just for testing
+        if (~config.url.indexOf('googleapis.com')) {
+            console.log("decided not to send Authorization header");
+            return null;
+        }
+
         var jwt = localStorage.getItem(appconf.jwt_id);
         if(!jwt) return null; //not jwt
 
@@ -139,3 +141,114 @@ function(appconf, $httpProvider, jwtInterceptorProvider) {
     $httpProvider.interceptors.push('jwtInterceptor');
 }]);
 
+/*
+//TODO - I am not sure if this is really worth existing
+app.factory('profile', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
+    var jwt = localStorage.getItem(appconf.jwt_id);
+    if(jwt) {
+        var user = jwtHelper.decodeToken(jwt);
+        return $http.get(appconf.profile_api+'/public/'+user.sub)
+        .then(function(res) {
+            return res.data;
+        });
+    } else return null;
+}]);
+*/
+
+//just a service to load all users from auth service
+app.factory('serverconf', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
+    return $http.get(appconf.api+'/config')
+    .then(function(res) {
+        return res.data;
+    });
+}]);
+
+//just a service to load public profiles from all user
+//TODO - this loads the entire public profile records!! I should make it lazy load?
+app.factory('profiles', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
+    return $http.get(appconf.profile_api+'/users')
+    .then(function(res) {
+        var profiles = [];
+        //only pull public profile
+        res.data.forEach(function(profile) {
+            profile.public.sub = profile.sub;
+            profiles.push(profile.public);
+        });
+        return profiles;
+    });
+}]);
+
+//load menu and profile by promise chaining
+//http://www.codelord.net/2015/09/24/$q-dot-defer-youre-doing-it-wrong/
+//https://www.airpair.com/angularjs/posts/angularjs-promises
+app.factory('menu', ['appconf', '$http', '$q', 'jwtHelper', function(appconf, $http, $q, jwtHelper) {
+    var menu = {};
+    return $http.get(appconf.shared_api+'/menu').then(function(res) {
+        if(res.status != 200) return $q.reject("Failed to load menu");
+        //look for top menu 
+        //TODO - add ?id= param to shared_api/menu so that I don't have to do this - ant don't load unnecessary stuff
+        res.data.forEach(function(m) {
+            switch(m.id) {
+            case 'top':
+                menu.top = m;
+                break;
+            }
+        });
+        
+        //then load user profile (if we have jwt)
+        var jwt = localStorage.getItem(appconf.jwt_id);
+        if(!jwt) return menu;
+        var user = jwtHelper.decodeToken(jwt);
+        //TODO - jwt could be invalid 
+        return $http.get(appconf.profile_api+'/public/'+user.sub);
+    }).then(function(res) {
+        if(res.status != 200) return $q.reject("Failed to load profile");
+        menu._profile = res.data;
+        return menu;
+    });
+}]);
+
+
+//http://plnkr.co/edit/juqoNOt1z1Gb349XabQ2?p=preview
+/**
+ * AngularJS default filter with the following expression:
+ * "person in people | filter: {name: $select.search, age: $select.search}"
+ * performs a AND between 'name: $select.search' and 'age: $select.search'.
+ * We want to perform a OR.
+ */
+app.filter('propsFilter', function() {
+  return function(items, props) {
+    var out = [];
+
+    if (angular.isArray(items)) {
+      items.forEach(function(item) {
+        var itemMatches = false;
+
+        var keys = Object.keys(props);
+        for (var i = 0; i < keys.length; i++) {
+          var prop = keys[i];
+          var text = props[prop].toLowerCase();
+          if (item[prop].toString().toLowerCase().indexOf(text) !== -1) {
+            itemMatches = true;
+            break;
+          }
+        }
+
+        if (itemMatches) {
+          out.push(item);
+        }
+      });
+    } else {
+      // Let the output be the input untouched
+      out = items;
+    }
+
+    return out;
+  };
+});
+
+app.filter('specname',function(){
+    return function(input){
+        if(input) return input.replace(new RegExp('_', 'g'), ' ');
+    }
+});

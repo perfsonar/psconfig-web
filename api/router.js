@@ -4,6 +4,7 @@
 var express = require('express');
 var router = express.Router();
 var jwt = require('express-jwt');
+var _ = require('underscore');
 
 //mine
 var config = require('./config/config');
@@ -12,9 +13,30 @@ var testspecs = require('./controllers/testspecs');
 router.get('/health', function(req, res) {
     res.json({status: 'ok'});
 });
-router.get('/config', function(req, res) {
-    var conf = {};
-    conf.service_types = config.meshconfig.service_types;
+
+function get_menu(user) {
+    var scopes = {
+        common: []
+    };
+    if(user) scopes = user.scopes;
+    var menus = [];
+    config.meshconfig.menu.forEach(function(menu) {
+        if(menu.scope && !menu.scope(scopes)) return;
+        var _menu = _.clone(menu);
+        if(_menu.submenu) {
+            _menu.submenu = get_menu(_menu.submenu, scopes);
+        }
+        menus.push(_menu);
+    });
+    return menus;
+}
+
+router.get('/config', jwt({secret: config.express.jwt.secret, credentialsRequired: false}), function(req, res) {
+    var conf = {
+        service_types: config.meshconfig.service_types,
+        defaults: config.meshconfig.defaults,
+        menu: get_menu(req.user),
+    };
     res.json(conf);
 });
 router.use('/testspecs', testspecs);

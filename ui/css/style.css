@@ -46,3 +46,6 @@ span.email {
   color: #666;
   font-family: Monaco, Menlo, Consolas, 'Courier New', monospace;
 }
+th.specname {
+  text-transform: capitalize;
+}

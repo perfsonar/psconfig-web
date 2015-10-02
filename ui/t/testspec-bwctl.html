@@ -1,0 +1,60 @@
+<div class="form-group">
+    <label for="tool" class="col-sm-2 control-label">Tool</label>
+    <div class="col-sm-4">
+        <select class="form-control" ng-model="testspec.specs.tool" required>
+            <option value="bwctl/iperf3">bwctl/iperf3</option>
+        </select>
+        <p class="help-block">Tool to do the bandwidth test</p>
+    </div>
+    <label for="protocol" class="col-sm-2 control-label">Protocol</label>
+    <div class="col-sm-4">
+        <select class="form-control" ng-model="testspec.specs.protocol" required>
+            <option value="tcp">TCP</option>
+            <option value="udp">UDP</option>
+        </select>
+    </div>
+</div>
+<div class="form-group">
+    <label for="interval" class="col-sm-2 control-label">Interval</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" class="form-control" id="interval" ng-model="testspec.specs.interval" required>
+            <div class="input-group-addon">seconds</div>
+        </div>
+        <p class="help-block">Number of seconds between each test</p>
+    </div>
+    <label for="duration" class="col-sm-2 control-label">Duration</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" class="form-control" id="duration" ng-model="testspec.specs.duration" required>
+            <div class="input-group-addon">seconds</div>
+        </div>
+        <p class="help-block">Length of each test</p>
+    </div>
+</div>
+<div class="form-group">
+    <label for="omit_interval" class="col-sm-2 control-label">Omit Interval</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" class="form-control" id="omit_interval" ng-model="testspec.specs.omit_interval" required>
+            <div class="input-group-addon">seconds</div>
+        </div>
+        <p class="help-block">Number of first seconds to ignore for each test</p>
+    </div>
+    <label for="random_start_percentage" class="col-sm-2 control-label">Random Start Percentage</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" class="form-control" ida"random" ng-model="testspec.specs.random_start_percentage" required>
+            <div class="input-group-addon">%</div>
+        </div>
+        <p class="help-block">Randomize test start time by this amount</p>
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+        <div class="checkbox">
+            <label> <input type="checkbox" ng-model="testspec.specs.force_bidirectional"> Do Bidirectional test</label>
+        </div>
+    </div>
+</div>
+
