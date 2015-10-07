@@ -8,7 +8,6 @@ var _ = require('underscore');
 
 //mine
 var config = require('./config/config');
-var testspecs = require('./controllers/testspecs');
 
 router.get('/health', function(req, res) {
     res.json({status: 'ok'});
@@ -39,7 +38,10 @@ router.get('/config', jwt({secret: config.express.jwt.secret, credentialsRequire
     };
     res.json(conf);
 });
-router.use('/testspecs', testspecs);
+
+router.use('/testspecs', require('./controllers/testspecs'));
+router.use('/services', require('./controllers/services'));
+router.use('/hostgroups', require('./controllers/hostgroups'));
 
 module.exports = router;
 

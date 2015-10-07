@@ -99,15 +99,18 @@ app.config(['appconf', '$httpProvider', 'jwtInterceptorProvider',
 function(appconf, $httpProvider, jwtInterceptorProvider) {
     jwtInterceptorProvider.tokenGetter = function(jwtHelper, config, $http) {
         //don't send jwt for template requests
+        //(I don't think angular will ever load css/js - browsers do)
         if (config.url.substr(config.url.length - 5) == '.html') {
             return null;
         }
 
+        /*
         //TODO - just for testing
-        if (~config.url.indexOf('googleapis.com')) {
+        if (~config.url.indexOf('googleapis')) {
             console.log("decided not to send Authorization header");
             return null;
         }
+        */
 
         var jwt = localStorage.getItem(appconf.jwt_id);
         if(!jwt) return null; //not jwt
@@ -181,10 +184,9 @@ app.factory('profiles', ['appconf', '$http', 'jwtHelper', function(appconf, $htt
 //load menu and profile by promise chaining
 //http://www.codelord.net/2015/09/24/$q-dot-defer-youre-doing-it-wrong/
 //https://www.airpair.com/angularjs/posts/angularjs-promises
-app.factory('menu', ['appconf', '$http', '$q', 'jwtHelper', function(appconf, $http, $q, jwtHelper) {
+app.factory('menu', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
     var menu = {};
     return $http.get(appconf.shared_api+'/menu').then(function(res) {
-        if(res.status != 200) return $q.reject("Failed to load menu");
         //look for top menu 
         //TODO - add ?id= param to shared_api/menu so that I don't have to do this - ant don't load unnecessary stuff
         res.data.forEach(function(m) {
@@ -197,14 +199,19 @@ app.factory('menu', ['appconf', '$http', '$q', 'jwtHelper', function(appconf, $h
         
         //then load user profile (if we have jwt)
         var jwt = localStorage.getItem(appconf.jwt_id);
-        if(!jwt) return menu;
+        if(!jwt)  return menu;
         var user = jwtHelper.decodeToken(jwt);
         //TODO - jwt could be invalid 
         return $http.get(appconf.profile_api+'/public/'+user.sub);
+    }, function(err) {
+        console.log("failed to load menu");
     }).then(function(res) {
-        if(res.status != 200) return $q.reject("Failed to load profile");
+        //TODO - this function is called with either valid profile, or just menu if jwt is not provided... only do following if res is profile
+        //if(res.status != 200) return $q.reject("Failed to load profile");
         menu._profile = res.data;
         return menu;
+    }, function(err) {
+        console.log("couldn't load profile");
     });
 }]);
 

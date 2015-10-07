@@ -1,15 +1,62 @@
-   type              perfsonarbuoy/owamp  # Perform a constant
-low-bandwidth OWAMP test
-   packet_interval   0.1                  # Send 10 packets every second
-(i.e. pause 0.1 seconds between each packet)
-   loss_threshold    10                   # Wait no more than 10 seconds
-for a response
-   session_count     10800                # Refresh the test every half
-hour (once every 18000 packets)
-   sample_count      600                  # Send results back every 60
-seconds (once every 600 packets)
-   packet_padding    0                    # The size of the packets (not
-including the IP/UDP headers)
-   bucket_width      0.0001               # The granularity of the
-measurements
-   force_bidirectional 0                  # do bidirectional test
+<div class="form-group">
+    <label for="packet_interval" class="col-sm-2 control-label">Packet Interval</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" class="form-control" id="packet_interval" ng-model="testspec.specs.packet_interval" required>
+            <div class="input-group-addon">Packets Per Second</div>
+        </div>
+        <p class="help-block">Number of packets to send per seconds</p>
+    </div>
+    <label for="loss_threshold" class="col-sm-2 control-label">Loss threshold</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" class="form-control" id="loss_threshold" ng-model="testspec.specs.loss_threshold" required>
+            <div class="input-group-addon">Seconds</div>
+        </div>
+        <p class="help-block">Wait no more than this number of seconds for response</p>
+    </div>
+</div>
+<div class="form-group">
+    <label for="session_count" class="col-sm-2 control-label">Session Count</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" class="form-control" id="session_count" ng-model="testspec.specs.session_count" required>
+            <div class="input-group-addon">tests</div>
+        </div>
+        <p class="help-block">Refresh session every this number of tests</p>
+    </div>
+    <label for="sample_count" class="col-sm-2 control-label">Sample Count</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" class="form-control" id="sample_count" ng-model="testspec.specs.sample_count" required>
+            <div class="input-group-addon">tests</div>
+        </div>
+        <p class="help-block">Send results back every this number of tests</p>
+    </div>
+</div>
+<div class="form-group">
+    <label for="packet_padding" class="col-sm-2 control-label">Packet Padding</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" class="form-control" id="packet_padding" ng-model="testspec.specs.packet_padding" required>
+            <div class="input-group-addon">packets</div>
+        </div>
+        <p class="help-block">The size of packets (not including the IP/UDP headers)</p>
+    </div>
+    <label for="bucket_width" class="col-sm-2 control-label">Bucket Width</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" class="form-control" id="bucket_width" ng-model="testspec.specs.bucket_width" required>
+            <div class="input-group-addon">?</div>
+        </div>
+        <p class="help-block">The granularity of the measurements</p>
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+        <div class="checkbox">
+            <label> <input type="checkbox" ng-model="testspec.specs.force_bidirectional"> Do Bidirectional test</label>
+        </div>
+    </div>
+</div>
+

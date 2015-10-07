@@ -5,10 +5,13 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, serverconf) {
     serverconf.then(function(_c) { $scope.serverconf = _c; });
 }]);
 
-app.controller('AboutController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', 'serverconf',
-function($scope, appconf, $route, toaster, $http, jwtHelper, menu, serverconf) {
+app.controller('AboutController', ['$scope', 'appconf', 'menu', 'serverconf',
+function($scope, appconf, menu, serverconf) {
+    menu.then(function(_menu) { 
+        $scope.menu = _menu; 
+        console.log("menu loaded");
+    });
     serverconf.then(function(_c) { $scope.serverconf = _c; });
-    menu.then(function(_menu) { $scope.menu = _menu; });
 }]);
 
 app.controller('HomeController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', 'serverconf',

@@ -16,6 +16,7 @@ var logger = new winston.Logger(config.logger.winston);
 module.exports = function(sequelize, DataTypes) {
     return sequelize.define('Hostgroup', {
         service_type: Sequelize.STRING, 
+        desc: Sequelize.STRING,
         
         //array of host ids (client-uuid in sLS)
         hosts: {
@@ -26,6 +27,15 @@ module.exports = function(sequelize, DataTypes) {
             },
             set: function (hosts) {
                 return this.setDataValue('hosts', JSON.stringify(hosts));
+            }
+        },
+        admins: {
+            type: Sequelize.TEXT,
+            get: function () { 
+                return JSON.parse(this.getDataValue('admins'));
+            },
+            set: function (admins) {
+                return this.setDataValue('admins', JSON.stringify(admins));
             }
         },
     }, {

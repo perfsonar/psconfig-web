@@ -13,10 +13,16 @@
             <th width="30%">Admins</th></tr>
         </thead>
         <tbody>
-            <tr ng-repeat="testspec in testspecs[service_id]" ng-class="{clickable: testspec.canedit == true, disabled: testspec.canedit == false}" ng-click="edit(testspec)">
+            <tr ng-repeat="testspec in testspecs | filter:{service_type: service_id}" ng-class="{clickable: testspec.canedit == true, disabled: testspec.canedit == false}" ng-click="edit(testspec)">
                 <th>{{testspec.id}}</th>
                 <td>{{testspec.desc}}</td>
-                <td ng-repeat="(k,v) in serverconf.defaults.testspecs[service_id]">{{testspec.specs[k]}}</td>
+                <td ng-repeat="(k,v) in serverconf.defaults.testspecs[service_id]">
+                    <div ng-switch="testspec.specs[k]">
+                      <span ng-switch-when="true">&check;</span>
+                      <span ng-switch-when="false"></span>
+                      <span ng-switch-default>{{testspec.specs[k]}}</span>
+                    </div>
+                </td>
                 <td>
                     <!--
                     <ul>

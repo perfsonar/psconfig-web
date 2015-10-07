@@ -35,11 +35,11 @@ body {
 .settings li.heading {
   background-color: #eee;
 }
-tr.clickable:hover {
+.clickable:hover {
   cursor: pointer;
   background-color: #eee;
 }
-tr.disabled {
+.disabled {
   background-color: #ccc;
 }
 span.email {

@@ -1,16 +1,13 @@
-
+'use strict';
 
 //show all testsspecs
 app.controller('TestspecsController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', '$location', 'serverconf', 'profiles', '$modal',
 function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, serverconf, profiles, $modal) {
     menu.then(function(_menu) { $scope.menu = _menu; });
-    serverconf.then(function(_serverconf) {
-        $scope.serverconf = _serverconf;
-    });
+    serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
 
     var jwt = localStorage.getItem(appconf.jwt_id);
     var user = jwtHelper.decodeToken(jwt);
-
     profiles.then(function(_profiles) {
         $scope.profiles = _profiles;
         
@@ -21,26 +18,27 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, se
         });
 
         //then load all testspecs
-        return load_testspecs();
+        return load();
     });
 
-    function load_testspecs() {
+    function load() {
         return $http.get(appconf.api+'/testspecs' /*,{cache: true}*/).then(function(res) {
-            //sort based on service_types
-            $scope.testspecs = {};
+            //convert admin ids to profile objects - so that select2 will recognize as already selected item
             res.data.forEach(function(testspec) {
+                /*
                 var type = testspec.service_type;
                 if($scope.testspecs[type] === undefined) {
                     $scope.testspecs[type] = [];
                 }
-                //convert admin ids to profile objects - so that select2 will recognize as already selected item
+                */
                 var admins = [];
                 testspec.admins.forEach(function(id) {
                     admins.push($scope.users[id]);
                 });
                 testspec.admins = admins; //override
-                $scope.testspecs[type].push(testspec);
+                //$scope.testspecs[type].push(testspec);
             });
+            $scope.testspecs = res.data;
             return $scope.testspecs;  //just to be more promise-ish
         });
     }
@@ -62,12 +60,13 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, se
                     return testspec;
                 },
                 title: function() {
-                    return "Update "+$scope.serverconf.service_types[testspec.service_type].label+" Test Spec";
+                    //return "Update "+$scope.serverconf.service_types[testspec.service_type].label+" Test Spec";
+                    return "Update Test Spec";
                 },
             }
         });
         modalInstance.result.then(function() {
-            load_testspecs();
+            load();
         }, function () {
             //toaster.info('Modal dismissed at: ' + new Date());
         });
@@ -92,12 +91,13 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, se
                     return testspec;
                 },
                 title: function() {
-                    return "New "+$scope.serverconf.service_types[service_type].label+" Test Spec";
+                    //return "New "+$scope.serverconf.service_types[service_type].label+" Test Spec";
+                    return "New Test Spec";
                 },
             }
         });
         modalInstance.result.then(function() {
-            load_testspecs();
+            load();
         }, function () {
             //toaster.info('Modal dismissed at: ' + new Date());
         });
@@ -107,22 +107,24 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, se
 //test spec editor
 app.controller('TestspecModalController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', '$location', 'profiles', '$modalInstance', 'testspec', 'title',
 function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, profiles, $modalInstance, testspec, title) {
-    //menu.then(function(_menu) { $scope.menu = _menu; });
+    $scope.testspec = testspec;
     $scope.title = title;
 
     //for admin list
     profiles.then(function(_profiles) { $scope.profiles = _profiles; });
 
-    $scope.testspec = testspec;
-
     //create a copy of $scope.testspec so that UI doesn't break while saving.. (just admins?)
     function getdata() {
+        /*
         var data = {
             service_type: $scope.testspec.service_type,
             desc: $scope.testspec.desc,
             specs: $scope.testspec.specs,
             admins: [] //to be added below
         };
+        */
+        var data = angular.copy($scope.testspec);
+        data.admins = [];
         $scope.testspec.admins.forEach(function(admin) {
             data.admins.push(admin.sub);
         });
