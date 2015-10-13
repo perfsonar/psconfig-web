@@ -185,18 +185,15 @@ app.factory('profiles', ['appconf', '$http', 'jwtHelper', function(appconf, $htt
 //http://www.codelord.net/2015/09/24/$q-dot-defer-youre-doing-it-wrong/
 //https://www.airpair.com/angularjs/posts/angularjs-promises
 app.factory('menu', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
-    var menu = {};
-    return $http.get(appconf.shared_api+'/menu').then(function(res) {
-        //look for top menu 
-        //TODO - add ?id= param to shared_api/menu so that I don't have to do this - ant don't load unnecessary stuff
-        res.data.forEach(function(m) {
-            switch(m.id) {
-            case 'top':
-                menu.top = m;
-                break;
-            }
-        });
-        
+    var menu = {
+        header: {
+            label: "MeshConfig Administrator",
+            url: "/meshconfig",
+        }
+    };
+
+    return $http.get(appconf.shared_api+'/menu/top').then(function(res) {
+        menu.top = res.data;
         //then load user profile (if we have jwt)
         var jwt = localStorage.getItem(appconf.jwt_id);
         if(!jwt)  return menu;

@@ -1,26 +1,4 @@
 
-app.factory('services', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
-    var label_c = 0;
-    function get_class() {
-        switch(label_c++ % 5) {
-        case 0: return "label-primary"; break;
-        case 1: return "label-success"; break;
-        case 2: return "label-info"; break;
-        case 3: return "label-warning"; break;
-        case 4: return "label-danger"; break;
-        }
-    }
-
-    return $http.get(appconf.api+'/services')
-    .then(function(res) {
-        //assign label_classes
-        for(var lsid in res.data.lss) {
-            res.data.lss[lsid].label_class = get_class();
-        };
-        return res.data;
-    });
-}]);
-
 app.controller('HostgroupsController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', 'serverconf', 'profiles', '$modal',
 function($scope, appconf, $route, toaster, $http, jwtHelper, menu, serverconf, profiles, $modal) {
     menu.then(function(_menu) { $scope.menu = _menu; });
@@ -52,67 +30,10 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, serverconf, p
                 //$scope.testspecs[type].push(testspec);
             });
             $scope.hostgroups = res.data;
-            /*
-            //group by service type
-            res.data.forEach(function(hostgroup) {
-                var type = hostgroup.service_type;
-                if($scope.hostgroups[type] === undefined) {
-                    $scope.hostgroups[type] = [];
-                }
-                $scope.hostgroups[type].push(hostgroup);
-            });
-            */
             return $scope.hostgroups;  //just to be more promise-ish
         });
     }
 
-    /*
-    //for test
-    $scope.hosts = [];
-    services.then(function(_services) { $scope.services = _services; });
-    $scope.refreshHostsOpt = function(query) {
-        return $http.get(appconf.api+'/services/query', {params: {q: query}})
-        .then(function(res) {
-            var ls = {};
-            function get_class() {
-                switch(Object.keys(ls).length % 5) {
-                case 0: return "label-primary"; break;
-                case 1: return "label-success"; break;
-                case 2: return "label-info"; break;
-                case 3: return "label-warning"; break;
-                case 4: return "label-danger"; break;
-                }
-            }
-            res.data.forEach(function(service) {
-                if(ls[service.ls_label] == undefined) {
-                    ls[service.ls_label] = get_class();
-                }
-                service.label_class = ls[service.ls_label];
-            });
-            $scope.hosts_opt = res.data;
-        });
-    }
-
-    //for test
-    $scope.addresses = [];
-    //$scope.addresses_opt = [];
-    $scope.refreshAddresses = function(address) {
-        var params = {address: address, sensor: false};
-        return $http({method: 'GET', url: 'https://maps.googleapis.com/maps/api/geocode/json', params: params, headers: 
-            {
-                //I have to remove some header explicitly set by sca-shared
-                Pragma: undefined,
-                'If-Modified-Since': undefined,
-                'Cache-Control': undefined,
-            },
-            skipAuthorization: true
-        })
-        .then(function(response) {
-            //console.dir(response.data.results);
-            $scope.addresses_opt = response.data.results
-        });
-    }
-    */
     $scope.edit = function(_hostgroup) {
         if(!_hostgroup.canedit) {
             toaster.error("You need to be listed as an admin in order to edit this testspec");
@@ -143,18 +64,12 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, serverconf, p
     }
 
     $scope.create = function(service_type) {
-        //$location.path('/newtestspec/'+service_type);
-        //construct a new testspec
         var hostgroup = {
             service_type: service_type,
             admins: [ $scope.users[user.sub] ], //select current user as admin
             hosts: [],
             desc: "",
         };
-        /*
-        if($scope.hostgroups[service_type] == undefined) $scope.hostgroups[service_type] = [];
-        $scope.hostgroups[service_type].push(hostgroup);
-        */
         var modalInstance = $modal.open({
             animation: true,
             templateUrl: 't/hostgroup.html',

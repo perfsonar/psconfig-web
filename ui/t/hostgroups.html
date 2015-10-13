@@ -1,52 +1,28 @@
 <sca-menubar menu="menu.top" active="'meshconfig'" profile="menu._profile"></sca-menubar>
 <sca-menutab menu="serverconf.menu" active="'hostgroups'"></sca-menutab>
 <div class="container-fluid">
-
     <div class="panel panel-default" ng-repeat="(service_id, service) in serverconf.service_types">
         <div class="panel-heading">
             {{service.label}}
         </div>
-        <div class="well" ng-repeat="hostgroup in hostgroups | filter:{service_type:service_id}" ng-class="{clickable: hostgroup.canedit == true, disabled: hostgroup.canedit == false}" ng-click="edit(hostgroup)">
-            {{hostgroup}} 
+        <div class="panel-body" ng-repeat="hostgroup in hostgroups | filter:{service_type:service_id}" ng-class="{clickable: hostgroup.canedit == true, disabled: hostgroup.canedit == false}" ng-click="edit(hostgroup)">
+            <h4><small>{{hostgroup.id}}</small> {{hostgroup.desc}}</h4>
+            <div class="row">
+            <div class="col-md-8">
+                <h5>Hosts</h5>
+                <mc-hosts serviceid="service_id" hosts="hostgroup.hosts"></mc-hosts>
+            </div>
+            <div class="col-md-4">
+                <h5>Admins</h5>
+                <mc-admins admins="hostgroup.admins"></mc-admins>
+            </div>
+            </div>
         </div>
         <div class="panel-body" style="background-color: #fafafa;">
             {{create}}
             <button class="btn btn-sm pull-right" ng-click="create(service_id)">Add New</button>
         </div>
     </div><!--panel-->
-
-    <!--
-    <hr>
-    Host Group (test)
-    <ui-select multiple ng-model="hosts" ng-disabled="disabled">
-        <ui-select-match placeholder="Enter host name"><span class="label {{services.lss[$item.lsid].label_class}}">
-            {{services.lss[$item.lsid].label}}</span> <b>{{$item.name}}</b> ({{$item.locator}})
-        </ui-select-match>
-        <ui-select-choices repeat="service.id as service in services.recs['owamp'] | filter: $select.search">
-            <span class="label {{services.lss[service.lsid].label_class}}">{{services.lss[service.lsid].label}}</span>&nbsp;
-            <b>{{service.name}}</b> ({{service.locator}})
-        </ui-select-choices>
-    </ui-select>
-
-    <ui-select multiple ng-model="hosts" ng-disabled="disabled">
-        <ui-select-match placeholder="Enter host name"><span class="label {{$item.label_class}}">{{$item.ls_label}}</span> <b>{{$item.name}}</b> ({{$item.locator}})</ui-select-match>
-        <ui-select-choices repeat="host.id as host in hosts_opt"
-             refresh="refreshHostsOpt($select.search)"
-             refresh-delay="200">
-             <span class="label {{host.label_class}}">{{host.ls_label}}</span> <b>{{host.name}}</b> {{host.locator}}
-        </ui-select-choices>
-    </ui-select>
-
-    Addresses
-    <ui-select multiple ng-model="addresses" ng-disabled="disabled">
-        <ui-select-match placeholder="Enter city name">{{$item.formatted_address}}</ui-select-match>
-        <ui-select-choices repeat="address in addresses_opt"
-             refresh="refreshAddresses($select.search)"
-             refresh-delay="200">
-            {{address.formatted_address}}
-        </ui-select-choices>
-    </ui-select>
-    -->
 </div>
 
 

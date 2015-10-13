@@ -31,19 +31,20 @@
                         </li>
                     </ul>
                     -->
+                    <mc-admins admins="testspec.admins"></mc-admins>
+                    <!--
                     <ui-select multiple ng-model="testspec.admins" disabled="disabled">
                         <ui-select-match placeholder="Select admins who can update this test spec">
                             <b>{{$item.fullname}}</b> <span class="email">&lt;{{$item.email}}&gt;</span>
                         </ui-select-match>
                         <ui-select-choices repeat="user in profiles | propsFilter: {fullname: $select.search, email: $select.search}">
-                          <!--<div ng-bind-html="user.fullname | highlight: $select.search"></div>-->
                           <div>{{user.fullname}}</div>
                           <small>
-                            email: {{user.email}} <!--<span ng-bind-html="user.email | highlight: $select.search"></span>-->
+                            email: {{user.email}}
                           </small>
                         </ui-select-choices>
                     </ui-select>
-
+                    -->
                 </td>
                 <!--
                 <td class="record-control">

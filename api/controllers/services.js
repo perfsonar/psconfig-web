@@ -13,28 +13,27 @@ var config = require('../config/config');
 var logger = new winston.Logger(config.logger.winston);
 var db = require('../models');
 
-
 //cache sls content .. loaded every now and then
 //grouped by ls/service_type/service
 var sls_cache = {};
 function request_data(lsid, ls, service_type, cb) {
-    request(ls.service_types[service_type].url, function(err, res, body) {
+    request(ls.service_types[service_type].url, {timeout: 1000*5}, function(err, res, body) {
         if(err) return cb(err);
         if(res.statusCode != 200) return cb(new Error("failed to sLS cahce from:"+ls.url+" statusCode:"+res.statusCode));
         try {
             var services = JSON.parse(body);
-            if(services.length == 0 && sls_cache[service_type][lsid] !== undefined) return logger.error("got 0 services from "+ls.url+" (keeping the most recent data)");
             if(sls_cache[lsid] === undefined) sls_cache[lsid] = {};
-            if(sls_cache[lsid][service_type] === undefined) sls_cache[lsid][service_type] = {};
+            if(sls_cache[lsid][service_type] === undefined) sls_cache[lsid][service_type] = [];
+            if(services.length == 0 && sls_cache[lsid][service_type] !== undefined) return cb("got 0 services from "+ls.url+" (keeping the most recent data)");
             sls_cache[lsid][service_type] = []; //reset all
             services.forEach(function(service) {
                 //TODO apply exclusion
 
                 //ignore record with no client-uuid (probably old toolkit instance?)
                 if(service['client-uuid'] === undefined) {
-                    logger.error("client-uuid not set - ignoring");
+                    logger.error("client-uuid not set - skipping");
                     logger.error(service);
-                    return;
+                    return;//continue to next service
                 }
 
                 sls_cache[lsid][service_type].push({
@@ -53,17 +52,28 @@ function request_data(lsid, ls, service_type, cb) {
         cb(e);
     });
 }
-function cache_sls() {
-    for(var lsid in config.lookup_services) {
-        var ls = config.lookup_services[lsid];
+
+function cache_sls(cb) {
+    async.forEachOf(config.lookup_services, function(ls, lsid, next_ls) {
+        async.forEachOf(ls.service_types, function(end, service_type, next) {
+            logger.debug("caching sLS content (service type:"+service_type+"):"+end.url);
+            request_data(lsid, ls, service_type, function(err) {
+                if(err) logger.error(err);//continue
+                logger.debug("caching sLS content done:"+end.url);
+                next(); 
+            });
+        }, next_ls);
+        /*
         for(var service_type in ls.service_types) {
             logger.info("caching sLS content (service type:"+service_type+"):"+ls.url);
             request_data(lsid, ls, service_type, function(err) {
                 if(err) logger.error(err);
             });
         }
-    };
+        */
+    }, cb);
 }
+
 setInterval(sls_cache, 1000*60*10); //reload every 10 minutes
 cache_sls(); //first time
 
@@ -83,6 +93,15 @@ router.get('/', function(req, res, next) {
     res.json({recs: services, lss: config.lookup_services});    
     //res.json(services);
     //res.json({hello: "there"});
+});
+
+//update service cache immediately
+//TODO - not used by anything at the moment
+router.post('/cache', function(req, res, next) {
+    cache_sls(function(err) {
+        if(err) return next(err);
+        res.json({status: "ok"});
+    });
 });
 
 /*

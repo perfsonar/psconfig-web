@@ -1,0 +1,6 @@
+<ul class="hosts">
+    <li ng-repeat="host in _hosts">
+        <span class="label {{services.lss[host.lsid].label_class}}"> {{services.lss[host.lsid].label}}</span>
+        <b>{{host.name}}</b> ({{host.locator}})
+    </li>
+</ul>
