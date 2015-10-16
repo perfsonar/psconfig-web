@@ -1,8 +1,12 @@
 <ul class="tests">
     <p class="text-muted" ng-if="!tests.length">No test specified</p>
     <li ng-repeat="test in tests">
-        {{test}}
-        <b>{{test.desc}}</b>
+        <b>desc: {{test.desc}}</b>
+        <span>service_type: {{test.service_type}}</span>
+        <span>mesh_type: {{test.mesh_type}}</span>
+        <span>testspec: {{test.TestspecId}}</span>
+        <span>agroup: {{test.agroup}}</span>
+        <span>bgroup: {{test.bgroup}}</span>
         <span ng-if="test.enabled">Enabled</span>
         <span ng-if="!test.enabled">Disabled</span>
     </li>

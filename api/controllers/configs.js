@@ -90,6 +90,7 @@ router.put('/:id', jwt({secret: config.express.jwt.secret}), function(req, res, 
                     //logger.debug("upserting following--------------");
                     //logger.debug(test);
                     if(test.id) {
+                        logger.debug("updating test with following--------------");
                         logger.debug(test);
                         db.Test.update(test, {where: {id: test.id}}).then(function() {
                             tests.push(test.id); //TODO will this work?
@@ -103,8 +104,8 @@ router.put('/:id', jwt({secret: config.express.jwt.secret}), function(req, res, 
                     }
                 }, function(err) {
                     if(err) return next(err);
-                    logger.debug("dumnping tests-------------------");
-                    logger.debug(tests);
+                    //logger.debug("dumnping tests-------------------");
+                    //logger.debug(tests);
                     config.setTests(tests).then(function() {
                         res.json({status: "ok"});
                     }, next); //TODO - not sure if this is correct way to handle err for sequelize?
@@ -117,7 +118,7 @@ router.put('/:id', jwt({secret: config.express.jwt.secret}), function(req, res, 
     }); 
 });
 
-//new config
+//new config (TODO)
 router.post('/', jwt({secret: config.express.jwt.secret}), function(req, res, next) {
     if(!~req.user.scopes.common.indexOf('user')) return res.status(401).end();
     db.Config.create(req.body).then(function(config) {
