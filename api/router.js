@@ -19,7 +19,7 @@ function get_menu(user) {
     };
     if(user) scopes = user.scopes;
     var menus = [];
-    config.meshconfig.menu.forEach(function(menu) {
+    config.menu.forEach(function(menu) {
         if(menu.scope && !menu.scope(scopes)) return;
         var _menu = _.clone(menu);
         if(_menu.submenu) {
@@ -33,12 +33,14 @@ function get_menu(user) {
 router.get('/config', jwt({secret: config.express.jwt.secret, credentialsRequired: false}), function(req, res) {
     var conf = {
         service_types: config.meshconfig.service_types,
+        mesh_types: config.meshconfig.mesh_types,
         defaults: config.meshconfig.defaults,
         menu: get_menu(req.user),
     };
     res.json(conf);
 });
 
+router.use('/configs', require('./controllers/configs'));
 router.use('/testspecs', require('./controllers/testspecs'));
 router.use('/services', require('./controllers/services'));
 router.use('/hostgroups', require('./controllers/hostgroups'));

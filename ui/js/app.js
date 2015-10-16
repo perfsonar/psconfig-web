@@ -59,11 +59,15 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         controller: 'HostgroupsController',
         requiresLogin: true,
     })
-    /*
-    when('/login', {
-        templateUrl: 't/login.html',
-        controller: 'LoginController'
+    .when('/configs', {
+        templateUrl: 't/configs.html',
+        controller: 'ConfigsController'
     })
+    .when('/config/:id', {
+        templateUrl: 't/config.html',
+        controller: 'ConfigController'
+    })
+    /*
     .when('/success', {
         templateUrl: 't/empty.html',
         controller: 'SuccessController'
@@ -97,20 +101,12 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
 //configure httpProvider to send jwt unless skipAuthorization is set in config (not tested yet..)
 app.config(['appconf', '$httpProvider', 'jwtInterceptorProvider', 
 function(appconf, $httpProvider, jwtInterceptorProvider) {
-    jwtInterceptorProvider.tokenGetter = function(jwtHelper, config, $http) {
+    jwtInterceptorProvider.tokenGetter = function(jwtHelper, config, $http, toaster) {
         //don't send jwt for template requests
         //(I don't think angular will ever load css/js - browsers do)
         if (config.url.substr(config.url.length - 5) == '.html') {
             return null;
         }
-
-        /*
-        //TODO - just for testing
-        if (~config.url.indexOf('googleapis')) {
-            console.log("decided not to send Authorization header");
-            return null;
-        }
-        */
 
         var jwt = localStorage.getItem(appconf.jwt_id);
         if(!jwt) return null; //not jwt
@@ -121,7 +117,8 @@ function(appconf, $httpProvider, jwtInterceptorProvider) {
         var expdate = jwtHelper.getTokenExpirationDate(jwt);
         var ttl = expdate - Date.now();
         if(ttl < 0) {
-            console.log("jwt expired");
+            toaster.error("Your login session has expired. Please re-sign in");
+            localStorage.removeItem(appconf.jwt_id);
             return null;
         } else if(ttl < 3600*1000) {
             //console.dir(config);
@@ -184,11 +181,12 @@ app.factory('profiles', ['appconf', '$http', 'jwtHelper', function(appconf, $htt
 //load menu and profile by promise chaining
 //http://www.codelord.net/2015/09/24/$q-dot-defer-youre-doing-it-wrong/
 //https://www.airpair.com/angularjs/posts/angularjs-promises
-app.factory('menu', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
+app.factory('menu', ['appconf', '$http', 'jwtHelper', '$sce', function(appconf, $http, jwtHelper, $sce) {
     var menu = {
         header: {
-            label: "MeshConfig Administrator",
-            url: "/meshconfig",
+            label: appconf.title,
+            icon: $sce.trustAsHtml("<img src=\""+appconf.icon_url+"\">"),
+            url: "#/",
         }
     };
 

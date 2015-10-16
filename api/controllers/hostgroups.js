@@ -13,12 +13,13 @@ var logger = new winston.Logger(config.logger.winston);
 var db = require('../models');
 
 router.get('/', jwt({secret: config.express.jwt.secret, credentialsRequired: false}), function(req, res, next) {
-    db.Hostgroup.findAll(/*{include: [{
-        model: db.Admin
-    }]}*/).then(function(hostgroups) {
+    db.Hostgroup.findAll({
+        /*include: [{ model: db.Admin}]*/
+        //raw: true, //return raw object instead of sequelize objec that I can't modify..
+    }).then(function(hostgroups) {
         //convert to normal javascript object so that I can add stuff to it (why can't I for sequelize object?)
-        var json = JSON.stringify(hostgroups);
-        hostgroups = JSON.parse(json);
+        hostgroups = JSON.parse(JSON.stringify(hostgroups)); //convert to raw object so that I can add properties
+        //TODO - use clone instead?
         hostgroups.forEach(function(hostgroup) {
             hostgroup.canedit = false;
             if(req.user) {

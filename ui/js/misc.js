@@ -27,6 +27,13 @@ app.directive('mcAdmins', function() {
     } 
 });
 
+app.directive('mcTests', function() {
+    return {
+        scope: { tests: '=', },
+        templateUrl: 't/tests.html',
+    } 
+});
+
 app.directive('mcHosts', ['services', function(services) {
     return {
         scope: { hosts: '=', serviceid: '=' },
@@ -47,18 +54,16 @@ app.directive('mcHosts', ['services', function(services) {
     } 
 }]);
 
-app.controller('HeaderController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'serverconf',
-function($scope, appconf, $route, toaster, $http, jwtHelper, serverconf) {
+app.controller('HeaderController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'serverconf', 'menu',
+function($scope, appconf, $route, toaster, $http, jwtHelper, serverconf, menu) {
     $scope.title = appconf.title;
     serverconf.then(function(_c) { $scope.serverconf = _c; });
+    menu.then(function(_menu) { $scope.menu = _menu; });
 }]);
 
 app.controller('AboutController', ['$scope', 'appconf', 'menu', 'serverconf',
 function($scope, appconf, menu, serverconf) {
-    menu.then(function(_menu) { 
-        $scope.menu = _menu; 
-        console.log("menu loaded");
-    });
+    menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_c) { $scope.serverconf = _c; });
 }]);
 

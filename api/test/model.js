@@ -5,17 +5,33 @@ var db = require('../models');
 describe('models', function() {
     var testspec = null;
     var admins = [];
+    var t1 = null;
     describe('#test data', function () {
-    /*
-        it('create/find admin test1', function (done) {
-            db.Admin.create({sub: "test1"}).then(function(new_a) {
-                db.Admin.findOne({where: {sub: new_a.sub}}).then(function(a) {
-                    admins.push(a);
+        it('create test1', function (done) {
+            db.Test.create({desc: "test1", service_type: "owamp", mesh_type: "mesh"}).then(function(_t1) {
+                t1 = _t1;
+                db.Test.findOne({where: {desc: "test1"}}).then(function(a) {
                     if(a) done();
-                    else done(new Error("couldn't create admin test1"));
+                    else done(new Error("couldn't create config1"));
                 });
             });
         });
+        it('create config1', function (done) {
+            db.Config.create({desc: "config4", url: "test-configr4", admins: []}).then(function(new_a) {
+                db.Config.findOne({where: {desc: "config4"}}).then(function(a) {
+                    if(a) done();
+                    else done(new Error("couldn't create config1"));
+                });
+            });
+        });
+        it('add test1 to config1', function (done) {
+            db.Config.findOne({where: {desc: "config4"}}).then(function(c) {
+                c.addTest(t1).then(function() {
+                    done();
+                });
+            });
+        });
+        /*
         it('create/find admin test2', function (done) {
             db.Admin.create({sub: "test2"}).then(function(new_a) {
                 db.Admin.findOne({where: {sub: new_a.sub}}).then(function(a) {

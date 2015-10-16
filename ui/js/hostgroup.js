@@ -1,6 +1,6 @@
 
-app.controller('HostgroupsController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', 'serverconf', 'profiles', '$modal',
-function($scope, appconf, $route, toaster, $http, jwtHelper, menu, serverconf, profiles, $modal) {
+app.controller('HostgroupsController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'menu', 'serverconf', 'profiles', '$modal',
+function($scope, appconf, toaster, $http, jwtHelper, menu, serverconf, profiles, $modal) {
     menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
 
@@ -92,18 +92,17 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, serverconf, p
     }
 }]);
 
-app.controller('HostgroupModalController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', '$location', 'profiles', '$modalInstance', 'hostgroup', 'title', 'services',
-function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, profiles, $modalInstance, hostgroup, title, services) {
+app.controller('HostgroupModalController', ['$scope', 'appconf', 'toaster', '$http', 'profiles', '$modalInstance', 'hostgroup', 'title', 'services', 'serverconf',
+function($scope, appconf, toaster, $http,  profiles, $modalInstance, hostgroup, title, services, serverconf) {
     $scope.hostgroup = hostgroup;
     $scope.title = title;
+    serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
 
-    //for admin list
-    profiles.then(function(_profiles) { $scope.profiles = _profiles; });
-    //for host list
-    services.then(function(_services) { $scope.services = _services; });
+    profiles.then(function(_profiles) { $scope.profiles = _profiles; }); //for admin list
+    services.then(function(_services) { $scope.services = _services; }); //for host list
 
-    //create a copy of $scope.testspec so that UI doesn't break while saving.. (just admins?)
     function getdata() {
+        //create a copy of $scope.testspec so that UI doesn't break while saving.. (just admins?)
         var data = angular.copy($scope.hostgroup);
         data.admins = [];
         $scope.hostgroup.admins.forEach(function(admin) {

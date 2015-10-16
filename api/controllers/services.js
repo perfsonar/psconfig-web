@@ -74,7 +74,10 @@ function cache_sls(cb) {
     }, cb);
 }
 
-setInterval(sls_cache, 1000*60*10); //reload every 10 minutes
+setInterval(function() {
+    logger.info("refreshing sls cache");
+    cache_sls();
+}, 1000*60*10); //reload every 10 minutes
 cache_sls(); //first time
 
 //return the whole thing.. until this becomes an issue
@@ -96,7 +99,8 @@ router.get('/', function(req, res, next) {
 });
 
 //update service cache immediately
-//TODO - not used by anything at the moment
+//TODO - only used for debug purpose right now.
+//TODO - should restrict access from localhost?
 router.post('/cache', function(req, res, next) {
     cache_sls(function(err) {
         if(err) return next(err);

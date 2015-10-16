@@ -1,0 +1,25 @@
+<sca-menutab menu="serverconf.menu" active="'configs'"></sca-menutab>
+<div class="container-fluid">
+    <div ng-repeat="config in configs">
+        <div class="pull-right">
+            <a href="#" class="btn btn-default">meshconfig</a>
+            <a href="#/config/{{config.id}}" class="btn btn-default" ng-if="config.canedit">edit</a>
+        </div>
+
+        <h4><small>{{config.id}}</small> {{config.desc}} <small>{{config.url}}<small></h4>
+        <div class="row">
+            <div class="col-md-8">
+                <h4><small>Tests</small></h4>
+                <mc-tests tests="config.Tests"></mc-tests>
+            </div>
+            <div class="col-md-4">
+                <h4><small>Admins</small></h4>
+                <mc-admins admins="config.admins"></mc-admins>
+            </div>
+        </div>
+        <hr>
+    </div>
+    <button type="button" ng-click="addconfig()" ng-if="cancreate" class="btn">Add Config</a>
+</div>
+
+

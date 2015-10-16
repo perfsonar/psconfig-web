@@ -17,10 +17,12 @@ body {
   box-shadow: 0px 0px 15px #666;
   border-radius: 5px;
 }
+/*
 .logo {
-  margin: 30px 0px;
-  width: 100%;
+    margin:30px 0px;
+    width: 100%;
 }
+*/
 .list-group-item-heading {
   margin-bottom: 0px;
 }
@@ -57,8 +59,10 @@ ul.hosts {
   padding: 0px;
   list-style: none;
   font-size: 12px;
-  border: 1px solid #ccc;
-  padding: 3px;
+  /*
+    border: 1px solid #ccc;
+    padding: 3px;
+    */
 }
 ul.admins li,
 ul.hosts li {
@@ -68,3 +72,16 @@ ul.hosts li {
   display: inline-block;
   margin: 1px 3px;
 }
+.navbar-brand .header-icon img {
+  max-height: 35px;
+  position: relative;
+  top: -5px;
+  left: -5px;
+  float: left;
+  margin-right: 10px;
+}
+/*
+.list-group-item h4 {
+    margin: 0px;
+}
+*/

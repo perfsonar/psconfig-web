@@ -15,10 +15,10 @@ var logger = new winston.Logger(config.logger.winston);
 
 module.exports = function(sequelize, DataTypes) {
     return sequelize.define('Test', {
+        desc: Sequelize.STRING,
         service_type: Sequelize.STRING, 
         mesh_type: Sequelize.STRING, 
         enabled: { type: Sequelize.BOOLEAN, defaultValue: true },
-        desc: Sequelize.STRING,
     }, {
         classMethods: {
         },

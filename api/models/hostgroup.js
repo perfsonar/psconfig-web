@@ -1,7 +1,5 @@
 'use strict';
 
-//this is just a sample
-
 //contrib
 var Sequelize = require('sequelize');
 var winston = require('winston');

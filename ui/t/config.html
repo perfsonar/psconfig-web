@@ -1,0 +1,53 @@
+<sca-menutab menu="serverconf.menu" active="'configs'"></sca-menutab>
+<div class="container-fluid">
+    {{config}}
+    <form ng-submit="submit()" class="form-horizontal"> 
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Name</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" ng-model="config.desc" id="desc" placeholder="Enter configuration name / short description." ng-disabled="!config.canedit">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">url</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" ng-model="config.url" id="url" placeholder="Choose URL to expose this configuration under (like.. 'us-atlas')" required ng-disabled="!config.canedit">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Admins</label>
+            <div class="col-sm-10">
+                <ui-select multiple ng-model="config.admins" ng-disabled="!config.canedit">
+                    <ui-select-match placeholder="Select admins who can update this test spec">
+                        <b>{{$item.fullname}}</b> <span class="email">&lt;{{$item.email}}&gt;</span>
+                    </ui-select-match>
+                    <ui-select-choices repeat="user in profiles | propsFilter: {fullname: $select.search, email: $select.search}">
+                      <!--<div ng-bind-html="user.fullname | highlight: $select.search"></div>-->
+                      <div>{{user.fullname}}</div>
+                      <small>
+                        email: {{user.email}} <!--<span ng-bind-html="user.email | highlight: $select.search"></span>-->
+                      </small>
+                    </ui-select-choices>
+                </ui-select>
+                <p class="help-block">Users who can update this test spec</p>
+            </div>
+        </div>
+        <hr>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Tests</label>
+            <div class="col-sm-10">
+                <div ng-repeat="test in config.Tests">
+                    {{test}}
+                </div>
+                <button type="button" ng-click="addtest()" ng-show="config.canedit" class="btn btn-sm">Add Test</button>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="button" class="btn btn-default" ng-click="cancel()">Cancel</button>
+            </div>
+        </div>
+    </form>
+</div>
+

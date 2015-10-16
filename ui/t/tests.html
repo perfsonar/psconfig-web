@@ -1,0 +1,9 @@
+<ul class="tests">
+    <p class="text-muted" ng-if="!tests.length">No test specified</p>
+    <li ng-repeat="test in tests">
+        {{test}}
+        <b>{{test.desc}}</b>
+        <span ng-if="test.enabled">Enabled</span>
+        <span ng-if="!test.enabled">Disabled</span>
+    </li>
+</ul>
