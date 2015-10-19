@@ -1,13 +1,27 @@
-<ul class="tests">
-    <p class="text-muted" ng-if="!tests.length">No test specified</p>
-    <li ng-repeat="test in tests">
-        <b>desc: {{test.desc}}</b>
-        <span>service_type: {{test.service_type}}</span>
-        <span>mesh_type: {{test.mesh_type}}</span>
-        <span>testspec: {{test.TestspecId}}</span>
-        <span>agroup: {{test.agroup}}</span>
-        <span>bgroup: {{test.bgroup}}</span>
-        <span ng-if="test.enabled">Enabled</span>
-        <span ng-if="!test.enabled">Disabled</span>
+<p class="text-muted" ng-if="!tests.length">No test specified</p>
+<ul class="list-group">
+    <li class="list-group-item test" ng-repeat="test in tests" ng-class="{disabled: !test.enabled}">
+        <h5>
+            <span class="label label-default">{{servicetypes[test.service_type].label}}</span>
+            {{test.desc}}
+            <span ng-if="!test.enabled" class="pull-right label label-warning">Disabled</span>
+        </h5>
+        <!--
+        <div class="row">
+            <div class="col-md-6">
+                <b ng-click="test.show_testspec = !test.show_testspec" stop-event='click'>
+                    <i class="fa" ng-class="{'fa-caret-square-o-right': !test.show_testspec, 'fa-caret-square-o-down': test.show_testspec}"></i> {{test.testspec.desc}}
+                </b>
+                <div ng-if="test.show_testspec" class="slide-down">
+                    <div ng-repeat="(k,v) in test.testspec.specs">{{k}}: {{v}}</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <span>mesh_type: {{test.mesh_type}}</span>
+                <span>agroup: {{test.agroup}}</span>
+                <span>bgroup: {{test.bgroup}}</span>
+            </div>
+        </div>
+        -->
     </li>
 </ul>

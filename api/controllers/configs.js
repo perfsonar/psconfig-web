@@ -44,7 +44,7 @@ router.get('/:id', jwt({secret: config.express.jwt.secret, credentialsRequired: 
         include: [ db.Test ],
     }).then(function(config) {
         config = JSON.parse(JSON.stringify(config)); //convert to raw object so that I can add properties
-        console.dir(config);
+        //console.dir(config);
         config.canedit = false;
         if(req.user) {
             if(~req.user.scopes.common.indexOf('admin') || ~config.admins.indexOf(req.user.sub)) {
@@ -87,8 +87,6 @@ router.put('/:id', jwt({secret: config.express.jwt.secret}), function(req, res, 
                 //upsert tests
                 var tests = [];
                 async.eachSeries(req.body.Tests, function(test, next) {
-                    //logger.debug("upserting following--------------");
-                    //logger.debug(test);
                     if(test.id) {
                         logger.debug("updating test with following--------------");
                         logger.debug(test);
@@ -122,7 +120,19 @@ router.put('/:id', jwt({secret: config.express.jwt.secret}), function(req, res, 
 router.post('/', jwt({secret: config.express.jwt.secret}), function(req, res, next) {
     if(!~req.user.scopes.common.indexOf('user')) return res.status(401).end();
     db.Config.create(req.body).then(function(config) {
-        res.json({status: "ok"});
+        //create tests
+        var tests = [];
+        async.eachSeries(req.body.Tests, function(test, next) {
+            db.Test.create(test).then(function(_test) {
+                tests.push(_test);
+                next();
+            });
+        }, function(err) {
+            //then 
+            config.setTests(tests).then(function() {
+                res.json({status: "ok"});
+            }, next); //TODO - not sure if this is correct way to handle err for sequelize?
+        });
     });
 });
 

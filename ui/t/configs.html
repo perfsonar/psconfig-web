@@ -1,25 +1,29 @@
+
 <sca-menutab menu="serverconf.menu" active="'configs'"></sca-menutab>
 <div class="container-fluid">
-    <div ng-repeat="config in configs">
-        <div class="pull-right">
-            <a href="#" class="btn btn-default">meshconfig</a>
-            <a href="#/config/{{config.id}}" class="btn btn-default" ng-if="config.canedit">edit</a>
-        </div>
-
-        <h4><small>{{config.id}}</small> {{config.desc}} <small>{{config.url}}<small></h4>
+    <ul class="list-group">
+    <li class="list-group-item clickable"
+        ng-repeat="config in configs"
+        ng-click="edit(config)">
         <div class="row">
             <div class="col-md-8">
-                <h4><small>Tests</small></h4>
-                <mc-tests tests="config.Tests"></mc-tests>
+                <h4><small>{{config.id}}</small> {{config.desc}} <small><a ng-click="openpuburl(config)" stop-event='click'>{{config.url}}</a></small></h4>
+                <mc-tests tests="config.Tests" servicetypes="serverconf.service_types" testspecs="testspecs"></mc-tests>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4" ng-if="config._admins">
                 <h4><small>Admins</small></h4>
-                <mc-admins admins="config.admins"></mc-admins>
+                <mc-admins admins="config._admins"></mc-admins>
             </div>
+            <!--
+            <div class="col-md-3">
+                <h4><small>Publish URL</small></h4>
+                <a ng-click="openpuburl(config)" stop-event='click'>{{config.url}}</a>
+            </div>
+            -->
         </div>
-        <hr>
-    </div>
-    <button type="button" ng-click="addconfig()" ng-if="cancreate" class="btn">Add Config</a>
+    </li>
+    </ul><!--list-group-->
+    <button type="button" ng-click="addconfig()" ng-if="cancreate" class="btn btn-sm">Add New Config</button>
 </div>
 
 

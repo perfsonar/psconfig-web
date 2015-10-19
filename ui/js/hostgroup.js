@@ -115,22 +115,20 @@ function($scope, appconf, toaster, $http,  profiles, $modalInstance, hostgroup, 
         if(!$scope.hostgroup.id) {
             //create 
             $http.post(appconf.api+'/hostgroups/', getdata())
-            .success(function(data, status, headers, config) {
+            .then(function(res) {
                 $modalInstance.close();
                 toaster.success("Hostgroup created successfully!");
-            })
-            .error(function(data, status, headers, config) {
-                toaster.error("Creation failed!");
+            }, function(res) {
+                toaster.error(res.data.message);
             });           
         } else {
             //edit
             $http.put(appconf.api+'/hostgroups/'+$scope.hostgroup.id, getdata())
-            .success(function(data, status, headers, config) {
+            .then(function(res) {
                 $modalInstance.close();
                 toaster.success("Updated Successfully!");
-            })
-            .error(function(data, status, headers, config) {
-                toaster.error("Update failed!");
+            }, function(res) {
+                toaster.error(res.data.message);
             });   
         }
     }
@@ -138,13 +136,12 @@ function($scope, appconf, toaster, $http,  profiles, $modalInstance, hostgroup, 
         $modalInstance.dismiss('cancel');
     }
     $scope.remove = function() {
-        $http.delete(appconf.api+'/hostgroups/'+$scope.hostgroup.id, getdata())
-        .success(function(data, status, headers, config) {
+        $http.delete(appconf.api+'/hostgroups/'+$scope.hostgroup.id)
+        .then(function(res) {
             $modalInstance.close();
             toaster.success("Deleted Successfully!");
-        })
-        .error(function(data, status, headers, config) {
-            toaster.error("Deletion failed!");
+        }, function(res) {
+            toaster.error(res.data.message);
         });       
     }
 }]);

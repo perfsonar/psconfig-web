@@ -13,6 +13,18 @@ var app = angular.module('app', [
     'ui.bootstrap',
 ]);
 
+//can't quite do the slidedown animation through pure angular/css.. borrowing slideDown from jQuery..
+app.animation('.slide-down', ['$animateCss', function($animateCss) {
+    return {
+        enter: function(elem, done) {
+            $(elem).hide().slideDown("slow", done);
+        },
+        leave: function(elem, done) {
+            $(elem).slideUp("slow", done);
+        }
+    };
+}]);
+
 //http://plnkr.co/edit/YWr6o2?p=preview
 app.directive('ngConfirmClick', [
     function() {
@@ -30,6 +42,39 @@ app.directive('ngConfirmClick', [
     }
 ])
 
+//http://stackoverflow.com/questions/14852802/detect-unsaved-changes-and-alert-user-using-angularjs
+app.directive('confirmOnExit', function() {
+    return {
+        //scope: { form: '=', },
+        link: function($scope, elem, attrs) {
+            window.onbeforeunload = function(){
+                if ($scope.form.$dirty) {
+                    return "You have unsaved changes.";
+                }
+            }
+            $scope.$on('$locationChangeStart', function(event, next, current) {
+                if ($scope.form.$dirty) {
+                    if(!confirm("Do you want to abondon unsaved changes?")) {
+                        event.preventDefault();
+                    }
+                }
+            });
+        }
+    };
+});
+
+//http://stackoverflow.com/questions/14544741/how-can-i-make-an-angularjs-directive-to-stoppropagation
+app.directive('stopEvent', function () {
+    return {
+        restrict: 'A',
+        link: function (scope, element, attr) {
+            if(attr && attr.stopEvent)
+                element.bind(attr.stopEvent, function (e) {
+                    e.stopPropagation();
+                });
+        }
+    };
+});
 
 //show loading bar at the top
 app.config(['cfpLoadingBarProvider', '$logProvider', function(cfpLoadingBarProvider, $logProvider) {
@@ -166,16 +211,23 @@ app.factory('serverconf', ['appconf', '$http', 'jwtHelper', function(appconf, $h
 //just a service to load public profiles from all user
 //TODO - this loads the entire public profile records!! I should make it lazy load?
 app.factory('profiles', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
-    return $http.get(appconf.profile_api+'/users')
-    .then(function(res) {
-        var profiles = [];
-        //only pull public profile
-        res.data.forEach(function(profile) {
-            profile.public.sub = profile.sub;
-            profiles.push(profile.public);
-        });
-        return profiles;
-    });
+    var jwt = localStorage.getItem(appconf.jwt_id);
+    if(jwt) {
+        var user = jwtHelper.decodeToken(jwt);//watch out..jwt could be invalid
+        if(user && ~user.scopes.common.indexOf("user")) {
+            return $http.get(appconf.profile_api+'/users')
+            .then(function(res) {
+                var profiles = [];
+                //only pull public profile
+                res.data.forEach(function(profile) {
+                    profile.public.sub = profile.sub;
+                    profiles.push(profile.public);
+                });
+                return profiles;
+            });
+        }
+    }
+    return null;
 }]);
 
 //load menu and profile by promise chaining
@@ -195,8 +247,7 @@ app.factory('menu', ['appconf', '$http', 'jwtHelper', '$sce', function(appconf, 
         //then load user profile (if we have jwt)
         var jwt = localStorage.getItem(appconf.jwt_id);
         if(!jwt)  return menu;
-        var user = jwtHelper.decodeToken(jwt);
-        //TODO - jwt could be invalid 
+        var user = jwtHelper.decodeToken(jwt);//jwt could be invalid
         return $http.get(appconf.profile_api+'/public/'+user.sub);
     }, function(err) {
         console.log("failed to load menu");

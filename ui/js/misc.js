@@ -29,26 +29,41 @@ app.directive('mcAdmins', function() {
 
 app.directive('mcTests', function() {
     return {
-        scope: { tests: '=', },
+        scope: { tests: '=', servicetypes: '=', testspecs: '='},
         templateUrl: 't/tests.html',
+        controller: function($scope) {
+            /* load testspec details
+            $scope.tests.forEach(function(test) {
+                $scope.testspecs.forEach(function(testspec) {
+                    if(testspec.id == test.TestspecId) test.testspec = testspec;
+                });
+            });
+            */
+        }
     } 
 });
 
 app.directive('mcHosts', ['services', function(services) {
     return {
-        scope: { hosts: '=', serviceid: '=' },
+        scope: { hosts: '=', serviceid: '='},
         templateUrl: 't/hosts.html',
         link: function(scope, element, attrs) {
-            scope._hosts = [];
-            services.then(function(_services) {
-                scope.services = _services;
-                //convert list of host ids to service record
-                scope.hosts.forEach(function(id) {
-                    //look for the serviceid
-                    _services.recs[scope.serviceid].forEach(function(rec) {
-                        if(rec.id == id) scope._hosts.push(rec);
+            //link only gets executed once. I need to watch hosts list myself in case it changes
+            function update() {
+                scope._hosts = [];
+                services.then(function(_services) {
+                    scope.services = _services;
+                    //convert list of host ids to service record
+                    scope.hosts.forEach(function(id) {
+                        //look for the serviceid
+                        _services.recs[scope.serviceid].forEach(function(rec) {
+                            if(rec.id == id) scope._hosts.push(rec);
+                        });
                     });
                 });
+            }
+            scope.$watch('hosts', function(nv, ov) {
+                update();
             });
         }
     } 
@@ -72,4 +87,5 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, serverconf) {
     menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_c) { $scope.serverconf = _c; });
 }]);
+
 

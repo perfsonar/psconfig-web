@@ -4,60 +4,38 @@
     <div class="panel panel-default" ng-repeat="(service_id, service) in serverconf.service_types">
         <div class="panel-heading">
             {{service.label}}
+            <!--
+            <button class="btn btn-xs" ng-click="create(service_id)">Add New Test Spec</button>
+            -->
         </div>
-        <table class="table">
-        <thead>
-            <tr><th>ID</th><th>Name</th>
-            <th class="specname" ng-repeat="(k,v) in serverconf.defaults.testspecs[service_id]">{{k|specname}}</th>
-            <th width="30%">Admins</th></tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="testspec in testspecs | filter:{service_type: service_id}" ng-class="{clickable: testspec.canedit == true, disabled: testspec.canedit == false}" ng-click="edit(testspec)">
-                <th>{{testspec.id}}</th>
-                <td>{{testspec.desc}}</td>
-                <td ng-repeat="(k,v) in serverconf.defaults.testspecs[service_id]">
-                    <div ng-switch="testspec.specs[k]">
-                      <span ng-switch-when="true">&check;</span>
-                      <span ng-switch-when="false"></span>
-                      <span ng-switch-default>{{testspec.specs[k]}}</span>
+
+        <ul class="list-group">
+        <li class="list-group-item"
+            ng-repeat="testspec in testspecs | filter:{service_type: service_id}"
+            ng-class="{clickable: testspec.canedit == true, disabled: testspec.canedit == false}" 
+            ng-click="edit(testspec)">
+            <!--
+            <div class="pull-right">
+                <button type="button" ng-click="edit(testspec)" ng-if="testspec.canedit" class="btn btn-sm">Edit</button>
+            </div>
+            -->
+            <div class="row">
+                <div class="col-md-5">
+                    <h4><small>{{testspec.id}}</small> {{testspec.desc}}</h4>
+                    <div ng-repeat="(k,v) in testspec.specs" class="row">
+                        <div class="col-xs-6"><b>{{k}}:</b></div>
+                        <div class="col-xs-6">{{v}}</div>
                     </div>
-                </td>
-                <td>
-                    <!--
-                    <ul>
-                        <li ng-repeat="id in spec.admins">
-                            {{users[id]}}
-                        </li>
-                    </ul>
-                    -->
+                </div>
+                <div class="col-md-7">
+                    <h4><small>Admins</small></h4>
                     <mc-admins admins="testspec.admins"></mc-admins>
-                    <!--
-                    <ui-select multiple ng-model="testspec.admins" disabled="disabled">
-                        <ui-select-match placeholder="Select admins who can update this test spec">
-                            <b>{{$item.fullname}}</b> <span class="email">&lt;{{$item.email}}&gt;</span>
-                        </ui-select-match>
-                        <ui-select-choices repeat="user in profiles | propsFilter: {fullname: $select.search, email: $select.search}">
-                          <div>{{user.fullname}}</div>
-                          <small>
-                            email: {{user.email}}
-                          </small>
-                        </ui-select-choices>
-                    </ui-select>
-                    -->
-                </td>
-                <!--
-                <td class="record-control">
-                    <div class="btn-group" role="group" aria-label="...">
-                        <button type="button" class="btn btn-sm btn-default">Delete</button>
-                        <button type="button" class="btn btn-sm btn-default">Edit</button>
-                    </div> 
-                </td>
-                -->
-            </tr>
-        </tbody>
-        </table>
+                </div>
+            </div>
+        </li>
+        </ul>
         <div class="panel-body" style="background-color: #fafafa;">
-            <button class="btn btn-sm pull-right" ng-click="create(service_id)">Add New <!--{{service_type.label}} Test Spec--></button>
+            <button class="btn btn-sm" ng-click="create(service_id)">Add New</button>
         </div>
     </div><!--panel-->
 </div>

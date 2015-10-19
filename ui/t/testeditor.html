@@ -1,0 +1,94 @@
+<div class="form-group">
+    <div class="col-sm-offset-2 col-sm-8">
+        <div class="checkbox">
+            <label> <input type="checkbox" ng-model="test.enabled" ng-disabled="!config.canedit"> Enabled (include in this mesh config)</label>
+        </div>
+    </div>
+    <div class="col-sm-2" ng-if="config.canedit">
+        <button type="button" class="btn btn-danger btn-xs pull-right" ng-click="removetest(test)"><i class="fa fa-times"></i> Remove Test</button>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label">Test Name</label>
+    <div class="col-sm-10">
+        <input type="text" class="form-control" ng-model="test.desc" placeholder="Enter test name / description" 
+            ng-disabled="!config.canedit" required>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label">Service Type</label>
+    <div class="col-sm-4">
+        <select class="form-control" ng-model="test.service_type" name="service_type" 
+            ng-disabled="!config.canedit" 
+            ng-change="reset_servicetype(test)" required>
+            <option value="">(Select Service Type)</option>
+            <option ng-repeat="(id, type) in serverconf.service_types" value="{{id}}">{{type.label}}</option>
+        </select>
+    </div>
+    <label class="col-sm-2 control-label">Mesh Type</label>
+    <div class="col-sm-4">
+        <select class="form-control" ng-model="test.mesh_type" name="mesh_type" 
+            ng-disabled="!config.canedit" 
+            required>
+            <option value="">(Select Mesh Type)</option>
+            <option ng-repeat="(id, type) in serverconf.mesh_types" value="{{id}}">{{type.label}}</option>
+        </select>
+    </div>
+</div>
+
+<div class="form-group" ng-if="test.service_type !== undefined">
+    <label class="col-sm-2 control-label">Host Group A</label>
+    <div class="col-sm-10">
+        <select class="form-control" ng-model="test.agroup" name="agroup" 
+            ng-disabled="!config.canedit" 
+            required>
+            <option value="">(Select Host Group)</option>
+            <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group.id}}">{{group.desc}}</option>
+        </select>
+        <div class="well well-sm" ng-if="test.agroup">
+            <mc-hosts serviceid="test.service_type" hosts="get_hostgroup(test.agroup).hosts"></mc-hosts>
+        </div>
+    </div>
+</div>
+
+<div class="form-group" ng-if="test.mesh_type != 'mesh'">
+    <label class="col-sm-2 control-label">Host Group B</label>
+    <div class="col-sm-10">
+        <select class="form-control" ng-model="test.bgroup" name="bgroup" 
+            ng-disabled="!config.canedit" 
+            required>
+            <option value="">(Select Host Group)</option>
+            <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group.id}}">{{group.desc}}</option>
+        </select>
+        <div class="well well-sm" ng-if="test.bgroup">
+            <mc-hosts serviceid="test.service_type" hosts="get_hostgroup(test.bgroup).hosts"></mc-hosts>
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label">Testspec</label>
+    <div class="col-sm-10">
+        <select class="form-control" ng-model="test.TestspecId" name="testspecid" 
+            ng-disabled="!config.canedit" 
+            required>
+            <option value="">(Select Test Spec)</option>
+            <option ng-repeat="spec in testspecs | filter:{service_type:test.service_type}" value="{{spec.id}}">{{spec.desc}} </option>
+        </select>
+        <div class="well well-sm" ng-if="test.TestspecId">
+            <div ng-repeat="(k,v) in get_selected_testspec(test.TestspecId).specs"><b>{{k}}</b>: {{v}}</div>
+        </div>
+    </div>
+</div>
+
+<!--
+   <select name="repeatSelect" id="repeatSelect" ng-model="test.whatever" required>
+      <option value="">(select me)</option>
+      <option value="1">something</option>
+      <option value="2">otherthing</option>
+    </select>
+-->
+
+

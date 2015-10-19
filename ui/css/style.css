@@ -54,20 +54,18 @@ span.email {
 th.specname {
   text-transform: capitalize;
 }
-ul.tests {
-  padding: 0px;
-  list-style: none;
-  font-size: 12px;
+li.test h5 {
+  margin-top: 0px;
 }
 ul.admins,
 ul.hosts {
   padding: 0px;
   list-style: none;
-  font-size: 12px;
   /*
     border: 1px solid #ccc;
     padding: 3px;
     */
+  font-size: 12px;
 }
 ul.admins li,
 ul.hosts li {

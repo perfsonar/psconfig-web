@@ -7,3 +7,4 @@ http://docs.perfsonar.net/config_mesh.html#config-mesh-test-spec
 # TODO
 
 Add page modified flag and alert user of page away
+Validate url, and other fields
