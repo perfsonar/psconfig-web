@@ -11,9 +11,7 @@
 
         <ul class="list-group">
         <li class="list-group-item"
-            ng-repeat="testspec in testspecs | filter:{service_type: service_id}"
-            ng-class="{clickable: testspec.canedit == true, disabled: testspec.canedit == false}" 
-            ng-click="edit(testspec)">
+            ng-repeat="testspec in testspecs | filter:{service_type: service_id}">
             <!--
             <div class="pull-right">
                 <button type="button" ng-click="edit(testspec)" ng-if="testspec.canedit" class="btn btn-sm">Edit</button>
@@ -32,6 +30,10 @@
                     <mc-admins admins="testspec.admins"></mc-admins>
                 </div>
             </div>
+            <div class="pull-right edit_button" ng-if="testspec.canedit">
+                <button type="button" ng-click="edit(testspec)" class="btn btn-sm pull-right"><i class="fa fa-pencil-square-o"></i></button>
+            </div>
+
         </li>
         </ul>
         <div class="panel-body" style="background-color: #fafafa;">

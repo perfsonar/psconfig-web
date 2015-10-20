@@ -11,6 +11,15 @@ var logger = new winston.Logger(config.logger.winston);
 //for field types
 //http://docs.sequelizejs.com/en/latest/api/datatypes/
 
+/* sample service record
+{
+    "id": "4415G0.owamp",
+    "name": "ps-latency.atlas.unimelb.edu.au owamp",
+    "locator": "tcp://ps-latency.atlas.unimelb.edu.au:861",
+    "lsid": "wlcg"
+},
+*/
+
 module.exports = function(sequelize, DataTypes) {
     return sequelize.define('Hostgroup', {
         service_type: Sequelize.STRING, 

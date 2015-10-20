@@ -42,13 +42,15 @@
             <label for="admins" class="col-sm-2 control-label">Hosts</label>
             <div class="col-sm-10">
                 <ui-select multiple ng-model="hostgroup.hosts" ng-disabled="disabled">
-                    <ui-select-match placeholder="Enter host name">
+                    <ui-select-match placeholder="Enter hostname">
                         <span class="label {{services.lss[$item.lsid].label_class}}"> {{services.lss[$item.lsid].label}}</span>
                         <b>{{$item.name}}</b> ({{$item.locator}})
+                        <span ng-if="$item.old" class="label label-warning">Deprecated</span>
                     </ui-select-match>
-                    <ui-select-choices repeat="service.id as service in services.recs[hostgroup.service_type] | filter: $select.search">
+                    <ui-select-choices repeat="service.uuid as service in services.recs[hostgroup.service_type] | filter: $select.search">
                         <span class="label {{services.lss[service.lsid].label_class}}">{{services.lss[service.lsid].label}}</span>&nbsp;
                         <b>{{service.name}}</b> ({{service.locator}})
+                        <span ng-if="service.old" class="label label-warning">Deprecated</span>
                     </ui-select-choices>
                 </ui-select>
             </div>

@@ -102,12 +102,13 @@ function($scope, appconf, toaster, $http,  profiles, $modalInstance, hostgroup, 
     services.then(function(_services) { $scope.services = _services; }); //for host list
 
     function getdata() {
-        //create a copy of $scope.testspec so that UI doesn't break while saving.. (just admins?)
+        //create a copy of $scope.testspec so that UI doesn't break while saving.. (why just admins?)
         var data = angular.copy($scope.hostgroup);
         data.admins = [];
         $scope.hostgroup.admins.forEach(function(admin) {
             if(admin) data.admins.push(admin.sub);
         });
+        console.dir(data);
         return data;
     }
 

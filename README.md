@@ -6,3 +6,9 @@ MeshConfig Administrator GUI and tools to publish generated meshconfig
 
 Meshconfig parameters
 http://docs.perfsonar.net/config_mesh.html
+
+# TODO
+
+Remove service records that are really old (1 week?)
+
+

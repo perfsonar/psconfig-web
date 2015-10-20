@@ -8,9 +8,7 @@
 
         <ul class="list-group">
             <li class="list-group-item" 
-                ng-repeat="hostgroup in hostgroups | filter:{service_type:service_id}" 
-                ng-class="{clickable: hostgroup.canedit == true, disabled: hostgroup.canedit == false}" 
-                ng-click="edit(hostgroup)">
+                ng-repeat="hostgroup in hostgroups | filter:{service_type:service_id}">
                 <!--<h4><small>{{hostgroup.id}}</small> {{hostgroup.desc}}</h4>-->
                 <div class="row">
                     <div class="col-md-8">
@@ -22,6 +20,9 @@
                         <h4><small>Admins</small></h4>
                         <mc-admins admins="hostgroup.admins"></mc-admins>
                     </div>
+                </div>
+                <div class="pull-right edit_button" ng-if="hostgroup.canedit">
+                    <button type="button" ng-click="edit(hostgroup)" class="btn btn-sm pull-right"><i class="fa fa-pencil-square-o"></i></button>
                 </div>
             </li>
         </ul>

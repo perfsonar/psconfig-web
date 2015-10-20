@@ -14,6 +14,8 @@ var expressWinston = require('express-winston');
 var config = require('./config/config');
 var logger = new winston.Logger(config.logger.winston);
 var db = require('./models');
+var migration = require('./migration');
+var slscache = require('./slscache');
 
 //init express
 var app = express();
@@ -42,13 +44,28 @@ exports.app = app;
 exports.start = function(cb) {
     db.sequelize
     .sync(/*{force: true}*/)
+    .then(migration.run)
     .then(function() {
-        var port = process.env.PORT || config.express.port || '8080';
-        var host = process.env.HOST || config.express.host || 'localhost';
-        app.listen(port, host, function() {
-            logger.info("meshconfig api service running on %s:%d in %s mode", host, port, app.settings.env);
-            cb(null);
+
+        //start sls cacher
+        setInterval(function() {
+            logger.info("refreshing sls cache");
+            slscache.cache(function(err) {
+                if(err) logger.error(err);
+                else logger.info("done refreshing sls cache");
+            });
+        }, 1000*60*10); //reload every 10 minutes
+
+        slscache.cache(function(err) {
+            //start server
+            var port = process.env.PORT || config.express.port || '8080';
+            var host = process.env.HOST || config.express.host || 'localhost';
+            app.listen(port, host, function() {
+                logger.info("meshconfig api service running on %s:%d in %s mode", host, port, app.settings.env);
+                cb(null);
+            });
         });
+                
     });
 }
 

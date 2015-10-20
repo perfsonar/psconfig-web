@@ -16,6 +16,15 @@ app.factory('services', ['appconf', '$http', 'jwtHelper', function(appconf, $htt
         for(var lsid in res.data.lss) {
             res.data.lss[lsid].label_class = get_class();
         };
+
+        //set old flag on hosts that haven't been updated lately
+        var now = new Date();
+        var old = new Date(now.getTime() - 1000*3600); //1 hour old enough?
+        for(var type in res.data.recs) {
+            res.data.recs[type].forEach(function(service) {
+                if(Date.parse(service.updatedAt) < old) service.old = true;
+            });
+        }
         return res.data;
     });
 }]);
@@ -57,7 +66,7 @@ app.directive('mcHosts', ['services', function(services) {
                     scope.hosts.forEach(function(id) {
                         //look for the serviceid
                         _services.recs[scope.serviceid].forEach(function(rec) {
-                            if(rec.id == id) scope._hosts.push(rec);
+                            if(rec.uuid == id) scope._hosts.push(rec);
                         });
                     });
                 });

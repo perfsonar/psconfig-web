@@ -63,6 +63,11 @@
                 </button>
             </div>
         </div>
+        <div class="form-group" ng-if="!config.canedit">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="button" class="btn pull-right" ng-click="cancel()">Back</button>
+            </div>
+        </div>
     </form>
 </div>
 

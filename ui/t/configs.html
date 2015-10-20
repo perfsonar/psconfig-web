@@ -2,9 +2,9 @@
 <sca-menutab menu="serverconf.menu" active="'configs'"></sca-menutab>
 <div class="container-fluid">
     <ul class="list-group">
-    <li class="list-group-item clickable"
-        ng-repeat="config in configs"
-        ng-click="edit(config)">
+    <li class="list-group-item"
+        ng-repeat="config in configs">
+        <!--ng-click="edit(config)">-->
         <div class="row">
             <div class="col-md-8">
                 <h4><small>{{config.id}}</small> {{config.desc}} <small><a ng-click="openpuburl(config)" stop-event='click'>{{config.url}}</a></small></h4>
@@ -14,12 +14,12 @@
                 <h4><small>Admins</small></h4>
                 <mc-admins admins="config._admins"></mc-admins>
             </div>
-            <!--
-            <div class="col-md-3">
-                <h4><small>Publish URL</small></h4>
-                <a ng-click="openpuburl(config)" stop-event='click'>{{config.url}}</a>
-            </div>
-            -->
+        </div>
+        <div class="pull-right edit_button" ng-if="config.canedit">
+            <button type="button" ng-click="edit(config)" class="btn btn-sm pull-right"><i class="fa fa-pencil-square-o"></i></button>
+        </div>
+        <div class="pull-right edit_button" ng-if="!config.canedit">
+            <button type="button" ng-click="edit(config)" class="btn btn-sm pull-right"><i class="fa fa-eye"></i></button>
         </div>
     </li>
     </ul><!--list-group-->

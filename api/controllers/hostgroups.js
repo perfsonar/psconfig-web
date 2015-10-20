@@ -80,28 +80,7 @@ router.put('/:id', jwt({secret: config.express.jwt.secret}), function(req, res, 
 
 router.post('/', jwt({secret: config.express.jwt.secret}), function(req, res, next) {
     if(!~req.user.scopes.common.indexOf('user')) return res.status(401).end();
-    //console.log(JSON.stringify(req.body, null, 4));
     db.Hostgroup.create(req.body).then(function(hostgroup) {
-        //console.log(JSON.stringify(testspec, null, 4));
-        /*
-        //first I need to recreate all admin records
-        var admins = [];
-        async.eachSeries(req.body.admins, function(sub, cb) {
-            //TODO - should remove all current Admins first so that I don't get piles of unsed Admins
-            db.Admin.create({sub: sub}).then(function(admin) {
-                //logger.debug(JSON.stringify(admin, null, 4));
-                admins.push(admin);
-                cb(null);
-            });
-        }, function(err) {
-            if(err) return next(err);
-            //console.dir(JSON.stringify(admins, null, 4));
-            //then reset all
-            testspec.setAdmins(admins).then(function() {
-                res.json({status: "ok"});
-            });
-        });
-        */
         res.json({status: "ok"});
     });
 });
