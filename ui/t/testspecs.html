@@ -11,7 +11,7 @@
 
         <ul class="list-group">
         <li class="list-group-item"
-            ng-repeat="testspec in testspecs | filter:{service_type: service_id}">
+            ng-repeat="testspec in testspecs | filter:{service_type: service_id} | orderBy: 'id'">
             <!--
             <div class="pull-right">
                 <button type="button" ng-click="edit(testspec)" ng-if="testspec.canedit" class="btn btn-sm">Edit</button>

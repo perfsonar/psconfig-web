@@ -126,7 +126,7 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, pr
         var data = angular.copy($scope.testspec);
         data.admins = [];
         $scope.testspec.admins.forEach(function(admin) {
-            data.admins.push(admin.sub);
+            if(admin) data.admins.push(admin.sub);
         });
         return data;
     }
