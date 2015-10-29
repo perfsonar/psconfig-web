@@ -7,7 +7,7 @@ var jwt = require('express-jwt');
 var _ = require('underscore');
 
 //mine
-var config = require('./config/config');
+var config = require('../config/config');
 
 router.get('/health', function(req, res) {
     res.json({status: 'ok'});
@@ -30,7 +30,7 @@ function get_menu(user) {
     return menus;
 }
 
-router.get('/config', jwt({secret: config.express.jwt.secret, credentialsRequired: false}), function(req, res) {
+router.get('/config', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res) {
     var conf = {
         service_types: config.meshconfig.service_types,
         mesh_types: config.meshconfig.mesh_types,

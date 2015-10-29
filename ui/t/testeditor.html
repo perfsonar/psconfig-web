@@ -38,47 +38,92 @@
     </div>
 </div>
 
-<div class="form-group" ng-if="test.service_type !== undefined">
+<div class="form-group" ng-if="test.service_type && test.mesh_type == 'star'">
+    <label for="center_address" class="col-sm-2 control-label">Star Center</label>
+    <div class="col-sm-10">
+        <ui-select ng-model="test.center_address" ng-disabled="!config.canedit" ng-required>
+            <ui-select-match placeholder="Pick a host to be the center">
+                <div style="padding-top: 2px; font-size: 12px">
+                    <span class="label {{services.lss[$select.selected.lsid].label_class}}"> {{services.lss[$select.selected.lsid].label}}</span>
+                    <b>{{$select.selected.name}}</b> ({{$select.selected.locator}})
+                    <span ng-if="$select.selected.old" class="label label-warning">Stale</span>
+                </div>
+            </ui-select-match>
+            <ui-select-choices repeat="service.uuid as service in services.recs[test.service_type] | filter: $select.search">
+                <span class="label {{services.lss[service.lsid].label_class}}">{{services.lss[service.lsid].label}}</span>&nbsp;
+                <b>{{service.name}}</b> ({{service.locator}})
+                <span ng-if="service.old" class="label label-warning">Stale</span>
+            </ui-select-choices>
+        </ui-select>
+    </div>
+</div>
+
+<!-- html5 version (can't display html in the option / selected value)
+<div class="form-group" ng-if="test.service_type && test.mesh_type == 'star'">
+    <label for="center_address" class="col-sm-2 control-label">Center Host</label>
+    <div class="col-sm-10">
+        <select class="form-control" ng-model="test.center_address" ng-disabled="!config.canedit" required>
+            <option value="">(Select Center Host)</option>
+            <option value="{{service.uuid}}" ng-repeat="service in services.recs[test.service_type] | filter: $select.search">
+                <span class="label {{services.lss[service.lsid].label_class}}">{{services.lss[service.lsid].label}}</span>&nbsp;
+                <b>{{service.name}}</b> ({{service.locator}})
+                <span ng-if="service.old" class="label label-warning">Stale</span>
+            </option>
+        </select>
+    </div>
+</div>
+-->
+
+<div class="form-group" ng-if="test.service_type">
     <label class="col-sm-2 control-label">Host Group A</label>
     <div class="col-sm-10">
-        <select class="form-control" ng-model="test.agroup" name="agroup" 
-            ng-disabled="!config.canedit" 
-            required>
+        <select class="form-control" ng-model="test.agroup" name="agroup" ng-disabled="!config.canedit" required>
             <option value="">(Select Host Group)</option>
             <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group.id}}">{{group.desc}}</option>
         </select>
-        <div class="well well-sm" ng-if="test.agroup">
+        <div class="well well-sm" ng-if="test.agroup" style="margin-bottom: 0px">
             <mc-hosts serviceid="test.service_type" hosts="get_hostgroup(test.agroup).hosts"></mc-hosts>
         </div>
     </div>
 </div>
 
-<div class="form-group" ng-if="test.mesh_type != 'mesh'">
+<div class="form-group" ng-if="test.service_type && test.mesh_type == 'disjoint'">
     <label class="col-sm-2 control-label">Host Group B</label>
     <div class="col-sm-10">
-        <select class="form-control" ng-model="test.bgroup" name="bgroup" 
-            ng-disabled="!config.canedit" 
-            required>
+        <select class="form-control" ng-model="test.bgroup" name="bgroup" ng-disabled="!config.canedit" required>
             <option value="">(Select Host Group)</option>
             <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group.id}}">{{group.desc}}</option>
         </select>
-        <div class="well well-sm" ng-if="test.bgroup">
+        <div class="well well-sm" ng-if="test.bgroup" style="margin-bottom: 0px;">
             <mc-hosts serviceid="test.service_type" hosts="get_hostgroup(test.bgroup).hosts"></mc-hosts>
         </div>
     </div>
 </div>
 
+<!-- I need to let user select host from specified host group (http://docs.perfsonar.net/config_mesh.html#config-mesh-group-no-agent)
+<div class="form-group" ng-if="test.service_type">
+    <label class="col-sm-2 control-label">No Agent</label>
+    <div class="col-sm-10">
+        <select class="form-control" ng-model="test.nagroup" name="nagroup" ng-disabled="!config.canedit">
+            <option value="">(Select No Agent Host Group)</option>
+            <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group.id}}">{{group.desc}}</option>
+        </select>
+        <div class="well well-sm" ng-if="test.bgroup">
+            <mc-hosts serviceid="test.service_type" hosts="get_hostgroup(test.nagroup).hosts"></mc-hosts>
+        </div>
+    </div>
+</div>
+-->
+
 <div class="form-group">
     <label class="col-sm-2 control-label">Testspec</label>
     <div class="col-sm-10">
-        <select class="form-control" ng-model="test.TestspecId" name="testspecid" 
-            ng-disabled="!config.canedit" 
-            required>
+        <select class="form-control" ng-model="test.TestspecId" name="testspecid" ng-disabled="!config.canedit" required>
             <option value="">(Select Test Spec)</option>
             <option ng-repeat="spec in testspecs | filter:{service_type:test.service_type}" value="{{spec.id}}">{{spec.desc}} </option>
         </select>
-        <div class="well well-sm" ng-if="test.TestspecId">
-            <div ng-repeat="(k,v) in get_selected_testspec(test.TestspecId).specs"><b>{{k}}</b>: {{v}}</div>
+        <div class="well well-sm" ng-if="test.TestspecId" style="margin-bottom: 0px;">
+            <mc-specs specs="get_selected_testspec(test.TestspecId).specs"></mc-specs>
         </div>
     </div>
 </div>

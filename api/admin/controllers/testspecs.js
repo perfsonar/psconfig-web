@@ -8,11 +8,11 @@ var jwt = require('express-jwt');
 var async = require('async');
 
 //mine
-var config = require('../config/config');
+var config = require('../../config/config');
 var logger = new winston.Logger(config.logger.winston);
-var db = require('../models');
+var db = require('../../models');
 
-router.get('/', jwt({secret: config.express.jwt.secret, credentialsRequired: false}), function(req, res, next) {
+router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
     db.Testspec.findAll(/*{include: [{
         model: db.Admin
     }]}*/).then(function(testspecs) {
@@ -53,7 +53,7 @@ router.get('/:id', function(req, res, next) {
     }); 
 });
 
-router.delete('/:id', jwt({secret: config.express.jwt.secret}), function(req, res, next) {
+router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var id = parseInt(req.params.id);
     db.Testspec.findOne({where: {id: id}/*, include: [{
         model: db.Admin
@@ -69,7 +69,7 @@ router.delete('/:id', jwt({secret: config.express.jwt.secret}), function(req, re
     });
 });
 
-router.put('/:id', jwt({secret: config.express.jwt.secret}), function(req, res, next) {
+router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var id = parseInt(req.params.id);
     console.log("updating "+id);
     db.Testspec.findOne({where: {id: id}/*, include: [{
@@ -112,7 +112,7 @@ router.put('/:id', jwt({secret: config.express.jwt.secret}), function(req, res, 
     }); 
 });
 
-router.post('/', jwt({secret: config.express.jwt.secret}), function(req, res, next) {
+router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     if(!~req.user.scopes.common.indexOf('user')) return res.status(401).end();
     console.log(JSON.stringify(req.body, null, 4));
     db.Testspec.create(req.body).then(function(testspec) {

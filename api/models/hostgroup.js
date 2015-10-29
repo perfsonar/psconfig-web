@@ -25,7 +25,7 @@ module.exports = function(sequelize, DataTypes) {
         service_type: Sequelize.STRING, 
         desc: Sequelize.STRING,
         
-        //array of host ids (client-uuid in sLS)
+        //array of host ids (client-uuid for service records in sLS)
         hosts: {
             type: Sequelize.TEXT,
             defaultValue: '[]',
@@ -36,8 +36,11 @@ module.exports = function(sequelize, DataTypes) {
                 return this.setDataValue('hosts', JSON.stringify(hosts));
             }
         },
+
+        //array of user ids (sub string in auth service)
         admins: {
             type: Sequelize.TEXT,
+            defaultValue: '[]',
             get: function () { 
                 return JSON.parse(this.getDataValue('admins'));
             },

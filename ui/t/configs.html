@@ -7,11 +7,11 @@
         <!--ng-click="edit(config)">-->
         <div class="row">
             <div class="col-md-8">
-                <h4><small>{{config.id}}</small> {{config.desc}} <small><a ng-click="openpuburl(config)" stop-event='click'>{{config.url}}</a></small></h4>
-                <mc-tests tests="config.Tests" servicetypes="serverconf.service_types" testspecs="testspecs"></mc-tests>
+                <h4><small>{{config.id}}</small> {{config.desc}} <small><a href="{{appconf.pub_url}}/config/{{config.url}}" target="_blank">{{appconf.pub_url}}/config/{{config.url}}</a></small></h4>
+                <mc-tests tests="config.Tests" servicetypes="serverconf.service_types"></mc-tests>
             </div>
             <div class="col-md-4" ng-if="config._admins">
-                <h4><small>Admins</small></h4>
+                <h5>Admins<small> (who can edit)</small></h5>
                 <mc-admins admins="config._admins"></mc-admins>
             </div>
         </div>
@@ -23,7 +23,7 @@
         </div>
     </li>
     </ul><!--list-group-->
-    <button type="button" ng-click="addconfig()" ng-if="cancreate" class="btn btn-sm">Add New Config</button>
+    <button type="button" ng-click="addconfig()" ng-if="cancreate" class="btn btn-sm">Add New</button>
 </div>
 
 

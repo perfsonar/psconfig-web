@@ -1,11 +1,32 @@
 <p class="text-muted" ng-if="!tests.length">No test specified</p>
 <ul class="list-group">
     <li class="list-group-item test" ng-repeat="test in tests" ng-class="{disabled: !test.enabled}">
-        <h5>
+        <div class="pull-right">
+            <span ng-if="test.testspec">{{test.testspec.desc}}</span>
+            <!--
+            <div style="display: inline-block;">
+                |
+                <span ng-if="test.mesh_type == 'mesh'">Mesh</span>
+                <span ng-if="test.mesh_type == 'disjoint'">Disjoin</span>
+                <span ng-if="test.mesh_type == 'star'">Star</span>
+                <span ng-if="test.mesh_type == 'ordered_mesh'">Ordered Mesh</span>
+            </div>
+            -->
+
+        </div>
+        <h5 style="margin-bottom: 0px;">
             <span class="label label-default">{{servicetypes[test.service_type].label}}</span>
             {{test.desc}}
+
+            |
+            <img src="images/{{test.mesh_type}}.png" style="max-height: 25px; top: -3px; position: relative;">
+            {{test.mesh_type}}
+
             <span ng-if="!test.enabled" class="pull-right label label-warning">Disabled</span>
+    
+            <!-- <mc-specs specs="testspecs[test.TestspecId].specs"></mc-specs> -->
         </h5>
+
         <!--
         <div class="row">
             <div class="col-md-6">

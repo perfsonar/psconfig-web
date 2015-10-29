@@ -42,6 +42,23 @@ app.directive('ngConfirmClick', [
     }
 ])
 
+/* attempt to get ui-select's required flag working.. didn't work
+app.directive('uiSelect', function() {
+    return {
+        restrict: 'EA',
+        require: '?ngModel',
+        link: function (scope, element, attrs, ctrl) {
+            //if (ctrl && angular.isDefined(attrs.multiple)) {
+            if (ctrl) {
+                ctrl.$isEmpty = function(value) {
+                    return !value || value.length === 0;
+                };
+            }
+        }
+    };
+});
+*/
+
 //http://stackoverflow.com/questions/14852802/detect-unsaved-changes-and-alert-user-using-angularjs
 app.directive('confirmOnExit', function() {
     return {

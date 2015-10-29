@@ -9,12 +9,12 @@ var async = require('async');
 var _ = require('underscore');
 
 //mine
-var config = require('../config/config');
+var config = require('../../config/config');
 var logger = new winston.Logger(config.logger.winston);
-var db = require('../models');
+var db = require('../../models');
 
 //just a plain list of configs
-router.get('/', jwt({secret: config.express.jwt.secret, credentialsRequired: false}), function(req, res, next) {
+router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
     db.Config.findAll({
         include: [ {
             model: db.Test,
@@ -36,7 +36,7 @@ router.get('/', jwt({secret: config.express.jwt.secret, credentialsRequired: fal
 });
 
 //config detail
-router.get('/:id', jwt({secret: config.express.jwt.secret, credentialsRequired: false}), function(req, res, next) {
+router.get('/:id', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
     var id = parseInt(req.params.id);
     logger.debug("retrieving "+id);
     db.Config.findOne({
@@ -55,7 +55,7 @@ router.get('/:id', jwt({secret: config.express.jwt.secret, credentialsRequired: 
     }); 
 });
 
-router.delete('/:id', jwt({secret: config.express.jwt.secret}), function(req, res, next) {
+router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var id = parseInt(req.params.id);
     db.Config.findOne({
         where: {id: id}
@@ -71,7 +71,7 @@ router.delete('/:id', jwt({secret: config.express.jwt.secret}), function(req, re
 });
 
 //update config
-router.put('/:id', jwt({secret: config.express.jwt.secret}), function(req, res, next) {
+router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var id = parseInt(req.params.id);  
     //console.log(JSON.stringify(req.body, null, 4));
     db.Config.findOne({
@@ -117,7 +117,7 @@ router.put('/:id', jwt({secret: config.express.jwt.secret}), function(req, res, 
 });
 
 //new config (TODO)
-router.post('/', jwt({secret: config.express.jwt.secret}), function(req, res, next) {
+router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     if(!~req.user.scopes.common.indexOf('user')) return res.status(401).end();
     db.Config.create(req.body).then(function(config) {
         //create tests

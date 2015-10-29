@@ -3,7 +3,11 @@
 #run this for production
 #sequelize db:migrate
 
-pm2 delete meshconfig
-pm2 start meshconfig.js --watch --ignore-watch="\.log$ test/ .sh$"
+pm2 delete mcadmin 
+pm2 start mcadmin.js --watch --ignore-watch="\.log$ test/ .sh$"
+
+pm2 delete mcpub
+#pm2 start mcpub.js -i 2  --watch --ignore-watch="\.log$ test/ .sh$"
+pm2 start mcpub.js --watch --ignore-watch="\.log$ test/ .sh$"
 
 #pm2 logs meshconfig

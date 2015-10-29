@@ -20,7 +20,7 @@
 </head>
 <body>
     <sca-menubar header="menu.header" menu="menu.top" active="'meshconfig'" profile="menu._profile"></sca-menubar>
-    <toaster-container></toaster-container>
+    <toaster-container toaster-options="{'position-class': 'toast-bottom-right'}"></toaster-container>
     <ng-view></ng-view>
     <ng-include src="'t/footer.html'"></ng-include> <!--should this be part of view?-->
 
@@ -46,6 +46,9 @@
 
         //url base for meshconfig api
         api: '/api/meshconfig',
+
+        //url base for meshconfig publisher
+        pub_url: './pub',
 
         profile_api: '/api/profile',
         profile_url: '/profile',

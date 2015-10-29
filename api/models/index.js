@@ -6,8 +6,20 @@ var Sequelize = require('sequelize');
 var basename  = path.basename(module.filename);
 //var env       = process.env.NODE_ENV || 'development';
 //var config    = require(__dirname + '/../config/config.json')[env];
-var config    = require('../config/config').db;
-var sequelize = new Sequelize(config.database, config.username, config.password, config);
+var config    = require('../config/config');
+if(typeof config.db === 'string') {
+    var sequelize = new Sequelize(config.db, {
+        /*
+        logging: function(str) {
+            //ignore for now..
+        }
+        */
+        logging: false
+    });
+} else {
+    //assume object
+    var sequelize = new Sequelize(config.db.database, config.db.username, config.db.password, config.db);
+}
 var db        = {};
 
 fs
@@ -31,25 +43,15 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 //relationships
-/*
-db.Hostgroup.belongsToMany(db.Admin, {through: 'AdminHostgroup'});
-db.Admin.belongsToMany(db.Hostgroup, {through: 'AdminHostgroup'});
-
-db.Testspec.belongsToMany(db.Admin, {through: 'AdminTestspec'});
-db.Admin.belongsToMany(db.Testspec, {through: 'AdminTestspec'});
-*/
-/*
-db.Test.belongsToMany(db.Hostgroup, {through: 'HostgroupToTest'});
-db.Hostgroup.belongsToMany(db.Test, {through: 'HostgroupToTest'});
-*/
-
-/*
-db.Config.belongsToMany(db.Admin, {through: 'AdminConfig'});
-db.Admin.belongsToMany(db.Config, {through: 'AdminConfig'});
-*/
 db.Config.hasMany(db.Test);
 db.Testspec.hasMany(db.Test);
+db.Test.belongsTo(db.Testspec);
 db.Hostgroup.hasMany(db.Test, {foreignKey: 'agroup'}); //Test.getAgroup, Test.setAgroup
+db.Test.belongsTo(db.Hostgroup, {foreignKey: 'agroup', as: 'HostGroupA'});
 db.Hostgroup.hasMany(db.Test, {foreignKey: 'bgroup'}); //Test.getBgroup, Test.setBgroup
+db.Test.belongsTo(db.Hostgroup, {foreignKey: 'bgroup', as: 'HostGroupB'});
+db.Hostgroup.hasMany(db.Test, {foreignKey: 'nagroup'}); //Test.getBgroup, Test.setBgroup
+db.Test.belongsTo(db.Hostgroup, {foreignKey: 'nagroup', as: 'HostGroupNA'});
+//db.Test.belongsTo(db.Hostgroup, {as: 'bgroup'});
 
 module.exports = db;

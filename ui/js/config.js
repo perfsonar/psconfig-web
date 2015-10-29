@@ -1,64 +1,61 @@
 
-app.controller('ConfigsController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'menu', 'serverconf', 'profiles', '$modal', '$location',
+app.controller('ConfigsController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'menu', 'serverconf', 'profiles', '$modal', '$location', 
 function($scope, appconf, toaster, $http, jwtHelper, menu, serverconf, profiles, $modal, $location) {
+    $scope.appconf = appconf;
+
     menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
-    $scope.appconf = appconf;
     
-    /*
-    //load stuff we need
-    $http.get(appconf.api+'/testspecs/').then(function(res) {
-        $scope.testspecs = res.data;
-    });
-    $http.get(appconf.api+'/hostgroups/').then(function(res) {
-        $scope.hostgroups = res.data;
-    });
-    */
-    $http.get(appconf.api+'/configs').then(function(res) {
-        $scope.configs = res.data;
-        /*
-        var jwt = localStorage.getItem(appconf.jwt_id);
-        if(jwt) {
-            user = jwtHelper.decodeToken(jwt);//watch out..jwt could be invalid
-            if(user && ~user.scopes.common.indexOf("user")) {
+    //load selectable options
+    $http.get(appconf.api+'/testspecs/').then(function(res) { 
+        var testspecs = res.data; 
+
+        $http.get(appconf.api+'/configs').then(function(res) {
+            $scope.configs = res.data;
+            if(profiles) profiles.then(function(_profiles) {
+                //if user can get profiles, then user must be a user
                 $scope.cancreate = true;
-            }
-        }
-        */
-        if(profiles) profiles.then(function(_profiles) {
-            //if user can get profiles, then user must be a user
-            $scope.cancreate = true;
-            
-            //map all user's profile to sub so that I use it to show admin info
-            var users = {};
-            _profiles.forEach(function(profile) {
-                users[profile.sub] = profile;
-            });
-            //convert admin ids to profile objects - so that select2 will recognize as already selected item
-            $scope.configs.forEach(function(config) {
-                config._admins = [];
-                config.admins.forEach(function(id) {
-                    config._admins.push(users[id]);
+                
+                //map all user's profile to sub so that I use it to show admin info
+                var users = {};
+                _profiles.forEach(function(profile) {
+                    users[profile.sub] = profile;
+                });
+                //convert admin ids to profile objects - so that select2 will recognize as already selected item
+                $scope.configs.forEach(function(config) {
+                    config._admins = [];
+                    config.admins.forEach(function(id) {
+                        config._admins.push(users[id]);
+                    });
+                   
+                    //deref testspecs
+                    config.Tests.forEach(function(test) {
+                        testspecs.forEach(function(_testspec) {
+                            if(test.TestspecId == _testspec.id) test.testspec = _testspec; 
+                        });
+                    });
                 });
             });
         });
     });
 
- 
+    /*
+    $scope.hostgroups = [];
+    $http.get(appconf.api+'/hostgroups/').then(function(res) { $scope.hostgroups = res.data; });
+    */
+    
     $scope.addconfig = function() {
         $location.url("/config/new");
     }
     $scope.edit = function(config) {
         $location.url("/config/"+config.id);
     }
-    $scope.openpuburl = function(config) {
-        document.location = appconf.api+"/pub/"+config.url;
-    }
 }]);
 
-app.controller('ConfigController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'serverconf', 'profiles', '$modal', '$routeParams', '$location',
-function($scope, appconf, toaster, $http, jwtHelper, serverconf, profiles, $modal, $routeParams, $location) {
+app.controller('ConfigController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'serverconf', 'profiles', '$modal', '$routeParams', '$location', 'services',
+function($scope, appconf, toaster, $http, jwtHelper, serverconf, profiles, $modal, $routeParams, $location, services) {
     $scope.id = $routeParams.id;
+    services.then(function(_services) { $scope.services = _services; }); //for host list
 
     if(profiles) {
         profiles.then(function(_profiles) { 
@@ -75,20 +72,19 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, profiles, $moda
     }
     
     //load selectable options
-    $http.get(appconf.api+'/testspecs/').then(function(res) {
-        $scope.testspecs = res.data;
-    });
-    $http.get(appconf.api+'/hostgroups/').then(function(res) {
-        $scope.hostgroups = res.data;
-    });
+    $scope.testspecs = [];
+    $http.get(appconf.api+'/testspecs/').then(function(res) { $scope.testspecs = res.data; });
+
+    $scope.hostgroups = [];
+    $http.get(appconf.api+'/hostgroups/').then(function(res) { $scope.hostgroups = res.data; });
 
     function load_guest(cb) {
         $http.get(appconf.api+'/configs/'+$routeParams.id).then(function(res) {
             $scope.config = res.data;
             res.data.Tests.forEach(function(test) {
                 //angular wants value key to be string
-                test.TestspecId = test.TestspecId.toString();
-                test.agroup = test.agroup.toString();
+                if(test.TestspecId) test.TestspecId = test.TestspecId.toString();
+                if(test.agroup) test.agroup = test.agroup.toString();
                 if(test.bgroup) test.bgroup = test.bgroup.toString();
             });
             if(cb) cb();

@@ -8,10 +8,9 @@ var jwt = require('express-jwt');
 var async = require('async');
 
 //mine
-var config = require('../config/config');
+var config = require('../../config/config');
 var logger = new winston.Logger(config.logger.winston);
-var db = require('../models');
-var slscache = require('../slscache');
+var db = require('../../models');
 
 //return the whole thing.. until that becomes an issue
 //open to public
@@ -35,7 +34,7 @@ router.get('/', function(req, res, next) {
             if(services[rec.type] === undefined) services[rec.type] = [];
             services[rec.type].push(rec);
         });
-        res.json({recs: services, lss: config.lookup_services});    
+        res.json({recs: services, lss: config.datasource.services});    
     });
     //res.json(services);
     //res.json({hello: "there"});
@@ -44,6 +43,7 @@ router.get('/', function(req, res, next) {
 //update service cache immediately
 //TODO - only used for debug purpose right now.
 //TODO - should restrict access from localhost?
+var slscache = require('../slscache');
 router.post('/cache', function(req, res, next) {
     slscache.cache(function(err) {
         if(err) return next(err);

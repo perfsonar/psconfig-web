@@ -36,9 +36,16 @@ app.directive('mcAdmins', function() {
     } 
 });
 
+app.directive('mcSpecs', function() {
+    return {
+        scope: { specs: '=', },
+        templateUrl: 't/specs.html',
+    } 
+});
+
 app.directive('mcTests', function() {
     return {
-        scope: { tests: '=', servicetypes: '=', testspecs: '='},
+        scope: { tests: '=', servicetypes: '=', /*testspecs: '=', hostgroups: '='*/},
         templateUrl: 't/tests.html',
         controller: function($scope) {
             /* load testspec details

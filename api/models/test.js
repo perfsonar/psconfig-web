@@ -18,6 +18,7 @@ module.exports = function(sequelize, DataTypes) {
         desc: Sequelize.STRING,
         service_type: Sequelize.STRING, 
         mesh_type: Sequelize.STRING, 
+        center_address: Sequelize.STRING, //only used for mesh_type == star
         enabled: { type: Sequelize.BOOLEAN, defaultValue: true },
     }, {
         classMethods: {

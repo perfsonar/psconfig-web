@@ -20,13 +20,10 @@
             <div class="row">
                 <div class="col-md-5">
                     <h4><small>{{testspec.id}}</small> {{testspec.desc}}</h4>
-                    <div ng-repeat="(k,v) in testspec.specs" class="row">
-                        <div class="col-xs-6"><b>{{k}}:</b></div>
-                        <div class="col-xs-6">{{v}}</div>
-                    </div>
+                    <mc-specs specs="testspec.specs"></mc-specs>
                 </div>
                 <div class="col-md-7">
-                    <h4><small>Admins</small></h4>
+                    <h5>Admins<small> (who can edit)</small></h5>
                     <mc-admins admins="testspec.admins"></mc-admins>
                 </div>
             </div>

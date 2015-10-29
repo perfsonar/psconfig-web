@@ -2,6 +2,6 @@
     <li ng-repeat="host in _hosts">
         <span class="label {{services.lss[host.lsid].label_class}}"> {{services.lss[host.lsid].label}}</span>
         <b>{{host.name}}</b> ({{host.locator}})
-        <span ng-if="host.old" class="label label-warning">Deprecated</span>
+        <span ng-if="host.old" class="label label-warning">Stale</span>
     </li>
 </ul>
