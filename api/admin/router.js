@@ -7,7 +7,7 @@ var jwt = require('express-jwt');
 var _ = require('underscore');
 
 //mine
-var config = require('../config/config');
+var config = require('../config');
 
 router.get('/health', function(req, res) {
     res.json({status: 'ok'});

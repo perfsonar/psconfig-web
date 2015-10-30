@@ -9,7 +9,7 @@ var async = require('async');
 var _ = require('underscore');
 
 //mine
-var config = require('../../config/config');
+var config = require('../../config');
 var logger = new winston.Logger(config.logger.winston);
 var db = require('../../models');
 

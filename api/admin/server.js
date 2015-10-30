@@ -12,7 +12,7 @@ var expressWinston = require('express-winston');
 var compression = require('compression');
 
 //mine
-var config = require('../config/config');
+var config = require('../config');
 var logger = new winston.Logger(config.logger.winston);
 var db = require('../models');
 var migration = require('./migration');
