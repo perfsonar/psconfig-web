@@ -144,15 +144,16 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
     });
     
     //console.dir($routeProvider);
-}]).run(['$rootScope', '$location', 'toaster', 'jwtHelper', 'appconf', function($rootScope, $location, toaster, jwtHelper, appconf) {
+}]).run(['$rootScope', '$location', 'toaster', 'jwtHelper', 'appconf', 'scaMessage',
+function($rootScope, $location, toaster, jwtHelper, appconf, scaMessage) {
     $rootScope.$on("$routeChangeStart", function(event, next, current) {
         //console.log("route changed from "+current+" to :"+next);
         //redirect to /login if user hasn't authenticated yet
         if(next.requiresLogin) {
             var jwt = localStorage.getItem(appconf.jwt_id);
             if(jwt == null || jwtHelper.isTokenExpired(jwt)) {
-                //TODO - use $cookies.set("messages") to send messages to user service ("please login first" or such..)
-                localStorage.setItem('post_auth_redirect', window.location.toString());
+                scaMessage.info("Please login first!");
+                sessionStorage.setItem('auth_redirect', window.location.toString());
                 window.location = appconf.auth_url;
                 event.preventDefault();
             }
@@ -218,7 +219,7 @@ app.factory('profile', ['appconf', '$http', 'jwtHelper', function(appconf, $http
 */
 
 //just a service to load all users from auth service
-app.factory('serverconf', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
+app.factory('serverconf', ['appconf', '$http', function(appconf, $http) {
     return $http.get(appconf.api+'/config')
     .then(function(res) {
         return res.data;
