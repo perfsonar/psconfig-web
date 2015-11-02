@@ -106,11 +106,13 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         templateUrl: 't/about.html',
         controller: 'AboutController'
     })
+    /*
     .when('/home', {
         templateUrl: 't/home.html',
         controller: 'HomeController',
         requiresLogin: true,
     })
+    */
     .when('/testspecs', {
         templateUrl: 't/testspecs.html',
         controller: 'TestspecsController',

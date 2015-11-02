@@ -1,18 +1,41 @@
 
-app.controller('ConfigsController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'menu', 'serverconf', 'profiles', '$modal', '$location', 
-function($scope, appconf, toaster, $http, jwtHelper, menu, serverconf, profiles, $modal, $location) {
+app.controller('ConfigsController', ['$scope', 'appconf', 'toaster', '$http', 'menu', 'serverconf', 'profiles', '$location', 'scaMessage', 'services', 'jwtHelper',
+function($scope, appconf, toaster, $http, menu, serverconf, profiles, $location, scaMessage, services, jwtHelper) {
     $scope.appconf = appconf;
+    scaMessage.show(toaster);
 
     menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
     
-    //load selectable options
-    $http.get(appconf.api+'/testspecs/').then(function(res) { 
-        var testspecs = res.data; 
+    //start loading stuff
+    var testspecs, hostgroups;//, services;
+    $http.get(appconf.api+'/testspecs/').then(function(res) {
+        testspecs = res.data; 
+        return $http.get(appconf.api+'/hostgroups/');
+    }).then(function(res) {
+        hostgroups = res.data;
+        return $http.get(appconf.api+'/configs');
+    }).then(function(res) {
+        $scope.configs = res.data;
+        //deref testspecs / hostgroups 
+        $scope.configs.forEach(function(config) {
+            config.Tests.forEach(function(test) {
+                testspecs.forEach(function(_testspec) {
+                    if(test.TestspecId == _testspec.id) test.testspec = _testspec; 
+                });
+                hostgroups.forEach(function(_hostgroup) {
+                    if(test.agroup == _hostgroup.id) test.agroup = _hostgroup;
+                    if(test.bgroup == _hostgroup.id) test.bgroup = _hostgroup;
+                    if(test.nagroup == _hostgroup.id) test.nagroup = _hostgroup;
+                });
+            });
+        });
 
-        $http.get(appconf.api+'/configs').then(function(res) {
-            $scope.configs = res.data;
-            if(profiles) profiles.then(function(_profiles) {
+        //do the rest only for user 
+        var jwt = localStorage.getItem(appconf.jwt_id);
+        if(jwt && jwtHelper.decodeToken(jwt)) {
+            //user gets to see admin - but I need to load profiles 
+            profiles.then(function(_profiles) {
                 //if user can get profiles, then user must be a user
                 $scope.cancreate = true;
                 
@@ -21,29 +44,40 @@ function($scope, appconf, toaster, $http, jwtHelper, menu, serverconf, profiles,
                 _profiles.forEach(function(profile) {
                     users[profile.sub] = profile;
                 });
+
                 //convert admin ids to profile objects - so that select2 will recognize as already selected item
                 $scope.configs.forEach(function(config) {
                     config._admins = [];
                     config.admins.forEach(function(id) {
                         config._admins.push(users[id]);
                     });
-                   
-                    //deref testspecs
-                    config.Tests.forEach(function(test) {
-                        testspecs.forEach(function(_testspec) {
-                            if(test.TestspecId == _testspec.id) test.testspec = _testspec; 
-                        });
-                    });
                 });
+     
             });
-        });
-    });
+        }
 
-    /*
-    $scope.hostgroups = [];
-    $http.get(appconf.api+'/hostgroups/').then(function(res) { $scope.hostgroups = res.data; });
-    */
+    });
     
+    /*
+    function find_services(service_type, uuids) {
+        var services = [];
+        uuids.forEach(function(uuid) {
+            services.push(find_service(service_type, uuid));
+        });
+        return services;
+    }
+
+    function find_service(service_type, uuid) {
+        for(var i = 0;i < $scope.services.recs[service_type].length;++i) {
+            var service = $scope.services.recs[service_type][i];
+            if(service.uuid == uuid)  {
+                return service;
+            }
+        }
+        return null;
+    } 
+    */
+
     $scope.addconfig = function() {
         $location.url("/config/new");
     }
@@ -52,8 +86,8 @@ function($scope, appconf, toaster, $http, jwtHelper, menu, serverconf, profiles,
     }
 }]);
 
-app.controller('ConfigController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'serverconf', 'profiles', '$modal', '$routeParams', '$location', 'services',
-function($scope, appconf, toaster, $http, jwtHelper, serverconf, profiles, $modal, $routeParams, $location, services) {
+app.controller('ConfigController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'serverconf', 'profiles', '$routeParams', '$location', 'services',
+function($scope, appconf, toaster, $http, jwtHelper, serverconf, profiles, $routeParams, $location, services) {
     $scope.id = $routeParams.id;
     services.then(function(_services) { $scope.services = _services; }); //for host list
 
@@ -94,12 +128,14 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, profiles, $moda
         if($scope.id == "new") {
             //new
             var jwt = localStorage.getItem(appconf.jwt_id);
-            var user = jwtHelper.decodeToken(jwt);
-            $scope.config = {
-                _admins: [ $scope.users[user.sub] ], //select current user as admin
-                Tests: [],
-                canedit: true, 
-            };
+            if(jwt) {
+                var user = jwtHelper.decodeToken(jwt);
+                $scope.config = {
+                    _admins: [ $scope.users[user.sub] ], //select current user as admin
+                    Tests: [],
+                    canedit: true, 
+                };
+            }
         } else {
             //update
             load_guest(function() {
@@ -127,15 +163,6 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, profiles, $moda
             if(admin) data.admins.push(admin.sub);
         });
 
-        /*
-        //convert various test objects to foreigh keys
-        data.Tests.forEach(function(test) {
-            test.TestspecId = test.testspec.id;
-            test.agroup = test.agroup.id;
-            if(test.bgroup) test.bgroup = test.bgroup.id;
-        });
-        */
-    
         return data;
     }
 
@@ -172,11 +199,6 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, profiles, $moda
             desc: "",
             enabled: true,
             mesh_type: "mesh",
-    /*
-            agroup: "",
-            bgroup: "",
-            TestspecId: "",
-    */
         });
     }
     $scope.removetest = function(test) {

@@ -1,8 +1,9 @@
 'use strict';
 
 //show all testsspecs
-app.controller('TestspecsController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', '$location', 'serverconf', 'profiles', '$modal',
-function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, serverconf, profiles, $modal) {
+app.controller('TestspecsController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', '$location', 'serverconf', 'profiles', '$modal', 'scaMessage',
+function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, serverconf, profiles, $modal, scaMessage) {
+    scaMessage.show(toaster);
     menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
 

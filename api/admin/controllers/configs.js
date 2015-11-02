@@ -73,7 +73,6 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
 //update config
 router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var id = parseInt(req.params.id);  
-    //console.log(JSON.stringify(req.body, null, 4));
     db.Config.findOne({
         where: {id: id}
     }).then(function(config) {
@@ -102,8 +101,6 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
                     }
                 }, function(err) {
                     if(err) return next(err);
-                    //logger.debug("dumnping tests-------------------");
-                    //logger.debug(tests);
                     config.setTests(tests).then(function() {
                         res.json({status: "ok"});
                     }, next); //TODO - not sure if this is correct way to handle err for sequelize?

@@ -6,21 +6,28 @@
         ng-repeat="config in configs | orderBy:'id' ">
         <!--ng-click="edit(config)">-->
         <div class="row">
-            <div class="col-md-8">
-                <h4><small>{{config.id}}</small> {{config.desc}} <small><a href="{{appconf.pub_url}}/config/{{config.url}}" target="_blank">{{appconf.pub_url}}/config/{{config.url}}</a></small></h4>
+            <div class="col-lg-8">
+                <h4>
+                    <small>{{config.id}}</small> 
+                    {{config.desc}}
+                    <small><a href="{{appconf.pub_url}}/config/{{config.url}}" target="_blank">{{appconf.pub_url}}/config/{{config.url}}</a></small>
+                </h4>
                 <mc-tests tests="config.Tests" servicetypes="serverconf.service_types"></mc-tests>
             </div>
-            <div class="col-md-4" ng-if="config._admins">
+            <div class="col-md-4">
                 <h5>Admins<small> (who can edit)</small></h5>
-                <mc-admins admins="config._admins"></mc-admins>
+                <mc-admins admins="config._admins" ng-if="config._admins"></mc-admins>
+                <p ng-if="!config._admins">(Please login to see admins)</p>
             </div>
         </div>
         <div class="pull-right edit_button" ng-if="config.canedit">
             <button type="button" ng-click="edit(config)" class="btn btn-sm pull-right"><i class="fa fa-pencil-square-o"></i></button>
         </div>
+        <!--
         <div class="pull-right edit_button" ng-if="!config.canedit">
             <button type="button" ng-click="edit(config)" class="btn btn-sm pull-right"><i class="fa fa-eye"></i></button>
         </div>
+        -->
     </li>
     </ul><!--list-group-->
     <button type="button" ng-click="addconfig()" ng-if="cancreate" class="btn btn-sm">Add New</button>

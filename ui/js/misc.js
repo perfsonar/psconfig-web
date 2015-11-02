@@ -92,16 +92,18 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, serverconf, menu) {
     menu.then(function(_menu) { $scope.menu = _menu; });
 }]);
 
-app.controller('AboutController', ['$scope', 'appconf', 'menu', 'serverconf',
-function($scope, appconf, menu, serverconf) {
+app.controller('AboutController', ['$scope', 'appconf', 'menu', 'serverconf', 'scaMessage', 'toaster',
+function($scope, appconf, menu, serverconf, scaMessage, toaster) {
+    scaMessage.show(toaster);
     menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_c) { $scope.serverconf = _c; });
 }]);
 
+/*
 app.controller('HomeController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', 'serverconf',
 function($scope, appconf, $route, toaster, $http, jwtHelper, menu, serverconf) {
     menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_c) { $scope.serverconf = _c; });
 }]);
-
+*/
 

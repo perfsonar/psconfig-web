@@ -1,9 +1,9 @@
 <p class="text-muted" ng-if="!tests.length">No test specified</p>
 <ul class="list-group">
     <li class="list-group-item test" ng-repeat="test in tests" ng-class="{disabled: !test.enabled}">
+        <!--
         <div class="pull-right">
             <span ng-if="test.testspec">{{test.testspec.desc}}</span>
-            <!--
             <div style="display: inline-block;">
                 |
                 <span ng-if="test.mesh_type == 'mesh'">Mesh</span>
@@ -11,38 +11,58 @@
                 <span ng-if="test.mesh_type == 'star'">Star</span>
                 <span ng-if="test.mesh_type == 'ordered_mesh'">Ordered Mesh</span>
             </div>
-            -->
-
         </div>
+        -->
         <h5 style="margin-bottom: 0px;">
             <span class="label label-default">{{servicetypes[test.service_type].label}}</span>
             {{test.desc}}
-
             |
             <img ng-src="images/{{test.mesh_type}}.png" style="max-height: 25px; top: -3px; position: relative;">
             {{test.mesh_type}}
-
-            <span ng-if="!test.enabled" class="pull-right label label-warning">Disabled</span>
-    
-            <!-- <mc-specs specs="testspecs[test.TestspecId].specs"></mc-specs> -->
         </h5>
 
-        <!--
         <div class="row">
-            <div class="col-md-6">
-                <b ng-click="test.show_testspec = !test.show_testspec" stop-event='click'>
-                    <i class="fa" ng-class="{'fa-caret-square-o-right': !test.show_testspec, 'fa-caret-square-o-down': test.show_testspec}"></i> {{test.testspec.desc}}
-                </b>
-                <div ng-if="test.show_testspec" class="slide-down">
-                    <div ng-repeat="(k,v) in test.testspec.specs">{{k}}: {{v}}</div>
+        <div class="col-md-8">
+            <div ng-switch="test.mesh_type">
+                <div ng-switch-when="star">
+                    <h6>Center Address</h6>
+                    <mc-hosts serviceid="test.service_type" hosts="[test.center_address]"></mc-hosts>
+                    <h6>{{test.agroup.desc}}</h6>
+                    <mc-hosts serviceid="test.service_type" hosts="test.agroup.hosts"></mc-hosts>
+                </div>
+                <div ng-switch-when="mesh">
+                    <h6>{{test.agroup.desc}}</h6>
+                    <mc-hosts serviceid="test.service_type" hosts="test.agroup.hosts"></mc-hosts>
+                </div>
+                <div ng-switch-when="disjoint">
+                    <h6>{{test.agroup.desc}}</h6>
+                    <mc-hosts serviceid="test.service_type" hosts="test.agroup.hosts"></mc-hosts>
+                    <h6>{{test.bgroup.desc}}</h6>
+                    <mc-hosts serviceid="test.service_type" hosts="test.bgroup.hosts"></mc-hosts>
+                </div>
+                <div ng-switch-when="ordered_mesh">
+                    <h6>{{test.agroup.desc}}</h6>
+                    <mc-hosts serviceid="test.service_type" hosts="test.agroup.hosts"></mc-hosts>
+                </div>
+                <div ng-switch-default>
+                    <p>(Unsupported mesh type: {{test.mesh_type}})</p>
                 </div>
             </div>
-            <div class="col-md-6">
-                <span>mesh_type: {{test.mesh_type}}</span>
-                <span>agroup: {{test.agroup}}</span>
-                <span>bgroup: {{test.bgroup}}</span>
+            <div ng-if="test.nagroup">
+                <h6>NA Group</h6>
+                <mc-hosts serviceid="test.service_type" hosts="test.nagroup.hosts"></mc-hosts>
             </div>
         </div>
-        -->
+        <div class="col-md-4">
+            <div ng-if="test.testspec">
+                <h6>{{test.testspec.desc}}</h6>
+                <mc-specs specs="test.testspec.specs"></mc-specs>
+            </div>
+        </div>
+        </div><!--row-->
+
+
+        <span ng-if="!test.enabled" class="pull-right label label-warning">Disabled</span>
+        <!-- <mc-specs specs="testspecs[test.TestspecId].specs"></mc-specs> -->
     </li>
 </ul>

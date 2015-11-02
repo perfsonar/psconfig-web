@@ -1,6 +1,7 @@
 
-app.controller('HostgroupsController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'menu', 'serverconf', 'profiles', '$modal',
-function($scope, appconf, toaster, $http, jwtHelper, menu, serverconf, profiles, $modal) {
+app.controller('HostgroupsController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'menu', 'serverconf', 'profiles', '$modal', 'scaMessage',
+function($scope, appconf, toaster, $http, jwtHelper, menu, serverconf, profiles, $modal, scaMessage) {
+    scaMessage.show(toaster);
     menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
 

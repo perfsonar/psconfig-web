@@ -4,7 +4,7 @@
 }
 
 body {
-  font-family: 'Lato', serif;
+  /*font-family: 'Lato', serif;*/
 }
 .center-block {
   display: block;
@@ -74,6 +74,7 @@ ul.hosts li {
   padding: 4px 6px;
   display: inline-block;
   margin: 1px 3px;
+  /*line-height: 140%;*/
 }
 .navbar-brand .header-icon img {
   max-height: 35px;
