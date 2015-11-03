@@ -20,3 +20,5 @@ Disallow user from used testspecs / hostgroups (and show which config/test uses 
 migration not receiving queryinterface
 
 Populate some sample testspecs / hosts / config(?) as very first migration?
+
+"sign in to see admin" doesn't make any sense.. because they are all public via json!
