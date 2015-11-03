@@ -276,14 +276,20 @@ function(appconf, $http, jwtHelper, $sce, scaMessage) {
         //TODO - this function is called with either valid profile, or just menu if jwt is not provided... only do following if res is profile
         //if(res.status != 200) return $q.reject("Failed to load profile");
         menu._profile = res.data;
-        if(res.data.email) {
-            return menu;
+        if(res.data) {
+            //logged in, but does user has email?
+            if(res.data.email) {
+                return menu;
+            } else {
+                //force user to update profile
+                //TODO - do I really need to?
+                scaMessage.info("Please update your profile before using application.");
+                sessionStorage.setItem('profile_settings_redirect', window.location.toString());
+                document.location = appconf.profile_url;
+            }
         } else {
-            //force user to update profile
-            //TODO - do I really need to?
-            scaMessage.info("Please update your profile before using application."); 
-            sessionStorage.setItem('profile_settings_redirect', window.location.toString());
-            document.location = appconf.profile_url;
+            //not logged in.
+            return menu;
         }
     }, function(err) {
         console.log("couldn't load profile");
