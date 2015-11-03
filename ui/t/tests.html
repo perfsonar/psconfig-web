@@ -2,17 +2,6 @@
 <ul class="list-group">
     <li class="list-group-item test" ng-repeat="test in tests" ng-class="{disabled: !test.enabled}">
         <!--
-        <div class="pull-right">
-            <span ng-if="test.testspec">{{test.testspec.desc}}</span>
-            <div style="display: inline-block;">
-                |
-                <span ng-if="test.mesh_type == 'mesh'">Mesh</span>
-                <span ng-if="test.mesh_type == 'disjoint'">Disjoin</span>
-                <span ng-if="test.mesh_type == 'star'">Star</span>
-                <span ng-if="test.mesh_type == 'ordered_mesh'">Ordered Mesh</span>
-            </div>
-        </div>
-        -->
         <h5 style="margin-bottom: 0px;">
             <span class="label label-default">{{servicetypes[test.service_type].label}}</span>
             {{test.desc}} | <img ng-src="images/{{test.mesh_type}}.png" style="top: -1px; position: relative;"> {{test.mesh_type}}
@@ -56,10 +45,35 @@
                 <mc-specs specs="test.testspec.specs"></mc-specs>
             </div>
         </div>
-        </div><!--row-->
+        </div>
+        -->
 
+        <h5 style="margin-bottom: 0px;">
+            <span class="label label-default">{{servicetypes[test.service_type].label}}</span>
+            {{test.desc}} <small>with {{test.testspec.desc}}</small>
+            | <img ng-src="images/{{test.mesh_type}}.png" style="top: -1px; position: relative;"> <small>{{test.mesh_type}}</small>
+            <div ng-switch="test.mesh_type" style="display: inline-block;">
+                <div ng-switch-when="star" style="display: inline-block;">
+                    {{test.agroup.desc}} (Center: {{get_service(test.center_address).name}})
+                </div>
+                <div ng-switch-when="mesh" style="display: inline-block;">
+                    {{test.agroup.desc}}
+                </div>
+                <div ng-switch-when="disjoint" style="display: inline-block;">
+                    A:{{test.agroup.desc}} B:{{test.bgroup.desc}}
+                </div>
+                <div ng-switch-when="ordered_mesh" style="dpslay: inline-block;">
+                    {{test.agroup.desc}} 
+                </div>
+                <div ng-switch-default style="display: inline-block;">
+                    (Unsupported mesh type: {{test.mesh_type}})
+                </div>
+            </div>
+            <div ng-if="test.nagroup" style="display: inline-block;">
+                | NA:{{test.nagroup.desc}} 
+            </div> 
+        </h5>
 
         <span ng-if="!test.enabled" class="pull-right label label-warning">Disabled</span>
-        <!-- <mc-specs specs="testspecs[test.TestspecId].specs"></mc-specs> -->
     </li>
 </ul>

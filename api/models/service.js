@@ -24,7 +24,12 @@ module.exports = function(sequelize, DataTypes) {
 
     //holds "cache" of sls service records
     return sequelize.define('Service', {
+        /////////////////////////////////////////////////////////////////////////////////////////..
+        //key
         uuid: Sequelize.STRING, //client-uuid + service-type
+
+        /////////////////////////////////////////////////////////////////////////////////////////..
+        //props
         name: Sequelize.STRING, //from service-name
         type: Sequelize.STRING, //like "owamp", "bwctl", etc.
         locator: Sequelize.STRING, // like "tcp://ps-latency.atlas.unimelb.edu.au:861" (used to pull hostname)

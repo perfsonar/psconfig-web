@@ -6,7 +6,7 @@ function($scope, appconf, toaster, $http, menu, serverconf, profiles, $location,
 
     menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
-    
+
     //start loading stuff
     var testspecs, hostgroups;//, services;
     $http.get(appconf.api+'/testspecs/').then(function(res) {
@@ -58,26 +58,6 @@ function($scope, appconf, toaster, $http, menu, serverconf, profiles, $location,
 
     });
     
-    /*
-    function find_services(service_type, uuids) {
-        var services = [];
-        uuids.forEach(function(uuid) {
-            services.push(find_service(service_type, uuid));
-        });
-        return services;
-    }
-
-    function find_service(service_type, uuid) {
-        for(var i = 0;i < $scope.services.recs[service_type].length;++i) {
-            var service = $scope.services.recs[service_type][i];
-            if(service.uuid == uuid)  {
-                return service;
-            }
-        }
-        return null;
-    } 
-    */
-
     $scope.addconfig = function() {
         $location.url("/config/new");
     }

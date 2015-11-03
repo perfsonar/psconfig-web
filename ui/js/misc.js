@@ -47,14 +47,20 @@ app.directive('mcTests', function() {
     return {
         scope: { tests: '=', servicetypes: '=', /*testspecs: '=', hostgroups: '='*/},
         templateUrl: 't/tests.html',
-        controller: function($scope) {
-            /* load testspec details
-            $scope.tests.forEach(function(test) {
-                $scope.testspecs.forEach(function(testspec) {
-                    if(testspec.id == test.TestspecId) test.testspec = testspec;
-                });
-            });
-            */
+        controller: function($scope, services) {
+            services.then(function(_services) { 
+
+                //find the service specified via uuid        
+                $scope.get_service = function(uuid) {
+                    for(var type in _services.recs) {
+                        var recs = _services.recs[type];
+                        for(var i = 0;i < recs.length;i++) {
+                            if(recs[i].uuid == uuid) return recs[i];
+                        };
+                    }
+                    return null;
+                }
+            }); 
         }
     } 
 });
