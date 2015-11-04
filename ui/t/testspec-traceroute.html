@@ -4,6 +4,7 @@
         <select class="form-control" ng-model="testspec.specs.tool">
             <option value="traceroute">traceroute</option>
             <option value="tracepath">tracepath</option>
+            <option value="paris-traceroute">paris-traceroute</option>
         </select>
         <p class="help-block">The tool to use to perform the traceroute</p>
     </div>
@@ -18,32 +19,6 @@
     </div>
 </div>
 <div class="form-group" ng-if="testspec.specs.tool == 'traceroute'">
-    <label for="test_interval" class="col-sm-2 control-label">Test Interval *</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="text" class="form-control" id="test_interval" ng-model="testspec.specs.test_interval" required>
-            <div class="input-group-addon">seconds</div>
-        </div>
-        <p class="help-block">Number of seconds between each test</p>
-    </div>
-    <label for="first_ttl" class="col-sm-2 control-label">First TTL</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="text" class="form-control" id="first_ttl" ng-model="testspec.specs.first_ttl">
-            <div class="input-group-addon">hops</div>
-        </div>
-        <p class="help-block">Length of each test</p>
-    </div>
-</div>
-<div class="form-group" ng-if="testspec.specs.tool == 'traceroute'">
-    <label for="random_start_percentage" class="col-sm-2 control-label">Random Start Percentage</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="text" class="form-control" id="random_start_percentage" ng-model="testspec.specs.random_start_percentage">
-            <div class="input-group-addon">%</div>
-        </div>
-        <p class="help-block">Randomize test start time by this amount</p>
-    </div>
     <div>
         <label for="packet_size" class="col-sm-2 control-label">Packet Size</label>
         <div class="col-sm-4">
@@ -54,8 +29,54 @@
             <p class="help-block">The size of packets to send in bytes when performing the traceroute</p>
         </div>
     </div>
+    <label for="first_ttl" class="col-sm-2 control-label">First TTL</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" class="form-control" id="first_ttl" ng-model="testspec.specs.first_ttl">
+            <div class="input-group-addon">hops</div>
+        </div>
+        <p class="help-block">Length of each test</p>
+    </div>
 </div>
-<div class="form-group" ng-if="testspec.specs.tool == 'traceroute'">
+<div class="form-group">
+    <label for="random_start_percentage" class="col-sm-2 control-label">Random Start Percentage</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" class="form-control" id="random_start_percentage" ng-model="testspec.specs.random_start_percentage">
+            <div class="input-group-addon">%</div>
+        </div>
+        <p class="help-block">Randomize test start time by this amount</p>
+    </div>
+    <label for="test_interval" class="col-sm-2 control-label">Test Interval *</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" class="form-control" id="test_interval" ng-model="testspec.specs.test_interval" required>
+            <div class="input-group-addon">seconds</div>
+        </div>
+        <p class="help-block">Number of seconds between each test</p>
+    </div>
+</div>
+<div class="form-group">
+    <label for="timeout" class="col-sm-2 control-label">Timeout</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" class="form-control" id="timeout" ng-model="testspec.specs.timeout">
+            <div class="input-group-addon">Seconds</div>
+        </div>
+        <p class="help-block">The maximum amount of time to wait in seconds for the traceroute to complete</p>
+    </div>
+    <!--
+    <label for="test_interval" class="col-sm-2 control-label">Test Interval *</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" class="form-control" id="test_interval" ng-model="testspec.specs.test_interval" required>
+            <div class="input-group-addon">seconds</div>
+        </div>
+        <p class="help-block">Number of seconds between each test</p>
+    </div>
+    -->
+</div>
+<div class="form-group" ng-if="testspec.specs.tool != 'traceroute'">
     <div class="col-sm-offset-2 col-sm-10">
         <div class="checkbox">
             <label> <input type="checkbox" ng-model="testspec.specs.force_bidirectional"> Do Bidirectional test</label>

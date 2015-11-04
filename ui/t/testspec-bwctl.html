@@ -54,7 +54,7 @@
     </div>
 </div>
 <div class="form-group">
-    <div class="col-sm-offset-2 col-sm-10">
+    <div class="col-sm-offset-2 col-sm-4">
         <div class="checkbox">
             <label> <input type="checkbox" ng-model="testspec.specs.force_bidirectional"> Do Bidirectional test</label>
         </div>
@@ -63,6 +63,17 @@
         </div>
         <div class="checkbox">
             <label> <input type="checkbox" ng-model="testspec.specs.ipv6_only"> IPv6 Only</label>
-        </div>    </div>
+        </div>    
+    </div>
+    <div ng-if="testspec.specs.protocol == 'udp'">
+        <label for="omit_interval" class="col-sm-2 control-label">UDP Bandwidth</label>
+        <div class="col-sm-4">
+            <div class="input-group">
+                <input type="text" class="form-control" id="omit_interval" ng-model="testspec.specs.udp_bandwidth">
+                <div class="input-group-addon">Bits Per Secs</div>
+            </div>
+            <p class="help-block">The rate at which the tool will attempt to send UDP packets.</p>
+        </div>
+    </div>
 </div>
 
