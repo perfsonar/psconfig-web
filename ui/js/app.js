@@ -257,7 +257,7 @@ app.factory('menu', ['appconf', '$http', 'jwtHelper', '$sce', 'scaMessage',
 function(appconf, $http, jwtHelper, $sce, scaMessage) {
     var menu = {
         header: {
-            label: appconf.title,
+            //label: appconf.title,
             icon: $sce.trustAsHtml("<img src=\""+appconf.icon_url+"\">"),
             url: "#/",
         }
