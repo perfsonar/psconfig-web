@@ -90,3 +90,6 @@ ul.hosts li {
   top: 0px;
   z-order: 1;
 }
+.ui-select-match-close {
+  color: #222;
+}

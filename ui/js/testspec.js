@@ -114,21 +114,50 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, pr
     //for admin list
     profiles.then(function(_profiles) { $scope.profiles = _profiles; });
 
+    /*
+    //massaging handful fields
+    if($scope.testspec.specs.ipv4_only) {
+        $scope.testspec._ipv46 = "4"; 
+    }
+    if($scope.testspec.specs.ipv6_only) {
+        $scope.testspec._ipv46 = "6"; 
+    }
+    */
+
+    //some special behaviors
+    $scope.$watch(function() { 
+        return $scope.testspec.specs.ipv4_only 
+    }, function(nv, ov) {
+        if(nv) {
+            delete $scope.testspec.specs.ipv6_only;
+        }
+    });
+    $scope.$watch(function() { 
+        return $scope.testspec.specs.ipv6_only 
+    }, function(nv, ov) {
+        if(nv) {
+            delete $scope.testspec.specs.ipv4_only;
+        }
+    });
+
     //create a copy of $scope.testspec so that UI doesn't break while saving.. (just admins?)
     function getdata() {
-        /*
-        var data = {
-            service_type: $scope.testspec.service_type,
-            desc: $scope.testspec.desc,
-            specs: $scope.testspec.specs,
-            admins: [] //to be added below
-        };
-        */
         var data = angular.copy($scope.testspec);
         data.admins = [];
         $scope.testspec.admins.forEach(function(admin) {
             if(admin) data.admins.push(admin.sub);
         });
+
+        /*
+        //need to do a bit of massaging for some fields
+        delete data.specs.ipv4_only;
+        delete data.specs.ipv6_only;
+        switch(data._ipv46) {
+        case "4": data.specs.ipv4_only = true; break;
+        case "6": data.specs.ipv6_only = true; break;
+        }
+        */
+    
         return data;
     }
 
