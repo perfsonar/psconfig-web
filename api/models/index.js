@@ -44,14 +44,19 @@ db.Sequelize = Sequelize;
 
 //relationships
 db.Config.hasMany(db.Test);
+
 db.Testspec.hasMany(db.Test);
+
 db.Test.belongsTo(db.Testspec);
-db.Hostgroup.hasMany(db.Test, {foreignKey: 'agroup'}); //Test.getAgroup, Test.setAgroup
 db.Test.belongsTo(db.Hostgroup, {foreignKey: 'agroup', as: 'HostGroupA'});
-db.Hostgroup.hasMany(db.Test, {foreignKey: 'bgroup'}); //Test.getBgroup, Test.setBgroup
 db.Test.belongsTo(db.Hostgroup, {foreignKey: 'bgroup', as: 'HostGroupB'});
-db.Hostgroup.hasMany(db.Test, {foreignKey: 'nagroup'}); //Test.getBgroup, Test.setBgroup
 db.Test.belongsTo(db.Hostgroup, {foreignKey: 'nagroup', as: 'HostGroupNA'});
+
+db.Hostgroup.hasMany(db.Test, {foreignKey: 'agroup'}); //Test.getAgroup, Test.setAgroup
+db.Hostgroup.hasMany(db.Test, {foreignKey: 'bgroup'}); //Test.getBgroup, Test.setBgroup
+db.Hostgroup.hasMany(db.Test, {foreignKey: 'nagroup'}); //Test.getBgroup, Test.setBgroup
+
 //db.Test.belongsTo(db.Hostgroup, {as: 'bgroup'});
+db.Service.belongsTo(db.Service, {foreignKey: 'ma', as: 'MA'});
 
 module.exports = db;

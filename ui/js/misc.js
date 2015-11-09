@@ -10,7 +10,7 @@ app.factory('services', ['appconf', '$http', 'jwtHelper', function(appconf, $htt
         }
     }
 
-    return $http.get(appconf.api+'/services')
+    return $http.get(appconf.api+'/cache/services')
     .then(function(res) {
         //assign label_classes
         for(var lsid in res.data.lss) {
@@ -25,6 +25,13 @@ app.factory('services', ['appconf', '$http', 'jwtHelper', function(appconf, $htt
                 if(Date.parse(service.updatedAt) < old) service.old = true;
             });
         }
+        return res.data;
+    });
+}]);
+
+app.factory('hosts', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
+    return $http.get(appconf.api+'/cache/hosts')
+    .then(function(res) {
         return res.data;
     });
 }]);

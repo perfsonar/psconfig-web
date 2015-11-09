@@ -85,10 +85,11 @@ app.directive('stopEvent', function () {
     return {
         restrict: 'A',
         link: function (scope, element, attr) {
-            if(attr && attr.stopEvent)
+            if(attr && attr.stopEvent) {
                 element.bind(attr.stopEvent, function (e) {
                     e.stopPropagation();
                 });
+            }
         }
     };
 });
@@ -118,6 +119,10 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         controller: 'TestspecsController',
         requiresLogin: true,
     })
+    .when('/testspec/:id/:service_type?', {
+        templateUrl: 't/testspec.html',
+        controller: 'TestspecController'
+    })
     .when('/hostgroups', {
         templateUrl: 't/hostgroups.html',
         controller: 'HostgroupsController',
@@ -130,6 +135,10 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
     .when('/config/:id', {
         templateUrl: 't/config.html',
         controller: 'ConfigController'
+    })
+    .when('/services', {
+        templateUrl: 't/services.html',
+        controller: 'ServicesController'
     })
     /*
     .when('/success', {
@@ -206,20 +215,6 @@ function(appconf, $httpProvider, jwtInterceptorProvider) {
     $httpProvider.interceptors.push('jwtInterceptor');
 }]);
 
-/*
-//TODO - I am not sure if this is really worth existing
-app.factory('profile', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
-    var jwt = localStorage.getItem(appconf.jwt_id);
-    if(jwt) {
-        var user = jwtHelper.decodeToken(jwt);
-        return $http.get(appconf.profile_api+'/public/'+user.sub)
-        .then(function(res) {
-            return res.data;
-        });
-    } else return null;
-}]);
-*/
-
 //just a service to load all users from auth service
 app.factory('serverconf', ['appconf', '$http', function(appconf, $http) {
     return $http.get(appconf.api+'/config')
@@ -295,7 +290,6 @@ function(appconf, $http, jwtHelper, $sce, scaMessage) {
         console.log("couldn't load profile");
     });
 }]);
-
 
 //http://plnkr.co/edit/juqoNOt1z1Gb349XabQ2?p=preview
 /**

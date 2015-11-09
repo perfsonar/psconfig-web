@@ -14,9 +14,11 @@ var db = require('../models');
 //grouped by ls/service_type/service
 //var sls_cache = {};
 function docache_ls(lsid, ls, service_type, cb) {
-    request(ls.service_types[service_type].url, {timeout: 1000*10}, function(err, res, body) {
+    var url = ls.service_types[service_type].url;
+    request({url: url, timeout: 1000*10, json: true}, function(err, res, services) {
         if(err) return cb(err);
         if(res.statusCode != 200) return cb(new Error("failed to sLS cahce from:"+ls.url+" statusCode:"+res.statusCode));
+        /*
         var services = null;
         try {
             services = JSON.parse(body);
@@ -24,6 +26,7 @@ function docache_ls(lsid, ls, service_type, cb) {
             //couldn't parse sls response..
             return cb(e);
         }
+        */
          
         //if(sls_cache[lsid] === undefined) sls_cache[lsid] = {};
         //if(sls_cache[lsid][service_type] === undefined) sls_cache[lsid][service_type] = [];
@@ -71,7 +74,7 @@ function docache_ls(lsid, ls, service_type, cb) {
                 },
 
                 //TODO - I need to query the real admin records from the cache (gocdb2sls service already genenrates contact records)
-                //I just have to store them in tour table
+                //I just have to store them in our table
                 admins: service['service-administrators'],
 
                 count: 0, //number of times updated (exists to allow updateTime update)
@@ -82,12 +85,20 @@ function docache_ls(lsid, ls, service_type, cb) {
                     count_update++;
                     rec.count = _service.count+1; //force records to get updated
                     _service.update(rec).then(function() {
-                        next();
+                        //TODO check service record update status?
+                        cache_host(service, res, function(err) {
+                            if(err) logger.error(err); //continue
+                            next();
+                        });
                     });
                 } else {
                     db.Service.create(rec).then(function(service) {
+                        //TODO check service record create status?
                         count_new++;
-                        next();
+                        cache_host(service, res, function(err) {
+                            if(err) logger.error(err); //continue
+                            next();
+                        });
                     });
                 }
             });
@@ -114,6 +125,184 @@ function docache_ls(lsid, ls, service_type, cb) {
         //failed to access sls..
         return cb(e);
     });*/
+}
+
+/*
+function load_json(url, cb) {
+    request({url, url, json: true, timeout: 1000*10}, function(err, res, body) {
+        if(err) return cb(err);
+        if(res.statusCode != 200) return cb(new Error("failed to load json from "+ls.url+" statusCode:"+res.statusCode));
+        var info = null;
+        try {
+            return JSON.parse(body);
+        } catch (e) {
+            return cb(e);
+        }
+    });
+}
+*/
+
+function cache_host(service, res, cb) {
+    //construct host information url
+    var uri = res.request.uri;
+    
+    //truncate the last 2 path (/lookup/record) which is already part of service-host
+    var pathname_tokens = uri.pathname.split("/");
+    pathname_tokens.splice(-3);
+    var pathname = pathname_tokens.join("/");
+
+    //reconstruct the url for the host record
+    var url = uri.protocol+"//"+uri.host+pathname+'/'+service['service-host'];
+    request({url: url, timeout: 1000*10, json: true}, function(err, res, host) {
+        if(err) return cb(err);
+        if(res.statusCode != 200) return cb(new Error("failed to sLS cahce from:"+url+" statusCode:"+res.statusCode));
+        /* sample host
+        {
+            host-net-tcp-autotunemaxbuffer-send: [
+            "33554432 bytes"
+            ],
+            pshost-bundle: [
+            "perfsonar-toolkit"
+            ],
+            state: "renewed",
+            type: [
+            "host"
+            ],
+            client-uuid: [
+            "62af464a-1bab-4e0a-afd6-00026dc1a3db"
+            ],
+            location-longitude: [
+            "-97.4405"
+            ],
+            host-net-tcp-autotunemaxbuffer-recv: [
+            "33554432 bytes"
+            ],
+            group-communities: [
+            "USATLAS",
+            "LHCTier2",
+            "ESnet",
+            "Internet2",
+            "OSG",
+            "LHC",
+            "WLCG"
+            ],
+            expires: "2015-11-09T02:59:50.236Z",
+            host-name: [
+            "129.15.40.232"
+            ],
+            host-os-version: [
+            "6.7 (Final)"
+            ],
+            host-hardware-cpuid: [
+            "Intel(R) Pentium(R) CPU G6950 @ 2.80GHz"
+            ],
+            host-os-name: [
+            "CentOS"
+            ],
+            location-city: [
+            "Norman"
+            ],
+            pshost-bundle-version: [
+            "3.5"
+            ],
+            host-net-tcp-congestionalgorithm: [
+            "htcp"
+            ],
+            host-os-kernel: [
+            "Linux 2.6.32-573.7.1.el6.web100.x86_64"
+            ],
+            location-sitename: [
+            "University of Oklahoma"
+            ],
+            host-hardware-memory: [
+            "3755 MB"
+            ],
+            host-net-tcp-maxbuffer-send: [
+            "67108864 bytes"
+            ],
+            uri: "lookup/host/3fc31895-d6fa-43e2-a6e7-ea745d88a621",
+            pshost-toolkitversion: [
+            "3.5"
+            ],
+            host-net-tcp-maxbuffer-recv: [
+            "67108864 bytes"
+            ],
+            location-latitude: [
+            "35.1835"
+            ],
+            host-hardware-processorcount: [
+            "1"
+            ],
+            host-hardware-processorcore: [
+            "2"
+            ],
+            host-administrators: [
+            "lookup/person/f27e8de8-0f2f-4996-b068-e9617db13e10"
+            ],
+            location-country: [
+            "US"
+            ],
+            host-hardware-processorspeed: [
+            "2793.027 MHz"
+            ],
+            location-state: [
+            "OK"
+            ],
+            location-code: [
+            "73019"
+            ],
+            host-net-interfaces: [
+            "lookup/interface/2dc4f65c-c001-4956-959f-2222bd1e59b7",
+            "lookup/interface/b60a3a72-b7b2-4c84-aba7-a243ab5deff1",
+            "lookup/interface/ced7f410-cde1-43b0-a904-93c856bb3f03"
+            ],
+            ttl: [ ]
+        }
+        */
+    
+        var rec = {
+            uuid: host['client-uuid'][0],
+            sitename: host['location-sitename'][0],
+            ip: host['host-name'][0], //always IP?
+            host: {
+                hardware_processorcount: host['host-hardware-processorcount']?host['host-hardware-processorcount'][0]:null,
+                hardware_processorspeed: host['host-hardware-processorspeed']?host['host-hardware-processorspeed'][0]:null,
+                hardware_memory: host['host-hardware-memory']?host['host-hardware-memory'][0]:null,
+                toolkitversion: host['pshost-toolkitversion']?host['pshost-toolkitversion'][0]:null,
+                os_version: host['host-os-version']?host['host-os-version'][0]:null,
+            },
+            location: {
+                longitude: host['location-longitude'][0],
+                latitude: host['location-latitude'][0], 
+                city: host['location-city'][0],
+                state: host['location-state'][0],
+                postal_code: host['location-code'][0],
+                country: host['location-country'][0],
+            },
+            //TODO - I need to query the real admin records from the cache (gocdb2sls service already genenrates contact records)
+            //I just have to store them in our table
+            admins: host['host-administrators'],
+            count: 0, //number of times updated (exists to allow updateTime update)
+        };
+
+        //logger.info(rec.uuid);
+        db.Host.findOne({where: {uuid: rec.uuid}}).then(function(_host) {
+           if(_host) {
+                //console.dir(JSON.stringify(_host));
+                rec.count = _host.count+1; //force records to get updatedAt updated
+                _host.update(rec).then(function() {
+                    //TODO - check error?
+                    cb();
+                });
+            } else {
+                logger.info("registering new host for the first time:"+rec.uuid);
+                db.Host.create(rec).then(function() {
+                    //TODO - check error?
+                    cb();
+                });
+            }
+        });
+    });
 }
 
 function cache_ls(ls, lsid, cb) {

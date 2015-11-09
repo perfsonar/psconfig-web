@@ -1,8 +1,6 @@
-'use strict';
-
 //show all testsspecs
-app.controller('TestspecsController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', '$location', 'serverconf', 'profiles', '$modal', 'scaMessage',
-function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, serverconf, profiles, $modal, scaMessage) {
+app.controller('TestspecsController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', '$location', 'serverconf', 'profiles', 'scaMessage',
+function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, serverconf, profiles, scaMessage) {
     scaMessage.show(toaster);
     menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
@@ -44,12 +42,22 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, se
         });
     }
 
-    $scope.edit = function(_testspec) {
-        if(!_testspec.canedit) {
+    $scope.add = function(service_id) {
+        $location.url("/testspec/new/"+service_id);
+    }
+
+    $scope.edit = function(testspec) {
+
+        /*
+        if(!testspec.canedit) {
             toaster.error("You need to be listed as an admin in order to edit this testspec");
             return;
         }
+        */
 
+        $location.url("/testspec/"+testspec.id);
+
+        /*
         var testspec = angular.copy(_testspec);
         var modalInstance = $modal.open({
             animation: true,
@@ -71,8 +79,10 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, se
         }, function () {
             //toaster.info('Modal dismissed at: ' + new Date());
         });
+        */
     }
 
+    /*
     $scope.create = function(service_type) {
         //$location.path('/newtestspec/'+service_type);
         //construct a new testspec
@@ -103,16 +113,28 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, se
             //toaster.info('Modal dismissed at: ' + new Date());
         });
     }
+    */
 }]);
 
 //test spec editor
-app.controller('TestspecModalController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', '$location', 'profiles', '$modalInstance', 'testspec', 'title',
-function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, profiles, $modalInstance, testspec, title) {
-    $scope.testspec = testspec;
-    $scope.title = title;
+app.controller('TestspecController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', '$location', 'profiles', '$routeParams',
+function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, profiles, $routeParams) {
+    $scope.id = $routeParams.id;
 
     //for admin list
-    profiles.then(function(_profiles) { $scope.profiles = _profiles; });
+    if(profiles) {
+        profiles.then(function(_profiles) { 
+            $scope.profiles = _profiles; 
+            //map all user's profile to sub so that I use it to show admin info
+            $scope.users = {};
+            _profiles.forEach(function(profile) {
+                $scope.users[profile.sub] = profile;
+            });
+            return load();
+        });
+    } else {
+        load_guest();
+    }
 
     /*
     //massaging handful fields
@@ -123,28 +145,63 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, pr
         $scope.testspec._ipv46 = "6"; 
     }
     */
+    function load_guest(cb) {
+        $http.get(appconf.api+'/testspecs/'+$routeParams.id).then(function(res) {
+            $scope.testspec = res.data;
+            watch();
+            if(cb) cb();
+        });
+    }
+    function load() {
+        if($scope.id == "new") {
+            //new
+            var jwt = localStorage.getItem(appconf.jwt_id);
+            if(jwt) {
+                var user = jwtHelper.decodeToken(jwt);
+                var service_type = $routeParams.service_type;
+                $scope.testspec = {
+                    service_type: service_type,
+                    admins: [ $scope.users[user.sub] ], //select current user as admin
+                    specs: $scope.serverconf.defaults.testspecs[service_type],
+                    desc: "",
+                };
+                watch();
+            }
+        } else {
+            //update
+            load_guest(function() {
+                //convert admins to admin objects
+                $scope.testspec._admins = [];
+                $scope.testspec.admins.forEach(function(id) {
+                    $scope.testspec._admins.push($scope.users[id]);
+                });
+            });
+        }
+    }
 
-    //some special behaviors
-    $scope.$watch(function() { 
-        return $scope.testspec.specs.ipv4_only 
-    }, function(nv, ov) {
-        if(nv) {
-            delete $scope.testspec.specs.ipv6_only;
-        }
-    });
-    $scope.$watch(function() { 
-        return $scope.testspec.specs.ipv6_only 
-    }, function(nv, ov) {
-        if(nv) {
-            delete $scope.testspec.specs.ipv4_only;
-        }
-    });
+    function watch() {
+        //some special behaviors
+        $scope.$watch(function() { 
+            return $scope.testspec.specs.ipv4_only 
+        }, function(nv, ov) {
+            if(nv) {
+                delete $scope.testspec.specs.ipv6_only;
+            }
+        });
+        $scope.$watch(function() { 
+            return $scope.testspec.specs.ipv6_only 
+        }, function(nv, ov) {
+            if(nv) {
+                delete $scope.testspec.specs.ipv4_only;
+            }
+        });
+    }
 
     //create a copy of $scope.testspec so that UI doesn't break while saving.. (just admins?)
     function getdata() {
         var data = angular.copy($scope.testspec);
         data.admins = [];
-        $scope.testspec.admins.forEach(function(admin) {
+        $scope.testspec._admins.forEach(function(admin) {
             if(admin) data.admins.push(admin.sub);
         });
 
@@ -162,43 +219,38 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, pr
     }
 
     $scope.submit = function() {
-        console.log("submitted");
         if(!$scope.testspec.id) {
             //create 
             $http.post(appconf.api+'/testspecs/', getdata())
-            .success(function(data, status, headers, config) {
-                //$location.path("/testspecs");
-                $modalInstance.close();
+            .then(function(data, status, headers, config) {
+                $scope.form.$setPristine();
+                $location.path("/testspecs");
                 toaster.success("Testspec created successfully!");
-            })
-            .error(function(data, status, headers, config) {
+            }, function(data, status, headers, config) {
                 toaster.error("Creation failed!");
             });           
         } else {
             //edit
             $http.put(appconf.api+'/testspecs/'+$scope.testspec.id, getdata())
-            .success(function(data, status, headers, config) {
-                //$location.path("/testspecs");
-                $modalInstance.close();
+            .then(function(data, status, headers, config) {
+                $scope.form.$setPristine();
+                $location.path("/testspecs");
                 toaster.success("Updated Successfully!");
-            })
-            .error(function(data, status, headers, config) {
+            }, function(data, status, headers, config) {
                 toaster.error("Update failed!");
             });   
         }
     }
     $scope.cancel = function() {
-        //$location.path("/testspecs");
-        $modalInstance.dismiss('cancel');
+        $location.path("/testspecs");
     }
     $scope.remove = function() {
         $http.delete(appconf.api+'/testspecs/'+$scope.testspec.id, getdata())
-        .success(function(data, status, headers, config) {
-            //$location.path("/testspecs");
-            $modalInstance.close();
+        .then(function(data, status, headers, config) {
+            $scope.form.$setPristine();//ignore all changed made
+            $location.path("/testspecs");
             toaster.success("Deleted Successfully!");
-        })
-        .error(function(data, status, headers, config) {
+        }, function(data, status, headers, config) {
             toaster.error("Deletion failed!");
         });       
     }

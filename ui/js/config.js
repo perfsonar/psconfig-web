@@ -1,11 +1,11 @@
 
 app.controller('ConfigsController', ['$scope', 'appconf', 'toaster', '$http', 'menu', 'serverconf', 'profiles', '$location', 'scaMessage', 'services', 'jwtHelper',
 function($scope, appconf, toaster, $http, menu, serverconf, profiles, $location, scaMessage, services, jwtHelper) {
-    $scope.appconf = appconf;
     scaMessage.show(toaster);
-
     menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
+
+    $scope.appconf = appconf;
 
     //start loading stuff
     var testspecs, hostgroups;//, services;
@@ -52,10 +52,8 @@ function($scope, appconf, toaster, $http, menu, serverconf, profiles, $location,
                         config._admins.push(users[id]);
                     });
                 });
-     
             });
         }
-
     });
     
     $scope.addconfig = function() {

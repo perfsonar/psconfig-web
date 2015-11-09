@@ -1,6 +1,7 @@
 'use strict';
 
-//this is just a sample
+//this table holds current migration version 
+//TODO - maybe I should rename this to "Info" or "Config" or such?
 
 //contrib
 var Sequelize = require('sequelize');

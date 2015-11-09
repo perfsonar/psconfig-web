@@ -1,0 +1,40 @@
+<sca-menutab menu="serverconf.menu" active="'services'"></sca-menutab>
+<div class="container-fluid">
+    <ul class="list-group">
+    <li class="list-group-item" ng-repeat="(client_uuid, host) in hosts">
+        <h4>
+            <small>{{host._detail.id}} <!--{{host._detail.uuid}}--></small>
+            {{host._detail.sitename}} ({{host._detail.ip}})
+            <small>
+                |
+                v{{host._detail.host.toolkitversion}}
+                |
+                {{host._detail.host.os_version}} / 
+                {{host._detail.host.hardware_memory}} / 
+                {{host._detail.host.hardware_processorspeed}} ({{host._detail.host.hardware_processorcount}} cores) 
+                <!--
+                |
+                lon: {{host._detail.location.longitude}} lat: {{host._detail.location.latitude}}
+                -->
+                |
+                {{host._detail.location.city}}, 
+                {{host._detail.location.state}}, 
+                {{host._detail.location.postal_code}}, 
+                {{host._detail.location.country}}
+            </small>
+        </h4>
+        <ul class="list-group">
+            <li class="list-group-item" ng-repeat="service in host.services">
+                <div class="host">
+                    <span class="label {{services.lss[service.lsid].label_class}}"> {{services.lss[service.lsid].label}}</span>
+                    <b>{{service.name}}</b> ({{service.locator}})
+                    <span ng-if="service.old" class="label label-warning">Stale</span>
+                </div>
+                <span ng-if="service.ma"> | MA {{service.ma}}</span>
+            </li>
+        </ul>
+    </li>
+    </ul>
+</div>
+
+

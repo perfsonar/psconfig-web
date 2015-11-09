@@ -1,64 +1,65 @@
-<form class="form-horizontal" ng-submit="submit()">
-   <div class="modal-header">
-        <h3 class="modal-title">{{title}}</h3>
-    </div>
-    <div class="modal-body">
-        <div class="form-group">
-            <label for="desc" class="col-sm-2 control-label">Name</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" id="desc" ng-model="testspec.desc" placeholder="Name for this test spec" required>
-            </div>
+<sca-menutab menu="serverconf.menu" active="'testspecs'"></sca-menutab>
+<div class="container-fluid">
+    <form ng-submit="submit()" class="form-horizontal" name="form" confirm-on-exit>
+       <div class="modal-header">
+            <h3 class="modal-title">{{title}}</h3>
         </div>
-        <div class="form-group">
-            <label for="desc" class="col-sm-2 control-label">Service Type</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" id="type" disabled=disabled ng-model="testspec.service_type" required>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="desc" class="col-sm-2 control-label">Name</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="desc" ng-model="testspec.desc" placeholder="Name for this test spec" required>
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label for="admins" class="col-sm-2 control-label">Admins</label>
-            <div class="col-sm-10">
-                <ui-select multiple ng-model="testspec.admins" ng-disabled="disabled">
-                    <ui-select-match placeholder="Select admins who can update this test spec">
-                        <b>{{$item.fullname}}</b> <span class="email">&lt;{{$item.email}}&gt;</span>
-                    </ui-select-match>
-                    <ui-select-choices repeat="user in profiles | propsFilter: {fullname: $select.search, email: $select.search}">
-                      <!--<div ng-bind-html="user.fullname | highlight: $select.search"></div>-->
-                      <div>{{user.fullname}}</div>
-                      <small>
-                        email: {{user.email}} <!--<span ng-bind-html="user.email | highlight: $select.search"></span>-->
-                      </small>
-                    </ui-select-choices>
-                </ui-select>
-                <p class="help-block">Users who can update this test spec</p>
+            <div class="form-group">
+                <label for="desc" class="col-sm-2 control-label">Service Type</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="type" disabled=disabled ng-model="testspec.service_type" required>
+                </div>
             </div>
-        </div>
-        <hr>
-        <div ng-switch="testspec.service_type">
-            <div ng-switch-when="test_service">
-                test service form
+            <div class="form-group">
+                <label for="admins" class="col-sm-2 control-label">Admins</label>
+                <div class="col-sm-10">
+                    <ui-select multiple ng-model="testspec._admins" ng-disabled="disabled">
+                        <ui-select-match placeholder="Select admins who can update this test spec">
+                            <b>{{$item.fullname}}</b> <span class="email">&lt;{{$item.email}}&gt;</span>
+                        </ui-select-match>
+                        <ui-select-choices repeat="user in profiles | propsFilter: {fullname: $select.search, email: $select.search}">
+                          <!--<div ng-bind-html="user.fullname | highlight: $select.search"></div>-->
+                          <div>{{user.fullname}}</div>
+                          <small>
+                            email: {{user.email}} <!--<span ng-bind-html="user.email | highlight: $select.search"></span>-->
+                          </small>
+                        </ui-select-choices>
+                    </ui-select>
+                    <p class="help-block">Users who can update this test spec</p>
+                </div>
             </div>
-            <div ng-switch-when="bwctl">
-                <ng-include src="'t/testspec-bwctl.html'"></ng-include>
-            </div>
-            <div ng-switch-when="owamp">
-                <ng-include src="'t/testspec-owamp.html'"></ng-include>
-            </div>
-            <div ng-switch-when="traceroute">
-                <ng-include src="'t/testspec-traceroute.html'"></ng-include>
-            </div>
-        </div> <!--ng-switch -->
-    </div><!--modal-body-->
-    <div class="modal-footer">
-        <button type="button" class="btn btn-sm btn-danger pull-left" ng-if="testspec.id"
-            confirmed-click="remove()" 
-            ng-confirm-click="Are you sure you want to remove this test spec?">
-            <i class="fa fa-times"></i> Remove
-        </button>
-        <button type="submit" class="btn btn-primary" ng-if="testspec.id">Update</button>
-        <button type="submit" class="btn btn-primary" ng-if="!testspec.id">Create</button>
-        <button type="button" class="btn" ng-click="cancel()">Cancel</button>
-    </div><!--modal-footer-->
-</form>
-
-
+            <hr>
+            <div ng-switch="testspec.service_type">
+                <div ng-switch-when="test_service">
+                    test service form
+                </div>
+                <div ng-switch-when="bwctl">
+                    <ng-include src="'t/testspec-bwctl.html'"></ng-include>
+                </div>
+                <div ng-switch-when="owamp">
+                    <ng-include src="'t/testspec-owamp.html'"></ng-include>
+                </div>
+                <div ng-switch-when="traceroute">
+                    <ng-include src="'t/testspec-traceroute.html'"></ng-include>
+                </div>
+            </div> <!--ng-switch -->
+        </div><!--modal-body-->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-sm btn-danger pull-left" ng-if="testspec.id"
+                confirmed-click="remove()" 
+                ng-confirm-click="Are you sure you want to remove this test spec?">
+                <i class="fa fa-times"></i> Remove
+            </button>
+            <button type="submit" class="btn btn-primary" ng-if="testspec.id">Update</button>
+            <button type="submit" class="btn btn-primary" ng-if="!testspec.id">Create</button>
+            <button type="button" class="btn" ng-click="cancel()">Cancel</button>
+        </div><!--modal-footer-->
+    </form>
+</div>

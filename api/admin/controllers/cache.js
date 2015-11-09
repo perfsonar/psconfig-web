@@ -14,19 +14,7 @@ var db = require('../../models');
 
 //return the whole thing.. until that becomes an issue
 //open to public
-router.get('/', function(req, res, next) {
-    /*
-    //merge records from different lses
-    var services = {};
-    for(var lsid in sls_cache) {
-        for(var service_type in sls_cache[lsid]) {
-            if(services[service_type] === undefined) services[service_type] = [];
-            sls_cache[lsid][service_type].forEach(function(service) {
-                services[service_type].push(service);
-            });
-        }
-    };
-    */
+router.get('/services', function(req, res, next) {
     var services = {};
     db.Service.findAll({raw: true}).then(function(recs) {
         //group into each service types
@@ -38,6 +26,19 @@ router.get('/', function(req, res, next) {
     });
     //res.json(services);
     //res.json({hello: "there"});
+});
+
+router.get('/hosts', function(req, res, next) {
+    db.Host.findAll({raw: true}).then(function(_recs) {
+        var recs = [];
+        _recs.forEach(function(rec) {
+            //somehow sequelize forgets to parse this.. it works for testspecs, so I am not sure why this doesn't work here
+            rec.host = JSON.parse(rec.host); 
+            rec.location = JSON.parse(rec.location); 
+            recs.push(rec);
+        });
+        res.json(recs);
+    });
 });
 
 //update service cache immediately

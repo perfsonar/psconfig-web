@@ -22,7 +22,6 @@ var logger = new winston.Logger(config.logger.winston);
 
 module.exports = function(sequelize, DataTypes) {
 
-    //holds "cache" of sls service records
     return sequelize.define('Service', {
         /////////////////////////////////////////////////////////////////////////////////////////..
         //key

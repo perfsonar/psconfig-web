@@ -42,7 +42,7 @@ router.get('/config', jwt({secret: config.admin.jwt.pub, credentialsRequired: fa
 
 router.use('/configs', require('./controllers/configs'));
 router.use('/testspecs', require('./controllers/testspecs'));
-router.use('/services', require('./controllers/services'));
+router.use('/cache', require('./controllers/cache'));
 router.use('/hostgroups', require('./controllers/hostgroups'));
 
 module.exports = router;

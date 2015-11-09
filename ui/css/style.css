@@ -57,16 +57,14 @@ th.specname {
 li.test h5 {
   margin-top: 0px;
 }
+ul.specs,
 ul.admins,
 ul.hosts {
   padding: 0px;
   list-style: none;
-  /*
-    border: 1px solid #ccc;
-    padding: 3px;
-    */
   font-size: 12px;
 }
+ul.specs li,
 ul.admins li,
 ul.hosts li {
   /*border: 1px solid #ccc;*/
@@ -92,4 +90,10 @@ ul.hosts li {
 }
 .ui-select-match-close {
   color: #222;
+}
+.host {
+  background-color: #f0f0f0;
+  padding: 4px 6px;
+  display: inline-block;
+  margin: 1px 3px;
 }
