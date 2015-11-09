@@ -18,8 +18,9 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
         //raw: true, //return raw object instead of sequelize objec that I can't modify..
     }).then(function(hostgroups) {
         //convert to normal javascript object so that I can add stuff to it (why can't I for sequelize object?)
-        hostgroups = JSON.parse(JSON.stringify(hostgroups)); //convert to raw object so that I can add properties
-        //TODO - use clone instead?
+        hostgroups = JSON.parse(JSON.stringify(hostgroups));
+
+        //set canedit flag
         hostgroups.forEach(function(hostgroup) {
             hostgroup.canedit = false;
             if(req.user) {
@@ -57,6 +58,16 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
     });
 });
 
+function filter_null(a) {
+    console.dir(a);
+    var ret = [];
+    a.forEach(function(it) {
+        if(it == null) return;
+        ret.push(it);
+    });
+    return ret;
+}
+
 router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var id = parseInt(req.params.id);
     db.Hostgroup.findOne({
@@ -65,9 +76,8 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
         if(!hostgroup) return next(new Error("can't find a hostgroup with id:"+id));
         //only superadmin or admin of this test spec can update
         if(~req.user.scopes.common.indexOf('admin') || ~hostgroup.admins.indexOf(req.user.sub)) {
-            //TODO - should validate?
             hostgroup.desc = req.body.desc;
-            hostgroup.hosts = req.body.hosts;
+            hostgroup.hosts = filter_null(req.body.hosts);
             hostgroup.admins = req.body.admins;
             hostgroup.save().then(function() {
                 res.json({status: "ok"});

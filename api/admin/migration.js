@@ -11,23 +11,21 @@ var logger = new winston.Logger(config.logger.winston);
 var db = require('../models');
 
 var migrations = [
+    /*
     function(qi, next) {
         logger.debug("running db migrate 1");
         next();
     },
     function(qi, next) {
         logger.debug("running db migrate 2");
-        next();
+        qi.addColumn('Services', 'ma', Sequelize.INTEGER).then(function(someting) {
+            next();
+        });
     },
     function(qi, next) {
         logger.debug("adding ma key");
-        /*
         qi.showAllTables().then(function(names) {
             console.dir(names);
-        });
-        */
-        qi.addColumn('Services', 'ma', Sequelize.INTEGER).then(function(someting) {
-            next();
         });
     },
     function(qi, next) {
@@ -41,6 +39,22 @@ var migrations = [
             });
         });
     },
+    function(qi, next) {
+        qi.addColumn('Migrations', 'deleteme2', Sequelize.INTEGER).then(function() {
+            next();
+        });
+    },
+    function(qi, next) {
+        qi.removeColumn('Migrations', 'deleteme', Sequelize.INTEGER).then(function() {
+            next();
+        });
+    },
+    function(qi, next) {
+        qi.removeColumn('Migrations', 'deleteme2', Sequelize.INTEGER).then(function() {
+            next();
+        });
+    },
+    */
 ];
 
 exports.run = function(cb) {
@@ -52,7 +66,7 @@ exports.run = function(cb) {
                 //assume brand new - skip everything
                 return db.Migration.create({version: migrations.length}).then(resolve);
             } else {
-                info.version = migrations.length;
+                var count = migrations.length;
                 var ms = migrations.splice(info.version);
                 qi = db.sequelize.getQueryInterface();
                 async.eachSeries(ms, function(m, next) {
@@ -60,6 +74,7 @@ exports.run = function(cb) {
                 }, function(err) {
                     if(err) reject(err);
                     else { 
+                        info.version = count; 
                         info.save().then(function() {
                             resolve("migration complete");
                         });

@@ -284,7 +284,10 @@ function cache_global_ls(service, id, cb) {
             var activehosts = JSON.parse(body);
             //load from all activehosts
             async.each(activehosts.hosts, function(host, next) {
-                if(host.status != "alive") return next();
+                if(host.status != "alive") {
+                    logger.warn("skipping "+host.locator+" with status:"+host.status);
+                    return next();
+                }
                 //massage the service url so that I can use cache_ls to do the rest
                 /*
                 for(var type in service.service_types) {

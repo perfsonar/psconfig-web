@@ -30,6 +30,7 @@ function($scope, appconf, toaster, $http, jwtHelper, menu, serverconf, profiles,
                 hostgroup.admins = admins; //override
                 //$scope.testspecs[type].push(testspec);
             });
+
             $scope.hostgroups = res.data;
             return $scope.hostgroups;  //just to be more promise-ish
         });
@@ -109,7 +110,7 @@ function($scope, appconf, toaster, $http,  profiles, $modalInstance, hostgroup, 
         $scope.hostgroup.admins.forEach(function(admin) {
             if(admin) data.admins.push(admin.sub);
         });
-        console.dir(data);
+        
         return data;
     }
 
