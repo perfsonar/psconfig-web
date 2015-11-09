@@ -146,19 +146,20 @@ function generate_meshconfig(config) {
                 }
             });
         }
-        console.dir(service.MA);
+        //console.dir(service.MA);
 
         if(hosts[service.client_uuid]) {
             var host = hosts[service.client_uuid];
             if(!~host.addresses.indexOf(_address)) host.addresses.push(_address);
             if(service.MA) host.measurement_archives.push(generate_mainfo(service));
-            host.description += " / "+service.name;
+            host.description += "/"+service.type; //service.name;
         } else {
             var host = {
                 //administrators: [], //TODO host admins
                 addresses: [ _address ], 
                 measurement_archives: [ ], 
-                description: service.name,
+                //description: service.name,
+                description: service.sitename+' '+service.type,
                 toolkit_url: "auto",
             };
             if(service.MA) host.measurement_archives.push(generate_mainfo(service));
@@ -230,7 +231,7 @@ function generate_mainfo(service) {
         //ma: service.MA,
         read_url: service.MA.locator,
         write_url: service.MA.locator,
-        type: get_type(service.type)
+        type: "perfsonarbuoy/"+service.type, //get_type(service.type)
     };
 }
 
