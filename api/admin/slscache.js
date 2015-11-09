@@ -20,8 +20,7 @@ function cache_host(service, res, cb) {
     var pathname = pathname_tokens.join("/");
 
     //reconstruct the url for the host record
-    //console.dir(service);
-    var url = uri.protocol+"//"+uri.host+pathname+'/'+service['service-host'];
+    var url = uri.protocol+"//"+uri.host+pathname+'/'+service['service-host'][0];
     request({url: url, timeout: 1000*10, json: true}, function(err, res, host) {
         if(err) return cb(err);
         if(res.statusCode != 200) return cb(new Error("failed to sLS cahce from:"+url+" statusCode:"+res.statusCode));
