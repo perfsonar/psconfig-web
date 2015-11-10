@@ -11,12 +11,18 @@ var async = require('async');
 var config = require('../../config');
 var logger = new winston.Logger(config.logger.winston);
 var db = require('../../models');
+var profile = require('../../profile');
 
 //return the whole thing.. until that becomes an issue
 //open to public
 router.get('/services', function(req, res, next) {
     var services = {};
-    db.Service.findAll({raw: true}).then(function(recs) {
+    db.Service.findAll({
+        raw: true,
+        include: [
+            //{ model: db.Service, as: "MA" }
+        ],
+    }).then(function(recs) {
         //group into each service types
         recs.forEach(function(rec) {
             if(services[rec.type] === undefined) services[rec.type] = [];
@@ -39,6 +45,36 @@ router.get('/hosts', function(req, res, next) {
         });
         res.json(recs);
     });
+});
+
+router.put('/host/:uuid', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
+    var uuid = req.params.uuid;
+    var _detail = req.body._detail;
+    //var services = req.body.services;
+    
+    db.Service.findAll({
+        where: {client_uuid: uuid},
+    }).then(function(services) {
+        //update ma pointers
+        req.body.services.forEach(function(_service) {
+            //find the service record to update
+            services.forEach(function(service) {
+                if(service.id == _service.id) service.ma = _service.ma;
+            });
+        });
+        //and save all
+        async.each(services, function(service, next) {
+            service.save().then(function() {
+                next();
+            }); 
+        }, function(err) {
+            res.json({status: "ok"});
+        }); 
+    });
+});
+
+router.get('/profiles', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
+    res.json(profile.getall());
 });
 
 //update service cache immediately

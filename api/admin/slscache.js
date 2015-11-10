@@ -1,14 +1,31 @@
 'use strict';
 
+//node
+var dns = require('dns');
+var net = require('net');
+
 //contrib
 var winston = require('winston');
 var async = require('async');
 var request = require('request');
+var Promise = require('promise');
 
 //mine
 var config = require('../config');
 var logger = new winston.Logger(config.logger.winston);
 var db = require('../models');
+
+/* works, but this isn't the bottleneck
+var ip_cache = {};
+function resolveip_cached(ip, cb) {
+    if(ip_cache[ip]) return cb(null, ip_cache[ip]);
+    dns.reverse(ip, function(err, hostnames) {
+        if(err) return cb(err);
+        ip_cache[ip] = hostnames; 
+        cb(null, hostnames);
+    });
+}
+*/
 
 function cache_host(service, res, cb) {
     //construct host information url
@@ -19,7 +36,10 @@ function cache_host(service, res, cb) {
     pathname_tokens.splice(-3);
     var pathname = pathname_tokens.join("/");
 
+    logger.debug("caching host:"+service['service-host'][0]);
+
     //reconstruct the url for the host record
+    //if(service['service-host'] === undefined) console.dir(service);
     var url = uri.protocol+"//"+uri.host+pathname+'/'+service['service-host'][0];
     request({url: url, timeout: 1000*10, json: true}, function(err, res, host) {
         if(err) return cb(err);
@@ -131,7 +151,6 @@ function cache_host(service, res, cb) {
         var rec = {
             uuid: host['client-uuid'][0],
             sitename: host['location-sitename'][0],
-            ip: host['host-name'][0], //always IP?
             host: {
                 hardware_processorcount: host['host-hardware-processorcount']?host['host-hardware-processorcount'][0]:null,
                 hardware_processorspeed: host['host-hardware-processorspeed']?host['host-hardware-processorspeed'][0]:null,
@@ -153,44 +172,63 @@ function cache_host(service, res, cb) {
             count: 0, //number of times updated (exists to allow updateTime update)
         };
 
-        //logger.info(rec.uuid);
-        db.Host.findOne({where: {uuid: rec.uuid}}).then(function(_host) {
-           if(_host) {
-                //console.dir(JSON.stringify(_host));
-                rec.count = _host.count+1; //force records to get updatedAt updated
-                _host.update(rec).then(function() {
-                    //TODO - check error?
-                    cb();
-                });
-            } else {
-                logger.info("registering new host for the first time:"+rec.uuid);
-                db.Host.create(rec).then(function() {
-                    //TODO - check error?
-                    cb();
-                });
-            }
-        });
+        var address = host['host-name'][0]; //could be ip or hostname
+       
+        //resolve ip
+        //logger.debug("resolving "+address);
+        if(net.isIP(address)) {
+            rec.ip = address;
+            dns.reverse(address, function(err, hostnames) {
+                if(err) {
+                    logger.error("couldn't reverse lookup ip: "+address);
+                    logger.error(err);  //continue
+                } else {
+                    if(hostnames.length > 0) rec.hostname = hostnames[0]; //only using the first entry?
+                }
+                upsert_host();
+            }); 
+        } else {
+            rec.hostname = address;
+            dns.lookup(address, function(err, address, family) {
+                if(err) {
+                    logger.error("couldn't lookup "+address);
+                } else rec.ip = address;
+                upsert_host();
+            });
+        }
+
+        function upsert_host() {
+            //logger.info(rec.uuid);
+            db.Host.findOne({where: {uuid: rec.uuid}}).then(function(_host) {
+               if(_host) {
+                    //console.dir(JSON.stringify(_host));
+                    rec.count = _host.count+1; //force records to get updatedAt updated
+                    _host.update(rec).then(function() {
+                        //TODO - check error?
+                        cb();
+                    });
+                } else {
+                    logger.info("registering new host for the first time:"+rec.uuid);
+                    db.Host.create(rec).then(function() {
+                        //TODO - check error?
+                        cb();
+                    });
+                }
+            });
+        }
+
     });
 }
 
 //TODO no point of existing.. just merge with docache_ls
 function cache_ls(ls, lsid, cb) {
-    logger.debug("caching "+lsid+" from "+ls.url);
+    logger.debug("caching ls:"+lsid+" from "+ls.url);
     request({url: ls.url, timeout: 1000*10, json: true}, function(err, res, services) {
         if(err) return cb(err);
         if(res.statusCode != 200) return cb(new Error("failed to sLS cahce from:"+ls.url+" statusCode:"+res.statusCode));
-        /*
-        var services = null;
-        try {
-            services = JSON.parse(body);
-        } catch (e) {
-            //couldn't parse sls response..
-            return cb(e);
-        }
-        */
-         
         var count_new = 0;
         var count_update = 0;
+        var host_uuids = []; //list of all host_uuids cached for this round
         async.eachSeries(services, function(service, next) {
             //TODO apply exclusion
             //console.dir(service);
@@ -201,9 +239,12 @@ function cache_ls(ls, lsid, cb) {
                 logger.error(service);
                 return next();//continue to next service
             }
+            var uuid = service['client-uuid'][0]; //service['service-host'][0];
+            logger.debug("caching service:"+service['service-locator'][0]);
+
             var rec = {
-                client_uuid: service['client-uuid'][0],
-                uuid: service['client-uuid'][0]+'.'+service['service-type'][0],
+                client_uuid: uuid,
+                uuid: uuid+'.'+service['service-type'][0],
                 name: service['service-name'][0],
                 type: service['service-type'][0],
                 //locator is now a critical information needed to generate the config
@@ -232,47 +273,27 @@ function cache_ls(ls, lsid, cb) {
                     //update updatedAt time
                     count_update++;
                     rec.count = _service.count+1; //force records to get updated
-                    _service.update(rec).then(function() {
-                        //TODO check service record update status?
-                        cache_host(service, res, function(err) {
-                            if(err) logger.error(err); //continue
-                            next();
-                        });
-                    });
+                    _service.update(rec).then(maybe_cache_host);
                 } else {
-                    db.Service.create(rec).then(function(service) {
-                        //TODO check service record create status?
-                        count_new++;
-                        cache_host(service, res, function(err) {
-                            if(err) logger.error(err); //continue
-                            next();
-                        });
-                    });
+                    count_new++;
+                    db.Service.create(rec).then(maybe_cache_host);
                 }
             });
-            /*
-            var uuid = service['client-uuid'][0];
-            var locator = (service['service-locator']&&service['service-locator'][0])?service['service-locator'][0] : null;
-            db.Service.findOrCreate({where: {uuid: uuid}, defaults: {
-                name: service['service-name'][0],
-                locator: locator,
-                lsid: lsid, //make it easier for ui
-            }})
-            .spread(function(service, created) {
-                if(created) count_new++;
-                else count_update++;
-                //update updatedAt time
-                service.save().then(next);
-            });
-            */
+
+            function maybe_cache_host() {
+                if(~host_uuids.indexOf(uuid)) return next(); //skip if we already cached this host
+                cache_host(service, res, function(err) {
+                    if(err) logger.error(err); //continue
+                    host_uuids.push(uuid);
+                    next();
+                });
+            }
+
         }, function(err) {
             logger.info("loaded "+services.length+" services for "+ls.label+" from "+ls.url + " updated:"+count_update+" new:"+count_new);
             cb();
         });
-    })/*.on('error', function(e) {
-        //failed to access sls..
-        return cb(e);
-    });*/
+    })
 }
 
 function cache_global_ls(service, id, cb) {
@@ -305,24 +326,26 @@ function cache_global_ls(service, id, cb) {
     }); 
 }
 
-exports.start = function(cb) {
-    //start caching
-    async.forEachOf(config.datasource.services, function(service, id, next) {
-        var timeout = service.cache || 60*30*1000; //default to 30 minutes
-        switch(service.type) {
-        case "sls":
-            setInterval(function() { cache_ls(service, id, function(err) {
-                if(err) logger.error(err);
-            }); }, timeout);
-            cache_ls(service, id, next);
-            break;
-        case "global-sls":
-            setInterval(function() { cache_global_ls(service, id); }, timeout);
-            cache_global_ls(service, id, next);
-            break;
-        default:
-            logger.error("unknown datasource/service type:"+service.type);
-        }
-    }, cb);
+exports.start = function() {
+    logger.debug("starting slscache");
+    return new Promise(function(resolve, reject) {
+        async.forEachOf(config.datasource.services, function(service, id, next) {
+            var timeout = service.cache || 60*30*1000; //default to 30 minutes
+            switch(service.type) {
+            case "sls":
+                setInterval(function() { cache_ls(service, id, function(err) {
+                    if(err) logger.error(err);
+                }); }, timeout);
+                cache_ls(service, id, next);
+                break;
+            case "global-sls":
+                setInterval(function() { cache_global_ls(service, id); }, timeout);
+                cache_global_ls(service, id, next);
+                break;
+            default:
+                logger.error("unknown datasource/service type:"+service.type);
+            }
+        }, resolve);
+    });
 }
 

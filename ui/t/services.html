@@ -1,10 +1,10 @@
 <sca-menutab menu="serverconf.menu" active="'services'"></sca-menutab>
 <div class="container-fluid">
     <ul class="list-group">
-    <li class="list-group-item" ng-repeat="(client_uuid, host) in hosts">
+    <li class="list-group-item" ng-repeat="(client_uuid, host) in hosts | orderObjectBy: '_detail.sitename'">
         <h4>
-            <small>{{host._detail.id}} <!--{{host._detail.uuid}}--></small>
-            {{host._detail.sitename}} ({{host._detail.ip}})
+            <small>{{host._detail.id}}</small>
+            {{host._detail.sitename}} (<span ng-if="host._detail.hostname">{{host._detail.hostname}}</span>)
             <small>
                 |
                 v{{host._detail.host.toolkitversion}}
@@ -24,15 +24,25 @@
             </small>
         </h4>
         <ul class="list-group">
-            <li class="list-group-item" ng-repeat="service in host.services">
+            <li class="list-group-item" ng-repeat="service in host.services | orderObjectBy: 'name'">
                 <div class="host">
                     <span class="label {{services.lss[service.lsid].label_class}}"> {{services.lss[service.lsid].label}}</span>
                     <b>{{service.name}}</b> ({{service.locator}})
                     <span ng-if="service.old" class="label label-warning">Stale</span>
                 </div>
-                <span ng-if="service.ma"> | MA {{service.ma}}</span>
+                <div style="display: inline-block;" ng-if="service.MA"> 
+                    <i class="fa fa-arrow-right"></i> MA 
+                    <div class="host">
+                        <span class="label {{services.lss[service.MA.lsid].label_class}}"> {{services.lss[service.MA.lsid].label}}</span>
+                        <b>{{service.MA.name}}</b> ({{service.MA.locator}})
+                        <span ng-if="service.MA.old" class="label label-warning">Stale</span>
+                    </div>
+                </div>
             </li>
         </ul>
+        <div class="pull-right edit_button" ng-if="canedit">
+            <button type="button" ng-click="edit(host)" class="btn btn-sm pull-right"><i class="fa fa-pencil-square-o"></i></button>
+        </div>
     </li>
     </ul>
 </div>

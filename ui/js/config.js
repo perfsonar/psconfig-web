@@ -1,12 +1,17 @@
 
-app.controller('ConfigsController', ['$scope', 'appconf', 'toaster', '$http', 'menu', 'serverconf', 'profiles', '$location', 'scaMessage', 'services', 'jwtHelper',
-function($scope, appconf, toaster, $http, menu, serverconf, profiles, $location, scaMessage, services, jwtHelper) {
+app.controller('ConfigsController', ['$scope', 'appconf', 'toaster', '$http', 'menu', 'serverconf', '$location', 'scaMessage', 'services', 'jwtHelper',
+function($scope, appconf, toaster, $http, menu, serverconf, $location, scaMessage, services, jwtHelper) {
     scaMessage.show(toaster);
     menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
 
     $scope.appconf = appconf;
 
+    var jwt = localStorage.getItem(appconf.jwt_id);
+    if(jwt && jwtHelper.decodeToken(jwt)) {
+        $scope.cancreate = true;
+    }
+    
     //start loading stuff
     var testspecs, hostgroups;//, services;
     $http.get(appconf.api+'/testspecs/').then(function(res) {
@@ -31,9 +36,7 @@ function($scope, appconf, toaster, $http, menu, serverconf, profiles, $location,
             });
         });
 
-        //do the rest only for user 
-        var jwt = localStorage.getItem(appconf.jwt_id);
-        if(jwt && jwtHelper.decodeToken(jwt)) {
+        /*
             //user gets to see admin - but I need to load profiles 
             profiles.then(function(_profiles) {
                 //if user can get profiles, then user must be a user
@@ -54,6 +57,7 @@ function($scope, appconf, toaster, $http, menu, serverconf, profiles, $location,
                 });
             });
         }
+        */
     });
     
     $scope.addconfig = function() {
@@ -64,11 +68,27 @@ function($scope, appconf, toaster, $http, menu, serverconf, profiles, $location,
     }
 }]);
 
-app.controller('ConfigController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'serverconf', 'profiles', '$routeParams', '$location', 'services',
-function($scope, appconf, toaster, $http, jwtHelper, serverconf, profiles, $routeParams, $location, services) {
+app.controller('ConfigController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'serverconf', '$routeParams', '$location', 'services', 'users', 'testspecs', 'hostgroups',
+function($scope, appconf, toaster, $http, jwtHelper, serverconf, $routeParams, $location, services, users, testspecs, hostgroups) {
     $scope.id = $routeParams.id;
-    services.then(function(_services) { $scope.services = _services; }); //for host list
 
+    //load stuff
+    //TODO while we are loading stuff, config template gets rendered and ui-select does odd things if the users list aren't loaded yet
+    //doc talks about using resolver inside the route config, but I want to keep stuff inside the controller.. how can I?
+    maybe_load_users(function() {
+        services.then(function(_services) { 
+            $scope.services = _services; 
+            testspecs.then(function(testspecs) { 
+                $scope.testspecs = testspecs;
+                hostgroups.then(function(hostgroups) { 
+                    $scope.hostgroups = hostgroups;
+                    load_config();
+                });
+            });
+        });
+    });
+
+    /*
     if(profiles) {
         profiles.then(function(_profiles) { 
             $scope.profiles = _profiles; 
@@ -82,45 +102,40 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, profiles, $rout
     } else {
         load_guest();
     }
-    
-    //load selectable options
-    $scope.testspecs = [];
-    $http.get(appconf.api+'/testspecs/').then(function(res) { $scope.testspecs = res.data; });
+    */
 
-    $scope.hostgroups = [];
-    $http.get(appconf.api+'/hostgroups/').then(function(res) { $scope.hostgroups = res.data; });
-
-    function load_guest(cb) {
-        $http.get(appconf.api+'/configs/'+$routeParams.id).then(function(res) {
-            $scope.config = res.data;
-            res.data.Tests.forEach(function(test) {
-                //angular wants value key to be string
-                if(test.TestspecId) test.TestspecId = test.TestspecId.toString();
-                if(test.agroup) test.agroup = test.agroup.toString();
-                if(test.bgroup) test.bgroup = test.bgroup.toString();
+    function maybe_load_users(cb) {
+        var jwt = localStorage.getItem(appconf.jwt_id);
+        if(jwt && jwtHelper.decodeToken(jwt)) {
+            console.log("loading users");
+            users.then(function(_users) { 
+                $scope.users = _users;
+                $scope.users_a = [];
+                for(var sub in $scope.users) {
+                    $scope.users_a.push($scope.users[sub]);
+                }
+                cb(jwtHelper.decodeToken(jwt));
             });
-            if(cb) cb();
-        });
+        } else cb();
     }
-    function load() {
+    
+    function load_config(user) {
         if($scope.id == "new") {
-            //new
-            var jwt = localStorage.getItem(appconf.jwt_id);
-            if(jwt) {
-                var user = jwtHelper.decodeToken(jwt);
-                $scope.config = {
-                    _admins: [ $scope.users[user.sub] ], //select current user as admin
-                    Tests: [],
-                    canedit: true, 
-                };
+            //new config
+            $scope.config = {
+                admins: [ $scope.users[user.sub] ], //select current user as admin
+                Tests: [],
+                canedit: true, 
             }
         } else {
-            //update
-            load_guest(function() {
-                //convert admins to admin objects
-                $scope.config._admins = [];
-                $scope.config.admins.forEach(function(id) {
-                    $scope.config._admins.push($scope.users[id]);
+            //updating config
+            $http.get(appconf.api+'/configs/'+$routeParams.id).then(function(res) {
+                $scope.config = res.data;
+                res.data.Tests.forEach(function(test) {
+                    //angular wants value key to be string
+                    if(test.TestspecId) test.TestspecId = test.TestspecId.toString();
+                    if(test.agroup) test.agroup = test.agroup.toString();
+                    if(test.bgroup) test.bgroup = test.bgroup.toString();
                 });
             });
         }
@@ -131,23 +146,19 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, profiles, $rout
         $location.url("/configs");
     }
 
+    /*
+    //is this needed still?
     function getdata() {
         //create a copy of $scope.testspec so that UI doesn't break while saving.. (just admins?)
         var data = angular.copy($scope.config);
-
-        //convert admin object to admin sub ids
-        data.admins = [];
-        $scope.config._admins.forEach(function(admin) {
-            if(admin) data.admins.push(admin.sub);
-        });
-
         return data;
     }
+    */
 
     $scope.submit = function() {
         if(!$scope.config.id) {
             //create 
-            $http.post(appconf.api+'/configs/', getdata())
+            $http.post(appconf.api+'/configs/', $scope.config)
             .then(function(res) {
                 $scope.form.$setPristine();
                 $location.url("/configs");
@@ -157,7 +168,7 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, profiles, $rout
             });           
         } else {
             //edit
-            $http.put(appconf.api+'/configs/'+$scope.config.id, getdata())
+            $http.put(appconf.api+'/configs/'+$scope.config.id, $scope.config)
             .then(function(res) {
                 $scope.form.$setPristine();
                 $location.url("/configs");

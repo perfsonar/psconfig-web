@@ -15,7 +15,7 @@ var compression = require('compression');
 var config = require('../config');
 var logger = new winston.Logger(config.logger.winston);
 var db = require('../models');
-var profile = require('./profile');
+var profile = require('../profile');
 
 //init express
 var app = express();
@@ -46,16 +46,14 @@ exports.start = function(cb) {
     db.sequelize
     //TODO - maybe pub shouldn't do this?
     .sync(/*{force: true}*/)
+    .then(profile.start)
     .then(function() {
-        profile.start(function(err) {
-            if(err) return cb(err);
-            //start server
-            var port = process.env.PORT || config.pub.port || '8080';
-            var host = process.env.HOST || config.pub.host || 'localhost';
-            app.listen(port, host, function() {
-                logger.info("meshconfig pub service running on %s:%d in %s mode", host, port, app.settings.env);
-                cb(null);
-            });
+        //start server
+        var port = process.env.PORT || config.pub.port || '8080';
+        var host = process.env.HOST || config.pub.host || 'localhost';
+        app.listen(port, host, function() {
+            logger.info("meshconfig pub service running on %s:%d in %s mode", host, port, app.settings.env);
+            cb(null);
         });
     });
 }

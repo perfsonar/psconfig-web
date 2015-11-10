@@ -3,12 +3,12 @@
 //contgib
 var winston = require('winston');
 var request = require('request');
+var Promise = require('promise');
 
 //mine
-var config = require('../config');
+var config = require('./config');
 var logger = new winston.Logger(config.logger.winston);
-var db = require('../models');
-var profile = require('./profile');
+var db = require('./models');
 
 var profiles = {};
 /*
@@ -42,11 +42,14 @@ function cache(cb) {
         //update cache (let's assume user never disappears)
         body.forEach(function(user) {
             profiles[user.sub] = user.public;
+            profiles[user.sub].sub = user.sub; 
         });
         //console.dir(profiles);
         cb(null);
     });
 }
+
+exports.getall = function() { return profiles };
 
 //synchronous.. because it uses the cache
 exports.load_admins = function(subs) {
@@ -62,12 +65,19 @@ exports.load_admins = function(subs) {
 }
 
 //start caching profile
-exports.start = function(cb) {
-    cache(cb);
+exports.start = function() {
+    logger.debug("starting profile cache");
     setInterval(function() {
         cache(function(err) {
             if(err) logger.error(err); //continue..
         });
     }, 1000*300); //every 5 minutes enough?
+
+    return new Promise(function(resolve, reject) {
+        cache(function(err) {
+            if(err) return reject(err);
+            resolve();
+        });
+    });
 }
 

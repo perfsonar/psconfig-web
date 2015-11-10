@@ -11,6 +11,7 @@ var async = require('async');
 var config = require('../../config');
 var logger = new winston.Logger(config.logger.winston);
 var db = require('../../models');
+var profile = require('../../profile');
 
 router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
     db.Testspec.findAll().then(function(testspecs) {
@@ -24,6 +25,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
                     testspec.canedit = true;
                 }
             }
+            testspec.admins = profile.load_admins(testspec.admins);
         });
         res.json(testspecs);
     }); 
@@ -33,6 +35,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
 router.get('/:id', function(req, res, next) {
     var id = parseInt(req.params.id);
     db.Testspec.findOne({where: {id: id}}).then(function(testspec) {
+        testspec.admins = profile.load_admins(testspec.admins);
         res.json(testspec);
     }); 
 });
@@ -60,8 +63,11 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             //TODO - should validate?
             testspec.desc = req.body.desc;
             testspec.specs = req.body.specs;
-            testspec.admins = req.body.admins;
-            console.dir(testspec);
+            var admins = [];
+            req.body.admins.forEach(function(admin) {
+                admins.push(admin.sub);
+            });
+            testspec.admins = admins;
             testspec.save().then(function() {
                 res.json({status: "ok"});
             }).catch(function(err) {
@@ -73,7 +79,15 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
 
 router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     if(!~req.user.scopes.common.indexOf('user')) return res.status(401).end();
-    console.log(JSON.stringify(req.body, null, 4));
+    //console.log(JSON.stringify(req.body, null, 4));
+
+    //convert admin objects to list of subs
+    var admins = [];
+    req.body.admins.forEach(function(admin) {
+        admins.push(admin.sub);
+    });
+    req.body.admins = admins;
+
     db.Testspec.create(req.body).then(function(testspec) {
         console.log(JSON.stringify(testspec, null, 4));
         res.json({status: "ok"});

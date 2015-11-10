@@ -1,12 +1,13 @@
 
-app.controller('HostgroupsController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'menu', 'serverconf', 'profiles', '$modal', 'scaMessage',
-function($scope, appconf, toaster, $http, jwtHelper, menu, serverconf, profiles, $modal, scaMessage) {
+app.controller('HostgroupsController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'menu', 'serverconf', 'users', '$modal', 'scaMessage',
+function($scope, appconf, toaster, $http, jwtHelper, menu, serverconf, users, $modal, scaMessage) {
     scaMessage.show(toaster);
     menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
 
     var jwt = localStorage.getItem(appconf.jwt_id);
     var user = jwtHelper.decodeToken(jwt);
+    /*
     profiles.then(function(_profiles) {
         $scope.profiles = _profiles;
         
@@ -18,9 +19,19 @@ function($scope, appconf, toaster, $http, jwtHelper, menu, serverconf, profiles,
 
         return load();
     });
+    */
 
-    function load() {
+    users.then(function(_users) {
+        $scope.users = _users;
+        /*
+        $scope.users_a = [];
+        for(var sub in $scope.users) {
+            $scope.users_a.push($scope.users[sub]);
+        }
+        */
+
         return $http.get(appconf.api+'/hostgroups' /*,{cache: true}*/).then(function(res) {
+            /*
             //convert admin ids to profile objects - so that select2 will recognize as already selected item
             res.data.forEach(function(hostgroup) {
                 var admins = [];
@@ -30,11 +41,11 @@ function($scope, appconf, toaster, $http, jwtHelper, menu, serverconf, profiles,
                 hostgroup.admins = admins; //override
                 //$scope.testspecs[type].push(testspec);
             });
-
+            */
             $scope.hostgroups = res.data;
             return $scope.hostgroups;  //just to be more promise-ish
         });
-    }
+    });
 
     $scope.edit = function(_hostgroup) {
         if(!_hostgroup.canedit) {
@@ -59,7 +70,9 @@ function($scope, appconf, toaster, $http, jwtHelper, menu, serverconf, profiles,
             }
         });
         modalInstance.result.then(function() {
-            load();
+            for(var k in hostgroup) {
+                _hostgroup[k] = hostgroup[k];
+            }
         }, function () {
             //toaster.info('Modal dismissed at: ' + new Date());
         });
@@ -87,22 +100,32 @@ function($scope, appconf, toaster, $http, jwtHelper, menu, serverconf, profiles,
             }
         });
         modalInstance.result.then(function() {
-            load();
+            $scope.hostgroups.push(hostgroup);
         }, function () {
             //toaster.info('Modal dismissed at: ' + new Date());
         });
     }
 }]);
 
-app.controller('HostgroupModalController', ['$scope', 'appconf', 'toaster', '$http', 'profiles', '$modalInstance', 'hostgroup', 'title', 'services', 'serverconf',
-function($scope, appconf, toaster, $http,  profiles, $modalInstance, hostgroup, title, services, serverconf) {
+app.controller('HostgroupModalController', ['$scope', 'appconf', 'toaster', '$http', '$modalInstance', 'hostgroup', 'title', 'services', 'serverconf', 'users',
+function($scope, appconf, toaster, $http, $modalInstance, hostgroup, title, services, serverconf, users) {
     $scope.hostgroup = hostgroup;
     $scope.title = title;
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
 
-    profiles.then(function(_profiles) { $scope.profiles = _profiles; }); //for admin list
+    //profiles.then(function(_profiles) { $scope.profiles = _profiles; }); //for admin list
     services.then(function(_services) { $scope.services = _services; }); //for host list
 
+    users.then(function(_users) {
+        $scope.users = _users;
+        $scope.users_a = [];
+        for(var sub in $scope.users) {
+            $scope.users_a.push($scope.users[sub]);
+        }
+    });
+
+
+    /*
     function getdata() {
         //create a copy of $scope.testspec so that UI doesn't break while saving.. (why just admins?)
         var data = angular.copy($scope.hostgroup);
@@ -110,14 +133,14 @@ function($scope, appconf, toaster, $http,  profiles, $modalInstance, hostgroup, 
         $scope.hostgroup.admins.forEach(function(admin) {
             if(admin) data.admins.push(admin.sub);
         });
-        
         return data;
     }
+    */
 
     $scope.submit = function() {
         if(!$scope.hostgroup.id) {
             //create 
-            $http.post(appconf.api+'/hostgroups/', getdata())
+            $http.post(appconf.api+'/hostgroups/', $scope.hostgroup)
             .then(function(res) {
                 $modalInstance.close();
                 toaster.success("Hostgroup created successfully!");
@@ -126,7 +149,7 @@ function($scope, appconf, toaster, $http,  profiles, $modalInstance, hostgroup, 
             });           
         } else {
             //edit
-            $http.put(appconf.api+'/hostgroups/'+$scope.hostgroup.id, getdata())
+            $http.put(appconf.api+'/hostgroups/'+$scope.hostgroup.id, $scope.hostgroup)
             .then(function(res) {
                 $modalInstance.close();
                 toaster.success("Updated Successfully!");

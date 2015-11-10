@@ -55,9 +55,15 @@ var migrations = [
         });
     },
     */
+    function(qi, next) {
+        logger.info("adding hostname field for host table");
+        qi.addColumn('Hosts', 'hostname', Sequelize.STRING).then(function() {
+            next();
+        });
+    },
 ];
 
-exports.run = function(cb) {
+exports.run = function() {
     logger.debug("running migration");
     return new Promise(function(resolve, reject) {
         db.Migration.findOne({}).then(function(info) {

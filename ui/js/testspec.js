@@ -1,10 +1,20 @@
 //show all testsspecs
-app.controller('TestspecsController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', '$location', 'serverconf', 'profiles', 'scaMessage',
-function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, serverconf, profiles, scaMessage) {
+app.controller('TestspecsController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', '$location', 'serverconf', 'scaMessage', 'users',
+function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, serverconf, scaMessage, users) {
     scaMessage.show(toaster);
     menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
+    /*
+    users.then(function(_users) { 
+        $scope.users = _users; 
+        $scope.users_a = [];
+        for(var sub in $scope.users) {
+            $scope.users_a.push($scope.users[sub]);
+        }
+    });
+    */
 
+    /*
     var jwt = localStorage.getItem(appconf.jwt_id);
     var user = jwtHelper.decodeToken(jwt);
     profiles.then(function(_profiles) {
@@ -19,17 +29,22 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, se
         //then load all testspecs
         return load();
     });
+    */
 
-    function load() {
+    //TODO - will fail for guest user
+    users.then(function(_users) {
+        $scope.users = _users;
+        /*
+        $scope.users_a = [];
+        for(var sub in $scope.users) {
+            $scope.users_a.push($scope.users[sub]);
+        }
+        */
+
         return $http.get(appconf.api+'/testspecs' /*,{cache: true}*/).then(function(res) {
             //convert admin ids to profile objects - so that select2 will recognize as already selected item
+            /*
             res.data.forEach(function(testspec) {
-                /*
-                var type = testspec.service_type;
-                if($scope.testspecs[type] === undefined) {
-                    $scope.testspecs[type] = [];
-                }
-                */
                 var admins = [];
                 testspec.admins.forEach(function(id) {
                     admins.push($scope.users[id]);
@@ -37,10 +52,11 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, se
                 testspec.admins = admins; //override
                 //$scope.testspecs[type].push(testspec);
             });
+            */
             $scope.testspecs = res.data;
             return $scope.testspecs;  //just to be more promise-ish
         });
-    }
+    });
 
     $scope.add = function(service_id) {
         $location.url("/testspec/new/"+service_id);
@@ -117,10 +133,25 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, se
 }]);
 
 //test spec editor
-app.controller('TestspecController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', '$location', 'profiles', '$routeParams',
-function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, profiles, $routeParams) {
+app.controller('TestspecController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', '$location', 'users', '$routeParams',
+function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, users, $routeParams) {
     $scope.id = $routeParams.id;
 
+    var jwt = localStorage.getItem(appconf.jwt_id);
+    if(jwt && jwtHelper.decodeToken(jwt)) {
+        users.then(function(_users) { 
+            $scope.users = _users;
+            $scope.users_a = [];
+            for(var sub in $scope.users) {
+                $scope.users_a.push($scope.users[sub]);
+            }
+            load(jwtHelper.decodeToken(jwt));
+        });
+    } else {
+        load_guest();
+    }
+
+    /*
     //for admin list
     if(profiles) {
         profiles.then(function(_profiles) { 
@@ -135,6 +166,7 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, pr
     } else {
         load_guest();
     }
+    */
 
     /*
     //massaging handful fields
@@ -152,29 +184,27 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, pr
             if(cb) cb();
         });
     }
-    function load() {
+    function load(user) {
         if($scope.id == "new") {
             //new
-            var jwt = localStorage.getItem(appconf.jwt_id);
-            if(jwt) {
-                var user = jwtHelper.decodeToken(jwt);
-                var service_type = $routeParams.service_type;
-                $scope.testspec = {
-                    service_type: service_type,
-                    admins: [ $scope.users[user.sub] ], //select current user as admin
-                    specs: $scope.serverconf.defaults.testspecs[service_type],
-                    desc: "",
-                };
-                watch();
-            }
+            var service_type = $routeParams.service_type;
+            $scope.testspec = {
+                service_type: service_type,
+                admins: [ $scope.users[user.sub] ], //select current user as admin
+                specs: $scope.serverconf.defaults.testspecs[service_type],
+                desc: "",
+            };
+            watch();
         } else {
             //update
             load_guest(function() {
+                /*
                 //convert admins to admin objects
                 $scope.testspec._admins = [];
                 $scope.testspec.admins.forEach(function(id) {
                     $scope.testspec._admins.push($scope.users[id]);
                 });
+                */
             });
         }
     }
@@ -198,12 +228,14 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, pr
     }
 
     //create a copy of $scope.testspec so that UI doesn't break while saving.. (just admins?)
+    /*
     function getdata() {
         var data = angular.copy($scope.testspec);
         data.admins = [];
         $scope.testspec._admins.forEach(function(admin) {
             if(admin) data.admins.push(admin.sub);
         });
+        */
 
         /*
         //need to do a bit of massaging for some fields
@@ -213,15 +245,15 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, pr
         case "4": data.specs.ipv4_only = true; break;
         case "6": data.specs.ipv6_only = true; break;
         }
-        */
     
         return data;
     }
+    */
 
     $scope.submit = function() {
         if(!$scope.testspec.id) {
             //create 
-            $http.post(appconf.api+'/testspecs/', getdata())
+            $http.post(appconf.api+'/testspecs/', $scope.testspec)
             .then(function(data, status, headers, config) {
                 $scope.form.$setPristine();
                 $location.path("/testspecs");
@@ -231,7 +263,7 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, pr
             });           
         } else {
             //edit
-            $http.put(appconf.api+'/testspecs/'+$scope.testspec.id, getdata())
+            $http.put(appconf.api+'/testspecs/'+$scope.testspec.id, $scope.testspec)
             .then(function(data, status, headers, config) {
                 $scope.form.$setPristine();
                 $location.path("/testspecs");
@@ -245,7 +277,7 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, pr
         $location.path("/testspecs");
     }
     $scope.remove = function() {
-        $http.delete(appconf.api+'/testspecs/'+$scope.testspec.id, getdata())
+        $http.delete(appconf.api+'/testspecs/'+$scope.testspec.id, $scope.testspec)
         .then(function(data, status, headers, config) {
             $scope.form.$setPristine();//ignore all changed made
             $location.path("/testspecs");

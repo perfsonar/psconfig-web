@@ -1,3 +1,10 @@
+//just a service to load all users from auth service
+app.factory('serverconf', ['appconf', '$http', function(appconf, $http) {
+    return $http.get(appconf.api+'/config')
+    .then(function(res) {
+        return res.data;
+    });
+}]);
 app.factory('services', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
     var label_c = 0;
     function get_class() {
@@ -28,9 +35,26 @@ app.factory('services', ['appconf', '$http', 'jwtHelper', function(appconf, $htt
         return res.data;
     });
 }]);
-
 app.factory('hosts', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
     return $http.get(appconf.api+'/cache/hosts')
+    .then(function(res) {
+        return res.data;
+    });
+}]);
+app.factory('users', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
+    return $http.get(appconf.api+'/cache/profiles')
+    .then(function(res) {
+        return res.data;
+    });
+}]);
+app.factory('testspecs', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
+    return $http.get(appconf.api+'/testspecs')
+    .then(function(res) {
+        return res.data;
+    });
+}]);
+app.factory('hostgroups', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
+    return $http.get(appconf.api+'/hostgroups')
     .then(function(res) {
         return res.data;
     });
@@ -112,11 +136,4 @@ function($scope, appconf, menu, serverconf, scaMessage, toaster) {
     serverconf.then(function(_c) { $scope.serverconf = _c; });
 }]);
 
-/*
-app.controller('HomeController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', 'serverconf',
-function($scope, appconf, $route, toaster, $http, jwtHelper, menu, serverconf) {
-    menu.then(function(_menu) { $scope.menu = _menu; });
-    serverconf.then(function(_c) { $scope.serverconf = _c; });
-}]);
-*/
 

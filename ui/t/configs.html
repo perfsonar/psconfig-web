@@ -15,8 +15,8 @@
             </div>
             <div class="col-md-4">
                 <h5>Admins<small> (who can edit)</small></h5>
-                <mc-admins admins="config._admins" ng-if="config._admins"></mc-admins>
-                <p ng-if="!config._admins">(Please login to see admins)</p>
+                <mc-admins admins="config.admins"></mc-admins>
+                <!--<p ng-if="!config._admins">(Please login to see admins)</p>-->
             </div>
         </div>
         <div class="pull-right edit_button" ng-if="config.canedit">

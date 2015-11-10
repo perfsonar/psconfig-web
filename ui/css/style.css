@@ -97,3 +97,7 @@ ul.hosts li {
   display: inline-block;
   margin: 1px 3px;
 }
+div.well-detail {
+  background-color: #ddd;
+  margin-bottom: 0px;
+}

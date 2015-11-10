@@ -16,11 +16,11 @@
         <div class="form-group">
             <label class="col-sm-2 control-label">Admins</label>
             <div class="col-sm-10">
-                <ui-select multiple ng-model="config._admins" ng-disabled="!config.canedit">
+                <ui-select multiple ng-model="config.admins" ng-disabled="!config.canedit">
                     <ui-select-match placeholder="Select admins who can update this test spec">
                         <b>{{$item.fullname}}</b> <span class="email">&lt;{{$item.email}}&gt;</span>
                     </ui-select-match>
-                    <ui-select-choices repeat="user in profiles | propsFilter: {fullname: $select.search, email: $select.search}">
+                    <ui-select-choices repeat="user in users_a | propsFilter: {fullname: $select.search, email: $select.search}">
                       <!--<div ng-bind-html="user.fullname | highlight: $select.search"></div>-->
                       <div>{{user.fullname}}</div>
                       <small>

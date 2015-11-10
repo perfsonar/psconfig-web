@@ -80,7 +80,8 @@ module.exports = function(sequelize, DataTypes) {
         /////////////////////////////////////////////////////////////////////////////////////////..
         //props
         sitename: Sequelize.STRING, //from host-name (could be just IP)
-        ip: Sequelize.STRING, //from host-name (could be just IP)
+        ip: Sequelize.STRING, //from host-name (always just ip?)
+        hostname: Sequelize.STRING, //resolved from the IP
         /*
         name: Sequelize.STRING, //from service-name
         type: Sequelize.STRING, //like "owamp", "bwctl", etc.

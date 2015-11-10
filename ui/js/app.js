@@ -11,6 +11,7 @@ var app = angular.module('app', [
     'ui.select',
     'sca-shared',
     'ui.bootstrap',
+    'ngOrderObjectBy',
 ]);
 
 //can't quite do the slidedown animation through pure angular/css.. borrowing slideDown from jQuery..
@@ -163,7 +164,7 @@ function($rootScope, $location, toaster, jwtHelper, appconf, scaMessage) {
         if(next.requiresLogin) {
             var jwt = localStorage.getItem(appconf.jwt_id);
             if(jwt == null || jwtHelper.isTokenExpired(jwt)) {
-                scaMessage.info("Please login first!");
+                scaMessage.info("Please login first");
                 sessionStorage.setItem('auth_redirect', window.location.toString());
                 window.location = appconf.auth_url;
                 event.preventDefault();
@@ -215,14 +216,7 @@ function(appconf, $httpProvider, jwtInterceptorProvider) {
     $httpProvider.interceptors.push('jwtInterceptor');
 }]);
 
-//just a service to load all users from auth service
-app.factory('serverconf', ['appconf', '$http', function(appconf, $http) {
-    return $http.get(appconf.api+'/config')
-    .then(function(res) {
-        return res.data;
-    });
-}]);
-
+/*
 //just a service to load public profiles from all user
 //TODO - this loads the entire public profile records!! I should make it lazy load?
 app.factory('profiles', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
@@ -244,7 +238,8 @@ app.factory('profiles', ['appconf', '$http', 'jwtHelper', function(appconf, $htt
     }
     return null;
 }]);
-
+*/
+ 
 //load menu and profile by promise chaining
 //http://www.codelord.net/2015/09/24/$q-dot-defer-youre-doing-it-wrong/
 //https://www.airpair.com/angularjs/posts/angularjs-promises

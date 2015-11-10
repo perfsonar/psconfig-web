@@ -17,6 +17,7 @@ var logger = new winston.Logger(config.logger.winston);
 var db = require('../models');
 var migration = require('./migration');
 var slscache = require('./slscache');
+var profile = require('../profile');
 
 //init express
 var app = express();
@@ -44,19 +45,18 @@ process.on('uncaughtException', function (err) {
 
 exports.app = app;
 exports.start = function(cb) {
-    logger.info("connecting / migrating DB.");
+    logger.info("initializing");
     db.sequelize
-    .sync(/*{force: true}*/)
+    .sync(/*{force: true}*/) //create missing tables - if it doesn't exist
     .then(migration.run)
+    .then(slscache.start)
+    .then(profile.start)
     .then(function() {
-        slscache.start(function(err) {
-            //start server
-            var port = process.env.PORT || config.admin.port || '8080';
-            var host = process.env.HOST || config.admin.host || 'localhost';
-            app.listen(port, host, function() {
-                logger.info("meshconfig admin/api service running on %s:%d in %s mode", host, port, app.settings.env);
-                cb(null);
-            });
+        var port = process.env.PORT || config.admin.port || '8080';
+        var host = process.env.HOST || config.admin.host || 'localhost';
+        app.listen(port, host, function() {
+            logger.info("meshconfig admin/api service running on %s:%d in %s mode", host, port, app.settings.env);
+            cb(null);
         });
     });
 }

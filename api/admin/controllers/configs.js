@@ -12,6 +12,7 @@ var _ = require('underscore');
 var config = require('../../config');
 var logger = new winston.Logger(config.logger.winston);
 var db = require('../../models');
+var profile = require('../../profile');
 
 //just a plain list of configs
 router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
@@ -30,6 +31,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
                     config.canedit = true;
                 }
             }
+            config.admins = profile.load_admins(config.admins);
         });
         res.json(configs);
     }); 
@@ -51,6 +53,7 @@ router.get('/:id', jwt({secret: config.admin.jwt.pub, credentialsRequired: false
                 config.canedit = true;
             }
         }
+        config.admins = profile.load_admins(config.admins);
         res.json(config);
     }); 
 });
@@ -81,7 +84,11 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
         if(~req.user.scopes.common.indexOf('admin') || ~config.admins.indexOf(req.user.sub)) {
             config.desc = req.body.desc;
             config.url = req.body.url;
-            config.admins = req.body.admins;
+            var admins = [];
+            req.body.admins.forEach(function(admin) {
+                admins.push(admin.sub);
+            });
+            config.admins = admins;
             config.save().then(function() {
                 //upsert tests
                 var tests = [];
@@ -116,6 +123,14 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
 //new config (TODO)
 router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     if(!~req.user.scopes.common.indexOf('user')) return res.status(401).end();
+
+    //convert admin objects to list of subs
+    var admins = [];
+    req.body.admins.forEach(function(admin) {
+        admins.push(admin.sub);
+    });
+    req.body.admins = admins;
+
     db.Config.create(req.body).then(function(config) {
         //create tests
         var tests = [];

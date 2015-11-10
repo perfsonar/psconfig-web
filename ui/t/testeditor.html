@@ -81,7 +81,7 @@
             <option value="">(Select Host Group)</option>
             <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group.id}}">{{group.desc}}</option>
         </select>
-        <div class="well well-sm" ng-if="test.agroup" style="margin-bottom: 0px">
+        <div class="well well-sm well-detail" ng-if="test.agroup">
             <mc-hosts serviceid="test.service_type" hosts="get_hostgroup(test.agroup).hosts"></mc-hosts>
         </div>
     </div>
@@ -94,7 +94,7 @@
             <option value="">(Select Host Group)</option>
             <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group.id}}">{{group.desc}}</option>
         </select>
-        <div class="well well-sm" ng-if="test.bgroup" style="margin-bottom: 0px;">
+        <div class="well well-sm well-detail" ng-if="test.bgroup">
             <mc-hosts serviceid="test.service_type" hosts="get_hostgroup(test.bgroup).hosts"></mc-hosts>
         </div>
     </div>
@@ -122,7 +122,7 @@
             <option value="">(Select Test Spec)</option>
             <option ng-repeat="spec in testspecs | filter:{service_type:test.service_type}" value="{{spec.id}}">{{spec.desc}} </option>
         </select>
-        <div class="well well-sm" ng-if="test.TestspecId" style="margin-bottom: 0px;">
+        <div class="well well-sm well-detail" ng-if="test.TestspecId">
             <mc-specs specs="get_selected_testspec(test.TestspecId).specs"></mc-specs>
         </div>
     </div>
