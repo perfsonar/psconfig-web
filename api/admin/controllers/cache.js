@@ -34,13 +34,20 @@ router.get('/services', function(req, res, next) {
     //res.json({hello: "there"});
 });
 
-router.get('/hosts', function(req, res, next) {
+router.get('/hosts', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
     db.Host.findAll({raw: true}).then(function(_recs) {
         var recs = [];
         _recs.forEach(function(rec) {
             //somehow sequelize forgets to parse this.. it works for testspecs, so I am not sure why this doesn't work here
             rec.host = JSON.parse(rec.host); 
             rec.location = JSON.parse(rec.location); 
+            rec.canedit = false;
+            if(req.user) {
+                if(~req.user.scopes.common.indexOf('admin') /*|| ~testspec.admins.indexOf(req.user.sub)*/) {
+                    rec.canedit = true;
+                }
+            }
+
             recs.push(rec);
         });
         res.json(recs);
@@ -51,26 +58,28 @@ router.put('/host/:uuid', jwt({secret: config.admin.jwt.pub}), function(req, res
     var uuid = req.params.uuid;
     var _detail = req.body._detail;
     //var services = req.body.services;
-    
-    db.Service.findAll({
-        where: {client_uuid: uuid},
-    }).then(function(services) {
-        //update ma pointers
-        req.body.services.forEach(function(_service) {
-            //find the service record to update
-            services.forEach(function(service) {
-                if(service.id == _service.id) service.ma = _service.ma;
+    if(~req.user.scopes.common.indexOf('admin') /*|| ~testspec.admins.indexOf(req.user.sub)*/) {
+        
+        db.Service.findAll({
+            where: {client_uuid: uuid},
+        }).then(function(services) {
+            //update ma pointers
+            req.body.services.forEach(function(_service) {
+                //find the service record to update
+                services.forEach(function(service) {
+                    if(service.id == _service.id) service.ma = _service.ma;
+                });
             });
-        });
-        //and save all
-        async.each(services, function(service, next) {
-            service.save().then(function() {
-                next();
+            //and save all
+            async.each(services, function(service, next) {
+                service.save().then(function() {
+                    next();
+                }); 
+            }, function(err) {
+                res.json({status: "ok"});
             }); 
-        }, function(err) {
-            res.json({status: "ok"});
-        }); 
-    });
+        });
+    } else return res.status(401).end();
 });
 
 router.get('/profiles', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {

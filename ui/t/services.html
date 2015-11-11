@@ -40,7 +40,8 @@
                 </div>
             </li>
         </ul>
-        <div class="pull-right edit_button" ng-if="canedit">
+        <!--<pre>{{host._detail | json}}</pre>-->
+        <div class="pull-right edit_button" ng-if="host._detail.canedit">
             <button type="button" ng-click="edit(host)" class="btn btn-sm pull-right"><i class="fa fa-pencil-square-o"></i></button>
         </div>
     </li>

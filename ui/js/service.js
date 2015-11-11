@@ -9,9 +9,12 @@ function($scope, appconf, toaster, $http, menu, serverconf, $location, scaMessag
     var jwt = localStorage.getItem(appconf.jwt_id);
     if(jwt) {
         var user = jwtHelper.decodeToken(jwt);
+        /*
+        //TODO - I should probably let server figure out.
         if(user && ~user.scopes.common.indexOf("admin")) {
             $scope.canedit = true;
         }
+        */
     }
 
     var mas = {};
