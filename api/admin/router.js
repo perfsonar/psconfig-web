@@ -13,6 +13,7 @@ router.get('/health', function(req, res) {
     res.json({status: 'ok'});
 });
 
+/*
 function get_menu(user) {
     var scopes = {
         common: []
@@ -29,13 +30,14 @@ function get_menu(user) {
     });
     return menus;
 }
+*/
 
 router.get('/config', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res) {
     var conf = {
         service_types: config.meshconfig.service_types,
         mesh_types: config.meshconfig.mesh_types,
         defaults: config.meshconfig.defaults,
-        menu: get_menu(req.user),
+        //menu: get_menu(req.user),
     };
     res.json(conf);
 });

@@ -126,14 +126,21 @@ app.controller('HeaderController', ['$scope', 'appconf', '$route', 'toaster', '$
 function($scope, appconf, $route, toaster, $http, jwtHelper, serverconf, menu) {
     $scope.title = appconf.title;
     serverconf.then(function(_c) { $scope.serverconf = _c; });
-    menu.then(function(_menu) { $scope.menu = _menu; });
+    $scope.menu = menu;
+    $scope.user = menu.user; //for app menu
 }]);
 
-app.controller('AboutController', ['$scope', 'appconf', 'menu', 'serverconf', 'scaMessage', 'toaster',
-function($scope, appconf, menu, serverconf, scaMessage, toaster) {
+app.controller('AboutController', ['$scope', 'appconf', 'menu', 'serverconf', 'scaMessage', 'toaster', 'jwtHelper',
+function($scope, appconf, menu, serverconf, scaMessage, toaster, jwtHelper) {
     scaMessage.show(toaster);
-    menu.then(function(_menu) { $scope.menu = _menu; });
-    serverconf.then(function(_c) { $scope.serverconf = _c; });
+    //menu.then(function(_menu) { $scope.menu = _menu; });
+    $scope.appconf = appconf;
+
+    /*
+    var jwt = localStorage.getItem(appconf.jwt_id);
+    if(jwt) { $scope.user = jwtHelper.decodeToken(jwt); }
+    */
+
 }]);
 
 

@@ -215,75 +215,48 @@ function(appconf, $httpProvider, jwtInterceptorProvider) {
     }
     $httpProvider.interceptors.push('jwtInterceptor');
 }]);
-
-/*
-//just a service to load public profiles from all user
-//TODO - this loads the entire public profile records!! I should make it lazy load?
-app.factory('profiles', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
-    var jwt = localStorage.getItem(appconf.jwt_id);
-    if(jwt) {
-        var user = jwtHelper.decodeToken(jwt);//watch out..jwt could be invalid
-        if(user && ~user.scopes.common.indexOf("user")) {
-            return $http.get(appconf.profile_api+'/users')
-            .then(function(res) {
-                var profiles = [];
-                //only pull public profile
-                res.data.forEach(function(profile) {
-                    profile.public.sub = profile.sub;
-                    profiles.push(profile.public);
-                });
-                return profiles;
-            });
-        }
-    }
-    return null;
-}]);
-*/
  
 //load menu and profile by promise chaining
 //http://www.codelord.net/2015/09/24/$q-dot-defer-youre-doing-it-wrong/
 //https://www.airpair.com/angularjs/posts/angularjs-promises
-app.factory('menu', ['appconf', '$http', 'jwtHelper', '$sce', 'scaMessage', 
-function(appconf, $http, jwtHelper, $sce, scaMessage) {
+app.factory('menu', ['appconf', '$http', 'jwtHelper', '$sce', 'scaMessage', 'scaMenu', '$q',
+function(appconf, $http, jwtHelper, $sce, scaMessage, scaMenu, $q) {
+
+    var jwt = localStorage.getItem(appconf.jwt_id);
     var menu = {
         header: {
             //label: appconf.title,
             icon: $sce.trustAsHtml("<img src=\""+appconf.icon_url+"\">"),
             url: "#/",
-        }
+        },
+        top: scaMenu,
+        user: null, //to-be-loaded
+        _profile: null, //to-be-loaded
     };
 
-    return $http.get(appconf.shared_api+'/menu/top').then(function(res) {
-        menu.top = res.data;
-        //then load user profile (if we have jwt)
-        var jwt = localStorage.getItem(appconf.jwt_id);
-        if(!jwt)  return menu;
-        var user = jwtHelper.decodeToken(jwt);//jwt could be invalid
-        return $http.get(appconf.profile_api+'/public/'+user.sub);
-    }, function(err) {
-        console.log("failed to load menu");
-    }).then(function(res) {
-        //TODO - this function is called with either valid profile, or just menu if jwt is not provided... only do following if res is profile
-        //if(res.status != 200) return $q.reject("Failed to load profile");
-        menu._profile = res.data;
-        if(res.data) {
-            //logged in, but does user has email?
-            if(res.data.email) {
-                return menu;
+    var jwt = localStorage.getItem(appconf.jwt_id);
+    if(jwt) menu.user = jwtHelper.decodeToken(jwt);
+    if(menu.user) {
+        $http.get(appconf.profile_api+'/public/'+menu.user.sub).then(function(res) {
+            menu._profile = res.data;
+            if(res.data) {
+                //logged in, but does user has email?
+                if(res.data.email) {
+                    return menu; //TODO - return return to what?
+                } else {
+                    //force user to update profile
+                    //TODO - do I really need to?
+                    scaMessage.info("Please update your profile before using application.");
+                    sessionStorage.setItem('profile_settings_redirect', window.location.toString());
+                    document.location = appconf.profile_url;
+                }
             } else {
-                //force user to update profile
-                //TODO - do I really need to?
-                scaMessage.info("Please update your profile before using application.");
-                sessionStorage.setItem('profile_settings_redirect', window.location.toString());
-                document.location = appconf.profile_url;
+                //not logged in.
+                return menu; //TODO return to what?
             }
-        } else {
-            //not logged in.
-            return menu;
-        }
-    }, function(err) {
-        console.log("couldn't load profile");
-    });
+        });
+    }
+    return menu;
 }]);
 
 //http://plnkr.co/edit/juqoNOt1z1Gb349XabQ2?p=preview

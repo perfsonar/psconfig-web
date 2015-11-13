@@ -1,9 +1,10 @@
 //show all testsspecs
-app.controller('TestspecsController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', '$location', 'serverconf', 'scaMessage', 'users',
-function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, serverconf, scaMessage, users) {
+app.controller('TestspecsController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', '$location', 'serverconf', 'scaMessage', 'users',
+function($scope, appconf, $route, toaster, $http, jwtHelper, $location, serverconf, scaMessage, users) {
     scaMessage.show(toaster);
-    menu.then(function(_menu) { $scope.menu = _menu; });
+    //menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
+    $scope.appconf = appconf;
     /*
     users.then(function(_users) { 
         $scope.users = _users; 
@@ -70,7 +71,6 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, se
             return;
         }
         */
-
         $location.url("/testspec/"+testspec.id);
 
         /*
@@ -133,9 +133,10 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, se
 }]);
 
 //test spec editor
-app.controller('TestspecController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'menu', '$location', 'users', '$routeParams',
-function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, users, $routeParams) {
+app.controller('TestspecController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', '$location', 'users', '$routeParams',
+function($scope, appconf, $route, toaster, $http, jwtHelper, $location, users, $routeParams) {
     $scope.id = $routeParams.id;
+    $scope.appconf = appconf;
 
     var jwt = localStorage.getItem(appconf.jwt_id);
     if(jwt && jwtHelper.decodeToken(jwt)) {
@@ -149,6 +150,12 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, menu, $location, us
         });
     } else {
         load_guest();
+    }
+
+    if($scope.id == 'new') {
+        $scope.title = "New Test Spec";
+    } else {
+        $scope.title = "Update Test Spec";
     }
 
     /*

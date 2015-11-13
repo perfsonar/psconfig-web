@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <sca-menubar header="menu.header" menu="menu.top" active="'meshconfig'" profile="menu._profile"></sca-menubar>
+    <sca-menubar header="menu.header" menu="menu.top" active="'meshconfig'" profile="menu._profile" user="menu.user"></sca-menubar>
     <toaster-container toaster-options="{'position-class': 'toast-bottom-right'}"></toaster-container>
     <ng-view></ng-view>
     <ng-include src="'t/footer.html'"></ng-include> <!--should this be part of view?-->
@@ -38,37 +38,8 @@
     <script src="bower_components/angularjs-toaster/toaster.min.js"></script>
     <script src="bower_components/angular-order-object-by/src/ng-order-object-by.js"></script>
 
-    <script>
-    'use strict';
-    angular.module('app.config', []).constant('appconf', {
-        //title to display
-        title: 'MeshConfig Admin',
-
-        icon_url: 'images/logo.png',
-
-        //url base for meshconfig api
-        api: '../api/meshconfig',
-
-        //url base for meshconfig publisher
-        pub_url: './pub',
-
-        profile_api: '../api/profile',
-        profile_url: '../profile',
-
-        //shared servive api and ui urls (for menus and stuff)
-        shared_api: '../api/shared',
-        shared_url: '../shared',
-
-        //authentcation service API to refresh token, etc.
-        auth_api: '../api/auth',
-        //authentication service URL to jump if user needs to login
-        auth_url: '../auth',
-
-        jwt_id: 'jwt',
-    });
-    </script>
-
-    <script src="../shared/shared.js"></script> <!-- TODO make this configurable? don't forget the shared/css/style.css -->
+    <script src="config.js"></script> 
+    <script src="../shared/dist/shared.js"></script> <!-- TODO make this configurable? don't forget the shared/css/style.css -->
 
     <!-- TODO grunt following into a single js -->
     <script src="js/app.js"></script>

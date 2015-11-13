@@ -1,4 +1,4 @@
-<sca-menutab menu="serverconf.menu" active="'services'"></sca-menutab>
+<sca-menutab menu="appconf.menu" active="'services'" user="user"></sca-menutab>
 <div class="container-fluid">
     <ul class="list-group">
     <li class="list-group-item" ng-repeat="(client_uuid, host) in hosts | orderObjectBy: '_detail.sitename'">

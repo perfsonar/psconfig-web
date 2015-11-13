@@ -1,9 +1,10 @@
 
-app.controller('HostgroupsController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'menu', 'serverconf', 'users', '$modal', 'scaMessage',
-function($scope, appconf, toaster, $http, jwtHelper, menu, serverconf, users, $modal, scaMessage) {
+app.controller('HostgroupsController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'serverconf', 'users', '$modal', 'scaMessage',
+function($scope, appconf, toaster, $http, jwtHelper, serverconf, users, $modal, scaMessage) {
     scaMessage.show(toaster);
-    menu.then(function(_menu) { $scope.menu = _menu; });
+    //menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
+    $scope.appconf = appconf;
 
     var jwt = localStorage.getItem(appconf.jwt_id);
     var user = jwtHelper.decodeToken(jwt);

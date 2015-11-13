@@ -1,8 +1,8 @@
 
-app.controller('ConfigsController', ['$scope', 'appconf', 'toaster', '$http', 'menu', 'serverconf', '$location', 'scaMessage', 'services', 'jwtHelper',
-function($scope, appconf, toaster, $http, menu, serverconf, $location, scaMessage, services, jwtHelper) {
+app.controller('ConfigsController', ['$scope', 'appconf', 'toaster', '$http', 'serverconf', '$location', 'scaMessage', 'services', 'jwtHelper',
+function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, services, jwtHelper) {
     scaMessage.show(toaster);
-    menu.then(function(_menu) { $scope.menu = _menu; });
+    //menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
 
     $scope.appconf = appconf;
@@ -71,6 +71,7 @@ function($scope, appconf, toaster, $http, menu, serverconf, $location, scaMessag
 app.controller('ConfigController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'serverconf', '$routeParams', '$location', 'services', 'users', 'testspecs', 'hostgroups',
 function($scope, appconf, toaster, $http, jwtHelper, serverconf, $routeParams, $location, services, users, testspecs, hostgroups) {
     $scope.id = $routeParams.id;
+    $scope.appconf = appconf;
 
     //load stuff
     //TODO while we are loading stuff, config template gets rendered and ui-select does odd things if the users list aren't loaded yet

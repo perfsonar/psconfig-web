@@ -1,8 +1,8 @@
 
-app.controller('ServicesController', ['$scope', 'appconf', 'toaster', '$http', 'menu', 'serverconf', '$location', 'scaMessage', 'services', 'jwtHelper', 'hosts', '$modal', 
-function($scope, appconf, toaster, $http, menu, serverconf, $location, scaMessage, services, jwtHelper, hosts, $modal) {
+app.controller('ServicesController', ['$scope', 'appconf', 'toaster', '$http', 'serverconf', '$location', 'scaMessage', 'services', 'jwtHelper', 'hosts', '$modal', 
+function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, services, jwtHelper, hosts, $modal) {
     scaMessage.show(toaster);
-    menu.then(function(_menu) { $scope.menu = _menu; });
+    //menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
     $scope.appconf = appconf;
 
