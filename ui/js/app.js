@@ -177,41 +177,9 @@ function($rootScope, $location, toaster, jwtHelper, appconf, scaMessage) {
 app.config(['appconf', '$httpProvider', 'jwtInterceptorProvider', 
 function(appconf, $httpProvider, jwtInterceptorProvider) {
     jwtInterceptorProvider.tokenGetter = function(jwtHelper, config, $http, toaster) {
-        //don't send jwt for template requests
-        //(I don't think angular will ever load css/js - browsers do)
-        if (config.url.substr(config.url.length - 5) == '.html') {
-            return null;
-        }
-
-        var jwt = localStorage.getItem(appconf.jwt_id);
-        if(!jwt) return null; //not jwt
-
-        //TODO - I should probably put this in $interval instead so that jwt will be renewed regardless
-        //of if user access server or not.. (as long as the page is opened?)
-        //(also, make it part of shared or auth module?)
-        var expdate = jwtHelper.getTokenExpirationDate(jwt);
-        var ttl = expdate - Date.now();
-        if(ttl < 0) {
-            toaster.error("Your login session has expired. Please re-sign in");
-            localStorage.removeItem(appconf.jwt_id);
-            return null;
-        } else if(ttl < 3600*1000) {
-            //console.dir(config);
-            console.log("jwt expiring in an hour.. refreshing first");
-            //jwt expring in less than an hour! refresh!
-            return $http({
-                url: appconf.auth_api+'/refresh',
-                skipAuthorization: true,  //prevent infinite recursion
-                headers: {'Authorization': 'Bearer '+jwt},
-                method: 'POST'
-            }).then(function(response) {
-                var jwt = response.data.jwt;
-                //console.log("got renewed jwt:"+jwt);
-                localStorage.setItem(appconf.jwt_id, jwt);
-                return jwt;
-            });
-        }
-        return jwt;
+        //don't send jwt for template requests (I don't think angular will ever load css/js - browsers do)
+        if (config.url.substr(config.url.length - 5) == '.html') return null;
+        return localStorage.getItem(appconf.jwt_id);
     }
     $httpProvider.interceptors.push('jwtInterceptor');
 }]);
@@ -235,7 +203,31 @@ function(appconf, $http, jwtHelper, $sce, scaMessage, scaMenu, $q) {
     };
 
     var jwt = localStorage.getItem(appconf.jwt_id);
-    if(jwt) menu.user = jwtHelper.decodeToken(jwt);
+    if(jwt) {
+        var expdate = jwtHelper.getTokenExpirationDate(jwt);
+        var ttl = expdate - Date.now();
+        if(ttl < 0) {
+            toaster.error("Your login session has expired. Please re-sign in");
+            localStorage.removeItem(appconf.jwt_id);
+        } else {
+            menu.user = jwtHelper.decodeToken(jwt);
+            if(ttl < 3600*1000) {
+                //jwt expring in less than an hour! refresh!
+                console.log("jwt expiring in an hour.. refreshing first");
+                $http({
+                    url: appconf.auth_api+'/refresh',
+                    skipAuthorization: true,  //prevent infinite recursion
+                    headers: {'Authorization': 'Bearer '+jwt},
+                    method: 'POST'
+                }).then(function(response) {
+                    var jwt = response.data.jwt;
+                    localStorage.setItem(appconf.jwt_id, jwt);
+                    menu.user = jwtHelper.decodeToken(jwt);
+                });
+            }
+        }
+    }
+
     if(menu.user) {
         $http.get(appconf.profile_api+'/public/'+menu.user.sub).then(function(res) {
             menu._profile = res.data;
