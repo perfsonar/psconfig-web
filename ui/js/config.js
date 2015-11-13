@@ -108,14 +108,14 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, $routeParams, $
     function maybe_load_users(cb) {
         var jwt = localStorage.getItem(appconf.jwt_id);
         if(jwt && jwtHelper.decodeToken(jwt)) {
-            console.log("loading users");
             users.then(function(_users) { 
                 $scope.users = _users;
                 $scope.users_a = [];
                 for(var sub in $scope.users) {
                     $scope.users_a.push($scope.users[sub]);
                 }
-                cb(jwtHelper.decodeToken(jwt));
+                //cb(jwtHelper.decodeToken(jwt));
+                cb();
             });
         } else cb();
     }
@@ -123,6 +123,8 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, $routeParams, $
     function load_config(user) {
         if($scope.id == "new") {
             //new config
+            var jwt = localStorage.getItem(appconf.jwt_id);
+            var user = jwtHelper.decodeToken(jwt);
             $scope.config = {
                 admins: [ $scope.users[user.sub] ], //select current user as admin
                 Tests: [],
