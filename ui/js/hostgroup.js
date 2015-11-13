@@ -2,47 +2,15 @@
 app.controller('HostgroupsController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'serverconf', 'users', '$modal', 'scaMessage',
 function($scope, appconf, toaster, $http, jwtHelper, serverconf, users, $modal, scaMessage) {
     scaMessage.show(toaster);
-    //menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
     $scope.appconf = appconf;
 
     var jwt = localStorage.getItem(appconf.jwt_id);
     var user = jwtHelper.decodeToken(jwt);
-    /*
-    profiles.then(function(_profiles) {
-        $scope.profiles = _profiles;
-        
-        //map all user's profile to sub so that I use it to show admin info
-        $scope.users = {};
-        _profiles.forEach(function(profile) {
-            $scope.users[profile.sub] = profile;
-        });
-
-        return load();
-    });
-    */
 
     users.then(function(_users) {
         $scope.users = _users;
-        /*
-        $scope.users_a = [];
-        for(var sub in $scope.users) {
-            $scope.users_a.push($scope.users[sub]);
-        }
-        */
-
         return $http.get(appconf.api+'/hostgroups' /*,{cache: true}*/).then(function(res) {
-            /*
-            //convert admin ids to profile objects - so that select2 will recognize as already selected item
-            res.data.forEach(function(hostgroup) {
-                var admins = [];
-                hostgroup.admins.forEach(function(id) {
-                    admins.push($scope.users[id]);
-                });
-                hostgroup.admins = admins; //override
-                //$scope.testspecs[type].push(testspec);
-            });
-            */
             $scope.hostgroups = res.data;
             return $scope.hostgroups;  //just to be more promise-ish
         });
@@ -65,7 +33,6 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, users, $modal, 
                     return hostgroup;
                 },
                 title: function() {
-                    //return "Update "+$scope.serverconf.service_types[testspec.service_type].label+" Test Spec";
                     return "Update Host Group";
                 },
             }
@@ -74,8 +41,15 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, users, $modal, 
             for(var k in hostgroup) {
                 _hostgroup[k] = hostgroup[k];
             }
-        }, function () {
-            //toaster.info('Modal dismissed at: ' + new Date());
+        }, function (code) {
+            if(code == "remove") {
+                for(var i = 0;i < $scope.hostgroups.length; ++i) {
+                    if($scope.hostgroups[i].id == hostgroup.id) {
+                        $scope.hostgroups.splice(i, 1);
+                        break;
+                    }
+                }
+            }
         });
     }
 
@@ -102,8 +76,8 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, users, $modal, 
         });
         modalInstance.result.then(function() {
             $scope.hostgroups.push(hostgroup);
-        }, function () {
-            //toaster.info('Modal dismissed at: ' + new Date());
+        }, function (code) {
+            //console.log("dismiss code"+code);
         });
     }
 }]);
@@ -145,6 +119,8 @@ function($scope, appconf, toaster, $http, $modalInstance, hostgroup, title, serv
             .then(function(res) {
                 $modalInstance.close();
                 toaster.success("Hostgroup created successfully!");
+                $scope.hostgroup.canedit = res.data.canedit;
+                $scope.hostgroup.id = res.data.id;
             }, function(res) {
                 toaster.error(res.data.message);
             });           
@@ -154,6 +130,7 @@ function($scope, appconf, toaster, $http, $modalInstance, hostgroup, title, serv
             .then(function(res) {
                 $modalInstance.close();
                 toaster.success("Updated Successfully!");
+                $scope.hostgroup.canedit = res.data.canedit;
             }, function(res) {
                 toaster.error(res.data.message);
             });   
@@ -165,7 +142,7 @@ function($scope, appconf, toaster, $http, $modalInstance, hostgroup, title, serv
     $scope.remove = function() {
         $http.delete(appconf.api+'/hostgroups/'+$scope.hostgroup.id)
         .then(function(res) {
-            $modalInstance.close();
+            $modalInstance.dismiss('remove');
             toaster.success("Deleted Successfully!");
         }, function(res) {
             toaster.error(res.data.message);

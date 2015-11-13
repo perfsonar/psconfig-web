@@ -1,52 +1,4 @@
 <div class="form-group">
-    <label for="tool" class="col-sm-2 control-label">Tool *</label>
-    <div class="col-sm-4">
-        <select class="form-control" ng-model="testspec.specs.tool">
-            <option value="traceroute">traceroute</option>
-            <option value="tracepath">tracepath</option>
-            <option value="paris-traceroute">paris-traceroute</option>
-        </select>
-        <p class="help-block">The tool to use to perform the traceroute</p>
-    </div>
-    <div ng-if="testspec.specs.tool == 'traceroute'">
-        <label for="protocol" class="col-sm-2 control-label">Protocol</label>
-        <div class="col-sm-4">
-            <select class="form-control" ng-model="testspec.specs.protocol">
-                <option value="icmp">ICMP</option>
-                <option value="udp">UDP</option>
-            </select>
-        </div>
-    </div>
-</div>
-<div class="form-group" ng-if="testspec.specs.tool == 'traceroute'">
-    <div>
-        <label for="packet_size" class="col-sm-2 control-label">Packet Size</label>
-        <div class="col-sm-4">
-            <div class="input-group">
-                <input type="text" class="form-control" id="packet_size" ng-model="testspec.specs.packet_size">
-                <div class="input-group-addon">bytes</div>
-            </div>
-            <p class="help-block">The size of packets to send in bytes when performing the traceroute</p>
-        </div>
-    </div>
-    <label for="first_ttl" class="col-sm-2 control-label">First TTL</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="text" class="form-control" id="first_ttl" ng-model="testspec.specs.first_ttl">
-            <div class="input-group-addon">hops</div>
-        </div>
-        <p class="help-block">Length of each test</p>
-    </div>
-</div>
-<div class="form-group">
-    <label for="random_start_percentage" class="col-sm-2 control-label">Random Start Percentage</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="text" class="form-control" id="random_start_percentage" ng-model="testspec.specs.random_start_percentage">
-            <div class="input-group-addon">%</div>
-        </div>
-        <p class="help-block">Randomize test start time by this amount</p>
-    </div>
     <label for="test_interval" class="col-sm-2 control-label">Test Interval *</label>
     <div class="col-sm-4">
         <div class="input-group">
@@ -55,8 +7,30 @@
         </div>
         <p class="help-block">Number of seconds between each test</p>
     </div>
+    <label for="random_start_percentage" class="col-sm-2 control-label">Random Start Percentage</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" class="form-control" id="random_start_percentage" ng-model="testspec.specs.random_start_percentage" placeholder="10">
+            <div class="input-group-addon">%</div>
+        </div>
+        <p class="help-block">The percentage to randomize the start time of test. Valid values are between 0 and 50 (inclusive). Example: interval of 7200 (2 hours) and random_start_percentage 50 means that a test can start anywhere between 1 hour and 3 hours after the previous test completes.</p>
+    </div>
 </div>
 <div class="form-group">
+    <label for="tool" class="col-sm-2 control-label">Tool</label>
+    <div class="col-sm-4">
+        <select class="form-control" ng-model="testspec.specs.tool">
+            <option value="traceroute">traceroute (default)</option>
+            <option value="tracepath">tracepath</option>
+            <option value="paris-traceroute">paris-traceroute</option>
+        </select>
+        <p class="help-block">The tool to use to perform the traceroute. <a href="" ng-click="show_tool_info = true;">More Info</a></p>
+        <ul ng-if="show_tool_info" class="slide-down help-block">
+            <li><b>traceroute</b> This is the default and generally the more reliable of the tools. It also includes more options in terms of setting the TTL and properly binding to interfaces.</li>
+            <li><b>tracepath</b> The main advantage of this tool is it reports MTU by default. It has fewer options than standard traceroute for setting TTLs and binding to local interfaces. It also is UDP-only and may be blocked by firewalls. It’s also been reported to have a harder time with MTU mismatches on the destination host.</li>
+            <li><b>paris-traceroute</b> This is another approach to running traceroute that tries to identify load balanced routes and similar. It requires the client to grant the paris-traceroute command the CAP_NET_RAW privilege on the system in order to run as a non-root user.</li>
+        </ul>
+    </div>
     <label for="timeout" class="col-sm-2 control-label">Timeout</label>
     <div class="col-sm-4">
         <div class="input-group">
@@ -65,27 +39,58 @@
         </div>
         <p class="help-block">The maximum amount of time to wait in seconds for the traceroute to complete</p>
     </div>
-    <!--
-    <label for="test_interval" class="col-sm-2 control-label">Test Interval *</label>
+</div>
+
+<div class="form-group" ng-if="testspec.specs.tool == 'traceroute'">
+    <label for="first_ttl" class="col-sm-2 control-label">First TTL</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" id="test_interval" ng-model="testspec.specs.test_interval" required>
-            <div class="input-group-addon">seconds</div>
+            <input type="text" class="form-control" id="first_ttl" ng-model="testspec.specs.first_ttl" placeholder="1">
+            <div class="input-group-addon">hops</div>
         </div>
-        <p class="help-block">Number of seconds between each test</p>
+        <p class="help-block">The first hop to look at starting at 1. This can be used to hide local routers. Not supported by tracepath or paris-traceroute</p>
     </div>
-    -->
+    <label for="max_ttl" class="col-sm-2 control-label">Max TTL</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" class="form-control" id="max_ttl" ng-model="testspec.specs.max_ttl" placeholder="30">
+            <div class="input-group-addon">hops</div>
+        </div>
+        <p class="help-block">The maximum number of hops before a traceroute fails. Not supported by tracepath or paris-traceroute</p>
+    </div>
 </div>
-<div class="form-group" ng-if="testspec.specs.tool != 'traceroute'">
+
+<div class="form-group" ng-if="testspec.specs.tool == 'traceroute'">
+    <label for="protocol" class="col-sm-2 control-label">Protocol</label>
+    <div class="col-sm-4">
+        <select class="form-control" ng-model="testspec.specs.protocol">
+            <option value="icmp">ICMP (Default)</option>
+            <option value="udp">UDP</option>
+        </select>
+        <p class="help-block">Indicates whether to use ICMP or UDP for the traceroute. Not supported by tracepath or paris-traceroute</p>
+    </div>
+    <label for="packet_size" class="col-sm-2 control-label">Packet Size</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" class="form-control" id="packet_size" ng-model="testspec.specs.packet_size" placeholder="(Tool Default)">
+            <div class="input-group-addon">bytes</div>
+        </div>
+        <p class="help-block">The size of packets to send in bytes when performing the traceroute. Not supported by tracepath or paris-traceroute</p>
+    </div>
+</div>
+
+<div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
         <div class="checkbox">
             <label> <input type="checkbox" ng-model="testspec.specs.force_bidirectional"> Do Bidirectional test</label>
+            <p class="help-block">Forces each endpoint to initiate the test in both directions. This will lead to redundant tests being run on each side.</p>
         </div>
         <div class="checkbox">
             <label> <input type="checkbox" ng-model="testspec.specs.ipv4_only"> IPv4 Only</label>
         </div>
         <div class="checkbox">
             <label> <input type="checkbox" ng-model="testspec.specs.ipv6_only"> IPv6 Only</label>
+            <p class="help-block">Forces each side to use IPv4/6. Test will fail if no IPv4/6 address can be determined for either endpoint</p>
         </div>
     </div>
 </div>

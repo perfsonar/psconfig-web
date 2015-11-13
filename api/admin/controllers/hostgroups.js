@@ -87,7 +87,11 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             });
             hostgroup.admins = admins;
             hostgroup.save().then(function() {
-                res.json({status: "ok"});
+                var canedit = false;
+                if(~req.user.scopes.common.indexOf('admin') || ~hostgroup.admins.indexOf(req.user.sub)) {
+                    canedit = true;
+                }
+                res.json({status: "ok", canedit: canedit});
             }).catch(function(err) {
                 next(err);
             });
@@ -106,7 +110,11 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     req.body.admins = admins;
 
     db.Hostgroup.create(req.body).then(function(hostgroup) {
-        res.json({status: "ok"});
+        var canedit = false;
+        if(~req.user.scopes.common.indexOf('admin') || ~hostgroup.admins.indexOf(req.user.sub)) {
+            canedit = true;
+        }
+        res.json({status: "ok", canedit: canedit, id: hostgroup.id});
     });
 });
 

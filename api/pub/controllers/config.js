@@ -221,6 +221,8 @@ function get_type(service_type) {
     case "bwctl": 
     case "owamp": 
         return "perfsonarbuoy/"+service_type;
+    case "ping": 
+        return "pinger";
     }
     return service_type; //no change
 }
