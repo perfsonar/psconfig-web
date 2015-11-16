@@ -49,14 +49,15 @@ exports.start = function(cb) {
     db.sequelize
     .sync(/*{force: true}*/) //create missing tables - if it doesn't exist
     .then(migration.run)
-    .then(slscache.start)
+    //.then(slscache.start)
     .then(profile.start)
     .then(function() {
         var port = process.env.PORT || config.admin.port || '8080';
         var host = process.env.HOST || config.admin.host || 'localhost';
         app.listen(port, host, function() {
             logger.info("meshconfig admin/api service running on %s:%d in %s mode", host, port, app.settings.env);
-            cb(null);
+            slscache.start().then(cb);
+            //cb(null);
         });
     });
 }

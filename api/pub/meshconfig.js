@@ -143,6 +143,15 @@ function generate(config) {
         //testspec should never be null.. but
         if(test.Testspec) {
             var parameters = test.Testspec.specs;
+
+            /*  I am not sure if this is really necessary
+            //convert all integer field to string
+            for(var k in parameters) {
+                var v = parameters[k];
+                if(typeof v == "number") parameters[k] = parameters[k].toString();
+            }
+            */
+
             parameters.type = get_type(test.service_type);
             mc.tests.push({
                 members: members,

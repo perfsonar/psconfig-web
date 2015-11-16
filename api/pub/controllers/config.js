@@ -21,6 +21,7 @@ router.get('/:url', function(req, res, next) {
         include: [ 
             //test has a lot of stuff
             {   model: db.Test, 
+                required: false, //test could be empty
                 where: {enabled: true},
                 include: [ 
                     db.Testspec, 
@@ -31,6 +32,7 @@ router.get('/:url', function(req, res, next) {
             } 
         ],
     }).then(function(_config) {
+        console.dir(_config);
         if(!_config) return next(new Error("Couldn't find config with URL:"+url));
         var config = JSON.parse(JSON.stringify(_config)); //sequelize stupidness.. raw:true returns flattened k/v list
         //load admin list for config
