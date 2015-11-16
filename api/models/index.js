@@ -43,7 +43,10 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 //relationships
-db.Config.hasMany(db.Test);
+db.Config.hasMany(db.Test, {
+    hooks: true,
+    onDelete: 'cascade'
+});
 
 db.Testspec.hasMany(db.Test);
 
@@ -62,3 +65,4 @@ db.Service.hasMany(db.Service, {foreignKey: 'ma'});
 db.Service.belongsTo(db.Host, {foreignKey: 'client_uuid', targetKey: 'uuid'});
 
 module.exports = db;
+
