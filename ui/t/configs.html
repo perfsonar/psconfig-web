@@ -1,6 +1,22 @@
 <sca-menutab menu="appconf.menu" active="'configs'" user="user"></sca-menutab>
 <div class="container-fluid">
     <ul class="list-group">
+    <li class="list-group-item" style="background-color: #fafafa">
+        <br>
+        <h4>Auto Mesh Config</h4>
+        <p>Enter hostname of perfSONAR toolkit instance to generate a mesh config containing tests that uses this instance as an endpoint.</p>
+        <ui-select ng-model="autoconf_select" on-select="autoconf($item)">
+            <ui-select-match placeholder="Enter hostname">
+                <div style="padding-top: 2px; font-size: 12px">
+                    <b>{{$select.selected.sitename}}</b> ({{$select.selected.hostname}})
+                </div>
+            </ui-select-match>
+            <ui-select-choices repeat="host.uuid as host in hosts | filter: $select.search">
+                <b>{{host.sitename}}</b> (<span ng-if="host.hostname">{{host.hostname}}</span><span ng-if="!host.hostname && host.ip">{{host.ip}}</span>)
+            </ui-select-choices>
+        </ui-select>
+        <br>
+    </li>
     <li class="list-group-item" ng-repeat="config in configs | orderBy:'id' ">
         <!--ng-click="edit(config)">-->
         <div class="row">

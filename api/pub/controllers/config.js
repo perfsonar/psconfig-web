@@ -11,6 +11,7 @@ var config = require('../../config');
 var logger = new winston.Logger(config.logger.winston);
 var db = require('../../models');
 var profile = require('../../profile');
+var meshconfig = require('../meshconfig');
 
 //construct meshconfig
 router.get('/:url', function(req, res, next) {
@@ -54,6 +55,7 @@ router.get('/:url', function(req, res, next) {
             where: {uuid: {$in: service_ids}},
             include: [ 
                 { model: db.Service, as: "MA" },
+                { model: db.Host },
             ]
         }).then(function(services) {
             config.services = services;
@@ -73,171 +75,12 @@ router.get('/:url', function(req, res, next) {
                 config.mas = mas;
 
                 //finally.. construct meshconfig
-                res.json(generate_meshconfig(config));
+                res.json(meshconfig.generate(config));
+                //res.json(config);//debug
             });
         });
     });
 });
-
-function generate_members(group, services) {
-    var members = [];
-    group.hosts.forEach(function(host) {
-        members.push(services[host]._address);
-    });
-    return members;
-}
-
-//synchronous function to construct meshconfig from admin config
-function generate_meshconfig(config) {
-    
-    //create uuid service mapping
-    var services = {};
-    config.services.forEach(function(service) {
-        services[service.uuid] = service;
-    });
-
-    //parse hostname out of locator
-    config.services.forEach(function(service) {
-        //parse hostname from locator
-        var address = service.locator;
-        var protpos = address.indexOf("://");
-        if(~protpos) {
-            address = address.substr(protpos+3); //remove "tcp://" or such
-        }
-        var portpos = address.indexOf(":");
-        if(~portpos) {
-            address = address.substr(0, portpos); //strip everything after port :
-        }
-        service._address = address;
-    });
-    
-    //meshconfig root template
-    var mc = {
-        organizations: [],
-        tests: [],
-        administrators: [],
-        description: config.desc,
-        //_config: config //debug
-    };
-    
-    //set meshconfig admins
-    config.admins.forEach(function(admin) {
-        mc.administrators.push({name: admin.fullname, email: admin.email});
-    });
-
-    //convert services to sites/hosts entries
-    //let's put all sites under a single organization - since I currently don't handle the concept of organization
-    var org = {
-        sites: [],
-        administrators: [],
-        //description: "",
-    };
-    mc.organizations.push(org);
-
-    var hosts = {}; //to keep up with already defined host (we can't list the same host multiple time - even with different ip address / hostname)
-
-    config.services.forEach(function(service) {
-        var _address = service._address;
-
-        if(!service.MA) {
-            //MA not specified.. find local MA
-            config.mas.forEach(function(ma) {
-                if(ma.client_uuid == service.client_uuid) {
-                    service.MA = ma;
-                }
-            });
-        }
-        //console.dir(service.MA);
-
-        if(hosts[service.client_uuid]) {
-            var host = hosts[service.client_uuid];
-            if(!~host.addresses.indexOf(_address)) host.addresses.push(_address);
-            if(service.MA) host.measurement_archives.push(generate_mainfo(service));
-            host.description += "/"+service.type; //service.name;
-        } else {
-            var host = {
-                //administrators: [], //TODO host admins
-                addresses: [ _address ], 
-                measurement_archives: [ ], 
-                //description: service.name,
-                description: service.sitename+' '+service.type,
-                toolkit_url: "auto",
-            };
-            if(service.MA) host.measurement_archives.push(generate_mainfo(service));
-            hosts[service.client_uuid] = host;
-
-            var site = {
-                hosts: [ host ],
-                //administrators: [], //TODO site admins (not needed?)
-                location: service.location,
-                description: service.sitename
-            };
-            org.sites.push(site);
-        }
-    });
-
-    //now the most interesting part..
-    config.Tests.forEach(function(test) {
-        var members = {
-            type: test.mesh_type
-        };
-        switch(test.mesh_type) { 
-        case "disjoint":
-            members.a_members = generate_members(test.HostGroupA, services);
-            members.b_members = generate_members(test.HostGroupB, services);
-            break;
-        case "mesh":
-            members.members = generate_members(test.HostGroupA, services);
-            break;
-        case "star":
-            members.members = generate_members(test.HostGroupA, services);
-            if(test.center_address) members.center_address = services[test.center_address]._address;
-            break;
-        case "ordered_mesh": 
-            members.members = generate_members(test.HostGroupA, services);
-            break;
-        }
-        if(test.HostGroupNA) {
-            //TODO - not handled yet
-            members.no_agent = generate_members(test.HostGroupNA, services);
-        }
-
-        //testspec should never be null.. but
-        if(test.Testspec) {
-            var parameters = test.Testspec.specs;
-            parameters.type = get_type(test.service_type);
-            mc.tests.push({
-                members: members,
-                parameters: parameters,
-                description: test.desc,
-            });
-        }
-    });
-
-    //mc.debug = config;
-    return mc;
-}
-
-function get_type(service_type) {
-    switch(service_type) {
-    case "bwctl": 
-    case "owamp": 
-        return "perfsonarbuoy/"+service_type;
-    case "ping": 
-        return "pinger";
-    }
-    return service_type; //no change
-}
-
-function generate_mainfo(service) {
-    
-    return {
-        //ma: service.MA,
-        read_url: service.MA.locator,
-        write_url: service.MA.locator,
-        type: "perfsonarbuoy/"+service.type, //get_type(service.type)
-    };
-}
 
 module.exports = router;
 

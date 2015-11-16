@@ -59,5 +59,6 @@ db.Hostgroup.hasMany(db.Test, {foreignKey: 'nagroup'}); //Test.getBgroup, Test.s
 //db.Test.belongsTo(db.Hostgroup, {as: 'bgroup'});
 db.Service.belongsTo(db.Service, {foreignKey: 'ma', as: 'MA'});
 db.Service.hasMany(db.Service, {foreignKey: 'ma'});
+db.Service.belongsTo(db.Host, {foreignKey: 'client_uuid', targetKey: 'uuid'});
 
 module.exports = db;

@@ -1,9 +1,9 @@
 
-app.controller('ConfigsController', ['$scope', 'appconf', 'toaster', '$http', 'serverconf', '$location', 'scaMessage', 'services', 'jwtHelper',
-function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, services, jwtHelper) {
+app.controller('ConfigsController', ['$scope', 'appconf', 'toaster', '$http', 'serverconf', '$location', 'scaMessage', 'services', 'jwtHelper', 'hosts',
+function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, services, jwtHelper, hosts) {
     scaMessage.show(toaster);
-    //menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
+    hosts.then(function(_hosts) { $scope.hosts = _hosts; });
 
     $scope.appconf = appconf;
 
@@ -13,7 +13,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, ser
     }
     
     //start loading stuff
-    var testspecs, hostgroups;//, services;
+    var testspecs, hostgroups;
     $http.get(appconf.api+'/testspecs/').then(function(res) {
         testspecs = res.data; 
         return $http.get(appconf.api+'/hostgroups/');
@@ -42,6 +42,10 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, ser
     }
     $scope.edit = function(config) {
         $location.url("/config/"+config.id);
+    }
+    $scope.autoconf = function(host) {
+        var address = host.hostname || host.ip;
+        document.location = appconf.pub_url+"/auto/"+address;
     }
 }]);
 

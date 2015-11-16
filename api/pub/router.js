@@ -17,6 +17,7 @@ router.get('/health', function(req, res) {
 });
 
 router.use('/config', require('./controllers/config'));
+router.use('/auto', require('./controllers/auto'));
 
 module.exports = router;
 

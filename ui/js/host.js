@@ -1,21 +1,9 @@
 
-app.controller('HostsController', ['$scope', 'appconf', 'toaster', '$http', 'serverconf', '$location', 'scaMessage', 'services', 'jwtHelper', 'hosts', '$modal', 
-function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, services, jwtHelper, hosts, $modal) {
+app.controller('HostsController', ['$scope', 'appconf', 'toaster', '$http', 'serverconf', '$location', 'scaMessage', 'services', 'hosts', '$modal', 
+function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, services, hosts, $modal) {
     scaMessage.show(toaster);
-    //menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
     $scope.appconf = appconf;
-
-    var jwt = localStorage.getItem(appconf.jwt_id);
-    if(jwt) {
-        var user = jwtHelper.decodeToken(jwt);
-        /*
-        //TODO - I should probably let server figure out.
-        if(user && ~user.scopes.common.indexOf("admin")) {
-            $scope.canedit = true;
-        }
-        */
-    }
 
     var mas = {};
     services.then(function(_services) { 
@@ -60,13 +48,6 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, ser
             if(service.client_uuid == _host._detail.uuid) _host.default_ma = service;
         });
         
-        /*
-        //if ma is not specified, pick local MA
-        _host.services.forEach(function(service) {
-            if(!service.ma) service.ma = ma;
-        });
-        */
-
         var modal = $modal.open({
             animation: true,
             templateUrl: 't/host.html',
@@ -90,8 +71,6 @@ app.controller('HostModalController', ['$scope', 'appconf', 'toaster', '$http', 
 function($scope, appconf, toaster, $http, $modalInstance, host, title, services, serverconf) {
     $scope.host = host;
     $scope.title = title;
-    //serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
-    //profiles.then(function(_profiles) { $scope.profiles = _profiles; }); //for admin list
     services.then(function(_services) { $scope.services = _services; }); //for host list
 
     $scope.cancel = function() {
