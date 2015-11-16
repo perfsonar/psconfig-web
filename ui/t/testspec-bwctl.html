@@ -1,7 +1,7 @@
 <div class="form-group">
     <label for="tool" class="col-sm-2 control-label">Tool *</label>
     <div class="col-sm-4">
-        <select class="form-control" ng-model="testspec.specs.tool" required>
+        <select class="form-control" name="tool" ng-model="testspec.specs.tool" required>
             <option value="bwctl/iperf3">bwctl/iperf3</option>
             <option value="bwctl/iperf">bwctl/iperf</option>
         </select>
@@ -11,7 +11,7 @@
         <label for="omit_interval" class="col-sm-2 control-label">Omit Interval</label>
         <div class="col-sm-4">
             <div class="input-group">
-                <input type="text" class="form-control" id="omit_interval" ng-model="testspec.specs.omit_interval" placeholder="0">
+                <input type="text" class="form-control" name="omit_interval" ng-model="testspec.specs.omit_interval" placeholder="0">
                 <div class="input-group-addon">seconds</div>
             </div>
             <p class="help-block">The time to ignore results at the beginning of a test in seconds. Useful for excluding TCP ramp-up time. Note that this is added to the duration (e.g. omit_interval of 5 and duration 30 leads to a 35 second test).</p>
@@ -22,7 +22,7 @@
     <label for="interval" class="col-sm-2 control-label">Interval *</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" id="interval" ng-model="testspec.specs.interval" required>
+            <input type="text" class="form-control" name="interval" ng-model="testspec.specs.interval" required>
             <div class="input-group-addon">seconds</div>
         </div>
         <p class="help-block">The time in between throughput tests in seconds</p>
@@ -30,7 +30,7 @@
     <label for="duration" class="col-sm-2 control-label">Duration *</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" id="duration" ng-model="testspec.specs.duration" required>
+            <input type="text" class="form-control" name="duration" ng-model="testspec.specs.duration" required>
             <div class="input-group-addon">seconds</div>
         </div>
         <p class="help-block">The length to run each throughput test in seconds</p>
@@ -39,7 +39,7 @@
 <div class="form-group">
     <label for="protocol" class="col-sm-2 control-label">Protocol</label>
     <div class="col-sm-4">
-        <select class="form-control" ng-model="testspec.specs.protocol">
+        <select class="form-control" name="protocol" ng-model="testspec.specs.protocol">
             <option value="tcp">TCP</option>
             <option value="udp">UDP</option>
         </select>
@@ -49,7 +49,7 @@
         <label for="udp_bandwidth" class="col-sm-2 control-label">UDP Bandwidth</label>
         <div class="col-sm-4">
             <div class="input-group">
-                <input type="text" class="form-control" id="udp_bandwidth" ng-model="testspec.specs.udp_bandwidth" placeholder="1000000">
+                <input type="text" class="form-control" name="udp_bandwidth" ng-model="testspec.specs.udp_bandwidth" placeholder="1000000">
                 <div class="input-group-addon">Bits Per Secs</div>
             </div>
             <p class="help-block">The rate at which the tool will attempt to send UDP packets. Can specify as bits per second or with suffix K, M, or G to indicated Kbps, Mbps or Gbps respectively.</p>
@@ -59,7 +59,7 @@
         <label for="window_size" class="col-sm-2 control-label">Window Size</label>
         <div class="col-sm-4">
             <div class="input-group">
-                <input type="text" class="form-control" id="window_size" ng-model="testspec.specs.window_size" placeholder="0 (use endpoint host default)">
+                <input type="text" class="form-control" name="window_size" ng-model="testspec.specs.window_size" placeholder="0 (use endpoint host default)">
                 <div class="input-group-addon">Bytes</div>
             </div>
             <p class="help-block">TCP window size (bytes)</p>
@@ -70,7 +70,7 @@
     <label for="random_start_percentage" class="col-sm-2 control-label">Random Start Percentage</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" id="random_start_percentage" ng-model="testspec.specs.random_start_percentage" placeholder="10">
+            <input type="text" class="form-control" name="random_start_percentage" ng-model="testspec.specs.random_start_percentage" placeholder="10">
             <div class="input-group-addon">%</div>
         </div>
         <p class="help-block">The percentage to randomize the start time of requests. Valid values are between 0 and 50 (inclusive). Example: interval of 7200 (2 hours) and random_start_percentage 50 means that a test can start anywhere between 1 hour and 3 hours after the previous test completes.</p>
@@ -78,7 +78,7 @@
     <label for="tos_bits" class="col-sm-2 control-label">TOS Bits</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" id="tos_bits" ng-model="testspec.specs.tos_bits">
+            <input type="text" class="form-control" name="tos_bits" ng-model="testspec.specs.tos_bits">
             <div class="input-group-addon">Seconds</div>
         </div>
         <p class="help-block">The type of service to set in the IP header of outgoing packets</p>
@@ -88,7 +88,7 @@
     <label for="buffer_length" class="col-sm-2 control-label">Buffer Length</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" id="buffer_length" ng-model="testspec.specs.buffer_length" placeholder="(system default)">
+            <input type="text" class="form-control" name="buffer_length" ng-model="testspec.specs.buffer_length" placeholder="(system default)">
             <div class="input-group-addon">Bytes</div>
         </div>
         <p class="help-block">Length of read and write buffers</p>
@@ -96,7 +96,7 @@
     <label for="Latest Time" class="col-sm-2 control-label">Latest Time</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" id="latest_time" ng-model="testspec.specs.latest_time" placeholder="">
+            <input type="text" class="form-control" name="latest_time" ng-model="testspec.specs.latest_time">
             <div class="input-group-addon">Seconds</div>
         </div>
         <p class="help-block">The delay in seconds after the test is requested that it is allowed to start. This may be useful on busy hosts where a test cannot be scheduled until further in the future than the default allows. Default: 50% of the interval OR the difference between the interval and duration (whichever is smaller)</p>
@@ -106,7 +106,7 @@
     <label for="report_interval" class="col-sm-2 control-label">Report Interval</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" id="report_interval" ng-model="testspec.specs.report_interval" placeholder="1">
+            <input type="text" class="form-control" name="report_interval" ng-model="testspec.specs.report_interval" placeholder="1">
             <div class="input-group-addon">Seconds</div>
         </div>
         <p class="help-block">The sub-interval at which to report results in seconds.</p>
@@ -114,7 +114,7 @@
     <label for="streams" class="col-sm-2 control-label">Streams</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" id="streams" ng-model="testspec.specs.streams" placeholder="1">
+            <input type="text" class="form-control" name="streams" ng-model="testspec.specs.streams" placeholder="1">
             <div class="input-group-addon">Streams</div>
         </div>
         <p class="help-block">The number of parallel streams to use in the test</p>
@@ -123,14 +123,14 @@
 <div class="form-group">
     <div class="col-sm-offset-2 col-sm-4">
         <div class="checkbox">
-            <label> <input type="checkbox" ng-model="testspec.specs.force_bidirectional"> Do Bidirectional test</label>
+            <label> <input type="checkbox" name="force_bidirectional" ng-model="testspec.specs.force_bidirectional"> Do Bidirectional test</label>
             <p class="help-block">Forces each endpoint to initiate the test in both directions. This will lead to redundant tests being run on each side.</p>
         </div>
         <div class="checkbox">
-            <label> <input type="checkbox" ng-model="testspec.specs.ipv4_only"> IPv4 Only</label>
+            <label> <input type="checkbox" name="ipv4_only" ng-model="testspec.specs.ipv4_only"> IPv4 Only</label>
         </div>
         <div class="checkbox">
-            <label> <input type="checkbox" ng-model="testspec.specs.ipv6_only"> IPv6 Only</label>
+            <label> <input type="checkbox" name="ipv6_only" ng-model="testspec.specs.ipv6_only"> IPv6 Only</label>
             <p class="help-block">Forces each side to use IPv4/IPv6. Test will fail if no IPv4/IPv6 address can be determined for either endpoint</p>
         </div>    
     </div>

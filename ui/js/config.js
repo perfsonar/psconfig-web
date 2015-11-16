@@ -35,29 +35,6 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, ser
                 });
             });
         });
-
-        /*
-            //user gets to see admin - but I need to load profiles 
-            profiles.then(function(_profiles) {
-                //if user can get profiles, then user must be a user
-                $scope.cancreate = true;
-                
-                //map all user's profile to sub so that I use it to show admin info
-                var users = {};
-                _profiles.forEach(function(profile) {
-                    users[profile.sub] = profile;
-                });
-
-                //convert admin ids to profile objects - so that select2 will recognize as already selected item
-                $scope.configs.forEach(function(config) {
-                    config._admins = [];
-                    config.admins.forEach(function(id) {
-                        config._admins.push(users[id]);
-                    });
-                });
-            });
-        }
-        */
     });
     
     $scope.addconfig = function() {
@@ -88,22 +65,6 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, $routeParams, $
             });
         });
     });
-
-    /*
-    if(profiles) {
-        profiles.then(function(_profiles) { 
-            $scope.profiles = _profiles; 
-            //map all user's profile to sub so that I use it to show admin info
-            $scope.users = {};
-            _profiles.forEach(function(profile) {
-                $scope.users[profile.sub] = profile;
-            });
-            return load();
-        }); 
-    } else {
-        load_guest();
-    }
-    */
 
     function maybe_load_users(cb) {
         var jwt = localStorage.getItem(appconf.jwt_id);

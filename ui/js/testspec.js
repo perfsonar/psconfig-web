@@ -1,3 +1,4 @@
+
 //show all testsspecs
 app.controller('TestspecsController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', '$location', 'serverconf', 'scaMessage', 'users',
 function($scope, appconf, $route, toaster, $http, jwtHelper, $location, serverconf, scaMessage, users) {
@@ -5,55 +6,11 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, $location, serverco
     //menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
     $scope.appconf = appconf;
-    /*
-    users.then(function(_users) { 
-        $scope.users = _users; 
-        $scope.users_a = [];
-        for(var sub in $scope.users) {
-            $scope.users_a.push($scope.users[sub]);
-        }
-    });
-    */
-
-    /*
-    var jwt = localStorage.getItem(appconf.jwt_id);
-    var user = jwtHelper.decodeToken(jwt);
-    profiles.then(function(_profiles) {
-        $scope.profiles = _profiles;
-        
-        //map all user's profile to sub so that I use it to show admin info
-        $scope.users = {};
-        _profiles.forEach(function(profile) {
-            $scope.users[profile.sub] = profile;
-        });
-
-        //then load all testspecs
-        return load();
-    });
-    */
 
     //TODO - will fail for guest user
     users.then(function(_users) {
         $scope.users = _users;
-        /*
-        $scope.users_a = [];
-        for(var sub in $scope.users) {
-            $scope.users_a.push($scope.users[sub]);
-        }
-        */
-
         return $http.get(appconf.api+'/testspecs' /*,{cache: true}*/).then(function(res) {
-            //convert admin ids to profile objects - so that select2 will recognize as already selected item
-            /*
-            res.data.forEach(function(testspec) {
-                var admins = [];
-                testspec.admins.forEach(function(id) {
-                    admins.push($scope.users[id]);
-                });
-                testspec.admins = admins; //override
-                //$scope.testspecs[type].push(testspec);
-            });
-            */
             $scope.testspecs = res.data;
             return $scope.testspecs;  //just to be more promise-ish
         });
@@ -64,72 +21,8 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, $location, serverco
     }
 
     $scope.edit = function(testspec) {
-
-        /*
-        if(!testspec.canedit) {
-            toaster.error("You need to be listed as an admin in order to edit this testspec");
-            return;
-        }
-        */
         $location.url("/testspec/"+testspec.id);
-
-        /*
-        var testspec = angular.copy(_testspec);
-        var modalInstance = $modal.open({
-            animation: true,
-            templateUrl: 't/testspec.html',
-            controller: 'TestspecModalController',
-            size: 'lg',
-            resolve: {
-                testspec: function () {
-                    return testspec;
-                },
-                title: function() {
-                    //return "Update "+$scope.serverconf.service_types[testspec.service_type].label+" Test Spec";
-                    return "Update Test Spec";
-                },
-            }
-        });
-        modalInstance.result.then(function() {
-            load();
-        }, function () {
-            //toaster.info('Modal dismissed at: ' + new Date());
-        });
-        */
     }
-
-    /*
-    $scope.create = function(service_type) {
-        //$location.path('/newtestspec/'+service_type);
-        //construct a new testspec
-        var testspec = {
-            service_type: service_type,
-            admins: [ $scope.users[user.sub] ], //select current user as admin
-            specs: $scope.serverconf.defaults.testspecs[service_type],
-            desc: "",
-        };
-        var modalInstance = $modal.open({
-            animation: true,
-            templateUrl: 't/testspec.html',
-            controller: 'TestspecModalController',
-            size: 'lg',
-            resolve: {
-                testspec: function () {
-                    return testspec;
-                },
-                title: function() {
-                    //return "New "+$scope.serverconf.service_types[service_type].label+" Test Spec";
-                    return "New Test Spec";
-                },
-            }
-        });
-        modalInstance.result.then(function() {
-            load();
-        }, function () {
-            //toaster.info('Modal dismissed at: ' + new Date());
-        });
-    }
-    */
 }]);
 
 //test spec editor
@@ -158,37 +51,10 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, $location, users, $
         $scope.title = "Update Test Spec";
     }
 
-    /*
-    //for admin list
-    if(profiles) {
-        profiles.then(function(_profiles) { 
-            $scope.profiles = _profiles; 
-            //map all user's profile to sub so that I use it to show admin info
-            $scope.users = {};
-            _profiles.forEach(function(profile) {
-                $scope.users[profile.sub] = profile;
-            });
-            return load();
-        });
-    } else {
-        load_guest();
-    }
-    */
-
-    /*
-    //massaging handful fields
-    if($scope.testspec.specs.ipv4_only) {
-        $scope.testspec._ipv46 = "4"; 
-    }
-    if($scope.testspec.specs.ipv6_only) {
-        $scope.testspec._ipv46 = "6"; 
-    }
-    */
-    function load_guest(cb) {
+    function load_guest() {
         $http.get(appconf.api+'/testspecs/'+$routeParams.id).then(function(res) {
             $scope.testspec = res.data;
             watch();
-            if(cb) cb();
         });
     }
     function load(user) {
@@ -204,15 +70,7 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, $location, users, $
             watch();
         } else {
             //update
-            load_guest(function() {
-                /*
-                //convert admins to admin objects
-                $scope.testspec._admins = [];
-                $scope.testspec.admins.forEach(function(id) {
-                    $scope.testspec._admins.push($scope.users[id]);
-                });
-                */
-            });
+            load_guest();
         }
     }
 
@@ -234,30 +92,19 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, $location, users, $
         });
     }
 
-    //create a copy of $scope.testspec so that UI doesn't break while saving.. (just admins?)
-    /*
-    function getdata() {
-        var data = angular.copy($scope.testspec);
-        data.admins = [];
-        $scope.testspec._admins.forEach(function(admin) {
-            if(admin) data.admins.push(admin.sub);
-        });
-        */
-
-        /*
-        //need to do a bit of massaging for some fields
-        delete data.specs.ipv4_only;
-        delete data.specs.ipv6_only;
-        switch(data._ipv46) {
-        case "4": data.specs.ipv4_only = true; break;
-        case "6": data.specs.ipv6_only = true; break;
-        }
-    
-        return data;
-    }
-    */
-
     $scope.submit = function() {
+        //remove parameter set to empty string
+        for(var k in $scope.testspec.specs) {
+            if($scope.testspec.specs[k] === '') delete $scope.testspec.specs[k];
+        }
+
+        //TODO - remove parameters that aren't shown on the UI
+        for(var k in $scope.testspec.specs) {
+            if($scope.form[k] === undefined) {
+                console.log("no such field:"+k+" removing");
+                delete $scope.testspec.specs[k];
+            }
+        }
         if(!$scope.testspec.id) {
             //create 
             $http.post(appconf.api+'/testspecs/', $scope.testspec)

@@ -40,7 +40,7 @@
         </div>
 
         <hr>
-        <ng-include src="'t/testspec-'+testspec.service_type+'.html'"></ng-include>
+        <ng-include ng-if="testspec" src="'t/testspec-'+testspec.service_type+'.html'"></ng-include>
         <hr>
 
         <div class="form-group">

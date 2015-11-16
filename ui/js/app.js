@@ -187,8 +187,8 @@ function(appconf, $httpProvider, jwtInterceptorProvider) {
 //load menu and profile by promise chaining
 //http://www.codelord.net/2015/09/24/$q-dot-defer-youre-doing-it-wrong/
 //https://www.airpair.com/angularjs/posts/angularjs-promises
-app.factory('menu', ['appconf', '$http', 'jwtHelper', '$sce', 'scaMessage', 'scaMenu', '$q',
-function(appconf, $http, jwtHelper, $sce, scaMessage, scaMenu, $q) {
+app.factory('menu', ['appconf', '$http', 'jwtHelper', '$sce', 'scaMessage', 'scaMenu', '$q', 'toaster',
+function(appconf, $http, jwtHelper, $sce, scaMessage, scaMenu, $q, toaster) {
 
     var jwt = localStorage.getItem(appconf.jwt_id);
     var menu = {

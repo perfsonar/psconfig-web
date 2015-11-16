@@ -45,6 +45,8 @@ app.factory('users', ['appconf', '$http', 'jwtHelper', function(appconf, $http, 
     return $http.get(appconf.api+'/cache/profiles')
     .then(function(res) {
         return res.data;
+    }, function(res) {
+        //console.log(res.statusText);
     });
 }]);
 app.factory('testspecs', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
