@@ -77,14 +77,6 @@ ul.hosts li {
   margin: 1px 3px;
   /*line-height: 140%;*/
 }
-.navbar-brand .header-icon img {
-  max-height: 35px;
-  position: relative;
-  top: -5px;
-  left: -5px;
-  float: left;
-  margin-right: 10px;
-}
 .edit_button {
   position: absolute;
   right: 0px;

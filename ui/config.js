@@ -4,6 +4,7 @@ angular.module('app.config', []).constant('appconf', {
     title: 'MeshConfig Admin',
 
     icon_url: 'images/logo.png',
+    home_url: '#/',
 
     //url base for meshconfig api
     api: '../api/meshconfig',
@@ -29,17 +30,17 @@ angular.module('app.config', []).constant('appconf', {
         {
             id: "about",
             label: "About",
-            url: "/meshconfig/#/about",
+            url: "#/about",
         },
         {
             id: "configs",
             label: "Configs",
-            url: "/meshconfig/#/configs",
+            url: "#/configs",
         },      
         {
             id: "testspecs",
             label: "Test Specs",
-            url: "/meshconfig/#/testspecs",
+            url: "#/testspecs",
             show: function(scope) {
                 if(~scope.common.indexOf('user')) return true;
                 return false;
@@ -48,7 +49,7 @@ angular.module('app.config', []).constant('appconf', {
         {
             id: "hostgroups",
             label: "Host Groups",
-            url: "/meshconfig/#/hostgroups",
+            url: "#/hostgroups",
             show: function(scope) {
                 if(~scope.common.indexOf('user')) return true;
                 return false;
@@ -57,7 +58,7 @@ angular.module('app.config', []).constant('appconf', {
         {
             id: "hosts",
             label: "Hosts",
-            url: "/meshconfig/#/hosts",
+            url: "#/hosts",
             show: function(scope) {
                 if(~scope.common.indexOf('user')) return true;
                 return false;

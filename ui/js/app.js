@@ -195,7 +195,7 @@ function(appconf, $http, jwtHelper, $sce, scaMessage, scaMenu, $q, toaster) {
         header: {
             //label: appconf.title,
             icon: $sce.trustAsHtml("<img src=\""+appconf.icon_url+"\">"),
-            url: "#/",
+            url: appconf.home_url,
         },
         top: scaMenu,
         user: null, //to-be-loaded
