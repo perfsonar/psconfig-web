@@ -1,6 +1,7 @@
 <p class="text-muted" ng-if="!tests.length">No test specified</p>
 <ul class="list-group">
     <li class="list-group-item test" ng-repeat="test in tests" ng-class="{disabled: !test.enabled}">
+        <span ng-if="!test.enabled" class="pull-right label label-warning" style="padding: 5px 10px">Disabled</span>
         <h5 style="margin-bottom: 0px;">
             <span class="label label-default">{{servicetypes[test.service_type].label}}</span>
             {{test.desc}} <small>with {{test.testspec.desc}}</small>
@@ -26,7 +27,5 @@
                 | NA:{{test.nagroup.desc}} 
             </div> 
         </h5>
-
-        <span ng-if="!test.enabled" class="pull-right label label-warning">Disabled</span>
     </li>
 </ul>

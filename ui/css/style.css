@@ -23,8 +23,11 @@ body {
     width: 100%;
 }
 */
-.list-group-item-heading {
+.list-group .list-group-item-heading {
   margin-bottom: 0px;
+}
+.list-group .list-group-item h4 {
+  margin-top: 0px;
 }
 .header {
   padding: 10px;

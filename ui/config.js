@@ -55,9 +55,9 @@ angular.module('app.config', []).constant('appconf', {
             }
         },
         {
-            id: "services",
+            id: "hosts",
             label: "Hosts",
-            url: "/meshconfig/#/services",
+            url: "/meshconfig/#/hosts",
             show: function(scope) {
                 if(~scope.common.indexOf('user')) return true;
                 return false;

@@ -76,6 +76,13 @@ app.directive('mcSpecs', function() {
     } 
 });
 
+app.directive('mcService', function() {
+    return {
+        scope: { ls: '=', service: '=', },
+        templateUrl: 't/service.html',
+    } 
+});
+
 app.directive('mcTests', function() {
     return {
         scope: { tests: '=', servicetypes: '=', /*testspecs: '=', hostgroups: '='*/},
@@ -98,10 +105,10 @@ app.directive('mcTests', function() {
     } 
 });
 
-app.directive('mcHosts', ['services', function(services) {
+app.directive('mcHostlist', ['services', function(services) {
     return {
         scope: { hosts: '=', serviceid: '='},
-        templateUrl: 't/hosts.html',
+        templateUrl: 't/hostlist.html',
         link: function(scope, element, attrs) {
             //link only gets executed once. I need to watch hosts list myself in case it changes
             function update() {

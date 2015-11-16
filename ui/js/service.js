@@ -1,5 +1,5 @@
 
-app.controller('ServicesController', ['$scope', 'appconf', 'toaster', '$http', 'serverconf', '$location', 'scaMessage', 'services', 'jwtHelper', 'hosts', '$modal', 
+app.controller('HostsController', ['$scope', 'appconf', 'toaster', '$http', 'serverconf', '$location', 'scaMessage', 'services', 'jwtHelper', 'hosts', '$modal', 
 function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, services, jwtHelper, hosts, $modal) {
     scaMessage.show(toaster);
     //menu.then(function(_menu) { $scope.menu = _menu; });
@@ -69,8 +69,8 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, ser
 
         var modal = $modal.open({
             animation: true,
-            templateUrl: 't/service.html',
-            controller: 'ServiceModalController',
+            templateUrl: 't/host.html',
+            controller: 'HostModalController',
             size: 'lg',
             resolve: {
                 host: function() { return _host; },
@@ -86,7 +86,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, ser
     }
 }]);
 
-app.controller('ServiceModalController', ['$scope', 'appconf', 'toaster', '$http', '$modalInstance', 'host', 'title', 'services', 'serverconf',
+app.controller('HostModalController', ['$scope', 'appconf', 'toaster', '$http', '$modalInstance', 'host', 'title', 'services', 'serverconf',
 function($scope, appconf, toaster, $http, $modalInstance, host, title, services, serverconf) {
     $scope.host = host;
     $scope.title = title;

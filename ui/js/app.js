@@ -137,9 +137,9 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         templateUrl: 't/config.html',
         controller: 'ConfigController'
     })
-    .when('/services', {
-        templateUrl: 't/services.html',
-        controller: 'ServicesController'
+    .when('/hosts', {
+        templateUrl: 't/hosts.html',
+        controller: 'HostsController'
     })
     /*
     .when('/success', {

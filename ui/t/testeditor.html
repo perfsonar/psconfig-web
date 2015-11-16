@@ -44,35 +44,25 @@
         <ui-select ng-model="test.center_address" ng-disabled="!config.canedit" ng-required>
             <ui-select-match placeholder="Pick a host to be the center">
                 <div style="padding-top: 2px; font-size: 12px">
+                    <!--
                     <span class="label {{services.lss[$select.selected.lsid].label_class}}"> {{services.lss[$select.selected.lsid].label}}</span>
                     <b>{{$select.selected.name}}</b> ({{$select.selected.locator}})
                     <span ng-if="$select.selected.old" class="label label-warning">Stale</span>
+                    -->
+                    <mc-service ls="services.lss[$select.selected.lsid]" service="$select.selected"></mc-service>
                 </div>
             </ui-select-match>
             <ui-select-choices repeat="service.uuid as service in services.recs[test.service_type] | filter: $select.search">
+                <!--
                 <span class="label {{services.lss[service.lsid].label_class}}">{{services.lss[service.lsid].label}}</span>&nbsp;
                 <b>{{service.name}}</b> ({{service.locator}})
                 <span ng-if="service.old" class="label label-warning">Stale</span>
+                -->
+                <mc-service ls="services.lss[service.lsid]" service="service"></mc-service>
             </ui-select-choices>
         </ui-select>
     </div>
 </div>
-
-<!-- html5 version (can't display html in the option / selected value)
-<div class="form-group" ng-if="test.service_type && test.mesh_type == 'star'">
-    <label for="center_address" class="col-sm-2 control-label">Center Host</label>
-    <div class="col-sm-10">
-        <select class="form-control" ng-model="test.center_address" ng-disabled="!config.canedit" required>
-            <option value="">(Select Center Host)</option>
-            <option value="{{service.uuid}}" ng-repeat="service in services.recs[test.service_type] | filter: $select.search">
-                <span class="label {{services.lss[service.lsid].label_class}}">{{services.lss[service.lsid].label}}</span>&nbsp;
-                <b>{{service.name}}</b> ({{service.locator}})
-                <span ng-if="service.old" class="label label-warning">Stale</span>
-            </option>
-        </select>
-    </div>
-</div>
--->
 
 <div class="form-group" ng-if="test.service_type">
     <label class="col-sm-2 control-label">Host Group A</label>
@@ -82,7 +72,7 @@
             <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group.id}}">{{group.desc}}</option>
         </select>
         <div class="well well-sm well-detail" ng-if="test.agroup">
-            <mc-hosts serviceid="test.service_type" hosts="get_hostgroup(test.agroup).hosts"></mc-hosts>
+            <mc-hostlist serviceid="test.service_type" hosts="get_hostgroup(test.agroup).hosts"></mc-hostlist>
         </div>
     </div>
 </div>
@@ -95,25 +85,10 @@
             <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group.id}}">{{group.desc}}</option>
         </select>
         <div class="well well-sm well-detail" ng-if="test.bgroup">
-            <mc-hosts serviceid="test.service_type" hosts="get_hostgroup(test.bgroup).hosts"></mc-hosts>
+            <mc-hostlist serviceid="test.service_type" hosts="get_hostgroup(test.bgroup).hosts"></mc-hostlist>
         </div>
     </div>
 </div>
-
-<!-- I need to let user select host from specified host group (http://docs.perfsonar.net/config_mesh.html#config-mesh-group-no-agent)
-<div class="form-group" ng-if="test.service_type">
-    <label class="col-sm-2 control-label">No Agent</label>
-    <div class="col-sm-10">
-        <select class="form-control" ng-model="test.nagroup" name="nagroup" ng-disabled="!config.canedit">
-            <option value="">(Select No Agent Host Group)</option>
-            <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group.id}}">{{group.desc}}</option>
-        </select>
-        <div class="well well-sm" ng-if="test.bgroup">
-            <mc-hosts serviceid="test.service_type" hosts="get_hostgroup(test.nagroup).hosts"></mc-hosts>
-        </div>
-    </div>
-</div>
--->
 
 <div class="form-group" ng-if="test.service_type">
     <label class="col-sm-2 control-label">Testspec</label>
@@ -127,13 +102,5 @@
         </div>
     </div>
 </div>
-
-<!--
-   <select name="repeatSelect" id="repeatSelect" ng-model="test.whatever" required>
-      <option value="">(select me)</option>
-      <option value="1">something</option>
-      <option value="2">otherthing</option>
-    </select>
--->
 
 

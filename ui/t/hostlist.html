@@ -1,0 +1,10 @@
+<ul class="hosts">
+    <li ng-repeat="service in _hosts">
+        <!--
+        <span class="label {{services.lss[host.lsid].label_class}}"> {{services.lss[host.lsid].label}}</span>
+        <b>{{host.name}}</b> ({{host.locator}})
+        <span ng-if="host.old" class="label label-warning">Stale</span>
+        -->
+        <mc-service ls="services.lss[service.lsid]" service="service"></mc-service>
+    </li>
+</ul>

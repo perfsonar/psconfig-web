@@ -20,6 +20,7 @@ router.get('/:url', function(req, res, next) {
         include: [ 
             //test has a lot of stuff
             {   model: db.Test, 
+                where: {enabled: true},
                 include: [ 
                     db.Testspec, 
                     { model: db.Hostgroup, as: "HostGroupA" },
@@ -197,6 +198,7 @@ function generate_meshconfig(config) {
             break;
         }
         if(test.HostGroupNA) {
+            //TODO - not handled yet
             members.no_agent = generate_members(test.HostGroupNA, services);
         }
 
