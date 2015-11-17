@@ -12,6 +12,7 @@ var app = angular.module('app', [
     'sca-shared',
     'ui.bootstrap',
     'ngOrderObjectBy',
+    'ui.gravatar',
 ]);
 
 //can't quite do the slidedown animation through pure angular/css.. borrowing slideDown from jQuery..

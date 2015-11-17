@@ -1,6 +1,7 @@
 <ul class="admins">
     <p class="text-muted" ng-if="!admins.length">No admins specified</p>
     <li ng-repeat="admin in admins">
+        <img gravatar-src="admin.email" gravatar-size="17"/>
         <b>{{admin.fullname}}</b> <span class="email">&lt;{{admin.email}}&gt;</span>
     </li>
 </ul>

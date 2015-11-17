@@ -18,14 +18,13 @@
             <div class="col-sm-10">
                 <ui-select multiple ng-model="config.admins" ng-disabled="!config.canedit">
                     <ui-select-match placeholder="Select admins who can update this test spec">
+                        <img gravatar-src="$item.email" gravatar-size="17"/>
                         <b>{{$item.fullname}}</b> <span class="email">&lt;{{$item.email}}&gt;</span>
                     </ui-select-match>
                     <ui-select-choices repeat="user in users_a | propsFilter: {fullname: $select.search, email: $select.search}">
                       <!--<div ng-bind-html="user.fullname | highlight: $select.search"></div>-->
-                      <div>{{user.fullname}}</div>
-                      <small>
-                        email: {{user.email}} <!--<span ng-bind-html="user.email | highlight: $select.search"></span>-->
-                      </small>
+                      <img gravatar-src="user.email" gravatar-size="17"/>
+                      <b>{{user.fullname}}</b> <small>&lt;{{user.email}}&gt;</small>
                     </ui-select-choices>
                 </ui-select>
                 <p class="help-block">Users who can update this configuration</p>

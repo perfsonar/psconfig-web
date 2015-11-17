@@ -24,7 +24,8 @@
     "simple-sidebar": "IronSummitMedia/startbootstrap-simple-sidebar",
     "font-awesome": "fontawesome#~4.4.0",
     "angular-bootstrap": "~0.13.4",
-    "angular-order-object-by": "~1.2.1"
+    "angular-order-object-by": "~1.2.1",
+    "angular-gravatar": "~0.4.1"
   },
   "overrides": {
     "simple-sidebar": {
