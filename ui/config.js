@@ -3,8 +3,10 @@ angular.module('app.config', []).constant('appconf', {
     //title to display
     title: 'MeshConfig Admin',
 
+    /*
     icon_url: 'images/logo.png',
     home_url: '#/',
+    */
 
     //url base for meshconfig api
     api: '../api/meshconfig',

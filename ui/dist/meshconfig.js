@@ -195,13 +195,17 @@ function(appconf, $http, jwtHelper, $sce, scaMessage, scaMenu, $q, toaster) {
     var menu = {
         header: {
             //label: appconf.title,
+            /*
             icon: $sce.trustAsHtml("<img src=\""+appconf.icon_url+"\">"),
             url: appconf.home_url,
+            */
         },
         top: scaMenu,
         user: null, //to-be-loaded
         _profile: null, //to-be-loaded
     };
+    if(appconf.icon_url) menu.header.icon = $sce.trustAsHtml("<img src=\""+appconf.icon_url+"\">");
+    if(appconf.home_url) menu.header.url = appconf.home_url
 
     var jwt = localStorage.getItem(appconf.jwt_id);
     if(jwt) {
@@ -217,8 +221,8 @@ function(appconf, $http, jwtHelper, $sce, scaMessage, scaMenu, $q, toaster) {
                 console.log("jwt expiring in an hour.. refreshing first");
                 $http({
                     url: appconf.auth_api+'/refresh',
-                    skipAuthorization: true,  //prevent infinite recursion
-                    headers: {'Authorization': 'Bearer '+jwt},
+                    //skipAuthorization: true,  //prevent infinite recursion
+                    //headers: {'Authorization': 'Bearer '+jwt},
                     method: 'POST'
                 }).then(function(response) {
                     var jwt = response.data.jwt;
