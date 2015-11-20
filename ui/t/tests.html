@@ -4,7 +4,7 @@
         <span ng-if="!test.enabled" class="pull-right label label-warning" style="padding: 5px 10px">Disabled</span>
         <h5 style="margin-bottom: 0px;">
             <span class="label label-default">{{servicetypes[test.service_type].label}}</span>
-            {{test.desc}} <small>with {{test.testspec.desc}}</small>
+            {{test.desc}} <!--<small>with {{test.testspec.desc}}</small>-->
             | <img ng-src="images/{{test.mesh_type}}.png" style="top: -1px; position: relative;"> <small>{{test.mesh_type}}</small>
             <div ng-switch="test.mesh_type" style="display: inline-block;">
                 <div ng-switch-when="star" style="display: inline-block;">
