@@ -1,29 +1,23 @@
 <sca-menutab menu="appconf.menu" active="'hosts'" user="user"></sca-menutab>
 <div class="container-fluid">
-    <p class="text-muted">Only administrators can update host information (like MA endpoints)</p>
+    <p class="help-block">Only administrators can update host information</p>
     <ul class="list-group">
     <li class="list-group-item" ng-repeat="(client_uuid, host) in hosts | orderObjectBy: '_detail.sitename'">
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-lg-7">
                 <h4>
                     <small>{{host._detail.id}}</small>
-                    {{host._detail.sitename}}
+                    <a ng-if="host._detail.toolkit_url == 'auto'" href="http://{{host._detail.hostname || host._detail.ip}}" target="_blank">{{host._detail.sitename}}</a>
+                    <a ng-if="host._detail.toolkit_url != 'auto'" href="{{host._detail.toolkit_url}}" target="_blank">{{host._detail.sitename}}</a>
                     <small>
-                        |
                         <span ng-if="host._detail.hostname">{{host._detail.hostname}}</span>
                         <span class="text-muted" ng-if="!host._detail.hostname && host._detail.ip">{{host._detail.ip}}</span>
-                        <!--
-                        |
-                        <span class="host._detail.location.city">{{host._detail.location.city}}, </span>
-                        <span class="host._detail.location.state">{{host._detail.location.state}}, </span>
-                        <span class="host._detail.location.postal_code">{{host._detail.location.postal_code}}, </span>
-                        <span class="host._detail.loocation.country">{{host._detail.location.country}}</span>
-                        -->
+                        <span class="label label-danger" ng-if="host._detail.no_agent">No Agent</span>
                     </small>
                 </h4>
                 <ul class="list-group">
                     <!--<li class="list-group-item" style="background-color: #eee;">Services (/MA)</li>-->
-                    <li class="list-group-item" ng-repeat="service in host.services | orderObjectBy: 'name'">
+                    <li class="list-group-item" ng-repeat="service in host.services | filter:{type:'!ma'} | orderObjectBy: 'name'">
                         <div class="host">
                             <!--
                             <span class="label {{services.lss[service.lsid].label_class}}"> {{services.lss[service.lsid].label}}</span>
@@ -34,7 +28,11 @@
                             <mc-service ls="services.lss[service.lsid]" service="service"></mc-service>
                             -->
                             {{service.type}}
-
+                            <span ng-if="service.old" class="label label-warning">Stale</span>
+                        </div>
+                        <div style="display: inline-block; opacity: 0.5" ng-if="!service.MA && host._detail._has_localma"> 
+                            <i class="fa fa-arrow-right"></i> 
+                            <div class="host">local ma</div>
                         </div>
                         <div style="display: inline-block;" ng-if="service.MA"> 
                             <i class="fa fa-arrow-right"></i> MA 
@@ -50,21 +48,13 @@
                     </li>
                 </ul>
             </div><!--col-md-8-->
-            <div class="col-md-4">
-                <!--TODO - maybe only show if requested-->
-                <!--
-                v{{host._detail.host.toolkitversion}}
-                |
-                {{host._detail.host.os_version}} / 
-                {{host._detail.host.hardware_memory}} / 
-                {{host._detail.host.hardware_processorspeed}} ({{host._detail.host.hardware_processorcount}} cores) 
-                |
-                lon: {{host._detail.location.longitude}} lat: {{host._detail.location.latitude}}
-                -->
-                <h5>Location</h5>
-                <mc-specs specs="host._detail.location"></mc-specs>
+            <div class="col-md-3">
                 <h5>Host Detail</h5>
                 <mc-specs specs="host._detail.host"></mc-specs>
+            </div>
+            <div class="col-md-2">
+                <h5>Location</h5>
+                <mc-specs specs="host._detail.location"></mc-specs>
             </div>
         </div><!--row-->
         <!--<pre>{{host._detail | json}}</pre>-->

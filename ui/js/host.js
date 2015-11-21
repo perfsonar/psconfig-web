@@ -17,11 +17,16 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, ser
         $scope.hosts = {};
         hosts.then(function(_hosts) {
             _hosts.forEach(function(host) {
+            
+                //massage toolkit_url
+                //if(host.toolkit_url == 'auto') host._toolkit_url = "http://"+(host.hostname||host.ip);
+                
                 var services = [];
-                //find all services that belongs to this host
+                //find all services that belongs to this host (and set _has_localma.. if the host has ma service)
                 for(var service_id in _services.recs) {
                     _services.recs[service_id].forEach(function(service) {
                         if(service.client_uuid == host.uuid) services.push(service);
+                        if(service.type == 'ma') host._has_localma = true;
                     });
                 }
                 services.forEach(deref_ma);
@@ -43,7 +48,6 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, ser
 
         //find *local* MA
         _host.default_ma = null;
-        //console.dir($scope.services);
         $scope.services.recs["ma"].forEach(function(service) {
             if(service.client_uuid == _host._detail.uuid) _host.default_ma = service;
         });
@@ -55,7 +59,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, ser
             size: 'lg',
             resolve: {
                 host: function() { return _host; },
-                title: function() { return _host._detail.sitename; },
+                title: function() { return _host._detail.sitename + " (" +(host._detail.hostname || host._detail.ip) + ")"; },
             }
         });
         modal.result.then(function() {
@@ -67,8 +71,8 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, ser
     }
 }]);
 
-app.controller('HostModalController', ['$scope', 'appconf', 'toaster', '$http', '$modalInstance', 'host', 'title', 'services', 'serverconf',
-function($scope, appconf, toaster, $http, $modalInstance, host, title, services, serverconf) {
+app.controller('HostModalController', ['$scope', 'appconf', 'toaster', '$http', '$modalInstance', 'host', 'title', 'services', 
+function($scope, appconf, toaster, $http, $modalInstance, host, title, services) {
     $scope.host = host;
     $scope.title = title;
     services.then(function(_services) { $scope.services = _services; }); //for host list
@@ -77,13 +81,9 @@ function($scope, appconf, toaster, $http, $modalInstance, host, title, services,
         $modalInstance.dismiss('cancel');
     }
 
-    function getdata() {
-        return $scope.host;
-    }
-
     $scope.submit = function() {
         //edit
-        $http.put(appconf.api+'/cache/host/'+host._detail.uuid, getdata())
+        $http.put(appconf.api+'/cache/host/'+host._detail.uuid, $scope.host)
         .then(function(res) {
             $modalInstance.close();
             toaster.success("Updated Successfully!");

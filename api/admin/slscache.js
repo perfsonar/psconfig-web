@@ -43,7 +43,7 @@ function cache_host(service, res, cb) {
     var url = uri.protocol+"//"+uri.host+pathname+'/'+service['service-host'][0];
     request({url: url, timeout: 1000*10, json: true}, function(err, res, host) {
         if(err) return cb(err);
-        if(res.statusCode != 200) return cb(new Error("failed to sLS cahce from:"+url+" statusCode:"+res.statusCode));
+        if(res.statusCode != 200) return cb(new Error("failed to cache host from:"+url+" statusCode:"+res.statusCode));
         /* sample host
         {
             host-net-tcp-autotunemaxbuffer-send: [
@@ -158,14 +158,8 @@ function cache_host(service, res, cb) {
                 toolkitversion: host['pshost-toolkitversion']?host['pshost-toolkitversion'][0]:null,
                 os_version: host['host-os-version']?host['host-os-version'][0]:null,
             },
-            location: {
-                longitude: host['location-longitude'][0],
-                latitude: host['location-latitude'][0], 
-                city: host['location-city'][0],
-                state: host['location-state'][0],
-                postal_code: host['location-code'][0],
-                country: host['location-country'][0],
-            },
+            location: get_location(host),
+
             //TODO - I need to query the real admin records from the cache (gocdb2sls service already genenrates contact records)
             //I just have to store them in our table
             admins: host['host-administrators'],
@@ -219,19 +213,28 @@ function cache_host(service, res, cb) {
 
     });
 }
+function get_location(service) {
+    return {
+        longitude: (service['location-longitude']?service['location-longitude'][0]:null),
+        latitude: (service['location-latitude']?service['location-latitude'][0]:null), 
+        city: (service['location-city']?service['location-city'][0]:null),
+        state: (service['location-state']?service['location-state'][0]:null),
+        postal_code: (service['location-code']?service['location-code'][0]:null),
+        country: (service['location-country']?service['location-country'][0]:null),
+    };
+}
 
 //TODO no point of existing.. just merge with docache_ls
 function cache_ls(ls, lsid, cb) {
     logger.debug("caching ls:"+lsid+" from "+ls.url);
     request({url: ls.url, timeout: 1000*10, json: true}, function(err, res, services) {
         if(err) return cb(err);
-        if(res.statusCode != 200) return cb(new Error("failed to sLS cahce from:"+ls.url+" statusCode:"+res.statusCode));
+        if(res.statusCode != 200) return cb(new Error("failed to cahce service from:"+ls.url+" statusCode:"+res.statusCode));
         var count_new = 0;
         var count_update = 0;
         var host_uuids = []; //list of all host_uuids cached for this round
         async.eachSeries(services, function(service, next) {
             //TODO apply exclusion
-            //console.dir(service);
 
             //ignore record with no client-uuid (probably old toolkit instance?)
             if(service['client-uuid'] === undefined) {
@@ -239,7 +242,7 @@ function cache_ls(ls, lsid, cb) {
                 logger.error(service);
                 return next();//continue to next service
             }
-            var uuid = service['client-uuid'][0]; //service['service-host'][0];
+            var uuid = service['client-uuid'][0]; 
             logger.debug("caching service:"+service['service-locator'][0]);
 
             var rec = {
@@ -247,21 +250,12 @@ function cache_ls(ls, lsid, cb) {
                 uuid: uuid+'.'+service['service-type'][0],
                 name: service['service-name'][0],
                 type: service['service-type'][0],
-                //locator is now a critical information needed to generate the config
-                locator: service['service-locator'][0],
-                //locator: (service['service-locator']&&service['service-locator'][0])?service['service-locator'][0] : null,
+                locator: service['service-locator'][0], //locator is now a critical information needed to generate the config
                 lsid: lsid, //make it easier for ui
 
                 sitename: service['location-sitename'][0],
-                location: {
-                    longitude: service['location-longitude'][0],
-                    latitude: service['location-latitude'][0], 
-                    city: service['location-city'][0],
-                    state: service['location-state'][0],
-                    postal_code: service['location-code'][0],
-                    country: service['location-country'][0],
-                },
-
+                location: get_location(service),
+                
                 //TODO - I need to query the real admin records from the cache (gocdb2sls service already genenrates contact records)
                 //I just have to store them in our table
                 admins: service['service-administrators'],
@@ -310,12 +304,6 @@ function cache_global_ls(service, id, cb) {
                     return next();
                 }
                 //massage the service url so that I can use cache_ls to do the rest
-                /*
-                for(var type in service.service_types) {
-                    var service_type = service.service_types[type];
-                    service_type.url = host.locator+service_type.query;
-                };
-                */
                 service.url = host.locator+service.query;
                 cache_ls(service, id, next);
             }, cb); 

@@ -30,8 +30,7 @@
     <label class="col-sm-2 control-label">Mesh Type</label>
     <div class="col-sm-4">
         <select class="form-control" ng-model="test.mesh_type" name="mesh_type" 
-            ng-disabled="!config.canedit" 
-            required>
+            ng-disabled="!config.canedit" required>
             <option value="">(Select Mesh Type)</option>
             <option ng-repeat="(id, type) in serverconf.mesh_types" value="{{id}}">{{type.label}}</option>
         </select>
@@ -103,4 +102,17 @@
     </div>
 </div>
 
-
+<!-- no_agent doesn't seem to work https://github.com/perfsonar/mesh-config/issues/23
+<div class="form-group">
+    <label class="col-sm-2 control-label">No Agent Group <span class="text-muted">(Optional)</span></label>
+    <div class="col-sm-10">
+        <select class="form-control" ng-model="test.nagroup" name="nagroup" ng-disabled="!config.canedit">
+            <option value="">(Select Host Group to not initiate tests from)</option>
+            <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group.id}}">{{group.desc}}</option>
+        </select>
+        <div class="well well-sm well-detail" ng-if="test.nagroup">
+            <mc-hostlist serviceid="test.service_type" hosts="get_hostgroup(test.nagroup).hosts"></mc-hostlist>
+        </div>
+    </div>
+</div>
+-->

@@ -57,29 +57,40 @@ router.get('/hosts', jwt({secret: config.admin.jwt.pub, credentialsRequired: fal
 router.put('/host/:uuid', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var uuid = req.params.uuid;
     var _detail = req.body._detail;
-    //var services = req.body.services;
-    if(~req.user.scopes.common.indexOf('admin') /*|| ~testspec.admins.indexOf(req.user.sub)*/) {
+
+    if(!~req.user.scopes.common.indexOf('admin')) return res.status(401).end();
+
+    //update host info
+    db.Host.findOne({where: {uuid: uuid}}).then(function(host) {
+        host.no_agent = req.body._detail.no_agent;
+        host.toolkit_url = req.body._detail.toolkit_url;
         
-        db.Service.findAll({
-            where: {client_uuid: uuid},
-        }).then(function(services) {
-            //update ma pointers
-            req.body.services.forEach(function(_service) {
-                //find the service record to update
-                services.forEach(function(service) {
-                    if(service.id == _service.id) service.ma = _service.ma;
+        //console.dir(req.body._detail);
+        //console.dir(host);
+        host.save().then(function() {
+            
+            //update ma pointers for each child services
+            db.Service.findAll({
+                where: {client_uuid: uuid},
+            }).then(function(services) {
+                req.body.services.forEach(function(_service) {
+                    //find the service record to update
+                    services.forEach(function(service) {
+                        if(service.id == _service.id) service.ma = _service.ma;
+                    });
                 });
-            });
-            //and save all
-            async.each(services, function(service, next) {
-                service.save().then(function() {
-                    next();
+                //and save all
+                async.each(services, function(service, next) {
+                    service.save().then(function() {
+                        next();
+                    }); 
+                }, function(err) {
+                    res.json({status: "ok"});
                 }); 
-            }, function(err) {
-                res.json({status: "ok"});
-            }); 
+            });
         });
-    } else return res.status(401).end();
+            
+    });
 });
 
 router.get('/profiles', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {

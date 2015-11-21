@@ -28,23 +28,6 @@ function generate(config) {
         services[service.uuid] = service;
     });
 
-    /*
-    //parse hostname out of locator
-    config.services.forEach(function(service) {
-        //parse hostname from locator
-        var address = service.locator;
-        var protpos = address.indexOf("://");
-        if(~protpos) {
-            address = address.substr(protpos+3); //remove "tcp://" or such
-        }
-        var portpos = address.indexOf(":");
-        if(~portpos) {
-            address = address.substr(0, portpos); //strip everything after port :
-        }
-        service._address = address;
-    });
-    */
-    
     //meshconfig root template
     var mc = {
         organizations: [],
@@ -82,7 +65,6 @@ function generate(config) {
                 }
             });
         }
-        //console.dir(service.MA);
 
         if(hosts[service.client_uuid]) {
             var host = hosts[service.client_uuid];
@@ -96,8 +78,9 @@ function generate(config) {
                 measurement_archives: [ ], 
                 //description: service.name,
                 description: service.sitename+' '+service.type,
-                toolkit_url: "auto",
+                toolkit_url: service.Host.toolkit_url,//"auto",
             };
+            if(service.Host.no_agent) host.no_agent = 1;
             if(service.MA) host.measurement_archives.push(generate_mainfo(service));
             hosts[service.client_uuid] = host;
 
@@ -143,14 +126,6 @@ function generate(config) {
         //testspec should never be null.. but
         if(test.Testspec) {
             var parameters = test.Testspec.specs;
-
-            /*  I am not sure if this is really necessary
-            //convert all integer field to string
-            for(var k in parameters) {
-                var v = parameters[k];
-                if(typeof v == "number") parameters[k] = parameters[k].toString();
-            }
-            */
 
             parameters.type = get_type(test.service_type);
             mc.tests.push({

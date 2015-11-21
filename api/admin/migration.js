@@ -61,6 +61,24 @@ var migrations = [
             next();
         });
     },
+    function(qi, next) {
+        logger.info("adding toolkit_url fields");
+        qi.addColumn('Hosts', 'toolkit_url', {
+            type: Sequelize.STRING,
+            defaultValue: "auto",
+        }).then(function() {
+            next();
+        });
+    },
+    function(qi, next) {
+        logger.info("adding no_agent fields");
+        qi.addColumn('Hosts', 'no_agent', {
+            type: Sequelize.BOOLEAN,
+            defaultValue: false,
+        }).then(function() {
+            next();
+        });
+    },
 ];
 
 exports.run = function() {

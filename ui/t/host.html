@@ -1,66 +1,55 @@
 <form class="form-horizontal" ng-submit="submit()">
-   <div class="modal-header">
+
+    <div class="modal-header">
         <h3 class="modal-title">{{title}}</h3>
     </div>
-    <div class="modal-body">
-        <h4>Measurement Archives</h4>
-        <br>
-        <!--<p class="help-block">Specify MA to store test results.</p>-->
-        <!--
-        <hr>
-        <div class="form-group">
-            <label class="col-sm-2 control-label">(Default)</label>
-            <div class="col-sm-10">
-                <ui-select ng-model="host.default_ma">
-                    <ui-select-match placeholder="Select the default MA for this host" ng-required>
-                        <div style="padding-top: 2px; font-size: 12px">
-                            <span class="label {{services.lss[$select.selected.lsid].label_class}}"> {{services.lss[$select.selected.lsid].label}}</span>
-                            <b>{{$select.selected.name}}</b> ({{$select.selected.locator}})
-                            <span ng-if="$select.selected.old" class="label label-warning">Stale</span>
-                        </div>
-                    </ui-select-match>
-                    <ui-select-choices repeat="service.uuid as service in services.recs['ma'] | filter: $select.search">
 
-                        <span class="label {{services.lss[service.lsid].label_class}}">{{services.lss[service.lsid].label}}</span>&nbsp;
-                        <b>{{service.name}}</b> ({{service.locator}})
-                        <span ng-if="service.old" class="label label-warning">Stale</span>
-                    </ui-select-choices>
-                </ui-select>
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">toolkit_url</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="toolkit_url" ng-model="host._detail.toolkit_url" placeholder="http://perfsonar-lt.grid.iu.edu">
+                <p class="help-block">For graphical displays that wish to provide a link to more information about the host (like MadDash host label)</p>
             </div>
         </div>
-        <hr>
-        -->
-        <div class="form-group" ng-repeat="service in host.services" ng-if="service.type != 'ma'">
-            <label class="col-sm-2 control-label">{{service.type}}</label>
-            <div class="col-sm-10">
-                <ui-select ng-model="service.ma">
-                    <ui-select-match placeholder="(Use {{title}} MA)">
-                        <div style="padding-top: 2px; font-size: 12px">
-                            <!--
-                            <span class="label {{services.lss[$select.selected.lsid].label_class}}"> {{services.lss[$select.selected.lsid].label}}</span>
-                            <b>{{$select.selected.name}}</b> ({{$select.selected.locator}})
-                            <span ng-if="$select.selected.old" class="label label-warning">Stale</span>
-                            -->
-                            <mc-service ls="services.lss[$select.selected.lsid]" service="$select.selected"></mc-service>
-                        </div>
-                    </ui-select-match>
-                    <ui-select-choices repeat="service.id as service in services.recs['ma'] | filter: $select.search">
-                        <!--
-                        <span class="label {{services.lss[service.lsid].label_class}}">{{services.lss[service.lsid].label}}</span>&nbsp;
-                        <b>{{service.name}}</b> ({{service.locator}})
-                        <span ng-if="service.old" class="label label-warning">Stale</span>
-                        -->
-                        <mc-service ls="services.lss[service.lsid]" service="service"></mc-service>
-                    </ui-select-choices>
-                </ui-select>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <div class="checkbox">
+                    <label><input type="checkbox" name="no_agent" ng-model="host._detail.no_agent"> No Agent</label>
+                    <p class="help-block">If checked, this host will not read the mesh config. This is significant because it means those that test to it are responsible for initiating tests in both directions and storing the results. If un-checked, it means other testers can assume this host is reading the mesh and will initiate its portion of the tests accordingly.</p>
+                </div>    
+            </div>
+        </div>
+
+        <div class="well">
+            <h5>MA (Measurement Archives) Overrides</h5>
+            <p class="help-block">Specify non-local MA if you want to send test results to remote MAs</p>
+            <div class="form-group" ng-repeat="service in host.services" ng-if="service.type != 'ma'">
+                <label class="col-sm-2 control-label">{{service.type}}</label>
+                <div class="col-sm-10">
+                    <ui-select ng-model="service.ma">
+                        <ui-select-match placeholder="(Use {{title}} MA)">
+                            <div style="padding-top: 2px; font-size: 12px">
+                                <mc-service ls="services.lss[$select.selected.lsid]" service="$select.selected"></mc-service>
+                            </div>
+                        </ui-select-match>
+                        <ui-select-choices repeat="service.id as service in services.recs['ma'] | filter: $select.search">
+                            <mc-service ls="services.lss[service.lsid]" service="service"></mc-service>
+                        </ui-select-choices>
+                    </ui-select>
+                </div>
             </div>
         </div>
 
     </div><!--modal-body-->
+
     <div class="modal-footer">
         <button type="submit" class="btn btn-primary">Update</button>
         <button type="button" class="btn" ng-click="cancel()">Cancel</button>
     </div><!--modal-footer-->
+
 </form>
 
 

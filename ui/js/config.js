@@ -104,6 +104,7 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, $routeParams, $
                     if(test.TestspecId) test.TestspecId = test.TestspecId.toString();
                     if(test.agroup) test.agroup = test.agroup.toString();
                     if(test.bgroup) test.bgroup = test.bgroup.toString();
+                    if(test.nagroup) test.nagroup = test.nagroup.toString();
                 });
             });
         }
@@ -124,6 +125,14 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, $routeParams, $
     */
 
     $scope.submit = function() {
+
+        //some test paramter can be empty (like nagroup) which needs to be null not an empty string
+        $scope.config.Tests.forEach(function(test) {
+            for(var k in test) {
+                if(test[k] === '') test[k] = null;
+            }
+        });
+
         if(!$scope.config.id) {
             //create 
             $http.post(appconf.api+'/configs/', $scope.config)
@@ -188,6 +197,7 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, $routeParams, $
     $scope.reset_servicetype = function(test) {
         delete test.agroup;
         delete test.bgroup;
+        delete test.nagroup;
         delete test.TestspecId;
     }
 }]);

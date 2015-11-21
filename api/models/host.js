@@ -82,16 +82,12 @@ module.exports = function(sequelize, DataTypes) {
         sitename: Sequelize.STRING, //from host-name (could be just IP)
         ip: Sequelize.STRING, //from host-name (always just ip?)
         hostname: Sequelize.STRING, //resolved from the IP
-        /*
-        name: Sequelize.STRING, //from service-name
-        type: Sequelize.STRING, //like "owamp", "bwctl", etc.
-        locator: Sequelize.STRING, // like "tcp://ps-latency.atlas.unimelb.edu.au:861" (used to pull hostname)
-        lsid: Sequelize.STRING,  //source LS instance
 
-        client_uuid: Sequelize.STRING, //used as host id
-
-        sitename: Sequelize.STRING, //from location-sitename
-        */
+        toolkit_url: {
+            type: Sequelize.STRING,
+            defaultValue: "auto", 
+        },
+        no_agent: { type: Sequelize.BOOLEAN, defaultValue: false },
 
         //host info (pshost-toolkitversion, host-hardware-memory, host-os-version, host-hadeware-processorspeed, host-hadware-processorcount)
         host: {
