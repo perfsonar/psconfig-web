@@ -55,7 +55,7 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
 
 router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var id = parseInt(req.params.id);
-    console.log("updating "+id);
+    //console.log("updating "+id);
     db.Testspec.findOne({where: {id: id}}).then(function(testspec) {
         if(!testspec) return next(new Error("can't find a testspec with id:"+id));
         //only superadmin or admin of this test spec can update
@@ -87,10 +87,11 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
         admins.push(admin.sub);
     });
     req.body.admins = admins;
+    //console.dir(req.body);
 
     db.Testspec.create(req.body).then(function(testspec) {
-        console.log(JSON.stringify(testspec, null, 4));
-        res.json({status: "ok"});
+        //console.log(JSON.stringify(testspec, null, 4));
+        res.json({status: "ok", testspec: testspec});
     });
 });
 

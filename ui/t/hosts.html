@@ -16,17 +16,8 @@
                     </small>
                 </h4>
                 <ul class="list-group">
-                    <!--<li class="list-group-item" style="background-color: #eee;">Services (/MA)</li>-->
                     <li class="list-group-item" ng-repeat="service in host.services | filter:{type:'!ma'} | orderObjectBy: 'name'">
                         <div class="host">
-                            <!--
-                            <span class="label {{services.lss[service.lsid].label_class}}"> {{services.lss[service.lsid].label}}</span>
-                            <b>{{service.name}}</b> ({{service.locator}})
-                            <span ng-if="service.old" class="label label-warning">Stale</span>
-                            -->
-                            <!--
-                            <mc-service ls="services.lss[service.lsid]" service="service"></mc-service>
-                            -->
                             {{service.type}}
                             <span ng-if="service.old" class="label label-warning">Stale</span>
                         </div>
@@ -37,11 +28,6 @@
                         <div style="display: inline-block;" ng-if="service.MA"> 
                             <i class="fa fa-arrow-right"></i> MA 
                             <div class="host">
-                                <!--
-                                <span class="label {{services.lss[service.MA.lsid].label_class}}"> {{services.lss[service.MA.lsid].label}}</span>
-                                <b>{{service.MA.name}}</b> ({{service.MA.locator}})
-                                <span ng-if="service.MA.old" class="label label-warning">Stale</span>
-                                -->
                                 <mc-service ls="services.lss[service.MA.lsid]" service="service.MA"></mc-service>
                             </div>
                         </div>
@@ -57,9 +43,8 @@
                 <mc-specs specs="host._detail.location"></mc-specs>
             </div>
         </div><!--row-->
-        <!--<pre>{{host._detail | json}}</pre>-->
         <div class="pull-right edit_button" ng-if="host._detail.canedit">
-            <button type="button" ng-click="edit(host)" class="btn btn-sm pull-right"><i class="fa fa-pencil-square-o"></i></button>
+            <button type="button" ng-click="edit(host)" class="btn btn-xs pull-right"><i class="fa fa-pencil-square-o"></i></button>
         </div>
     </li>
     </ul>

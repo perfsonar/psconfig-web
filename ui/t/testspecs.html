@@ -9,11 +9,6 @@
         <ul class="list-group">
         <li class="list-group-item"
             ng-repeat="testspec in testspecs | filter:{service_type: service_id} | orderBy: 'id'">
-            <!--
-            <div class="pull-right">
-                <button type="button" ng-click="edit(testspec)" ng-if="testspec.canedit" class="btn btn-sm">Edit</button>
-            </div>
-            -->
             <div class="row">
                 <div class="col-md-7">
                     <h4><small>{{testspec.id}}</small> {{testspec.desc}}</h4>
@@ -25,7 +20,7 @@
                 </div>
             </div>
             <div class="pull-right edit_button" ng-if="testspec.canedit">
-                <button type="button" ng-click="edit(testspec)" class="btn btn-sm pull-right"><i class="fa fa-pencil-square-o"></i></button>
+                <button type="button" ng-click="edit(testspec)" class="btn btn-xs pull-right"><i class="fa fa-pencil-square-o"></i></button>
             </div>
 
         </li>
