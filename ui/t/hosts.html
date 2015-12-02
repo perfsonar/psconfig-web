@@ -7,17 +7,25 @@
             <div class="col-lg-7">
                 <h4>
                     <small>{{host._detail.id}}</small>
-                    <a ng-if="host._detail.toolkit_url == 'auto'" href="http://{{host._detail.hostname || host._detail.ip}}" target="_blank">{{host._detail.sitename}}</a>
-                    <a ng-if="host._detail.toolkit_url != 'auto'" href="{{host._detail.toolkit_url}}" target="_blank">{{host._detail.sitename}}</a>
+                    <!-- assume all services comes from the same ls.. so pick the first one-->
+                    <Small><span class="label {{services.lss[host.services[0].lsid].label_class}}"> {{services.lss[host.services[0].lsid].label}}</span></small>
+                    {{host._detail.sitename}}
                     <small>
                         <span ng-if="host._detail.hostname">{{host._detail.hostname}}</span>
-                        <span class="text-muted" ng-if="!host._detail.hostname && host._detail.ip">{{host._detail.ip}}</span>
+                        <span ng-if="!host._detail.hostname && host._detail.ip">{{host._detail.ip}}</span>
+                        <a ng-if="host._detail.toolkit_url != 'auto'" href="{{host._detail.toolkit_url}}" target="_blank"><i class="fa fa-external-link"></i></a>
+                        <!--
+                        <a ng-if="host._detail.toolkit_url == 'auto'" href="http://{{host._detail.hostname || host._detail.ip}}" target="_blank"><i class="fa fa-external-link"></i><i class="fa fa-external-link"></i></a>
+                        -->
                         <span class="label label-danger" ng-if="host._detail.no_agent">No Agent</span>
                     </small>
                 </h4>
                 <ul class="list-group">
                     <li class="list-group-item" ng-repeat="service in host.services | filter:{type:'!ma'} | orderObjectBy: 'name'">
                         <div class="host">
+                            <!--
+                            <span class="label {{services.lss[service.lsid].label_class}}"> {{services.lss[service.lsid].label}}</span>
+                            -->
                             {{service.type}}
                             <span ng-if="service.old" class="label label-warning">Stale</span>
                         </div>
