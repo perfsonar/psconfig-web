@@ -11,7 +11,7 @@ var async = require('async');
 var config = require('../../config');
 var logger = new winston.Logger(config.logger.winston);
 var db = require('../../models');
-var profile = require('../../profile');
+var common = require('../../common');
 
 //return the whole thing.. until that becomes an issue
 //open to public
@@ -34,12 +34,24 @@ router.get('/services', function(req, res, next) {
     //res.json({hello: "there"});
 });
 
+//TODO - I may need to restrict access to dynamic-allowed scope
+router.get('/services-js', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
+    //need any validation?
+    var js = req.query.js;
+    var type = req.query.type;
+
+    common.filter.resolveHostGroup(js, type, function(err, hosts) {
+        if(err) return next(new Error(err));
+        res.json(hosts);
+    });
+});
+
 router.get('/hosts', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
     db.Host.findAll({raw: true}).then(function(_recs) {
         var recs = [];
         _recs.forEach(function(rec) {
             //somehow sequelize forgets to parse this.. it works for testspecs, so I am not sure why this doesn't work here
-            rec.host = JSON.parse(rec.host); 
+            rec.info = JSON.parse(rec.info); 
             rec.location = JSON.parse(rec.location); 
             rec.canedit = false;
             if(req.user) {
@@ -57,7 +69,6 @@ router.get('/hosts', jwt({secret: config.admin.jwt.pub, credentialsRequired: fal
 router.put('/host/:uuid', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var uuid = req.params.uuid;
     var _detail = req.body._detail;
-
     if(!~req.user.scopes.common.indexOf('admin')) return res.status(401).end();
 
     //update host info
@@ -89,14 +100,15 @@ router.put('/host/:uuid', jwt({secret: config.admin.jwt.pub}), function(req, res
                 }); 
             });
         });
-            
     });
 });
 
+//is this still used?
 router.get('/profiles', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    res.json(profile.getall());
+    res.json(common.profile.getall());
 });
 
+/*
 //update service cache immediately
 //TODO - only used for debug purpose right now.
 //TODO - should restrict access from localhost?
@@ -107,6 +119,7 @@ router.post('/cache', function(req, res, next) {
         res.json({status: "ok"});
     });
 });
+*/
 
 module.exports = router;
 

@@ -79,6 +79,35 @@ var migrations = [
             next();
         });
     },
+    function(qi, next) {
+        logger.info("adding host_filter fields");
+        qi.addColumn('Hostgroups', 'host_filter', {
+            type: Sequelize.STRING,
+        }).then(function() {
+            next();
+        });
+    },
+    function(qi, next) {
+        logger.info("adding host_filter fields");
+        qi.changeColumn('Hostgroups', 'host_filter', {
+            type: Sequelize.TEXT,
+        }).then(function() {
+            next();
+        });
+    },
+    function(qi, next) {
+        logger.info("adding type fields");
+        qi.addColumn('Hostgroups', 'type', {
+            type: Sequelize.STRING,
+            defaultValue: 'static',
+        }).then(function() {
+            next();
+        });
+    },
+    function(qi, next) {
+        logger.info("renaming host.host to host.info");
+        qi.renameColumn('Hosts', 'host', 'info').then(function() { next(); });
+    },
 ];
 
 exports.run = function() {

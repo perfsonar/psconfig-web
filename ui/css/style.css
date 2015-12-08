@@ -66,6 +66,7 @@ ul.hosts {
   padding: 0px;
   list-style: none;
   font-size: 12px;
+  margin-bottom: 0px;
 }
 ul.specs li,
 ul.admins li,
@@ -95,4 +96,7 @@ ul.hosts li {
 div.well-detail {
   background-color: #ddd;
   margin-bottom: 0px;
+}
+.ace_editor {
+  height: 100px;
 }

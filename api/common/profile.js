@@ -6,9 +6,9 @@ var request = require('request');
 var Promise = require('promise');
 
 //mine
-var config = require('./config');
+var config = require('../config');
 var logger = new winston.Logger(config.logger.winston);
-var db = require('./models');
+var db = require('../models');
 
 var profiles = {};
 /*
@@ -28,7 +28,7 @@ var profiles = {};
 }
 */
 
-function cache(cb) {
+exports.cache = function(cb) {
     logger.debug("caching user public profiles");
     request({
         url: config.pub.profile_api+"/users",
@@ -44,6 +44,7 @@ function cache(cb) {
             profiles[user.sub] = user.public;
             profiles[user.sub].sub = user.sub; 
         });
+        logger.debug("cached "+body.length+" profiles");
         //console.dir(profiles);
         cb(null);
     });
@@ -64,20 +65,15 @@ exports.load_admins = function(subs) {
     return admins;
 }
 
+/*
 //start caching profile
-exports.start = function() {
+exports.start = function(cb) {
     logger.debug("starting profile cache");
     setInterval(function() {
         cache(function(err) {
             if(err) logger.error(err); //continue..
         });
     }, 1000*300); //every 5 minutes enough?
-
-    return new Promise(function(resolve, reject) {
-        cache(function(err) {
-            if(err) return reject(err);
-            resolve();
-        });
-    });
+    cache(cb);
 }
-
+*/

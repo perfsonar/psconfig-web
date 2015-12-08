@@ -8,11 +8,12 @@ var app = angular.module('app', [
     'toaster',
     'angular-loading-bar',
     'angular-jwt',
+    'ui.bootstrap',
     'ui.select',
     'sca-shared',
-    'ui.bootstrap',
     'ngOrderObjectBy',
     'ui.gravatar',
+    'ui.ace',
 ]);
 
 //can't quite do the slidedown animation through pure angular/css.. borrowing slideDown from jQuery..
@@ -515,7 +516,9 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, users, $modal, 
         var hostgroup = {
             service_type: service_type,
             admins: [ $scope.users[user.sub] ], //select current user as admin
+            type: 'static',
             hosts: [],
+            host_filter: "return false; //select none",
             desc: "",
         };
         var modalInstance = $modal.open({
@@ -557,7 +560,6 @@ function($scope, appconf, toaster, $http, $modalInstance, hostgroup, title, serv
         }
     });
 
-
     /*
     function getdata() {
         //create a copy of $scope.testspec so that UI doesn't break while saving.. (why just admins?)
@@ -571,6 +573,17 @@ function($scope, appconf, toaster, $http, $modalInstance, hostgroup, title, serv
     */
 
     $scope.submit = function() {
+        //find active tab
+        for(var type in $scope.tabs) {
+            if($scope.tabs[type].active) $scope.hostgroup.type = type;
+        }
+
+        //dynamic uses hosts as cache of the latest query result. let's use the validation result
+        if($scope.hostgroup.type == 'dynamic') {
+            $scope.hostgroup.hosts = $scope.hostgroup._hosts||[];
+            console.dir($scope.hostgroup.hosts);
+        }
+
         if(!$scope.hostgroup.id) {
             //create 
             $http.post(appconf.api+'/hostgroups/', $scope.hostgroup)
@@ -594,9 +607,11 @@ function($scope, appconf, toaster, $http, $modalInstance, hostgroup, title, serv
             });   
         }
     }
+
     $scope.cancel = function() {
         $modalInstance.dismiss('cancel');
     }
+
     $scope.remove = function() {
         $http.delete(appconf.api+'/hostgroups/'+$scope.hostgroup.id)
         .then(function(res) {
@@ -606,7 +621,78 @@ function($scope, appconf, toaster, $http, $modalInstance, hostgroup, title, serv
             toaster.error(res.data.message);
         });       
     }
+
+    /*
+    //test dynamic filter script
+    $scope.test = function() {
+        $http.get(appconf.api+'/cache/services-js/', {params: 
+            {
+                type: $scope.hostgroup.service_type,
+                js: $scope.hostgroup.host_filter,
+            }
+        })
+        .then(function(res) {
+            $scope.host_filter_alert = null;
+            $scope.host_filter_result = res.data.recs;
+            console.dir(res);
+        }, function(res) {
+            //toaster.error(res.data.message);
+            $scope.host_filter_alert = res.data.message;
+            $scope.host_filter_result = null;
+            console.dir(res);
+        });    
+    }
+    */
+    
+    //pick active tab
+    $scope.tabs = {
+        static: {active: false},
+        dynamic: {active: false},
+    };
+    $scope.tabs[hostgroup.type].active = true;
+
+    /*
+    //if dynamic is selected, run test
+    if(hostgroup.type == "dynamic") {
+        $scope.test(); 
+    }
+    */
 }]);
+
+//validator for host_filter ace
+app.directive('hostfilter', function($q, $http, appconf) {
+    return {
+        require: 'ngModel',
+        link: function(scope, elm, attrs, ctrl) {
+
+            var p = scope.$parent.$parent; //TODO - this feels very icky..
+
+            ctrl.$asyncValidators.hostfilter = function(modelValue, viewValue) {
+                //TODO this doesn't fire if empty.
+                if (ctrl.$isEmpty(modelValue)) {
+                    console.log("empty");
+                    return $q.when();
+                }
+
+                var def = $q.defer();
+                $http.get(appconf.api+'/cache/services-js/', {
+                    params: { type: attrs.serviceType, js: modelValue, }
+                })
+                .then(function(res) {
+                    p.hostgroup._hosts = res.data.recs;
+                    p.host_filter_alert = null;
+                    def.resolve();
+                }, function(res) {
+                    //toaster.error(res.data.message);
+                    p.hostgroup._hosts = null;
+                    p.host_filter_alert = res.data.message;
+                    def.reject();
+                });   
+                return def.promise;
+            };
+        }
+    };
+});
 
 
 

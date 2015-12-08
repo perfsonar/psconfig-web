@@ -18,14 +18,15 @@
     "angular-jwt": "~0.0.9",
     "angular-loading-bar": "~0.7.1",
     "angular-route": "~1.4.0",
-    "angular-ui": "angular-ui/ui-select",
     "angularjs-toaster": "~0.4.14",
     "bootstrap": "~3.3.2",
     "simple-sidebar": "IronSummitMedia/startbootstrap-simple-sidebar",
     "font-awesome": "fontawesome#~4.4.0",
+    "angular-ui-select": "angular-ui/ui-select",
     "angular-bootstrap": "~0.13.4",
     "angular-order-object-by": "~1.2.1",
-    "angular-gravatar": "~0.4.1"
+    "angular-gravatar": "~0.4.1",
+    "angular-ui-ace": "~0.2.3"
   },
   "overrides": {
     "simple-sidebar": {

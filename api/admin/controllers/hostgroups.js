@@ -11,7 +11,7 @@ var async = require('async');
 var config = require('../../config');
 var logger = new winston.Logger(config.logger.winston);
 var db = require('../../models');
-var profile = require('../../profile');
+var profile = require('../../common').profile;
 
 router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
     db.Hostgroup.findAll({
@@ -35,7 +35,6 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
     }); 
 });
 
-//all test specs are open to public for read access
 router.get('/:id', function(req, res, next) {
     var id = parseInt(req.params.id);
     db.Hostgroup.findOne({
@@ -61,8 +60,8 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
     });
 });
 
+//remove null items from an array
 function filter_null(a) {
-    console.dir(a);
     var ret = [];
     a.forEach(function(it) {
         if(it == null) return;
@@ -80,7 +79,11 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
         //only superadmin or admin of this test spec can update
         if(~req.user.scopes.common.indexOf('admin') || ~hostgroup.admins.indexOf(req.user.sub)) {
             hostgroup.desc = req.body.desc;
+
+            hostgroup.type = req.body.type; //not service type, the host type (static, dynamic, etc..)
             hostgroup.hosts = filter_null(req.body.hosts);
+            hostgroup.host_filter = req.body.host_filter;
+
             var admins = [];
             req.body.admins.forEach(function(admin) {
                 admins.push(admin.sub);

@@ -7,6 +7,7 @@ var winston = require('winston');
 //mine
 var config = require('../config');
 var logger = new winston.Logger(config.logger.winston);
+var db = require('./index');
 
 //for field types
 //http://docs.sequelizejs.com/en/latest/api/datatypes/
@@ -24,8 +25,14 @@ module.exports = function(sequelize, DataTypes) {
     return sequelize.define('Hostgroup', {
         service_type: Sequelize.STRING, 
         desc: Sequelize.STRING,
-        
-        //array of host ids (client-uuid for service records in sLS)
+
+        //hostgroup type (static, dynamic, etc..) - not service type
+        type: {
+            type: Sequelize.STRING,
+            defaultValue: 'static',
+        },
+ 
+        //(static) array of host ids (client-uuid for service records in sLS)
         hosts: {
             type: Sequelize.TEXT,
             defaultValue: '[]',
@@ -36,6 +43,9 @@ module.exports = function(sequelize, DataTypes) {
                 return this.setDataValue('hosts', JSON.stringify(hosts));
             }
         },
+
+        //(dynamic) javascript filter code to select services (takes precedence over static list)
+        host_filter: Sequelize.STRING,
 
         //array of user ids (sub string in auth service)
         admins: {
@@ -48,6 +58,7 @@ module.exports = function(sequelize, DataTypes) {
                 return this.setDataValue('admins', JSON.stringify(admins));
             }
         },
+
     }, {
         classMethods: {
             /*
@@ -73,6 +84,15 @@ module.exports = function(sequelize, DataTypes) {
 
         },
         instanceMethods: {
+            /*
+            getHosts: function(cb) {
+                var rec = this;
+                if(this.type == 'static') return cb(null, rec.hosts);
+                if(this.type == 'dynamic') {
+                    common.filter.resolveHostGroup(rec.host_filter, rec.type, cb);
+                } 
+            }
+            */
             /*
             setPassword: function (password, cb) {
                 var rec = this;

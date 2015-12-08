@@ -90,13 +90,15 @@ module.exports = function(sequelize, DataTypes) {
         no_agent: { type: Sequelize.BOOLEAN, defaultValue: false },
 
         //host info (pshost-toolkitversion, host-hardware-memory, host-os-version, host-hadeware-processorspeed, host-hadware-processorcount)
-        host: {
+        info: {
             type: Sequelize.TEXT,
             get: function () {
-                return JSON.parse(this.getDataValue('host'));
+                var v = this.getDataValue('info');
+                if(!v) return null;
+                return JSON.parse(v);
             },
             set: function (host) {
-                return this.setDataValue('host', JSON.stringify(host));
+                return this.setDataValue('info', JSON.stringify(host));
             }
         },
 
@@ -104,7 +106,9 @@ module.exports = function(sequelize, DataTypes) {
         location: {
             type: Sequelize.TEXT,
             get: function () {
-                return JSON.parse(this.getDataValue('location'));
+                var v = this.getDataValue('location');
+                if(!v) return null;
+                return JSON.parse(v);
             },
             set: function (location) {
                 return this.setDataValue('location', JSON.stringify(location));
@@ -116,7 +120,9 @@ module.exports = function(sequelize, DataTypes) {
             type: Sequelize.TEXT,
             defaultValue: '[]',
             get: function () {
-                return JSON.parse(this.getDataValue('admins'));
+                var v = this.getDataValue('admins');
+                if(!v) return null;
+                return JSON.parse(v);
             },
             set: function (admins) {
                 return this.setDataValue('admins', JSON.stringify(admins));

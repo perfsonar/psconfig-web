@@ -15,7 +15,7 @@ var compression = require('compression');
 var config = require('../config');
 var logger = new winston.Logger(config.logger.winston);
 var db = require('../models');
-var profile = require('../profile');
+var profile = require('../common').profile;
 
 //init express
 var app = express();

@@ -10,7 +10,11 @@
                 ng-repeat="hostgroup in hostgroups | filter:{service_type:service_id} | orderBy:'id' ">
                 <div class="row">
                     <div class="col-md-8">
-                        <h4><small>{{hostgroup.id}}</small> {{hostgroup.desc}}</h4>
+                        <h4>
+                            <small>{{hostgroup.id}}</small> 
+                            <span class="label label-default" ng-if="hostgroup.type == 'dynamic'">Dynamic</span>
+                            {{hostgroup.desc}}
+                        </h4>
                         <!--<h5>Hosts</h5>-->
                         <mc-hostlist serviceid="service_id" hosts="hostgroup.hosts"></mc-hostlist>
                     </div>
@@ -25,7 +29,7 @@
             </li>
         </ul>
         <div class="panel-body" style="background-color: #fafafa;">
-            <button class="btn btn-sm" ng-click="create(service_id)">Add New</button>
+            <button class="btn btn-sm" ng-click="create(service_id)">Add New {{service.label}}</button>
         </div>
     </div><!--panel-->
 </div>

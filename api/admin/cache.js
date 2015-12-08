@@ -8,12 +8,13 @@ var net = require('net');
 var winston = require('winston');
 var async = require('async');
 var request = require('request');
-var Promise = require('promise');
+//var Promise = require('promise');
 
 //mine
 var config = require('../config');
 var logger = new winston.Logger(config.logger.winston);
 var db = require('../models');
+var common = require('../common');
 
 /* works, but this isn't the bottleneck
 var ip_cache = {};
@@ -151,7 +152,7 @@ function cache_host(service, res, cb) {
         var rec = {
             uuid: host['client-uuid'][0],
             sitename: host['location-sitename'][0],
-            host: {
+            info: {
                 hardware_processorcount: host['host-hardware-processorcount']?host['host-hardware-processorcount'][0]:null,
                 hardware_processorspeed: host['host-hardware-processorspeed']?host['host-hardware-processorspeed'][0]:null,
                 hardware_memory: host['host-hardware-memory']?host['host-hardware-memory'][0]:null,
@@ -314,26 +315,71 @@ function cache_global_ls(service, id, cb) {
     }); 
 }
 
-exports.start = function() {
-    logger.debug("starting slscache");
-    return new Promise(function(resolve, reject) {
-        async.forEachOf(config.datasource.services, function(service, id, next) {
-            var timeout = service.cache || 60*30*1000; //default to 30 minutes
-            switch(service.type) {
-            case "sls":
-                setInterval(function() { cache_ls(service, id, function(err) {
-                    if(err) logger.error(err);
-                }); }, timeout);
-                cache_ls(service, id, next);
-                break;
-            case "global-sls":
-                setInterval(function() { cache_global_ls(service, id); }, timeout);
-                cache_global_ls(service, id, next);
-                break;
-            default:
-                logger.error("unknown datasource/service type:"+service.type);
-            }
-        }, resolve);
+function update_dynamic_hostgroup(cb) {
+    logger.debug("update_dynamic_hostgruop TODO");
+    db.Hostgroup.findAll({where: {type: 'dynamic'}}).then(function(groups) {
+        async.forEach(groups, function(group, next) {
+            common.filter.resolveHostGroup(group.host_filter, group.service_type, function(err, hosts) {
+                if(err) return next(err);
+                group.hosts = hosts.recs;
+                group.save().then(function() {
+                    logger.debug(group.host_filter);
+                    logger.debug("... resolved to ...");
+                    logger.debug(hosts);
+                    next();
+                });
+            });
+        }, function(err) {
+            if(err) logger.error(err);
+            if(cb) cb();
+        });
     });
 }
+
+exports.start = function(cb) {
+    logger.info("starting slscache");
+    async.forEachOf(config.datasource.services, function(service, id, next) {
+
+        function run_cache_ls(_next) {
+            cache_ls(service, id, function(err) {
+                if(err) logger.error(err);
+                update_dynamic_hostgroup(_next);
+            }); 
+        }
+
+        function run_cache_global_ls(_next) {
+            cache_global_ls(service, id, function(err) {
+                if(err) logger.error(err);
+                update_dynamic_hostgroup(_next);
+            }); 
+        }
+
+        var timeout = service.cache || 60*30*1000; //default to 30 minutes
+        switch(service.type) {
+        case "sls":
+            setInterval(run_cache_ls, timeout);
+            run_cache_ls(next);
+            break;
+        case "global-sls":
+            setInterval(run_cache_global_ls, timeout);
+            run_cache_global_ls(next);
+            break;
+        default:
+            logger.error("unknown datasource/service type:"+service.type);
+        }
+
+    }, function(err) {
+        if(err) logger.error(err);
+
+        function run_cache_profile(cb) {
+            common.profile.cache(cb||function(err) {
+                if(err) logger.error(err);
+            });
+        };
+        logger.info("starting profile cache");
+        setInterval(run_cache_profile, 1000*300); //5 minutes?
+        run_cache_profile(cb);
+    });
+}
+
 

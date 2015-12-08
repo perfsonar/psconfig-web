@@ -8,11 +8,12 @@ var app = angular.module('app', [
     'toaster',
     'angular-loading-bar',
     'angular-jwt',
+    'ui.bootstrap',
     'ui.select',
     'sca-shared',
-    'ui.bootstrap',
     'ngOrderObjectBy',
     'ui.gravatar',
+    'ui.ace',
 ]);
 
 //can't quite do the slidedown animation through pure angular/css.. borrowing slideDown from jQuery..

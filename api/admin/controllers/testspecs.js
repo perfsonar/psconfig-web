@@ -11,7 +11,7 @@ var async = require('async');
 var config = require('../../config');
 var logger = new winston.Logger(config.logger.winston);
 var db = require('../../models');
-var profile = require('../../profile');
+var profile = require('../../common').profile;
 
 router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
     db.Testspec.findAll().then(function(testspecs) {

@@ -10,7 +10,7 @@ var winston = require('winston');
 var config = require('../../config');
 var logger = new winston.Logger(config.logger.winston);
 var db = require('../../models');
-var profile = require('../../profile');
+var profile = require('../../common').profile;
 var meshconfig = require('../meshconfig');
 
 //construct meshconfig
