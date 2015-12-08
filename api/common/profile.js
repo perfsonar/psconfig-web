@@ -65,7 +65,6 @@ exports.load_admins = function(subs) {
     return admins;
 }
 
-/*
 //start caching profile
 exports.start = function(cb) {
     logger.debug("starting profile cache");
@@ -74,6 +73,5 @@ exports.start = function(cb) {
             if(err) logger.error(err); //continue..
         });
     }, 1000*300); //every 5 minutes enough?
-    cache(cb);
+    exports.cache(cb);
 }
-*/

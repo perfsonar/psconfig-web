@@ -368,7 +368,7 @@ exports.start = function(cb) {
             logger.error("unknown datasource/service type:"+service.type);
         }
 
-    }, function(err) {
+    }, /*function(err) {
         if(err) logger.error(err);
 
         function run_cache_profile(cb) {
@@ -379,7 +379,7 @@ exports.start = function(cb) {
         logger.info("starting profile cache");
         setInterval(run_cache_profile, 1000*300); //5 minutes?
         run_cache_profile(cb);
-    });
+    }*/ cb);
 }
 
 
