@@ -43,11 +43,13 @@ process.on('uncaughtException', function (err) {
     logger.error(err.stack)
 });
 
+/*
 function run_cache_profile(cb) {
     common.profile.cache(cb||function(err) {
         if(err) logger.error(err);
     });
 };
+*/
 
 exports.app = app;
 exports.start = function(cb) {
@@ -61,8 +63,8 @@ exports.start = function(cb) {
         app.listen(port, host, function() {
             logger.info("meshconfig admin/api service running on %s:%d in %s mode", host, port, app.settings.env);
 
-            setInterval(run_cache_profile, 1000*300); //5 minutes?
-            run_cache_profile(cb);
+            setInterval(common.profile.cache, 1000*300); //5 minutes?
+            common.profile.cache(cb);
         });
     });
 }

@@ -46,7 +46,7 @@ exports.cache = function(cb) {
         });
         logger.debug("cached "+body.length+" profiles");
         //console.dir(profiles);
-        cb(null);
+        if(cb) cb(null);
     });
 }
 
@@ -65,13 +65,16 @@ exports.load_admins = function(subs) {
     return admins;
 }
 
+/*
 //start caching profile
 exports.start = function(cb) {
     logger.debug("starting profile cache");
     setInterval(function() {
-        cache(function(err) {
+        exports.cache(function(err) {
             if(err) logger.error(err); //continue..
         });
     }, 1000*300); //every 5 minutes enough?
     exports.cache(cb);
 }
+*/
+
