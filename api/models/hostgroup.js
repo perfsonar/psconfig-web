@@ -37,7 +37,9 @@ module.exports = function(sequelize, DataTypes) {
             type: Sequelize.TEXT,
             defaultValue: '[]',
             get: function () { 
-                return JSON.parse(this.getDataValue('hosts'));
+                var v = this.getDataValue('hosts');
+                if(!v) return null;
+                return JSON.parse(v);
             },
             set: function (hosts) {
                 return this.setDataValue('hosts', JSON.stringify(hosts));
@@ -52,7 +54,9 @@ module.exports = function(sequelize, DataTypes) {
             type: Sequelize.TEXT,
             defaultValue: '[]',
             get: function () { 
-                return JSON.parse(this.getDataValue('admins'));
+                var v = this.getDataValue('admins');
+                if(!v) return null;
+                return JSON.parse(v);
             },
             set: function (admins) {
                 return this.setDataValue('admins', JSON.stringify(admins));
