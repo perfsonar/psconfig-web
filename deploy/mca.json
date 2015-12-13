@@ -1,0 +1,30 @@
+{
+  apps : [
+    {
+      name      : "mcadmin",
+      script    : "mca/api/mcadmin.js",
+    },
+    {
+      name      : "mccache",
+      script    : "mca/api/mccache.js"
+    },
+    {
+      name      : "mcpub",
+      script    : "mca/api/mcpub.js"
+    },
+    {
+      name      : "auth",
+      script    : "auth/api/auth.js"
+    },
+    {
+      name      : "shared",
+      script    : "shared/api/shared.js"
+    },
+    {
+      name      : "profile",
+      script    : "profile/api/profile.js"
+    },
+  ], 
+}
+
+

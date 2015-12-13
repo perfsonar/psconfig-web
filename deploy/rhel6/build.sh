@@ -1,0 +1,1 @@
+rpmbuild -ba mca.spec

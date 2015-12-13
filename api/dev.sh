@@ -10,7 +10,7 @@ pm2 start mccache.js --watch --ignore-watch="\.log$ test/ .sh$ pub/"
 
 pm2 delete mcpub
 #pm2 start mcpub.js -i 2  --watch --ignore-watch="\.log$ test/ .sh$"
-pm2 start mcpub.js --watch --ignore-watch="\.log$ test/ .sh$ admin/"
+pm2 start mcpub.js -i 4 --watch --ignore-watch="\.log$ test/ .sh$ admin/"
 
 
 #pm2 logs meshconfig

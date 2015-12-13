@@ -43,14 +43,6 @@ process.on('uncaughtException', function (err) {
     logger.error(err.stack)
 });
 
-/*
-function run_cache_profile(cb) {
-    common.profile.cache(cb||function(err) {
-        if(err) logger.error(err);
-    });
-};
-*/
-
 exports.app = app;
 exports.start = function(cb) {
     logger.info("initializing");
@@ -62,7 +54,6 @@ exports.start = function(cb) {
         var host = process.env.HOST || config.admin.host || 'localhost';
         app.listen(port, host, function() {
             logger.info("meshconfig admin/api service running on %s:%d in %s mode", host, port, app.settings.env);
-
             setInterval(common.profile.cache, 1000*300); //5 minutes?
             common.profile.cache(cb);
         });

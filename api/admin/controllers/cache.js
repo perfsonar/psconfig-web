@@ -103,7 +103,7 @@ router.put('/host/:uuid', jwt({secret: config.admin.jwt.pub}), function(req, res
     });
 });
 
-//is this still used?
+//used for admin list editor
 router.get('/profiles', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     res.json(common.profile.getall());
 });
