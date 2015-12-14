@@ -14,7 +14,7 @@ exports.resolveHostGroup = function(js, type, cb) {
         include: [
             {
                 model: db.Host, 
-                attributes: ['info', 'hostname', 'toolkit_url', 'no_agent', 'ip'], //TODO - not sure on this yet.
+                attributes: ['info', 'communities', 'hostname', 'toolkit_url', 'no_agent', 'ip'], //TODO - not sure on this yet.
             }, 
         ],
         where: {type: type}

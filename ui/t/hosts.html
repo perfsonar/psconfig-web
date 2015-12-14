@@ -49,6 +49,11 @@
             <div class="col-md-2">
                 <h5>Location</h5>
                 <mc-specs specs="host._detail.location"></mc-specs>
+                <h5>Communities</h5>
+                <p class="help-block" ng-if="!host._detail.communities">No Communities</p>
+                <ul class="specs">
+                    <li ng-repeat="com in host._detail.communities">{{com}}</li>
+                </div>
             </div>
         </div><!--row-->
         <div class="pull-right edit_button" ng-if="host._detail.canedit">

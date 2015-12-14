@@ -97,8 +97,8 @@ module.exports = function(sequelize, DataTypes) {
                 if(!v) return null;
                 return JSON.parse(v);
             },
-            set: function (host) {
-                return this.setDataValue('info', JSON.stringify(host));
+            set: function (v) {
+                return this.setDataValue('info', JSON.stringify(v));
             }
         },
 
@@ -110,8 +110,21 @@ module.exports = function(sequelize, DataTypes) {
                 if(!v) return null;
                 return JSON.parse(v);
             },
-            set: function (location) {
-                return this.setDataValue('location', JSON.stringify(location));
+            set: function (v) {
+                return this.setDataValue('location', JSON.stringify(v));
+            }
+        },
+        
+        //(location-state, location-city, location-country, etc..)
+        communities: {
+            type: Sequelize.TEXT,
+            get: function () {
+                var v = this.getDataValue('communities');
+                if(!v) return null;
+                return JSON.parse(v);
+            },
+            set: function (v) {
+                return this.setDataValue('communities', JSON.stringify(v));
             }
         },
     
@@ -124,8 +137,8 @@ module.exports = function(sequelize, DataTypes) {
                 if(!v) return null;
                 return JSON.parse(v);
             },
-            set: function (admins) {
-                return this.setDataValue('admins', JSON.stringify(admins));
+            set: function (v) {
+                return this.setDataValue('admins', JSON.stringify(v));
             }
         },
 

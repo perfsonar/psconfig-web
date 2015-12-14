@@ -108,6 +108,12 @@ var migrations = [
         logger.info("renaming host.host to host.info");
         qi.renameColumn('Hosts', 'host', 'info').then(function() { next(); });
     },
+    function(qi, next) {
+        logger.debug("adding communities field for host");
+        qi.addColumn('Hosts', 'communities', Sequelize.TEXT).then(function(someting) {
+            next();
+        });
+    },
 ];
 
 exports.run = function() {

@@ -53,6 +53,7 @@ router.get('/hosts', jwt({secret: config.admin.jwt.pub, credentialsRequired: fal
             //somehow sequelize forgets to parse this.. it works for testspecs, so I am not sure why this doesn't work here
             rec.info = JSON.parse(rec.info); 
             rec.location = JSON.parse(rec.location); 
+            rec.communities = JSON.parse(rec.communities); 
             rec.canedit = false;
             if(req.user) {
                 if(~req.user.scopes.common.indexOf('admin') /*|| ~testspec.admins.indexOf(req.user.sub)*/) {

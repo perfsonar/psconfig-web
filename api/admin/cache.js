@@ -37,11 +37,12 @@ function cache_host(service, res, cb) {
     pathname_tokens.splice(-3);
     var pathname = pathname_tokens.join("/");
 
-    logger.debug("caching host:"+service['service-host'][0]);
 
     //reconstruct the url for the host record
     //if(service['service-host'] === undefined) console.dir(service);
     var url = uri.protocol+"//"+uri.host+pathname+'/'+service['service-host'][0];
+    //logger.debug("caching host:"+service['service-host'][0]);
+    logger.debug("caching host:"+url);
     request({url: url, timeout: 1000*10, json: true}, function(err, res, host) {
         if(err) return cb(err);
         if(res.statusCode != 200) return cb(new Error("failed to cache host from:"+url+" statusCode:"+res.statusCode));
@@ -152,20 +153,26 @@ function cache_host(service, res, cb) {
         var rec = {
             uuid: host['client-uuid'][0],
             sitename: host['location-sitename'][0],
+            /*
             info: {
+                //note.. host is from the sls/host - not toolkit json
                 hardware_processorcount: host['host-hardware-processorcount']?host['host-hardware-processorcount'][0]:null,
                 hardware_processorspeed: host['host-hardware-processorspeed']?host['host-hardware-processorspeed'][0]:null,
                 hardware_memory: host['host-hardware-memory']?host['host-hardware-memory'][0]:null,
                 toolkitversion: host['pshost-toolkitversion']?host['pshost-toolkitversion'][0]:null,
                 os_version: host['host-os-version']?host['host-os-version'][0]:null,
             },
+            */
+            info: get_hostinfo(host),
             location: get_location(host),
+            communities: host['group-communities']||[],
 
             //TODO - I need to query the real admin records from the cache (gocdb2sls service already genenrates contact records)
             //I just have to store them in our table
             admins: host['host-administrators'],
             count: 0, //number of times updated (exists to allow updateTime update)
         };
+        console.dir(rec.info);
 
         var address = host['host-name'][0]; //could be ip or hostname
        
@@ -214,6 +221,7 @@ function cache_host(service, res, cb) {
 
     });
 }
+
 function get_location(service) {
     return {
         longitude: (service['location-longitude']?service['location-longitude'][0]:null),
@@ -223,6 +231,28 @@ function get_location(service) {
         postal_code: (service['location-code']?service['location-code'][0]:null),
         country: (service['location-country']?service['location-country'][0]:null),
     };
+}
+
+function get_hostinfo(host) {
+
+    var info = {};
+    for(var key in host) {
+        var v = host[key];
+
+        if(key == "host-administrators") continue;
+        if(key == "host-net-interfaces") continue;
+        if(key == "host-name") continue;
+        
+        ["host-", "pshost-"].forEach(function(prefix) {
+            var p = key.indexOf(prefix);
+            if(p === 0) {
+                var ikey = key.substr(prefix.length);
+                ikey = ikey.replace(/-/g, '_');
+                info[ikey] = v[0];
+            }
+        });
+    }
+    return info;
 }
 
 //TODO no point of existing.. just merge with docache_ls

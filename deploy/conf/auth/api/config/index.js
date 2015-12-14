@@ -26,7 +26,7 @@ exports.local = {
 
 exports.db = {
     "dialect": "sqlite", 
-    "storage": "/usr/local/sca/auth.sqlite"
+    "storage": "/var/lib/mca/auth.sqlite"
 }
 
 //comment this out to disable iucas auth
