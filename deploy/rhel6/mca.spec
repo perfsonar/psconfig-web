@@ -45,10 +45,10 @@ git clone https://github.com/soichih/sca-auth.git $RPM_BUILD_ROOT/opt/mca/auth
 git clone https://github.com/soichih/sca-profile.git $RPM_BUILD_ROOT/opt/mca/profile
 git clone https://github.com/soichih/sca-shared.git $RPM_BUILD_ROOT/opt/mca/shared
 
-cd $RPM_BUILD_ROOT/opt/mca/mca/ui && bower install -p
-cd $RPM_BUILD_ROOT/opt/mca/auth/ui && bower install -p
-cd $RPM_BUILD_ROOT/opt/mca/shared/ui && bower install -p
-cd $RPM_BUILD_ROOT/opt/mca/profile/ui && bower install -p
+cd $RPM_BUILD_ROOT/opt/mca/mca/ui && bower install -p --allow-root
+cd $RPM_BUILD_ROOT/opt/mca/auth/ui && bower install -p --allow-root
+cd $RPM_BUILD_ROOT/opt/mca/shared/ui && bower install -p --allow-root 
+cd $RPM_BUILD_ROOT/opt/mca/profile/ui && bower install -p --allow-root
 
 #cp $RPM_BUILD_ROOT/opt/mca/meshconfig/rhel6/mca.init $RPM_BUILD_ROOT/etc/init.d/mca
 
@@ -70,21 +70,9 @@ cd /opt/mca/auth/bin && ./auth.js issue --scopes '{ "common": ["user"] }' --sub 
 
 pm2 startup redhat 
 pm2 start /opt/mca/mca/deploy/mca.json
-#pm2 start --name sca-shared /opt/mca/shared/api/shared.js 
-#pm2 start --name sca-auth /opt/mca/auth/api/auth.js 
-#pm2 start --name sca-profile /opt/mca/profile/api/profile.js
-#pm2 start --name mccache /opt/mca/mca/api/mccache.js
-#pm2 start --name mcadmin /opt/mca/mca/api/mcadmin.js
-#pm2 start --name mcpub /opt/mca/mca/api/mcpub.js -i 4
 pm2 save
 
 %preun
-#pm2 delete sca-shared
-#pm2 delete sca-auth
-#pm2 delete sca-profile
-#pm2 delete mccache
-#pm2 delete mcadmin
-#pm2 delete mcpub
 pm2 delete /opt/mca/mca/deploy/mca.json
 pm2 save
 

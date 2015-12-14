@@ -1,4 +1,5 @@
 {
+  //see http://pm2.keymetrics.io/docs/usage/application-declaration/
   apps : [
     {
         name: "mcadmin",
@@ -8,19 +9,21 @@
     },
     {
         name: "mccache",
-        script: "/opt/mca/mca/api/mccache.js"
+        script: "/opt/mca/mca/api/mccache.js",
         error_file: "/var/log/mca/error.log",
         out_file: "/var/log/mca/out.log"
     },
     {
         name: "mcpub",
-        script: "/opt/mca/mca/api/mcpub.js"
+        script: "/opt/mca/mca/api/mcpub.js",
         instances: 4,
         exec_mode: "cluster_mode",
+        error_file: "/var/log/mca/error.log",
+        out_file: "/var/log/mca/out.log"
     },
     {
         name: "auth",
-        script: "/opt/mca/auth/api/auth.js"
+        script: "/opt/mca/auth/api/auth.js",
         error_file: "/var/log/mca/error.log",
         out_file: "/var/log/mca/out.log"
     },
@@ -32,11 +35,11 @@
     */
     {
         name: "profile",
-        script: "/opt/mca/profile/api/profile.js"
+        script: "/opt/mca/profile/api/profile.js",
         error_file: "/var/log/mca/error.log",
         out_file: "/var/log/mca/out.log"
-    },
-  ], 
+    }
+  ] 
 }
 
 
