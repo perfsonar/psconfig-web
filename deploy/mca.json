@@ -1,28 +1,40 @@
 {
   apps : [
     {
-      name      : "mcadmin",
-      script    : "mca/api/mcadmin.js",
+        name: "mcadmin",
+        script: "/opt/mca/mca/api/mcadmin.js",
+        error_file: "/var/log/mca/error.log",
+        out_file: "/var/log/mca/out.log"
     },
     {
-      name      : "mccache",
-      script    : "mca/api/mccache.js"
+        name: "mccache",
+        script: "/opt/mca/mca/api/mccache.js"
+        error_file: "/var/log/mca/error.log",
+        out_file: "/var/log/mca/out.log"
     },
     {
-      name      : "mcpub",
-      script    : "mca/api/mcpub.js"
+        name: "mcpub",
+        script: "/opt/mca/mca/api/mcpub.js"
+        instances: 4,
+        exec_mode: "cluster_mode",
     },
     {
-      name      : "auth",
-      script    : "auth/api/auth.js"
+        name: "auth",
+        script: "/opt/mca/auth/api/auth.js"
+        error_file: "/var/log/mca/error.log",
+        out_file: "/var/log/mca/out.log"
     },
+    /*
     {
       name      : "shared",
       script    : "shared/api/shared.js"
     },
+    */
     {
-      name      : "profile",
-      script    : "profile/api/profile.js"
+        name: "profile",
+        script: "/opt/mca/profile/api/profile.js"
+        error_file: "/var/log/mca/error.log",
+        out_file: "/var/log/mca/out.log"
     },
   ], 
 }
