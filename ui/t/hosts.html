@@ -3,6 +3,9 @@
     <p class="help-block">Only administrators can update host information</p>
     <ul class="list-group">
     <li class="list-group-item" ng-repeat="(client_uuid, host) in hosts | orderObjectBy: '_detail.sitename'">
+        <div class="pull-right edit_button" ng-if="host._detail.canedit" style="z-index: 10;">
+            <button type="button" ng-click="edit(host)" class="btn btn-xs pull-right"><i class="fa fa-pencil-square-o"></i></button>
+        </div>
         <div class="row">
             <div class="col-lg-7">
                 <h4>
@@ -56,9 +59,6 @@
                 </div>
             </div>
         </div><!--row-->
-        <div class="pull-right edit_button" ng-if="host._detail.canedit">
-            <button type="button" ng-click="edit(host)" class="btn btn-xs pull-right"><i class="fa fa-pencil-square-o"></i></button>
-        </div>
     </li>
     </ul>
 </div>

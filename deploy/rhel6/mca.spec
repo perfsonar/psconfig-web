@@ -57,6 +57,8 @@ cp -r $RPM_BUILD_ROOT/opt/mca/mca/deploy/conf/*  $RPM_BUILD_ROOT/opt/mca
 
 %post
 
+sh /opt/mca/mca/deploy/init_postgres.sh
+
 npm install node-gyp -g #need by auth/bcrypt (and others?)
 npm install pm2 -g
 
