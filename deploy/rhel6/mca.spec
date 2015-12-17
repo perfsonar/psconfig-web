@@ -11,6 +11,9 @@ URL: https://github.com/soichih/meshconfig-admin
 #Source0: %{name}-%{version}.zip
 
 BuildRequires: git
+BuildRequires: which
+BuildRequires: postgresql-devel
+BuildRequires: tar
 
 Requires: httpd
 Requires: postgresql
@@ -55,17 +58,28 @@ cd $RPM_BUILD_ROOT/opt/mca/profile/ui && bower install -p --allow-root
 ln -sf /opt/mca/mca/deploy/apache-mca.conf $RPM_BUILD_ROOT/etc/httpd/conf.d/apache-mca.conf
 cp -r $RPM_BUILD_ROOT/opt/mca/mca/deploy/conf/*  $RPM_BUILD_ROOT/opt/mca
 
+#install node_modules
+npm install pm2 -g
+npm install node-gyp -g #need by auth/bcrypt (and others?)
+function npm_install {
+    npm --production install 
+    tar -czf node_modules.tgz node_modules 
+    rm -rf node_modules
+}
+cd $RPM_BUILD_ROOT/opt/mca/mca && npm_install
+cd $RPM_BUILD_ROOT/opt/mca/auth && npm_install
+cd $RPM_BUILD_ROOT/opt/mca/shared && npm_install
+cd $RPM_BUILD_ROOT/opt/mca/profile && npm_install
+
 %post
 
+#uncompress node_modules
+cd /opt/mca/mca && tar -xzf node_modules.tgz
+cd /opt/mca/auth && tar -xzf node_modules.tgz
+cd /opt/mca/shared && tar -xzf node_modules.tgz
+cd /opt/mca/profile && tar -xzf node_modules.tgz
+
 sh /opt/mca/mca/deploy/init_postgres.sh
-
-npm install node-gyp -g #need by auth/bcrypt (and others?)
-npm install pm2 -g
-
-cd /opt/mca/mca && npm --production install
-cd /opt/mca/auth && npm --production install
-cd /opt/mca/shared && npm --production install
-cd /opt/mca/profile && npm --production install
 
 cd /opt/mca/auth/api/config && ./genkey.sh
 cd /opt/mca/auth/bin && ./auth.js issue --scopes '{ "common": ["user"] }' --sub 'mca_service' --out /opt/mca/mca/api/config/profile.jwt
