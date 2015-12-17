@@ -28,6 +28,52 @@ function resolveip_cached(ip, cb) {
 }
 */
 
+function upsert_host(rec, cb) {
+    //logger.info(rec.uuid);
+    db.Host.findOne({where: {uuid: rec.uuid}}).then(function(_host) {
+       if(_host) {
+            //console.dir(JSON.stringify(_host));
+            rec.count = _host.count+1; //force records to get updatedAt updated
+            _host.update(rec).then(function() {
+                //TODO - check error?
+                cb();
+            });
+        } else {
+            logger.info("registering new host for the first time:"+rec.uuid);
+            db.Host.create(rec).then(function() {
+                //TODO - check error?
+                cb();
+            });
+        }
+    });
+}
+
+function lookup_address(address, cb) {
+    var ip = null;
+    var hostname = null;
+
+    if(net.isIP(address)) {
+        ip = address;
+        dns.reverse(address, function(err, _hostnames) {
+            if(err) {
+                logger.error("couldn't reverse lookup ip: "+address);
+                logger.error(err);  //continue
+            } else {
+                if(_hostnames.length > 0) hostname = _hostnames[0]; //only using the first entry?
+            }
+            cb(ip, hostname);
+        }); 
+    } else {
+        hostname = address;
+        dns.lookup(address, function(err, _ip, family) {
+            if(err) {
+                logger.error("couldn't lookup "+address);
+            } else ip = _ip;
+            cb(ip, hostname);
+        });
+    }
+}
+
 function cache_host(service, res, cb) {
     //construct host information url
     var uri = res.request.uri;
@@ -172,12 +218,19 @@ function cache_host(service, res, cb) {
             admins: host['host-administrators'],
             count: 0, //number of times updated (exists to allow updateTime update)
         };
-        console.dir(rec.info);
+        //console.dir(rec.info);
 
         var address = host['host-name'][0]; //could be ip or hostname
+        lookup_address(address, function(ip, hostname) {
+            rec.ip = ip;
+            rec.hostname = hostname;
+            //console.dir(rec);
+            upsert_host(rec, cb);
+        });
        
         //resolve ip
         //logger.debug("resolving "+address);
+        /*
         if(net.isIP(address)) {
             rec.ip = address;
             dns.reverse(address, function(err, hostnames) {
@@ -187,7 +240,7 @@ function cache_host(service, res, cb) {
                 } else {
                     if(hostnames.length > 0) rec.hostname = hostnames[0]; //only using the first entry?
                 }
-                upsert_host();
+                upsert_host(rec, cb);
             }); 
         } else {
             rec.hostname = address;
@@ -195,10 +248,12 @@ function cache_host(service, res, cb) {
                 if(err) {
                     logger.error("couldn't lookup "+address);
                 } else rec.ip = address;
-                upsert_host();
+                upsert_host(rec, cb);
             });
         }
+        */
 
+        /*
         function upsert_host() {
             //logger.info(rec.uuid);
             db.Host.findOne({where: {uuid: rec.uuid}}).then(function(_host) {
@@ -218,6 +273,7 @@ function cache_host(service, res, cb) {
                 }
             });
         }
+        */
 
     });
 }
@@ -293,17 +349,35 @@ function cache_ls(ls, lsid, cb) {
 
                 count: 0, //number of times updated (exists to allow updateTime update)
             };
-            db.Service.findOne({where: {uuid: rec.uuid}}).then(function(_service) {
-                if(_service) {
-                    //update updatedAt time
-                    count_update++;
-                    rec.count = _service.count+1; //force records to get updated
-                    _service.update(rec).then(maybe_cache_host);
-                } else {
-                    count_new++;
-                    db.Service.create(rec).then(maybe_cache_host);
-                }
-            });
+
+            if(net.isIP(rec.locator)) {
+                dns.reverse(rec.locator, function(err, _hostnames) {
+                    if(err) {
+                        logger.error("couldn't reverse lookup ip: "+rec.locator);
+                        logger.error(err);  //continue though
+                    } else {
+                        if(_hostnames.length > 0) rec.locator = _hostnames[0]; //only using the first entry?
+                    }
+                    upsertService();
+                }); 
+            } else {
+                upsertService();
+            }
+
+            function upsertService() {
+                //if(~rec.locator.indexOf("192.41.")) console.dir(rec);
+                db.Service.findOne({where: {uuid: rec.uuid}}).then(function(_service) {
+                    if(_service) {
+                        //update updatedAt time
+                        count_update++;
+                        rec.count = _service.count+1; //force records to get updated
+                        _service.update(rec).then(maybe_cache_host);
+                    } else {
+                        count_new++;
+                        db.Service.create(rec).then(maybe_cache_host);
+                    }
+                });
+            }
 
             function maybe_cache_host() {
                 if(~host_uuids.indexOf(uuid)) return next(); //skip if we already cached this host
