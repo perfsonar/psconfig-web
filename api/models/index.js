@@ -1,12 +1,18 @@
 'use strict';
 
+//node
 var fs        = require('fs');
 var path      = require('path');
+
+//contrib
 var Sequelize = require('sequelize');
 var basename  = path.basename(module.filename);
-//var env       = process.env.NODE_ENV || 'development';
-//var config    = require(__dirname + '/../config/config.json')[env];
+var winston = require('winston');
+
+//mine
 var config    = require('../config');
+var logger = new winston.Logger(config.logger.winston);
+
 if(typeof config.db === 'string') {
     var sequelize = new Sequelize(config.db, {
         /*
@@ -14,6 +20,7 @@ if(typeof config.db === 'string') {
             //ignore for now..
         }
         */
+        //logging: logger.debug
         logging: false
     });
 } else {
@@ -33,10 +40,11 @@ fs
     db[model.name] = model;
   });
 
+//I am not sure what this is for, but it's from the sequelize doc
 Object.keys(db).forEach(function(modelName) {
-  if (db[modelName].associate) {
-    db[modelName].associate(db);
-  }
+    if (db[modelName].associate) {
+        db[modelName].associate(db);
+    }
 });
 
 db.sequelize = sequelize;
@@ -55,14 +63,15 @@ db.Test.belongsTo(db.Hostgroup, {foreignKey: 'agroup', as: 'HostGroupA'});
 db.Test.belongsTo(db.Hostgroup, {foreignKey: 'bgroup', as: 'HostGroupB'});
 db.Test.belongsTo(db.Hostgroup, {foreignKey: 'nagroup', as: 'HostGroupNA'});
 
-db.Hostgroup.hasMany(db.Test, {foreignKey: 'agroup'}); //Test.getAgroup, Test.setAgroup
-db.Hostgroup.hasMany(db.Test, {foreignKey: 'bgroup'}); //Test.getBgroup, Test.setBgroup
-db.Hostgroup.hasMany(db.Test, {foreignKey: 'nagroup'}); //Test.getBgroup, Test.setBgroup
+db.Hostgroup.hasMany(db.Test, {foreignKey: 'agroup'});
+db.Hostgroup.hasMany(db.Test, {foreignKey: 'bgroup'});
+db.Hostgroup.hasMany(db.Test, {foreignKey: 'nagroup'});
 
-//db.Test.belongsTo(db.Hostgroup, {as: 'bgroup'});
 db.Service.belongsTo(db.Service, {foreignKey: 'ma', as: 'MA'});
 db.Service.hasMany(db.Service, {foreignKey: 'ma'});
+
 db.Service.belongsTo(db.Host, {foreignKey: 'client_uuid', targetKey: 'uuid'});
+//db.Host.hasMany(db.Service, {foreignKey: 'client_uuid', targetKey: 'uuid'});
 
 module.exports = db;
 

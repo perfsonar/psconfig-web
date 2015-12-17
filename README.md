@@ -26,3 +26,5 @@ Populate some sample testspecs / hosts / config(?) as very first migration?
 when config is removed, test records will be orphaned - should be cascaded?
 
 Add x509 authentication for auth and allow user to sign up / login through it
+
+* Prevent user from removing hostgroups / testspecs currently used by a config

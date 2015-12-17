@@ -16,18 +16,6 @@ var logger = new winston.Logger(config.logger.winston);
 var db = require('../models');
 var common = require('../common');
 
-/* works, but this isn't the bottleneck
-var ip_cache = {};
-function resolveip_cached(ip, cb) {
-    if(ip_cache[ip]) return cb(null, ip_cache[ip]);
-    dns.reverse(ip, function(err, hostnames) {
-        if(err) return cb(err);
-        ip_cache[ip] = hostnames; 
-        cb(null, hostnames);
-    });
-}
-*/
-
 function upsert_host(rec, cb) {
     //logger.info(rec.uuid);
     db.Host.findOne({where: {uuid: rec.uuid}}).then(function(_host) {
@@ -74,9 +62,8 @@ function lookup_address(address, cb) {
     }
 }
 
-function cache_host(service, res, cb) {
+function cache_host(service, uri, cb) {
     //construct host information url
-    var uri = res.request.uri;
     
     //truncate the last 2 path (/lookup/record) which is already part of service-host
     var pathname_tokens = uri.pathname.split("/");
@@ -199,16 +186,6 @@ function cache_host(service, res, cb) {
         var rec = {
             uuid: host['client-uuid'][0],
             sitename: host['location-sitename'][0],
-            /*
-            info: {
-                //note.. host is from the sls/host - not toolkit json
-                hardware_processorcount: host['host-hardware-processorcount']?host['host-hardware-processorcount'][0]:null,
-                hardware_processorspeed: host['host-hardware-processorspeed']?host['host-hardware-processorspeed'][0]:null,
-                hardware_memory: host['host-hardware-memory']?host['host-hardware-memory'][0]:null,
-                toolkitversion: host['pshost-toolkitversion']?host['pshost-toolkitversion'][0]:null,
-                os_version: host['host-os-version']?host['host-os-version'][0]:null,
-            },
-            */
             info: get_hostinfo(host),
             location: get_location(host),
             communities: host['group-communities']||[],
@@ -227,54 +204,6 @@ function cache_host(service, res, cb) {
             //console.dir(rec);
             upsert_host(rec, cb);
         });
-       
-        //resolve ip
-        //logger.debug("resolving "+address);
-        /*
-        if(net.isIP(address)) {
-            rec.ip = address;
-            dns.reverse(address, function(err, hostnames) {
-                if(err) {
-                    logger.error("couldn't reverse lookup ip: "+address);
-                    logger.error(err);  //continue
-                } else {
-                    if(hostnames.length > 0) rec.hostname = hostnames[0]; //only using the first entry?
-                }
-                upsert_host(rec, cb);
-            }); 
-        } else {
-            rec.hostname = address;
-            dns.lookup(address, function(err, address, family) {
-                if(err) {
-                    logger.error("couldn't lookup "+address);
-                } else rec.ip = address;
-                upsert_host(rec, cb);
-            });
-        }
-        */
-
-        /*
-        function upsert_host() {
-            //logger.info(rec.uuid);
-            db.Host.findOne({where: {uuid: rec.uuid}}).then(function(_host) {
-               if(_host) {
-                    //console.dir(JSON.stringify(_host));
-                    rec.count = _host.count+1; //force records to get updatedAt updated
-                    _host.update(rec).then(function() {
-                        //TODO - check error?
-                        cb();
-                    });
-                } else {
-                    logger.info("registering new host for the first time:"+rec.uuid);
-                    db.Host.create(rec).then(function() {
-                        //TODO - check error?
-                        cb();
-                    });
-                }
-            });
-        }
-        */
-
     });
 }
 
@@ -290,7 +219,6 @@ function get_location(service) {
 }
 
 function get_hostinfo(host) {
-
     var info = {};
     for(var key in host) {
         var v = host[key];
@@ -311,7 +239,6 @@ function get_hostinfo(host) {
     return info;
 }
 
-//TODO no point of existing.. just merge with docache_ls
 function cache_ls(ls, lsid, cb) {
     logger.debug("caching ls:"+lsid+" from "+ls.url);
     request({url: ls.url, timeout: 1000*10, json: true}, function(err, res, services) {
@@ -330,7 +257,7 @@ function cache_ls(ls, lsid, cb) {
                 return next();//continue to next service
             }
             var uuid = service['client-uuid'][0]; 
-            logger.debug("caching service:"+service['service-locator'][0]);
+            logger.debug("caching service:"+service['service-locator'][0] + " on "+uuid);
 
             var rec = {
                 client_uuid: uuid,
@@ -365,29 +292,35 @@ function cache_ls(ls, lsid, cb) {
             }
 
             function upsertService() {
-                //if(~rec.locator.indexOf("192.41.")) console.dir(rec);
-                db.Service.findOne({where: {uuid: rec.uuid}}).then(function(_service) {
-                    if(_service) {
-                        //update updatedAt time
-                        count_update++;
-                        rec.count = _service.count+1; //force records to get updated
-                        _service.update(rec).then(maybe_cache_host);
-                    } else {
-                        count_new++;
-                        db.Service.create(rec).then(maybe_cache_host);
+                //first make sure we have stored host (oitherwise it will violate foreign key constraint "Services_client_uuid_fkey")
+                maybe_cache_host(function(err) {
+                    if(err) {
+                        logger.error("couldn't cache host info for client_uuid:"+uuid+" - can't store service without host");
+                        logger.error(err.toString());
+                        return next(); //continue
                     }
-                });
+                    db.Service.findOne({where: {uuid: rec.uuid}}).then(function(_service) {
+                        if(_service) {
+                            //update updatedAt time
+                            count_update++;
+                            rec.count = _service.count+1; //force records to get updated
+                            _service.update(rec).then(function() { next() });
+                        } else {
+                            count_new++;
+                            db.Service.create(rec).then(function() { next() });
+                        }
+                    });
+                });            
             }
-
-            function maybe_cache_host() {
-                if(~host_uuids.indexOf(uuid)) return next(); //skip if we already cached this host
-                cache_host(service, res, function(err) {
-                    if(err) logger.error(err); //continue
+            function maybe_cache_host(cb) {
+                if(~host_uuids.indexOf(uuid)) return cb(); //already cached
+                var uri = res.request.uri;
+                cache_host(service, uri, function(err) {
+                    if(err) return cb(err);
                     host_uuids.push(uuid);
-                    next();
+                    cb();
                 });
             }
-
         }, function(err) {
             logger.info("loaded "+services.length+" services for "+ls.label+" from "+ls.url + " updated:"+count_update+" new:"+count_new);
             cb();
@@ -403,7 +336,7 @@ function cache_global_ls(service, id, cb) {
         try {
             var activehosts = JSON.parse(body);
             //load from all activehosts
-            async.each(activehosts.hosts, function(host, next) {
+            async.eachSeries(activehosts.hosts, function(host, next) {
                 if(host.status != "alive") {
                     logger.warn("skipping "+host.locator+" with status:"+host.status);
                     return next();
@@ -422,7 +355,7 @@ function cache_global_ls(service, id, cb) {
 function update_dynamic_hostgroup(cb) {
     logger.debug("update_dynamic_hostgruop TODO");
     db.Hostgroup.findAll({where: {type: 'dynamic'}}).then(function(groups) {
-        async.forEach(groups, function(group, next) {
+        async.eachSeries(groups, function(group, next) {
             common.filter.resolveHostGroup(group.host_filter, group.service_type, function(err, hosts) {
                 if(err) return next(err);
                 group.hosts = hosts.recs;
@@ -447,6 +380,7 @@ exports.start = function(cb) {
         function run_cache_ls(_next) {
             cache_ls(service, id, function(err) {
                 if(err) logger.error(err);
+                logger.debug("done processing private ls");
                 update_dynamic_hostgroup(_next);
             }); 
         }
@@ -454,6 +388,7 @@ exports.start = function(cb) {
         function run_cache_global_ls(_next) {
             cache_global_ls(service, id, function(err) {
                 if(err) logger.error(err);
+                logger.debug("done processing global ls");
                 update_dynamic_hostgroup(_next);
             }); 
         }

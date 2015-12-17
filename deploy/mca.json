@@ -2,43 +2,53 @@
   //see http://pm2.keymetrics.io/docs/usage/application-declaration/
   apps : [
     {
-        name: "mcadmin",
-        script: "/opt/mca/mca/api/mcadmin.js",
+        name: "profile",
+        cwd: "/opt/mca/profile/api",
+        script: "profile.js",
         error_file: "/var/log/mca/error.log",
-        out_file: "/var/log/mca/out.log"
-    },
-    {
-        name: "mccache",
-        script: "/opt/mca/mca/api/mccache.js",
-        error_file: "/var/log/mca/error.log",
-        out_file: "/var/log/mca/out.log"
-    },
-    {
-        name: "mcpub",
-        script: "/opt/mca/mca/api/mcpub.js",
-        instances: 4,
-        exec_mode: "cluster_mode",
-        error_file: "/var/log/mca/error.log",
-        out_file: "/var/log/mca/out.log"
+        out_file: "/var/log/mca/out.log",
+        watch: true
     },
     {
         name: "auth",
-        script: "/opt/mca/auth/api/auth.js",
+        cwd: "/opt/mca/auth/api",
+        script: "auth.js",
         error_file: "/var/log/mca/error.log",
-        out_file: "/var/log/mca/out.log"
+        out_file: "/var/log/mca/out.log",
+        watch: true
     },
+    {
+        name: "mcadmin",
+        cwd: "/opt/mca/mca/api",
+        script: "mcadmin.js",
+        error_file: "/var/log/mca/error.log",
+        out_file: "/var/log/mca/out.log",
+        watch: false
+    },
+    {
+        name: "mccache",
+        cwd: "/opt/mca/mca/api",
+        script: "mccache.js",
+        error_file: "/var/log/mca/error.log",
+        out_file: "/var/log/mca/out.log",
+        watch: false
+    },
+    {
+        name: "mcpub",
+        cwd: "/opt/mca/mca/api",
+        script: "mcpub.js",
+        instances: 4,
+        exec_mode: "cluster_mode",
+        error_file: "/var/log/mca/error.log",
+        out_file: "/var/log/mca/out.log",
+        watch: false
+    }
     /*
     {
       name      : "shared",
       script    : "shared/api/shared.js"
     },
     */
-    {
-        name: "profile",
-        script: "/opt/mca/profile/api/profile.js",
-        error_file: "/var/log/mca/error.log",
-        out_file: "/var/log/mca/out.log"
-    }
   ] 
 }
 

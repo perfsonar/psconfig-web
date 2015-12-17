@@ -22,6 +22,7 @@ exports.resolveHostGroup = function(js, type, cb) {
         var sandbox = new Sandbox();
         var matches = [];
         var code = "JSON.stringify("+JSON.stringify(recs)+".filter(function(service) {var host = service.Host||{};\n"+js+"\n}));";
+        //var code = "JSON.stringify("+JSON.stringify(recs)+".filter(function(service) {"+js+"\n}));";
         sandbox.run(code, function(res) {
             var _recs = res.result.slice(1, -1);
             try {

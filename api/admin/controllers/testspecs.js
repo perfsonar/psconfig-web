@@ -69,7 +69,11 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             });
             testspec.admins = admins;
             testspec.save().then(function() {
-                res.json({status: "ok"});
+                var canedit = false;
+                if(~req.user.scopes.common.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
+                    var canedit = true;
+                }
+                res.json({status: "ok", canedit: canedit});
             }).catch(function(err) {
                 next(err);
             });
@@ -90,8 +94,11 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     //console.dir(req.body);
 
     db.Testspec.create(req.body).then(function(testspec) {
-        //console.log(JSON.stringify(testspec, null, 4));
-        res.json({status: "ok", testspec: testspec});
+        var canedit = false;
+        if(~req.user.scopes.common.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
+            var canedit = true;
+        }
+        res.json({status: "ok", canedit: canedit, id: testspec.id});
     });
 });
 

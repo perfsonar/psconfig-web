@@ -1,6 +1,6 @@
 
-app.controller('HostgroupsController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'serverconf', 'users', '$modal', 'scaMessage',
-function($scope, appconf, toaster, $http, jwtHelper, serverconf, users, $modal, scaMessage) {
+app.controller('HostgroupsController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'serverconf', 'users', '$modal', 'scaMessage', 'hostgroups',
+function($scope, appconf, toaster, $http, jwtHelper, serverconf, users, $modal, scaMessage, hostgroups) {
     scaMessage.show(toaster);
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
     $scope.appconf = appconf;
@@ -10,10 +10,13 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, users, $modal, 
 
     users.then(function(_users) {
         $scope.users = _users;
-        return $http.get(appconf.api+'/hostgroups' /*,{cache: true}*/).then(function(res) {
+        /*
+        return $http.get(appconf.api+'/hostgroups').then(function(res) {
             $scope.hostgroups = res.data;
             return $scope.hostgroups;  //just to be more promise-ish
         });
+        */
+        hostgroups.then(function(_hostgroups) { $scope.hostgroups = _hostgroups});
     });
 
     $scope.edit = function(_hostgroup) {
@@ -38,6 +41,7 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, users, $modal, 
             }
         });
         modalInstance.result.then(function() {
+            //apply change
             for(var k in hostgroup) {
                 _hostgroup[k] = hostgroup[k];
             }
@@ -77,7 +81,9 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, users, $modal, 
             }
         });
         modalInstance.result.then(function() {
-            $scope.hostgroups.push(hostgroup);
+            console.log("adding hostgroupu to list");
+            //console.dir(hostgroup);
+            $scope.hostgroups.push(hostgroup); 
         }, function (code) {
             //console.log("dismiss code"+code);
         });
@@ -122,7 +128,7 @@ function($scope, appconf, toaster, $http, $modalInstance, hostgroup, title, serv
         //dynamic uses hosts as cache of the latest query result. let's use the validation result
         if($scope.hostgroup.type == 'dynamic') {
             $scope.hostgroup.hosts = $scope.hostgroup._hosts||[];
-            console.dir($scope.hostgroup.hosts);
+            //console.dir($scope.hostgroup.hosts);
         }
 
         if(!$scope.hostgroup.id) {
@@ -162,28 +168,6 @@ function($scope, appconf, toaster, $http, $modalInstance, hostgroup, title, serv
             toaster.error(res.data.message);
         });       
     }
-
-    /*
-    //test dynamic filter script
-    $scope.test = function() {
-        $http.get(appconf.api+'/cache/services-js/', {params: 
-            {
-                type: $scope.hostgroup.service_type,
-                js: $scope.hostgroup.host_filter,
-            }
-        })
-        .then(function(res) {
-            $scope.host_filter_alert = null;
-            $scope.host_filter_result = res.data.recs;
-            console.dir(res);
-        }, function(res) {
-            //toaster.error(res.data.message);
-            $scope.host_filter_alert = res.data.message;
-            $scope.host_filter_result = null;
-            console.dir(res);
-        });    
-    }
-    */
     
     //pick active tab
     $scope.tabs = {
@@ -191,13 +175,6 @@ function($scope, appconf, toaster, $http, $modalInstance, hostgroup, title, serv
         dynamic: {active: false},
     };
     $scope.tabs[hostgroup.type].active = true;
-
-    /*
-    //if dynamic is selected, run test
-    if(hostgroup.type == "dynamic") {
-        $scope.test(); 
-    }
-    */
 }]);
 
 //validator for host_filter ace
@@ -226,7 +203,8 @@ app.directive('hostfilter', function($q, $http, appconf) {
                 }, function(res) {
                     //toaster.error(res.data.message);
                     p.hostgroup._hosts = null;
-                    p.host_filter_alert = res.data.message;
+                    if(res.data.message) p.host_filter_alert = res.data.message;
+                    //console.dir(res);
                     def.reject();
                 });   
                 return def.promise;
