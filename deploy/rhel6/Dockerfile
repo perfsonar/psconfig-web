@@ -15,4 +15,4 @@ RUN yum install -y vim man
 COPY mca.spec /root/mca.spec
 RUN rpmbuild -ba /root/mca.spec
 
-RUN yum install -y /root/rpmbuild/RPMS/x86_64/mca-1.0-1.el6.x86_64.rpm
+#RUN yum install -y /root/rpmbuild/RPMS/x86_64/mca-1.0-1.el6.x86_64.rpm

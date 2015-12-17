@@ -76,10 +76,11 @@ cd $RPM_BUILD_ROOT/opt/mca/profile && npm_install
 %post
 
 #uncompress node_modules
-cd /opt/mca/mca && tar -xzf node_modules.tgz --owner=mca
-cd /opt/mca/auth && tar -xzf node_modules.tgz --owner=mca
-cd /opt/mca/shared && tar -xzf node_modules.tgz --owner=mca
-cd /opt/mca/profile && tar -xzf node_modules.tgz --owner=mca
+cd /opt/mca/mca && tar -xzf node_modules.tgz
+cd /opt/mca/auth && tar -xzf node_modules.tgz
+cd /opt/mca/shared && tar -xzf node_modules.tgz
+cd /opt/mca/profile && tar -xzf node_modules.tgz
+chown -R mca:mca /opt/mca
 
 #setup access control, etc
 #sh /opt/mca/mca/deploy/init_postgres.sh
@@ -88,28 +89,22 @@ cd /opt/mca/profile && tar -xzf node_modules.tgz --owner=mca
 #install postgresql-db
 #mca doesn't work with postgresql 8.4 that comes with RHEL6 (too old for sequelize-ORM driver)
 #until I find a solution, I will need to install pg9 RPM from postgresql.org
-yum localinstall http://yum.postgresql.org/9.4/redhat/rhel-6-x86_64/pgdg-centos94-9.4-1.noarch.rpm
-yum install postgresql94-server
+yum localinstall -y http://yum.postgresql.org/9.4/redhat/rhel-6-x86_64/pgdg-centos94-9.4-1.noarch.rpm
+yum install -y postgresql94-server
 
 #service postgresql-9.4 initdb
 su - postgres -c "/usr/pgsql-9.4/bin/initdb --auth-host=md5"
 
-#start postgresql
 chkconfig postgresql-9.4 on
 service postgresql-9.4 start #will fail if v8 is already running on port 5432
 
 #create mca user/db
 echo $RANDOM.$RANDOM.$RANDOM > /root/mca.pgpasswd
-#su - postgres -c "initdb --auth-host=md5 --pwfile /root/pgsql.passwd -D /var/lib/pgsql/data"
 su - postgres -c "psql -c \"CREATE ROLE mca PASSWORD '$(cat /root/mca.pgpasswd)' CREATEDB INHERIT LOGIN;\""
 su - postgres -c "psql -c \"CREATE DATABASE mcadmin OWNER mca\""
 echo "//autogeneated by mca rpm" > /opt/mca/mca/api/config/db.js
 echo "module.exports = 'postgres://mca:$(cat /root/mca.pgpasswd)@localhost/mcadmin'" >> /opt/mca/mca/api/config/db.js
 rm /root/mca.pgpasswd
-
-#service postgresql start
-#su - postgres -c "createuser -S -D -R -e mca"
-#su - postgres -c "createdb mcadmin"
 
 #TODO - limit access for generated keys to mca user
 cd /opt/mca/auth/api/config && ./genkey.sh
