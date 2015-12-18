@@ -31,9 +31,9 @@ var profiles = {};
 exports.cache = function(cb) {
     logger.debug("caching user public profiles");
     request({
-        url: config.pub.profile_api+"/users",
+        url: config.common.profile_api+"/users",
         json: true,
-        headers: { 'Authorization': 'Bearer '+config.pub.profile_jwt }
+        headers: { 'Authorization': 'Bearer '+config.common.profile_jwt }
     }, function (err, res, body) {
         if(err) return cb(err);
         if (res.statusCode != 200) {

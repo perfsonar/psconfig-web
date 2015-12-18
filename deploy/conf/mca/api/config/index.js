@@ -22,10 +22,11 @@ exports.pub = {
     //web server port
     port: 12053,
     //host: "0.0.0.0",
-    
+};
+
+exports.common = {
     //profile service api
     profile_api: 'http://localhost:12402',
-    
     //jwt needed to access profile service - use auth/bin/auth.js to create the token
     profile_jwt: fs.readFileSync(__dirname+'/profile.jwt'),
 };
