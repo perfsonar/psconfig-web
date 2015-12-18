@@ -8,6 +8,11 @@
             url: "/meshconfig/admin"
         },
         {
+            id: "doc",
+            label: "Documentation",
+            url: "http://soichi7.ppa.iu.edu/pdoc/mca.html"
+        },
+        {
             id: "user",
             //icon: "<img src='http://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=19'>",
             _label: {default: "Me", profile: "fullname"},

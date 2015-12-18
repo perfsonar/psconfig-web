@@ -3,7 +3,7 @@
 
 Name: mca
 Version: 1.0
-Release: 2
+Release: 3
 Summary: Meshconfig administration web UI and publisher
 
 License: MIT
@@ -20,7 +20,6 @@ Requires: mod_ssl
 
 #Requires: postgresql
 #Requires: postgresql-server
-
 Requires: postgresql94
 Requires: postgresql94-server
 
