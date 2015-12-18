@@ -23,11 +23,16 @@ cd /opt/mca/auth/bin && ./auth.js issue --scopes '{ "common": ["user"] }' --sub 
 mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.disabled
 
 #now I should be able to start everything
-su - mca -c "pm2 start /opt/mca/mca/deploy/mca.json"
-su - mca -c "pm2 save"
+#su - mca -c "pm2 start /opt/mca/mca/deploy/mca.json"
+#su - mca -c "pm2 save"
 
 #persist pm2 session over reboot
 pm2 startup redhat -u mca
 
+#install igtf certs
+mkdir -p /etc/grid-security/certificates
+cd /etc/grid-security/certificates && wget https://dist.igtf.net/distribution/current/accredited/igtf-preinstalled-bundle-classic-1.70.tar.gz && tar -xzf *.tar.gz
+
 service httpd start
 chkconfig httpd on
+

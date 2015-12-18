@@ -65,7 +65,7 @@ cd $RPM_BUILD_ROOT/opt/mca/profile/ui && bower install -p --allow-root
 
 ln -sf /opt/mca/mca/deploy/apache-mca.conf $RPM_BUILD_ROOT/etc/httpd/conf.d/apache-mca.conf
 cp -r $RPM_BUILD_ROOT/opt/mca/mca/deploy/conf/*  $RPM_BUILD_ROOT/opt/mca
-ln -sf /opt/mca/mca/deploy/mca.init $RPM_BUILD_ROOT/etc/init.d/mca
+ln -sf /opt/mca/mca/deploy/rhel6/mca.init $RPM_BUILD_ROOT/etc/init.d/mca
 
 #install node_modules
 npm install pm2 -g

@@ -9,28 +9,22 @@
 # Description:       Enable service provided by daemon.
 ### END INIT INFO
 
-dir=""
-cmd=""
 user=mca
 pm2json=/opt/mca/mca/deploy/mca.json
-
-name=`basename $0`
-stdout_log="/var/log/$name.log"
-stderr_log="/var/log/$name.err"
+#name=`basename $0`
 
 case "$1" in
     start)
-    sudo -u "$user" pm2 start $pm2json
+    su - "$user" -c "pm2 start $pm2json"
     ;;
     stop)
-    sudo -u "$user" pm2 stop $pm2json
-    fi
+    su - "$user" -c "pm2 stop $pm2json"
     ;;
     restart)
-    sudo -u "$user" pm2 restart $pm2json
+    su - "$user" -c "pm2 restart $pm2json"
     ;;
     status)
-    sudo -u "$user" pm2 status
+    su - "$user" -c "pm2 status"
     ;;
     *)
     echo "Usage: $0 {start|stop|restart|status}"
@@ -39,3 +33,4 @@ case "$1" in
 esac
 
 exit 0
+
