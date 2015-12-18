@@ -19,6 +19,12 @@ cd /opt/mca/auth/api/config && ./genkey.sh
 cd /opt/mca/auth/bin && ./auth.js issue --scopes '{ "common": ["user"] }' --sub 'mca_service' --out /opt/mca/mca/api/config/profile.jwt
 #TODO - limit access for generated keys to mca user
 
-#now I should be able to start everything
-su - mca -c "pm2 start"
+#need to disable mod_ssl default conf
+mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.disabled
 
+#now I should be able to start everything
+su - mca -c "pm2 start /opt/mca/mca/deploy/mca.json"
+su - mca -c "pm2 save"
+
+#persist pm2 session over reboot
+pm2 startup redhat -u mca

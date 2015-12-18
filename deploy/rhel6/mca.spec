@@ -16,6 +16,7 @@ BuildRequires: postgresql-devel
 BuildRequires: tar
 
 Requires: httpd
+Requires: mod_ssl
 
 #Requires: postgresql
 #Requires: postgresql-server
@@ -93,14 +94,14 @@ chown -R mca:mca /opt/mca
 #yum install -y postgresql94-server
 
 #deploy to pm2 and immediately stop (let user start it)
-pm2 startup redhat -u mca
-su - mca -c "pm2 start /opt/mca/mca/deploy/mca.json"
-su - mca -c "pm2 save"
-su - mca -c "pm2 stop /opt/mca/mca/deploy/mca.json"
+#pm2 startup redhat -u mca
+#su - mca -c "pm2 start /opt/mca/mca/deploy/mca.json"
+#su - mca -c "pm2 save"
+#su - mca -c "pm2 stop /opt/mca/mca/deploy/mca.json"
 
 %preun
-su - mca -c "pm2 delete /opt/mca/mca/deploy/mca.json"
-su - mca -c "pm2 save"
+#su - mca -c "pm2 delete /opt/mca/mca/deploy/mca.json"
+#su - mca -c "pm2 save"
 
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
