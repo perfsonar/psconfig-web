@@ -12,7 +12,7 @@ RUN yum install -y npm
 RUN npm install -g --allow-root bower
 
 #for debugging
-RUN yum install -y vim man
+RUN yum install -y vim man wget
 
 COPY mca.spec /root/mca.spec
 RUN rpmbuild -bb /root/mca.spec

@@ -24,6 +24,14 @@ exports.auth = {
 exports.local = {
 };
 
+exports.x509 = {
+    //http header to look for x509 DN 
+    //for nginx set proxy_set_header DN $ssl_client_s_dn
+    //for apache, SSLOptions +StdEnvVars will set it to SSL_CLIENT_S_DN
+    dn_header: 'SSL_CLIENT_S_DN',
+    allow_origin: '*', 
+};
+
 exports.db = {
     "dialect": "sqlite", 
     "storage": "/var/lib/mca/auth.sqlite"
