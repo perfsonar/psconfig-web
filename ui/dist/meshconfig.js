@@ -160,6 +160,9 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
     //console.dir($routeProvider);
 }]).run(['$rootScope', '$location', 'jwtHelper', 'appconf', 'scaMessage',
 function($rootScope, $location, jwtHelper, appconf, scaMessage) {
+
+    //console.log("application starting");
+
     $rootScope.$on("$routeChangeStart", function(event, next, current) {
         //console.log("route changed from "+current+" to :"+next);
         //redirect to /login if user hasn't authenticated yet
@@ -173,6 +176,7 @@ function($rootScope, $location, jwtHelper, appconf, scaMessage) {
             }
         }
     });
+
 }]);
 
 //configure httpProvider to send jwt unless skipAuthorization is set in config (not tested yet..)
@@ -205,7 +209,10 @@ function(appconf, $http, jwtHelper, $sce, scaMessage, scaMenu, toaster) {
     };
     if(appconf.icon_url) menu.header.icon = $sce.trustAsHtml("<img src=\""+appconf.icon_url+"\">");
     if(appconf.home_url) menu.header.url = appconf.home_url
+    if(jwt) menu.user = jwtHelper.decodeToken(jwt);
 
+    /*
+    //TODO - maybe I should set up interval inside application.run()
     var jwt = localStorage.getItem(appconf.jwt_id);
     if(jwt) {
         var expdate = jwtHelper.getTokenExpirationDate(jwt);
@@ -214,7 +221,6 @@ function(appconf, $http, jwtHelper, $sce, scaMessage, scaMenu, toaster) {
             toaster.error("Your login session has expired. Please re-sign in");
             localStorage.removeItem(appconf.jwt_id);
         } else {
-            menu.user = jwtHelper.decodeToken(jwt);
             if(ttl < 3600*1000) {
                 //jwt expring in less than an hour! refresh!
                 console.log("jwt expiring in an hour.. refreshing first");
@@ -231,25 +237,25 @@ function(appconf, $http, jwtHelper, $sce, scaMessage, scaMenu, toaster) {
             }
         }
     }
+    */
 
     if(menu.user) {
         $http.get(appconf.profile_api+'/public/'+menu.user.sub).then(function(res) {
             menu._profile = res.data;
-            if(res.data) {
+            /* 
+            //TODO this is a bad place to do this, because requested page will still be loaded
+            //and flashes the scaMessage added below
+            if(menu.user) {
                 //logged in, but does user has email?
-                if(res.data.email) {
-                    return menu; //TODO - return return to what?
-                } else {
+                if(!res.data.email) {
                     //force user to update profile
                     //TODO - do I really need to?
                     scaMessage.info("Please update your profile before using application.");
                     sessionStorage.setItem('profile_settings_redirect', window.location.toString());
                     document.location = appconf.profile_url;
                 }
-            } else {
-                //not logged in.
-                return menu; //TODO return to what?
             }
+            */
         });
     }
     return menu;
@@ -680,6 +686,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, ser
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
     $scope.appconf = appconf;
 
+    $scope.loading = true;
     var mas = {};
     services.then(function(_services) { 
         $scope.services = _services;
@@ -710,6 +717,8 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, ser
                     services: services
                 }
             });
+            $scope.hosts_num = Object.keys($scope.hosts).length;
+            $scope.loading = false;
         });
     });
 

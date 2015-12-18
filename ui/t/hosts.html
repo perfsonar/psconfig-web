@@ -1,6 +1,8 @@
 <sca-menutab menu="appconf.menu" active="'hosts'" user="user"></sca-menutab>
 <div class="container-fluid">
-    <p class="help-block">Only administrators can update host information</p>
+    <p ng-if="loading" class="help-block"><i class="fa fa-circle-o-notch fa-spin"></i> Loading..</p>
+    <!--<p ng-if="hosts_num > 0" class="help-block">Only administrators can update host information</p>-->
+    <p ng-if="hosts_num == 0" class="help-block">No hosts / services cached yet. Is MeshConfig Admin cache service runing?</p>
     <ul class="list-group">
     <li class="list-group-item" 
         ng-repeat="(client_uuid, host) in hosts | orderObjectBy: '_detail.sitename'">

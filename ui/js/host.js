@@ -5,6 +5,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, ser
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
     $scope.appconf = appconf;
 
+    $scope.loading = true;
     var mas = {};
     services.then(function(_services) { 
         $scope.services = _services;
@@ -35,6 +36,8 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, ser
                     services: services
                 }
             });
+            $scope.hosts_num = Object.keys($scope.hosts).length;
+            $scope.loading = false;
         });
     });
 

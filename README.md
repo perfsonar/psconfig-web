@@ -28,3 +28,4 @@ when config is removed, test records will be orphaned - should be cascaded?
 Add x509 authentication for auth and allow user to sign up / login through it
 
 * Prevent user from removing hostgroups / testspecs currently used by a config
+* Prevent user from orphaning config / testspecs / hostsgroups by removing all admins
