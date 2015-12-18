@@ -26,8 +26,12 @@ case "$1" in
     status)
     su - "$user" -c "pm2 status"
     ;;
+    setup)
+    /opt/mca/mca/deploy/rhel6/setup.sh
+    su - "$user" -c "pm2 status"
+    ;;
     *)
-    echo "Usage: $0 {start|stop|restart|status}"
+    echo "Usage: $0 {start|stop|restart|status|setup}"
     exit 1
     ;;
 esac
