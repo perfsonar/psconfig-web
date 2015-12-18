@@ -333,7 +333,7 @@ app.factory('services', ['appconf', '$http', 'jwtHelper', function(appconf, $htt
                 if(Date.parse(service.updatedAt) < old) service.old = true;
             });
         }
-        console.dir(res.data);
+        //console.dir(res.data);
         return res.data;
     });
 }]);

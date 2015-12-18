@@ -36,3 +36,5 @@ cd /etc/grid-security/certificates && wget https://dist.igtf.net/distribution/cu
 service httpd start
 chkconfig httpd on
 
+service mca start
+
