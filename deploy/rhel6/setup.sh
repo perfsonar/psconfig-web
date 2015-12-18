@@ -28,3 +28,6 @@ su - mca -c "pm2 save"
 
 #persist pm2 session over reboot
 pm2 startup redhat -u mca
+
+service httpd start
+chkconfig httpd on

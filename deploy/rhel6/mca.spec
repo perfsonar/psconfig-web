@@ -3,7 +3,7 @@
 
 Name: mca
 Version: 1.0
-Release: 1%{?dist}
+Release: 2
 Summary: Meshconfig administration web UI and publisher
 
 License: MIT
@@ -68,23 +68,23 @@ cp -r $RPM_BUILD_ROOT/opt/mca/mca/deploy/conf/*  $RPM_BUILD_ROOT/opt/mca
 #install node_modules
 npm install pm2 -g
 npm install node-gyp -g #need by auth/bcrypt (and others?)
-function npm_install {
+function npm_install_and_tar {
     npm --production install 
     tar -czf node_modules.tgz node_modules 
     rm -rf node_modules
 }
-cd $RPM_BUILD_ROOT/opt/mca/mca && npm_install
-cd $RPM_BUILD_ROOT/opt/mca/auth && npm_install
-cd $RPM_BUILD_ROOT/opt/mca/shared && npm_install
-cd $RPM_BUILD_ROOT/opt/mca/profile && npm_install
+cd $RPM_BUILD_ROOT/opt/mca/mca && npm_install_and_tar
+cd $RPM_BUILD_ROOT/opt/mca/auth && npm_install_and_tar
+cd $RPM_BUILD_ROOT/opt/mca/shared && npm_install_and_tar
+cd $RPM_BUILD_ROOT/opt/mca/profile && npm_install_and_tar
 
 %post
 
 #uncompress node_modules
-cd /opt/mca/mca && tar -xzf node_modules.tgz
-cd /opt/mca/auth && tar -xzf node_modules.tgz
-cd /opt/mca/shared && tar -xzf node_modules.tgz
-cd /opt/mca/profile && tar -xzf node_modules.tgz
+cd /opt/mca/mca && tar -xzf node_modules.tgz && rm node_modules.tgz
+cd /opt/mca/auth && tar -xzf node_modules.tgz && rm node_modules.tgz
+cd /opt/mca/shared && tar -xzf node_modules.tgz && node_modules.tgz
+cd /opt/mca/profile && tar -xzf node_modules.tgz && node_modules.tgz
 chown -R mca:mca /opt/mca
 
 #install postgresql-db
