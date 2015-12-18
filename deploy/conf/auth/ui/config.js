@@ -13,7 +13,7 @@ angular.module('app.config', [])
     home_url: '../admin',
 
     admin_email: 'hayashis@iu.edu',
-    logo_400_url: 'images/perfsonar400x100.png',
+    logo_400_url: 'images/perfsonar400x86.png',
 
     //URL for auth service API
     api: '../api/auth',
