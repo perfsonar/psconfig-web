@@ -37,7 +37,6 @@ Requires epel-release
 
 %prep
 /usr/sbin/groupadd mca
-#/usr/sbin/useradd -g mca -r -s /sbin/nologin -c "MeshConfig Admin User" -d /tmp mca 
 /usr/sbin/useradd -g mca mca
 
 %install
@@ -61,8 +60,6 @@ cd $RPM_BUILD_ROOT/opt/mca/auth/ui && bower install -p --allow-root
 cd $RPM_BUILD_ROOT/opt/mca/shared/ui && bower install -p --allow-root 
 cd $RPM_BUILD_ROOT/opt/mca/profile/ui && bower install -p --allow-root
 
-#cp $RPM_BUILD_ROOT/opt/mca/meshconfig/rhel6/mca.init $RPM_BUILD_ROOT/etc/init.d/mca
-
 ln -sf /opt/mca/mca/deploy/apache-mca.conf $RPM_BUILD_ROOT/etc/httpd/conf.d/apache-mca.conf
 cp -r $RPM_BUILD_ROOT/opt/mca/mca/deploy/conf/*  $RPM_BUILD_ROOT/opt/mca
 ln -sf /opt/mca/mca/deploy/rhel6/mca.init $RPM_BUILD_ROOT/etc/init.d/mca
@@ -81,7 +78,6 @@ cd $RPM_BUILD_ROOT/opt/mca/shared && npm_install_and_tar
 cd $RPM_BUILD_ROOT/opt/mca/profile && npm_install_and_tar
 
 %post
-
 #uncompress node_modules
 cd /opt/mca/mca && tar -xzf node_modules.tgz && rm node_modules.tgz
 cd /opt/mca/auth && tar -xzf node_modules.tgz && rm node_modules.tgz
@@ -89,21 +85,9 @@ cd /opt/mca/shared && tar -xzf node_modules.tgz && rm node_modules.tgz
 cd /opt/mca/profile && tar -xzf node_modules.tgz && rm node_modules.tgz
 chown -R mca:mca /opt/mca
 
-#install postgresql-db
-#mca doesn't work with postgresql 8.4 that comes with RHEL6 (too old for sequelize-ORM driver)
-#until I find a solution, I will need to install pg9 RPM from postgresql.org
-#yum localinstall -y http://yum.postgresql.org/9.4/redhat/rhel-6-x86_64/pgdg-centos94-9.4-1.noarch.rpm
-#yum install -y postgresql94-server
-
-#deploy to pm2 and immediately stop (let user start it)
-#pm2 startup redhat -u mca
-#su - mca -c "pm2 start /opt/mca/mca/deploy/mca.json"
-#su - mca -c "pm2 save"
-#su - mca -c "pm2 stop /opt/mca/mca/deploy/mca.json"
-
 %preun
-#su - mca -c "pm2 delete /opt/mca/mca/deploy/mca.json"
-#su - mca -c "pm2 save"
+su - mca -c "pm2 delete /opt/mca/mca/deploy/mca.json"
+su - mca -c "pm2 save"
 
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
@@ -119,7 +103,7 @@ chown -R mca:mca /opt/mca
 /etc/httpd/conf.d/apache-mca.conf
 /etc/init.d/mca
 
-%attr(-,root,root) /etc/httpd/conf.d/apache-mca.conf
+#%attr(-,root,root) /etc/httpd/conf.d/apache-mca.conf
 
 %changelog
 * Thu Dec 10 2015 Soichi Hayashi <hayashis@iu.edu> 0.8.18.1-0.1

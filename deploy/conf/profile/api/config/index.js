@@ -19,7 +19,7 @@ exports.db = {
 exports.express = {
     //web server port
     port: 12402,
-    host: "0.0.0.0",
+    //host: "0.0.0.0",
 
     jwt: {
         pub: fs.readFileSync('/opt/mca/auth/api/config/auth.pub'),

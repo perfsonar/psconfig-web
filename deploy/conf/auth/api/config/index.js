@@ -44,7 +44,7 @@ exports.iucas = {
 exports.express = {
     //web server port
     port: 12000,
-    host: "0.0.0.0",
+    //host: "0.0.0.0",
 };
 
 exports.logger = {

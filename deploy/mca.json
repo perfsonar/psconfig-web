@@ -5,32 +5,32 @@
         name: "profile",
         cwd: "/opt/mca/profile/api",
         script: "profile.js",
-        error_file: "/var/log/mca/error.log",
-        out_file: "/var/log/mca/out.log",
+        error_file: "/var/log/mca/profile.err",
+        out_file: "/var/log/mca/profile.log",
         watch: true
     },
     {
         name: "auth",
         cwd: "/opt/mca/auth/api",
         script: "auth.js",
-        error_file: "/var/log/mca/error.log",
-        out_file: "/var/log/mca/out.log",
+        error_file: "/var/log/mca/auth.err",
+        out_file: "/var/log/mca/auth.log",
         watch: true
     },
     {
         name: "mcadmin",
         cwd: "/opt/mca/mca/api",
         script: "mcadmin.js",
-        error_file: "/var/log/mca/error.log",
-        out_file: "/var/log/mca/out.log",
+        error_file: "/var/log/mca/admin.err",
+        out_file: "/var/log/mca/admin.log",
         watch: false
     },
     {
         name: "mccache",
         cwd: "/opt/mca/mca/api",
         script: "mccache.js",
-        error_file: "/var/log/mca/error.log",
-        out_file: "/var/log/mca/out.log",
+        error_file: "/var/log/mca/cache.err",
+        out_file: "/var/log/mca/cache.log",
         watch: false
     },
     {
@@ -39,8 +39,8 @@
         script: "mcpub.js",
         instances: 4,
         exec_mode: "cluster_mode",
-        error_file: "/var/log/mca/error.log",
-        out_file: "/var/log/mca/out.log",
+        error_file: "/var/log/mca/pub.err",
+        out_file: "/var/log/mca/pub.log",
         watch: false
     }
     /*
