@@ -27,7 +27,8 @@ mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.disabled
 #su - mca -c "pm2 save"
 
 #persist pm2 session over reboot
-pm2 startup redhat -u mca
+#TODO - this somehow hoses up the script when run from init script
+#pm2 startup redhat -u mca
 
 #install igtf certs
 mkdir -p /etc/grid-security/certificates

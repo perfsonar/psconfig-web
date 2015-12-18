@@ -132,8 +132,8 @@ app.directive('mcHostlist', ['services', function(services) {
     } 
 }]);
 
-app.controller('HeaderController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', 'serverconf', 'menu',
-function($scope, appconf, $route, toaster, $http, jwtHelper, serverconf, menu) {
+app.controller('HeaderController', ['$scope', 'appconf', '$route', 'serverconf', 'menu',
+function($scope, appconf, $route, serverconf, menu) {
     $scope.title = appconf.title;
     serverconf.then(function(_c) { $scope.serverconf = _c; });
     $scope.menu = menu;

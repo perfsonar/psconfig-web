@@ -23,7 +23,7 @@
         script: "mcadmin.js",
         error_file: "/var/log/mca/admin.err",
         out_file: "/var/log/mca/admin.log",
-        watch: false
+        watch: true
     },
     {
         name: "mccache",
@@ -31,17 +31,18 @@
         script: "mccache.js",
         error_file: "/var/log/mca/cache.err",
         out_file: "/var/log/mca/cache.log",
-        watch: false
+        watch: true
     },
     {
         name: "mcpub",
         cwd: "/opt/mca/mca/api",
         script: "mcpub.js",
+        //this is very unstable.. at least on rhel6
         instances: 4,
-        exec_mode: "cluster_mode",
+        //exec_mode: "cluster_mode",
         error_file: "/var/log/mca/pub.err",
         out_file: "/var/log/mca/pub.log",
-        watch: false
+        watch: true
     }
     /*
     {

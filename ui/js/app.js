@@ -158,8 +158,8 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
     });
     
     //console.dir($routeProvider);
-}]).run(['$rootScope', '$location', 'toaster', 'jwtHelper', 'appconf', 'scaMessage',
-function($rootScope, $location, toaster, jwtHelper, appconf, scaMessage) {
+}]).run(['$rootScope', '$location', 'jwtHelper', 'appconf', 'scaMessage',
+function($rootScope, $location, jwtHelper, appconf, scaMessage) {
     $rootScope.$on("$routeChangeStart", function(event, next, current) {
         //console.log("route changed from "+current+" to :"+next);
         //redirect to /login if user hasn't authenticated yet
@@ -178,7 +178,7 @@ function($rootScope, $location, toaster, jwtHelper, appconf, scaMessage) {
 //configure httpProvider to send jwt unless skipAuthorization is set in config (not tested yet..)
 app.config(['appconf', '$httpProvider', 'jwtInterceptorProvider', 
 function(appconf, $httpProvider, jwtInterceptorProvider) {
-    jwtInterceptorProvider.tokenGetter = function(jwtHelper, config, $http, toaster) {
+    jwtInterceptorProvider.tokenGetter = function(jwtHelper, config, $http) {
         //don't send jwt for template requests (I don't think angular will ever load css/js - browsers do)
         if (config.url.substr(config.url.length - 5) == '.html') return null;
         return localStorage.getItem(appconf.jwt_id);
