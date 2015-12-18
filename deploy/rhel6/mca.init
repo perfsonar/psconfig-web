@@ -1,0 +1,41 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start daemon at boot time
+# Description:       Enable service provided by daemon.
+### END INIT INFO
+
+dir=""
+cmd=""
+user=mca
+pm2json=/opt/mca/mca/deploy/mca.json
+
+name=`basename $0`
+stdout_log="/var/log/$name.log"
+stderr_log="/var/log/$name.err"
+
+case "$1" in
+    start)
+    sudo -u "$user" pm2 start $pm2json
+    ;;
+    stop)
+    sudo -u "$user" pm2 stop $pm2json
+    fi
+    ;;
+    restart)
+    sudo -u "$user" pm2 restart $pm2json
+    ;;
+    status)
+    sudo -u "$user" pm2 status
+    ;;
+    *)
+    echo "Usage: $0 {start|stop|restart|status}"
+    exit 1
+    ;;
+esac
+
+exit 0

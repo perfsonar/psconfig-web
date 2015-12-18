@@ -48,6 +48,7 @@ mkdir -p $RPM_BUILD_ROOT/etc/httpd/conf.d
 mkdir -p $RPM_BUILD_ROOT/opt/mca
 mkdir -p $RPM_BUILD_ROOT/var/lib/mca #where the sqlite3 db goes
 mkdir -p $RPM_BUILD_ROOT/var/log/mca 
+mkdir -p $RPM_BUILD_ROOT/etc/init.d
 
 #TODO - pick specific branch / tag instead of master
 git clone https://github.com/soichih/meshconfig-admin.git $RPM_BUILD_ROOT/opt/mca/mca
@@ -64,6 +65,7 @@ cd $RPM_BUILD_ROOT/opt/mca/profile/ui && bower install -p --allow-root
 
 ln -sf /opt/mca/mca/deploy/apache-mca.conf $RPM_BUILD_ROOT/etc/httpd/conf.d/apache-mca.conf
 cp -r $RPM_BUILD_ROOT/opt/mca/mca/deploy/conf/*  $RPM_BUILD_ROOT/opt/mca
+ln -sf /opt/mca/mca/deploy/mca.init $RPM_BUILD_ROOT/etc/init.d/mca
 
 #install node_modules
 npm install pm2 -g
@@ -83,8 +85,8 @@ cd $RPM_BUILD_ROOT/opt/mca/profile && npm_install_and_tar
 #uncompress node_modules
 cd /opt/mca/mca && tar -xzf node_modules.tgz && rm node_modules.tgz
 cd /opt/mca/auth && tar -xzf node_modules.tgz && rm node_modules.tgz
-cd /opt/mca/shared && tar -xzf node_modules.tgz && node_modules.tgz
-cd /opt/mca/profile && tar -xzf node_modules.tgz && node_modules.tgz
+cd /opt/mca/shared && tar -xzf node_modules.tgz && rm node_modules.tgz
+cd /opt/mca/profile && tar -xzf node_modules.tgz && rm node_modules.tgz
 chown -R mca:mca /opt/mca
 
 #install postgresql-db
@@ -115,6 +117,7 @@ chown -R mca:mca /opt/mca
 /var/lib/mca
 /var/log/mca
 /etc/httpd/conf.d/apache-mca.conf
+/etc/init.d/mca
 
 %attr(-,root,root) /etc/httpd/conf.d/apache-mca.conf
 
