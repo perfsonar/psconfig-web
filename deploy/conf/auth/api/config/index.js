@@ -25,10 +25,13 @@ exports.local = {
 };
 
 exports.x509 = {
-    //http header to look for x509 DN 
-    //for nginx set proxy_set_header DN $ssl_client_s_dn
-    //for apache, SSLOptions +StdEnvVars will set it to SSL_CLIENT_S_DN
-    dn_header: 'SSL_CLIENT_S_DN',
+    //http header to look for x509 DN. You have to configure your webserver to set ssl_dn on your header like..
+    //for nginx 
+    //          set proxy_set_header ssl_dn $ssl_client_s_dn
+    //for apache, 
+    //          RequestHeader set ssl_dn "%{SSL_CLIENT_S_DN}s"
+    //          RequestHeader set ssl_verify "%{SSL_CLIENT_VERIFY}s"
+    dn_header: 'ssl_dn',
     allow_origin: '*', 
 };
 
