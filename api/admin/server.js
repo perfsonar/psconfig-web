@@ -45,6 +45,9 @@ process.on('uncaughtException', function (err) {
 
 exports.app = app;
 exports.start = function(cb) {
+    //TODO - should mcadin remove old readyfile, or let startup script do that?
+    //fs.unlinkSync(config.admin.readyfile);
+    
     //logger.info("initializing");
     db.sequelize
     .sync(/*{force: true}*/) //create missing tables - if it doesn't exist
@@ -55,6 +58,7 @@ exports.start = function(cb) {
         app.listen(port, host, function() {
             logger.info("meshconfig admin/api service running on %s:%d in %s mode", host, port, app.settings.env);
             setInterval(common.profile.cache, 1000*60); 
+            fs.writeFileSync(config.admin.readyfile, "ready");
             common.profile.cache(cb);
         });
     });

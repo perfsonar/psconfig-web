@@ -692,7 +692,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, ser
         $scope.services = _services;
 
         //create id>ma mapping for deref_ma
-        $scope.services.recs['ma'].forEach(function(service) {
+        if($scope.services.recs['ma']) $scope.services.recs['ma'].forEach(function(service) {
             mas[service.id] = service;
         });
 

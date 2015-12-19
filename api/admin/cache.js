@@ -376,7 +376,6 @@ function update_dynamic_hostgroup(cb) {
 exports.start = function(cb) {
     logger.info("starting slscache");
     async.forEachOf(config.datasource.services, function(service, id, next) {
-
         function run_cache_ls(_next) {
             cache_ls(service, id, function(err) {
                 if(err) logger.error(err);
