@@ -43,11 +43,11 @@ process.on('uncaughtException', function (err) {
 
 exports.app = app;
 exports.start = function(cb) {
-    db.sequelize
+    //db.sequelize
     //let mcadmin do the sync
     //.sync(/*{force: true}*/)
     //.then(profile.start)
-    .then(function() {
+    //.then(function() {
         //start server
         var port = process.env.PORT || config.pub.port || '8080';
         var host = process.env.HOST || config.pub.host || 'localhost';
@@ -56,6 +56,6 @@ exports.start = function(cb) {
             setInterval(common.profile.cache, 1000*60);
             common.profile.cache(cb);
         });
-    });
+    //});
 }
 
