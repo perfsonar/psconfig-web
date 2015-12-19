@@ -44,8 +44,8 @@ process.on('uncaughtException', function (err) {
 exports.app = app;
 exports.start = function(cb) {
     db.sequelize
-    //TODO - maybe pub shouldn't do this?
-    .sync(/*{force: true}*/)
+    //let mcadmin do the sync
+    //.sync(/*{force: true}*/)
     //.then(profile.start)
     .then(function() {
         //start server
