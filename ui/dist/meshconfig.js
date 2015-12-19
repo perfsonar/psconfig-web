@@ -971,6 +971,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, ser
     hosts.then(function(_hosts) { $scope.hosts = _hosts; });
 
     $scope.appconf = appconf;
+    //$scope.pub_url_base = location.hostname+location.pathname;
 
     var jwt = localStorage.getItem(appconf.jwt_id);
     if(jwt && jwtHelper.decodeToken(jwt)) {

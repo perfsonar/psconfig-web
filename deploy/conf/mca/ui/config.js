@@ -12,7 +12,8 @@ angular.module('app.config', []).constant('appconf', {
     api: '../api/admin',
 
     //url base for meshconfig publisher
-    pub_url: '../pub',
+    //pub_url: '../pub',
+    pub_url: 'http://'+location.hostname+location.pathname+'pub',
 
     profile_api: '../api/profile',
     profile_url: '../profile',
