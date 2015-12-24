@@ -13,7 +13,7 @@ angular.module('app.config', []).constant('appconf', {
 
     //url base for meshconfig publisher
     //pub_url: '../pub',
-    pub_url: 'http://'+location.hostname+location.pathname+'pub',
+    pub_url: 'http://'+location.hostname+location.pathname+'../pub',
 
     profile_api: '../api/profile',
     profile_url: '../profile',
@@ -36,10 +36,14 @@ angular.module('app.config', []).constant('appconf', {
             url: "#/about",
         },
         {
-            id: "configs",
-            label: "Configs",
-            url: "#/configs",
-        },      
+            id: "hostgroups",
+            label: "Host Groups",
+            url: "#/hostgroups",
+            show: function(scope) {
+                if(~scope.common.indexOf('user')) return true;
+                return false;
+            }
+        },
         {
             id: "testspecs",
             label: "Test Specs",
@@ -50,14 +54,10 @@ angular.module('app.config', []).constant('appconf', {
             }
         },
         {
-            id: "hostgroups",
-            label: "Host Groups",
-            url: "#/hostgroups",
-            show: function(scope) {
-                if(~scope.common.indexOf('user')) return true;
-                return false;
-            }
-        },
+            id: "configs",
+            label: "Configs",
+            url: "#/configs",
+        },      
         {
             id: "hosts",
             label: "Hosts",
