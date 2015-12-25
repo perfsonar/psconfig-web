@@ -53,8 +53,8 @@ exports.start = function(cb) {
         var host = process.env.HOST || config.pub.host || 'localhost';
         app.listen(port, host, function() {
             logger.info("meshconfig pub service running on %s:%d in %s mode", host, port, app.settings.env);
-            setInterval(common.profile.cache, 1000*60);
-            common.profile.cache(cb);
+            //setInterval(common.profile.cache, 1000*60);
+            //common.profile.cache(cb);
         });
     //});
 }

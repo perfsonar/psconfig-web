@@ -17,11 +17,7 @@ when a user login for the first time, I should forward user to install ui that d
 
 Disallow user from used testspecs / hostgroups (and show which config/test uses them)
 
-migration not receiving queryinterface
-
 Populate some sample testspecs / hosts / config(?) as very first migration?
-
-"sign in to see admin" doesn't make any sense.. because they are all public via json!
 
 when config is removed, test records will be orphaned - should be cascaded?
 
@@ -29,3 +25,6 @@ Add x509 authentication for auth and allow user to sign up / login through it
 
 * Prevent user from removing hostgroups / testspecs currently used by a config
 * Prevent user from orphaning config / testspecs / hostsgroups by removing all admins
+* Prevent user from entering config with duplicate url
+
+* profile service needs to announce any updates made by user to all other services caching profile info

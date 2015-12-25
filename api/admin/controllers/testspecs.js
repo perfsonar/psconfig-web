@@ -16,21 +16,24 @@ var profile = require('../../common').profile;
 router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
     db.Testspec.findAll().then(function(testspecs) {
         //convert to normal javascript object so that I can add stuff to it (why can't I for sequelize object?)
-        var json = JSON.stringify(testspecs);
-        testspecs = JSON.parse(json);
-        testspecs.forEach(function(testspec) {
-            testspec.canedit = false;
-            if(req.user) {
-                if(~req.user.scopes.common.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
-                    testspec.canedit = true;
+        profile.getall(function(err, profiles) {
+            var json = JSON.stringify(testspecs);
+            testspecs = JSON.parse(json);
+            testspecs.forEach(function(testspec) {
+                testspec.canedit = false;
+                if(req.user) {
+                    if(~req.user.scopes.common.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
+                        testspec.canedit = true;
+                    }
                 }
-            }
-            testspec.admins = profile.load_admins(testspec.admins);
+                testspec.admins = profile.select(profiles, testspec.admins);
+            });
+            res.json(testspecs);
         });
-        res.json(testspecs);
     }); 
 });
 
+/* deprecated?
 //all test specs are open to public for read access
 router.get('/:id', function(req, res, next) {
     var id = parseInt(req.params.id);
@@ -39,6 +42,7 @@ router.get('/:id', function(req, res, next) {
         res.json(testspec);
     }); 
 });
+*/
 
 router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var id = parseInt(req.params.id);

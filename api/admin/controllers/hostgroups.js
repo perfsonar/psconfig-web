@@ -20,30 +20,37 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
     }).then(function(hostgroups) {
         //convert to normal javascript object so that I can add stuff to it (why can't I for sequelize object?)
         hostgroups = JSON.parse(JSON.stringify(hostgroups));
-
-        //set canedit flag
-        hostgroups.forEach(function(hostgroup) {
-            hostgroup.canedit = false;
-            if(req.user) {
-                if(~req.user.scopes.common.indexOf('admin') || ~hostgroup.admins.indexOf(req.user.sub)) {
-                    hostgroup.canedit = true;
+        profile.getall(function(err, profiles) {
+            if(err) return next(err);
+            //set canedit flag and admin profiles
+            hostgroups.forEach(function(hostgroup) {
+                hostgroup.canedit = false;
+                if(req.user) {
+                    if(~req.user.scopes.common.indexOf('admin') || ~hostgroup.admins.indexOf(req.user.sub)) {
+                        hostgroup.canedit = true;
+                    }
                 }
-            }
-            hostgroup.admins = profile.load_admins(hostgroup.admins);
+                hostgroup.admins = profile.select(profiles, hostgroup.admins);
+            });
+            res.json(hostgroups);
         });
-        res.json(hostgroups);
     }); 
 });
 
+/* deprecated?
 router.get('/:id', function(req, res, next) {
     var id = parseInt(req.params.id);
     db.Hostgroup.findOne({
         where: {id: id}
     }).then(function(hostgroup) {
-        hostgroup.admins = profile.load_admins(hostgroup.admins);
-        res.json(hostgroup);
+        profile.getall(function(err, profiles) {
+            if(err) return next(err);
+            hostgroup.admins = profile.select(profiles, hostgroup.admins);
+            res.json(hostgroup);
+        });
     }); 
 });
+*/
 
 router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var id = parseInt(req.params.id);
@@ -85,10 +92,12 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             hostgroup.host_filter = req.body.host_filter;
 
             var admins = [];
+            //console.log(JSON.stringify(req.body, null, 4));
             req.body.admins.forEach(function(admin) {
                 admins.push(admin.sub);
             });
             hostgroup.admins = admins;
+            //console.log(JSON.stringify(hostgroup, null, 4));
             hostgroup.save().then(function() {
                 var canedit = false;
                 if(~req.user.scopes.common.indexOf('admin') || ~hostgroup.admins.indexOf(req.user.sub)) {

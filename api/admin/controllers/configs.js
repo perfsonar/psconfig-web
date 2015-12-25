@@ -23,17 +23,19 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
         } ],
         //raw: true, //return raw object instead of sequelize objec that I can't modify..
     }).then(function(configs) {
-        configs = JSON.parse(JSON.stringify(configs)); //convert to raw object so that I can add properties
-        configs.forEach(function(config) {
-            config.canedit = false;
-            if(req.user) {
-                if(~req.user.scopes.common.indexOf('admin') || ~config.admins.indexOf(req.user.sub)) {
-                    config.canedit = true;
+        profile.getall(function(err, profiles) {
+            configs = JSON.parse(JSON.stringify(configs)); //convert to raw object so that I can add properties
+            configs.forEach(function(config) {
+                config.canedit = false;
+                if(req.user) {
+                    if(~req.user.scopes.common.indexOf('admin') || ~config.admins.indexOf(req.user.sub)) {
+                        config.canedit = true;
+                    }
                 }
-            }
-            config.admins = profile.load_admins(config.admins);
+                config.admins = profile.select(profiles, config.admins);
+            });
+            res.json(configs);
         });
-        res.json(configs);
     }); 
 });
 
@@ -45,16 +47,18 @@ router.get('/:id', jwt({secret: config.admin.jwt.pub, credentialsRequired: false
         where: {id: id},
         include: [ db.Test ],
     }).then(function(config) {
-        config = JSON.parse(JSON.stringify(config)); //convert to raw object so that I can add properties
-        //console.dir(config);
-        config.canedit = false;
-        if(req.user) {
-            if(~req.user.scopes.common.indexOf('admin') || ~config.admins.indexOf(req.user.sub)) {
-                config.canedit = true;
+        profile.getall(function(err, profiles) {
+            config = JSON.parse(JSON.stringify(config)); //convert to raw object so that I can add properties
+            //console.dir(config);
+            config.canedit = false;
+            if(req.user) {
+                if(~req.user.scopes.common.indexOf('admin') || ~config.admins.indexOf(req.user.sub)) {
+                    config.canedit = true;
+                }
             }
-        }
-        config.admins = profile.load_admins(config.admins);
-        res.json(config);
+            config.admins = profile.select(profiles, config.admins);
+            res.json(config);
+        });
     }); 
 });
 

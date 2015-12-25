@@ -106,7 +106,11 @@ router.put('/host/:uuid', jwt({secret: config.admin.jwt.pub}), function(req, res
 
 //used for admin list editor
 router.get('/profiles', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    res.json(common.profile.getall());
+    logger.debug("requested profiles");
+    common.profile.getall(function(err, profiles) {
+        if(err) next(err);
+        res.json(profiles);
+    });
 });
 
 /*
