@@ -7,16 +7,16 @@ var _ = require('underscore');
 var winston = require('winston');
 
 //mine
-var config = require('../config');
+var config = require('../../config');
 var logger = new winston.Logger(config.logger.winston);
-var db = require('../models');
+var db = require('../../models');
 
 router.get('/health', function(req, res) {
     res.json({status: 'ok'});
 });
 
-router.use('/config', require('./controllers/config'));
-router.use('/auto', require('./controllers/auto'));
+router.use('/config', require('./config'));
+router.use('/auto', require('./auto'));
 
 module.exports = router;
 

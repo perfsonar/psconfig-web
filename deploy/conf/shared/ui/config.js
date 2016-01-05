@@ -18,7 +18,7 @@
             _label: {default: "Me", profile: "fullname"},
             props: { right: true },
             show: function(scope) {
-                if(~scope.common.indexOf('user')) return true;
+                if(~scope.sca.indexOf('user')) return true;
                 return false;
             },
             submenu: [
@@ -27,7 +27,15 @@
                     label: "Settings",
                     url: "/meshconfig/profile",
                 },
-                { separator: true },
+                {
+                    id: "admin",
+                    label: "Administration",
+                    url: "/meshconfig/auth/#/admin/users",
+                    show: function(scope) {
+                        if(~scope.sca.indexOf('admin')) return true;
+                        return false;
+                    },
+                },                { separator: true },
                 //{ header: true, label: "Random Header Here" },
                 {
                     id: "signout",
@@ -41,7 +49,7 @@
             label: "Sign In",
             url: "/meshconfig/auth",
             show: function(scope) {
-                if(~scope.common.indexOf('user')) return false;
+                if(~scope.sca.indexOf('user')) return false;
                 return true;
             },
             props: { right: true }
@@ -51,7 +59,7 @@
             label: "Sign Up",
             url: "/meshconfig/auth/#/signup",
             show: function(scope) {
-                if(~scope.common.indexOf('user')) return false;
+                if(~scope.sca.indexOf('user')) return false;
                 return true;
             },
             props: { right: true }
@@ -64,16 +72,28 @@
             label: "Profile",
             url: "/meshconfig/profile",
             show: function(scope) {
-                if(~scope.common.indexOf('user')) return true;
+                if(~scope.sca.indexOf('user')) return true;
                 return false;
             }
         },
         {
             id: "account",
             label: "Account",
-            url: "/meshconfig/auth/#/settings",
+            url: "/meshconfig/auth/#/settings/account",
             show: function(scope) {
-                if(~scope.common.indexOf('user')) return true;
+                if(~scope.sca.indexOf('user')) return true;
+                return false;
+            }
+        },
+    ]);
+
+    sca.constant('scaAdminMenu', [
+        {
+            id: "adminusers",
+            label: "Users",
+            url: "/meshconfig/auth/#/admin/users",
+            show: function(scope) {
+                if(~scope.sca.indexOf('admin')) return true;
                 return false;
             }
         },

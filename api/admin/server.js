@@ -26,7 +26,7 @@ app.use(bodyParser.json()); //parse application/json
 app.use(expressWinston.logger(config.logger.winston));
 
 //setup routes
-app.use('/', require('./router'));
+app.use('/', require('./controllers'));
 
 //error handling
 app.use(expressWinston.errorLogger(config.logger.winston)); 
@@ -57,9 +57,7 @@ exports.start = function(cb) {
         var host = process.env.HOST || config.admin.host || 'localhost';
         app.listen(port, host, function() {
             logger.info("meshconfig admin/api service running on %s:%d in %s mode", host, port, app.settings.env);
-            //setInterval(common.profile.cache, 1000*60); 
             fs.writeFileSync(config.admin.readyfile, "ready");
-            //common.profile.cache(cb);
         });
     });
 }

@@ -24,7 +24,7 @@ app.use(bodyParser.json()); //parse application/json
 app.use(expressWinston.logger(config.logger.winston));
 
 //setup routes
-app.use('/', require('./router'));
+app.use('/', require('./controllers'));
 
 //error handling
 app.use(expressWinston.errorLogger(config.logger.winston)); 

@@ -176,7 +176,6 @@ function($rootScope, $location, jwtHelper, appconf, scaMessage) {
             }
         }
     });
-
 }]);
 
 //configure httpProvider to send jwt unless skipAuthorization is set in config (not tested yet..)

@@ -176,7 +176,6 @@ function($rootScope, $location, jwtHelper, appconf, scaMessage) {
             }
         }
     });
-
 }]);
 
 //configure httpProvider to send jwt unless skipAuthorization is set in config (not tested yet..)
@@ -450,14 +449,7 @@ function($scope, appconf, $route, serverconf, menu) {
 app.controller('AboutController', ['$scope', 'appconf', 'menu', 'serverconf', 'scaMessage', 'toaster', 'jwtHelper',
 function($scope, appconf, menu, serverconf, scaMessage, toaster, jwtHelper) {
     scaMessage.show(toaster);
-    //menu.then(function(_menu) { $scope.menu = _menu; });
     $scope.appconf = appconf;
-
-    /*
-    var jwt = localStorage.getItem(appconf.jwt_id);
-    if(jwt) { $scope.user = jwtHelper.decodeToken(jwt); }
-    */
-
 }]);
 
 
