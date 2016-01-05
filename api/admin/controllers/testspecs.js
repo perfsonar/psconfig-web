@@ -22,7 +22,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
             testspecs.forEach(function(testspec) {
                 testspec.canedit = false;
                 if(req.user) {
-                    if(~req.user.scopes.common.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
+                    if(~req.user.scopes.mca.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
                         testspec.canedit = true;
                     }
                 }
@@ -49,7 +49,7 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
     db.Testspec.findOne({where: {id: id}}).then(function(testspec) {
         if(!testspec) return next(new Error("can't find a testspec with id:"+id));
         //only superadmin or admin of this test spec can update
-        if(~req.user.scopes.common.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
+        if(~req.user.scopes.mca.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
             testspec.destroy().then(function() {
                 res.json({status: "ok"});
             }); 
@@ -63,7 +63,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
     db.Testspec.findOne({where: {id: id}}).then(function(testspec) {
         if(!testspec) return next(new Error("can't find a testspec with id:"+id));
         //only superadmin or admin of this test spec can update
-        if(~req.user.scopes.common.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
+        if(~req.user.scopes.mca.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
             //TODO - should validate?
             testspec.desc = req.body.desc;
             testspec.specs = req.body.specs;
@@ -74,7 +74,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             testspec.admins = admins;
             testspec.save().then(function() {
                 var canedit = false;
-                if(~req.user.scopes.common.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
+                if(~req.user.scopes.mca.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
                     var canedit = true;
                 }
                 res.json({status: "ok", canedit: canedit});
@@ -86,7 +86,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
 });
 
 router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    if(!~req.user.scopes.common.indexOf('user')) return res.status(401).end();
+    if(!~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
     //console.log(JSON.stringify(req.body, null, 4));
 
     //convert admin objects to list of subs
@@ -99,7 +99,7 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
 
     db.Testspec.create(req.body).then(function(testspec) {
         var canedit = false;
-        if(~req.user.scopes.common.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
+        if(~req.user.scopes.mca.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
             var canedit = true;
         }
         res.json({status: "ok", canedit: canedit, id: testspec.id});

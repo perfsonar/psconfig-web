@@ -56,7 +56,7 @@ router.get('/hosts', jwt({secret: config.admin.jwt.pub, credentialsRequired: fal
             rec.communities = JSON.parse(rec.communities); 
             rec.canedit = false;
             if(req.user) {
-                if(~req.user.scopes.common.indexOf('admin') /*|| ~testspec.admins.indexOf(req.user.sub)*/) {
+                if(~req.user.scopes.mca.indexOf('admin') /*|| ~testspec.admins.indexOf(req.user.sub)*/) {
                     rec.canedit = true;
                 }
             }
@@ -70,7 +70,7 @@ router.get('/hosts', jwt({secret: config.admin.jwt.pub, credentialsRequired: fal
 router.put('/host/:uuid', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var uuid = req.params.uuid;
     var _detail = req.body._detail;
-    if(!~req.user.scopes.common.indexOf('admin')) return res.status(401).end();
+    if(!~req.user.scopes.mca.indexOf('admin')) return res.status(401).end();
 
     //update host info
     db.Host.findOne({where: {uuid: uuid}}).then(function(host) {

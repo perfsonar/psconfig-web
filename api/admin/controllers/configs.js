@@ -28,7 +28,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
             configs.forEach(function(config) {
                 config.canedit = false;
                 if(req.user) {
-                    if(~req.user.scopes.common.indexOf('admin') || ~config.admins.indexOf(req.user.sub)) {
+                    if(~req.user.scopes.mca.indexOf('admin') || ~config.admins.indexOf(req.user.sub)) {
                         config.canedit = true;
                     }
                 }
@@ -52,7 +52,7 @@ router.get('/:id', jwt({secret: config.admin.jwt.pub, credentialsRequired: false
             //console.dir(config);
             config.canedit = false;
             if(req.user) {
-                if(~req.user.scopes.common.indexOf('admin') || ~config.admins.indexOf(req.user.sub)) {
+                if(~req.user.scopes.mca.indexOf('admin') || ~config.admins.indexOf(req.user.sub)) {
                     config.canedit = true;
                 }
             }
@@ -69,7 +69,7 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
     }).then(function(config) {
         if(!config) return next(new Error("can't find the config with id:"+id));
         //only superadmin or admin of this config can update
-        if(~req.user.scopes.common.indexOf('admin') || ~config.admins.indexOf(req.user.sub)) {
+        if(~req.user.scopes.mca.indexOf('admin') || ~config.admins.indexOf(req.user.sub)) {
             config.destroy().then(function() {
                 res.json({status: "ok"});
             }); 
@@ -85,7 +85,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
     }).then(function(config) {
         if(!config) return next(new Error("can't find a config with id:"+id));
         //only superadmin or admin of this test spec can update
-        if(~req.user.scopes.common.indexOf('admin') || ~config.admins.indexOf(req.user.sub)) {
+        if(~req.user.scopes.mca.indexOf('admin') || ~config.admins.indexOf(req.user.sub)) {
             config.desc = req.body.desc;
             config.url = req.body.url;
             var admins = [];
@@ -124,9 +124,9 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
     }); 
 });
 
-//new config (TODO)
+//new config
 router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    if(!~req.user.scopes.common.indexOf('user')) return res.status(401).end();
+    //if(!~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
 
     //convert admin objects to list of subs
     var admins = [];
