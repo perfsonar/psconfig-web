@@ -16,7 +16,7 @@ rm /root/mca.pgpasswd
 
 #generate service tokens
 cd /opt/mca/auth/api/config && ./genkey.sh
-cd /opt/mca/auth/bin && ./auth.js issue --scopes '{ "common": ["user"] }' --sub 'mca_service' --out /opt/mca/mca/api/config/profile.jwt
+cd /opt/mca/auth/bin && ./auth.js issue --scopes '{ "mca": [] }' --sub 'mca_service' --out /opt/mca/mca/api/config/profile.jwt
 #TODO - limit access for generated keys to mca user
 
 #need to disable mod_ssl default conf

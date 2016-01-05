@@ -7,7 +7,7 @@ module.exports = [
         url: "/meshconfig/admin/#/about",
         /* always display
         scope: function(scope) {
-            if(~scope.common.indexOf('user')) return true;
+            if(~scope.mca.indexOf('user')) return true;
             return false;
         }
         */
@@ -18,7 +18,7 @@ module.exports = [
         url: "/meshconfig/admin/#/configs",
         /* guest gets to see list of all configs currently defined
         scope: function(scope) {
-            if(~scope.common.indexOf('user')) return true;
+            if(~scope.mca.indexOf('user')) return true;
             return false;
         }
         */
@@ -28,7 +28,7 @@ module.exports = [
         label: "Test Specs",
         url: "/meshconfig/admin/#/testspecs",
         scope: function(scope) {
-            if(~scope.common.indexOf('user')) return true;
+            if(~scope.mca.indexOf('user')) return true;
             return false;
         }
     },
@@ -37,7 +37,7 @@ module.exports = [
         label: "Host Groups",
         url: "/meshconfig/#/hostgroups",
         scope: function(scope) {
-            if(~scope.common.indexOf('user')) return true;
+            if(~scope.mca.indexOf('user')) return true;
             return false;
         }
     },
@@ -46,7 +46,7 @@ module.exports = [
         label: "Hosts",
         url: "/meshconfig/#/services",
         scope: function(scope) {
-            if(~scope.common.indexOf('user')) return true;
+            if(~scope.mca.indexOf('user')) return true;
             return false;
         }
     },
