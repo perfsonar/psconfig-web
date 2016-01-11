@@ -2,8 +2,8 @@
 #%define __arch_install_post /bin/true
 
 Name: mca
-Version: 1.0
-Release: 9
+Version: 2.0
+Release: 11
 Summary: Meshconfig administration web UI and publisher
 
 License: MIT
