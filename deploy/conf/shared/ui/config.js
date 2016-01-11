@@ -49,7 +49,7 @@
             label: "Sign In",
             url: "/meshconfig/auth",
             show: function(scope) {
-                if(~scope.sca.indexOf('user')) return false;
+                if(scope.sca && ~scope.sca.indexOf('user')) return false;
                 return true;
             },
             props: { right: true }
@@ -59,7 +59,7 @@
             label: "Sign Up",
             url: "/meshconfig/auth/#/signup",
             show: function(scope) {
-                if(~scope.sca.indexOf('user')) return false;
+                if(scope.sca && ~scope.sca.indexOf('user')) return false;
                 return true;
             },
             props: { right: true }
