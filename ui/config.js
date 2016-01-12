@@ -40,7 +40,7 @@ angular.module('app.config', []).constant('appconf', {
             label: "Host Groups",
             url: "#/hostgroups",
             show: function(scope) {
-                if(~scope.mca.indexOf('user')) return true;
+                if(~scope.sca.indexOf('user')) return true;
                 return false;
             }
         },
@@ -49,7 +49,7 @@ angular.module('app.config', []).constant('appconf', {
             label: "Test Specs",
             url: "#/testspecs",
             show: function(scope) {
-                if(~scope.mca.indexOf('user')) return true;
+                if(~scope.sca.indexOf('user')) return true;
                 return false;
             }
         },
@@ -62,7 +62,7 @@ angular.module('app.config', []).constant('appconf', {
             label: "Hosts",
             url: "#/hosts",
             show: function(scope) {
-                if(~scope.mca.indexOf('user')) return true;
+                if(~scope.sca.indexOf('user')) return true;
                 return false;
             }
         },
