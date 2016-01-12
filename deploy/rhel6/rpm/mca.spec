@@ -8,7 +8,6 @@ Summary: Meshconfig administration web UI and publisher
 
 License: MIT
 URL: https://github.com/soichih/meshconfig-admin
-#Source0: %{name}-%{version}.zip
 
 BuildRequires: git
 BuildRequires: which
@@ -46,7 +45,6 @@ mkdir -p $RPM_BUILD_ROOT/var/lib/mca #where the sqlite3 db goes
 mkdir -p $RPM_BUILD_ROOT/var/log/mca 
 mkdir -p $RPM_BUILD_ROOT/etc/init.d
 
-#TODO - pick specific branch / tag instead of master
 git clone https://github.com/soichih/meshconfig-admin.git $RPM_BUILD_ROOT/opt/mca/mca
 git clone https://github.com/soichih/sca-auth.git $RPM_BUILD_ROOT/opt/mca/auth
 git clone https://github.com/soichih/sca-profile.git $RPM_BUILD_ROOT/opt/mca/profile
@@ -61,7 +59,6 @@ cp -r $RPM_BUILD_ROOT/opt/mca/mca/deploy/conf/*  $RPM_BUILD_ROOT/opt/mca
 ln -sf /opt/mca/mca/deploy/apache-mca.conf $RPM_BUILD_ROOT/etc/httpd/conf.d/apache-mca.conf
 ln -sf /opt/mca/mca/deploy/rhel6/mca.init $RPM_BUILD_ROOT/etc/init.d/mca
 
-#install node_modules
 npm install node-gyp -g #need by auth/bcrypt (and others?)
 function npm_install_and_tar {
     npm --production install 
@@ -95,7 +92,6 @@ su - mca -c "pm2 save"
 
 %files
 %defattr(-,mca,mca)
-#%doc README TODO COPYING ChangeLog
 %config(noreplace) /opt/mca/*/api/config
 %config(noreplace) /opt/mca/*/ui/config.js
 /opt/mca
@@ -103,8 +99,6 @@ su - mca -c "pm2 save"
 /var/log/mca
 /etc/httpd/conf.d/apache-mca.conf
 /etc/init.d/mca
-
-#%attr(-,root,root) /etc/httpd/conf.d/apache-mca.conf
 
 %changelog
 * Thu Dec 10 2015 Soichi Hayashi <hayashis@iu.edu> 0.8.18.1-0.1
