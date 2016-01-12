@@ -5,7 +5,7 @@ var winston = require('winston');
 exports.auth = {
     //user scopes to give to all new users
     default_scopes: {
-        mca: ["user"]
+        sca: ["user"]
     },
 
     //isser to use for generated jwt token

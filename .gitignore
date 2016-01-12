@@ -4,3 +4,4 @@ barn
 api/config
 api/debug
 **/*.log
+deploy/rhel6/test/x86_64/

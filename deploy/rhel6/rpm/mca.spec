@@ -3,7 +3,7 @@
 
 Name: mca
 Version: 2.0
-Release: 11
+Release: 13
 Summary: Meshconfig administration web UI and publisher
 
 License: MIT
@@ -17,6 +17,8 @@ BuildRequires: tar
 
 Requires: httpd
 Requires: mod_ssl
+Requires: wget
+Requires: tar
 
 #Requires: postgresql
 #Requires: postgresql-server
@@ -33,10 +35,6 @@ This application allows perfSONAR toolkit adminitrators to define /
 edit MeshConfig and publish JSON to be consumed by various perfSONAR services.
 
 Requires epel-release
-
-%prep
-/usr/sbin/groupadd mca
-/usr/sbin/useradd -g mca mca
 
 %install
 #in case previous build fails
@@ -64,7 +62,6 @@ ln -sf /opt/mca/mca/deploy/apache-mca.conf $RPM_BUILD_ROOT/etc/httpd/conf.d/apac
 ln -sf /opt/mca/mca/deploy/rhel6/mca.init $RPM_BUILD_ROOT/etc/init.d/mca
 
 #install node_modules
-npm install pm2 -g
 npm install node-gyp -g #need by auth/bcrypt (and others?)
 function npm_install_and_tar {
     npm --production install 
@@ -76,13 +73,18 @@ cd $RPM_BUILD_ROOT/opt/mca/auth && npm_install_and_tar
 cd $RPM_BUILD_ROOT/opt/mca/shared && npm_install_and_tar
 cd $RPM_BUILD_ROOT/opt/mca/profile && npm_install_and_tar
 
+%pre
+/usr/sbin/groupadd mca
+/usr/sbin/useradd -g mca mca
+
 %post
-#uncompress node_modules
 cd /opt/mca/mca && tar -xzf node_modules.tgz && rm node_modules.tgz
 cd /opt/mca/auth && tar -xzf node_modules.tgz && rm node_modules.tgz
 cd /opt/mca/shared && tar -xzf node_modules.tgz && rm node_modules.tgz
 cd /opt/mca/profile && tar -xzf node_modules.tgz && rm node_modules.tgz
 chown -R mca:mca /opt/mca
+
+npm install pm2 -g
 
 %preun
 su - mca -c "pm2 delete /opt/mca/mca/deploy/mca.json"
