@@ -1,11 +1,14 @@
 #This script is used by "service mca setup" to setup DB / access tokens, etc..
 
 #initialize postgresql (with md5 host auth)
-su - postgres -c "/usr/pgsql-9.4/bin/initdb --auth-host=md5"
+#su - postgres -c "/usr/pgsql-9.4/bin/initdb --auth-host=md5"
+service postgresql92-postgresql initdb
 
 #start postgresql
-chkconfig postgresql-9.4 on
-service postgresql-9.4 start #will fail if v8 is already running on port 5432
+#chkconfig postgresql-9.4 on
+#service postgresql-9.4 start #will fail if v8 is already running on port 5432
+chkconfig postgresql92-postgresql on
+service postgresql92-postgresql start #will fail if v8 is already running on port 5432
 
 #create mca user/db
 if [ ! -f /root/mca.pgpasswd ]; then
@@ -40,9 +43,8 @@ mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.disabled
 mkdir -p /etc/grid-security/certificates
 cd /etc/grid-security/certificates && wget https://dist.igtf.net/distribution/current/accredited/igtf-preinstalled-bundle-classic.tar.gz && tar -xzf *.tar.gz
 
-#service httpd start
-#chkconfig httpd on
-httpd
+service httpd start
+chkconfig httpd on
 
 service mca start
 

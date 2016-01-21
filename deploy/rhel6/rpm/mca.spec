@@ -21,8 +21,7 @@ Requires: mod_ssl
 
 #Requires: postgresql
 #Requires: postgresql-server
-Requires: postgresql94
-Requires: postgresql94-server
+Requires: postgresql92
 
 Requires: npm
 Requires: nodejs
@@ -33,7 +32,7 @@ Requires: sqlite-devel
 This application allows perfSONAR toolkit adminitrators to define / 
 edit MeshConfig and publish JSON to be consumed by various perfSONAR services.
 
-Requires epel-release
+Requires epel-release for nodejs
 
 %install
 #in case previous build fails

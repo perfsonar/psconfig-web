@@ -2,17 +2,16 @@ FROM centos:6
 
 RUN yum install -y rpm-build
 
-#install BuildRequires
-RUN yum install -y git which postgresql-devel tar
-
-#need epel to install node
+#need epel to install node (which is then needed to build the rpm)
 RUN yum install -y epel-release
 
+#install BuildRequires
+RUN yum install -y git which postgresql-devel tar
 RUN yum install -y npm
 RUN npm install -g --allow-root bower
 
 #for debugging
-RUN yum install -y vim man wget telnet
+#RUN yum install -y vim man wget telnet
 
 #use local copy instead of git -- I keep run into a case where rpm is built with outdated content
 #COPY ~/git/meshconfig /mca
