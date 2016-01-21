@@ -64,5 +64,7 @@ RUN ls /etc/grid-security/certificates
 RUN mkdir -p /var/lib/mca/
 RUN mkdir -p /var/log/mca/
 
+EXPOSE 80 443 9443
+
 COPY boot.sh /
 CMD ["/boot.sh"]
