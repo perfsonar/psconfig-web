@@ -3,7 +3,7 @@
 
 Name: mca
 Version: 2.0
-Release: 21
+Release: 22
 Summary: Meshconfig administration web UI and publisher
 
 License: MIT
@@ -49,6 +49,7 @@ git clone https://github.com/soichih/sca-auth.git $RPM_BUILD_ROOT/opt/mca/auth
 git clone https://github.com/soichih/sca-shared.git $RPM_BUILD_ROOT/opt/mca/shared
 git clone https://github.com/soichih/sca-profile.git $RPM_BUILD_ROOT/opt/mca/profile
 git clone https://github.com/soichih/meshconfig-admin.git $RPM_BUILD_ROOT/opt/mca/mca
+#ln -sf /mca $RPM_BUILD_ROOT/opt/mca/mca
 
 cd $RPM_BUILD_ROOT/opt/mca/mca/ui && bower install -p --allow-root
 cd $RPM_BUILD_ROOT/opt/mca/auth/ui && bower install -p --allow-root

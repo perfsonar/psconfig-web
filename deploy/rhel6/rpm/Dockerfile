@@ -14,6 +14,9 @@ RUN npm install -g --allow-root bower
 #for debugging
 RUN yum install -y vim man wget telnet
 
+#use local copy instead of git -- I keep run into a case where rpm is built with outdated content
+#COPY ~/git/meshconfig /mca
+
 COPY mca.spec /root/mca.spec
 RUN rpmbuild -bb /root/mca.spec
 
