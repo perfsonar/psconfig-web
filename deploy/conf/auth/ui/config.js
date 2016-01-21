@@ -19,8 +19,8 @@ angular.module('app.config', [])
     api: '../api/auth',
     
     //URL for x509 validation API
-    //x509api: 'https://soichi7.ppa.iu.edu:9443',
-    x509api: '../api/auth',
+    //x509api: '../api/auth',
+    x509api: 'https://'+document.location.hostname+':9443/meshconfig/api/auth',
 
     //shared servive api and ui urls (for menus and stuff)
     shared_api: '../api/shared',
