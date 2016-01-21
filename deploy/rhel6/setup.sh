@@ -8,17 +8,22 @@ chkconfig postgresql-9.4 on
 service postgresql-9.4 start #will fail if v8 is already running on port 5432
 
 #create mca user/db
-echo $RANDOM.$RANDOM.$RANDOM > /root/mca.pgpasswd
-su - postgres -c "psql -c \"CREATE ROLE mca PASSWORD '$(cat /root/mca.pgpasswd)' CREATEDB INHERIT LOGIN;\""
-su - postgres -c "psql -c \"CREATE DATABASE mcadmin OWNER mca\""
-echo "//autogeneated by mca rpm" > /opt/mca/mca/api/config/db.js
-echo "module.exports = 'postgres://mca:$(cat /root/mca.pgpasswd)@localhost/mcadmin'" >> /opt/mca/mca/api/config/db.js
-rm /root/mca.pgpasswd
+if [ ! -f /root/mca.pgpasswd ]; then
+    echo $RANDOM.$RANDOM.$RANDOM > /root/mca.pgpasswd
+    su - postgres -c "psql -c \"CREATE ROLE mca PASSWORD '$(cat /root/mca.pgpasswd)' CREATEDB INHERIT LOGIN;\""
+    su - postgres -c "psql -c \"CREATE DATABASE mcadmin OWNER mca\""
+    echo "//autogeneated by mca rpm" > /opt/mca/mca/api/config/db.js
+    echo "module.exports = 'postgres://mca:$(cat /root/mca.pgpasswd)@localhost/mcadmin'" >> /opt/mca/mca/api/config/db.js
+fi
 
 #generate service tokens
-cd /opt/mca/auth/api/config && ./genkey.sh
-cd /opt/mca/auth/bin && ./auth.js issue --scopes '{ "mca": [] }' --sub 'mca_service' --out /opt/mca/mca/api/config/profile.jwt
-#TODO - limit access for generated keys to mca user
+if [ ! -f /opt/mca/auth/api/config/auth.pub ]; then
+    cd /opt/mca/auth/api/config && ./genkey.sh
+fi
+
+if [ ! -f /opt/mca/mca/api/config/profile.jwt ]; then
+    cd /opt/mca/auth/bin && ./auth.js issue --scopes '{ "mca": [] }' --sub 'mca_service' --out /opt/mca/mca/api/config/profile.jwt
+fi
 
 #need to disable mod_ssl default conf
 mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.disabled
@@ -33,10 +38,11 @@ mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.disabled
 
 #install igtf certs
 mkdir -p /etc/grid-security/certificates
-cd /etc/grid-security/certificates && wget https://dist.igtf.net/distribution/current/accredited/igtf-preinstalled-bundle-classic-1.70.tar.gz && tar -xzf *.tar.gz
+cd /etc/grid-security/certificates && wget https://dist.igtf.net/distribution/current/accredited/igtf-preinstalled-bundle-classic.tar.gz && tar -xzf *.tar.gz
 
-service httpd start
-chkconfig httpd on
+#service httpd start
+#chkconfig httpd on
+httpd
 
 service mca start
 

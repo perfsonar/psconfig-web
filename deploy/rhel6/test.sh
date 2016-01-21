@@ -9,5 +9,5 @@ docker run \
     -d mca.rhel6.test tail -f /etc/issue
 
 docker exec -it mca-rhel6-test /etc/init.d/mca setup
-echo "to access it via https://soichi7.ppa.iu.edu:14443/meshconfig/admin/"
+echo "test it via https://soichi7.ppa.iu.edu:14443/meshconfig/admin/"
 
