@@ -6,6 +6,7 @@ docker run \
     --name mca-rhel6-test \
     -p 0.0.0.0:14080:80 \
     -p 0.0.0.0:14443:443 \
+    -p 0.0.0.0:19443:9443 \
     -d mca.rhel6.test tail -f /etc/issue
 
 docker exec -it mca-rhel6-test /etc/init.d/mca setup
