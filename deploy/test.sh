@@ -16,4 +16,5 @@ docker run --name mca1 \
     -p 0.0.0.0:19443:9443 \
     -d soichih/mca
 
-docker logs -f mca1
+#docker logs -f mca1
+echo "you can test it as https://soichi7.ppa.iu.edu:10443/meshconfig"
