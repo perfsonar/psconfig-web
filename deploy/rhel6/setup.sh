@@ -1,7 +1,7 @@
 #This script is used by "service mca setup" to setup DB / access tokens, etc..
 
 #initialize postgresql (with md5 host auth)
-su - postgres -c "scl enable postgresql92 \"initdb --auth-host=md5\""
+su - postgres -c "scl enable postgresql92 \"initdb --auth-host=md5 -D /opt/rh/postgresql92/root/var/lib/pgsql/data\""
 
 #start postgresql
 #chkconfig postgresql-9.4 on
