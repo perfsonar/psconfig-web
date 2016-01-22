@@ -13,7 +13,7 @@ service postgresql92-postgresql start #will fail if v8 is already running on por
 #create mca user/db
 if [ ! -f /root/mca.pgpasswd ]; then
     password=$RANDOM.$RANDOM.$RANDOM
-    su - postgres -c "echo \"CREATE ROLE mca2 PASSWORD '$password' CREATEDB INHERIT LOGIN;\" > cmd"
+    su - postgres -c "echo \"CREATE ROLE mca PASSWORD '$password' CREATEDB INHERIT LOGIN;\" > cmd"
     su - postgres -c "scl enable postgresql92 \"psql -f cmd\""
     su - postgres -c "scl enable postgresql92 \"rm cmd\""
     su - postgres -c "scl enable postgresql92 \"psql -c 'CREATE DATABASE mcadmin OWNER mca'\""

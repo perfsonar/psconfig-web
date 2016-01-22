@@ -3,7 +3,7 @@
 
 Name: mca
 Version: 2.0
-Release: 24
+Release: 25
 Summary: Meshconfig administration web UI and publisher
 
 License: MIT
