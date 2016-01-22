@@ -12,11 +12,13 @@ service postgresql92-postgresql start #will fail if v8 is already running on por
 
 #create mca user/db
 if [ ! -f /root/mca.pgpasswd ]; then
-    echo $RANDOM.$RANDOM.$RANDOM > /root/mca.pgpasswd
-    su - postgres -c "psql -c \"CREATE ROLE mca PASSWORD '$(cat /root/mca.pgpasswd)' CREATEDB INHERIT LOGIN;\""
-    su - postgres -c "psql -c \"CREATE DATABASE mcadmin OWNER mca\""
+    password=$RANDOM.$RANDOM.$RANDOM
+    su - postgres -c "echo \"CREATE ROLE mca2 PASSWORD '$password' CREATEDB INHERIT LOGIN;\" > cmd"
+    su - postgres -c "scl enable postgresql92 \"psql -f cmd\""
+    su - postgres -c "scl enable postgresql92 \"rm cmd\""
+    su - postgres -c "scl enable postgresql92 \"psql -c 'CREATE DATABASE mcadmin OWNER mca'\""
     echo "//autogeneated by mca rpm" > /opt/mca/mca/api/config/db.js
-    echo "module.exports = 'postgres://mca:$(cat /root/mca.pgpasswd)@localhost/mcadmin'" >> /opt/mca/mca/api/config/db.js
+    echo "module.exports = 'postgres://mca:$password@localhost/mcadmin'" >> /opt/mca/mca/api/config/db.js
 fi
 
 #generate service tokens
