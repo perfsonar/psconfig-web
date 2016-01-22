@@ -1,21 +1,21 @@
 FROM centos:7
 MAINTAINER Soichi Hayashi <hayashis@iu.edu>
 
-RUN yum install -y epel-release
-RUN yum install -y git tar whichi
+RUN yum install -y epel-release; yum -y clean all
+RUN yum install -y git tar whichi; yum -y clean all
 
-RUN yum install -y sqlite sqlite-devel 
+RUN yum install -y sqlite sqlite-devel; yum -y clean all
 
 #install npm & bower
-RUN yum install -y npm
+RUN yum install -y npm; yum -y clean all
 RUN npm install -g npm pm2
 RUN npm install -g --allow-root bower
 
 #install apache
-RUN yum install -y httpd mod_ssl
+RUN yum install -y httpd mod_ssl; yum -y clean all
 
 #for debugging
-RUN yum install -y vim man wget telnet which
+RUN yum install -y vim man wget telnet which; yum -y clean all
 
 #install git repos
 RUN mkdir -p /opt/mca
@@ -28,7 +28,7 @@ RUN git clone https://github.com/soichih/sca-shared.git /opt/mca/shared
 COPY mca.json /opt/mca/
 
 #install npm modules
-RUN yum install -y postgresql-devel make
+RUN yum install -y postgresql-devel make; yum -y clean all
 RUN npm install -g node-gyp
 RUN cd /opt/mca/mca && npm install --production
 RUN cd /opt/mca/auth && npm install --production

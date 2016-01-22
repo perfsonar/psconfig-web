@@ -10,14 +10,16 @@ chkconfig postgresql92-postgresql on
 service postgresql92-postgresql start #will fail if v8 is already running on port 5432
 
 #create mca user/db
-if [ ! -f /root/mca.pgpasswd ]; then
+if [ ! -f /opt/mca/mca/api/config/db.js ]; then
     password=$RANDOM.$RANDOM.$RANDOM
     su - postgres -c "echo \"CREATE ROLE mca PASSWORD '$password' CREATEDB INHERIT LOGIN;\" > cmd"
-    su - postgres -c "scl enable postgresql92 \"psql -f cmd\""
-    su - postgres -c "scl enable postgresql92 \"rm cmd\""
-    su - postgres -c "scl enable postgresql92 \"psql -c 'CREATE DATABASE mcadmin OWNER mca'\""
-    echo "//autogeneated by mca rpm" > /opt/mca/mca/api/config/db.js
-    echo "module.exports = 'postgres://mca:$password@localhost/mcadmin'" >> /opt/mca/mca/api/config/db.js
+    if [ $? -eq 0 ]; then
+        su - postgres -c "scl enable postgresql92 \"psql -f cmd\""
+        su - postgres -c "scl enable postgresql92 \"rm cmd\""
+        su - postgres -c "scl enable postgresql92 \"psql -c 'CREATE DATABASE mcadmin OWNER mca'\""
+        echo "//autogeneated by mca rpm" > /opt/mca/mca/api/config/db.js
+        echo "module.exports = 'postgres://mca:$password@localhost/mcadmin'" >> /opt/mca/mca/api/config/db.js
+    fi
 fi
 
 #generate service tokens
@@ -48,3 +50,4 @@ chkconfig httpd on
 #pm2 startup redhat -u mca
 
 service mca start
+chkconfig mca on
