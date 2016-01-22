@@ -1,8 +1,7 @@
 #This script is used by "service mca setup" to setup DB / access tokens, etc..
 
 #initialize postgresql (with md5 host auth)
-#su - postgres -c "/usr/pgsql-9.4/bin/initdb --auth-host=md5"
-service postgresql92-postgresql initdb
+su - postgres -c "scl enable postgresql92 \"initdb --auth-host=md5\""
 
 #start postgresql
 #chkconfig postgresql-9.4 on
@@ -33,6 +32,13 @@ fi
 #need to disable mod_ssl default conf
 mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.disabled
 
+#install igtf certs
+mkdir -p /etc/grid-security/certificates
+cd /etc/grid-security/certificates && wget https://dist.igtf.net/distribution/current/accredited/igtf-preinstalled-bundle-classic.tar.gz && tar -xzf *.tar.gz
+
+service httpd start
+chkconfig httpd on
+
 #now I should be able to start everything
 #su - mca -c "pm2 start /opt/mca/mca/deploy/mca.json"
 #su - mca -c "pm2 save"
@@ -41,12 +47,4 @@ mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.disabled
 #TODO - this somehow hoses up the script when run from init script
 #pm2 startup redhat -u mca
 
-#install igtf certs
-mkdir -p /etc/grid-security/certificates
-cd /etc/grid-security/certificates && wget https://dist.igtf.net/distribution/current/accredited/igtf-preinstalled-bundle-classic.tar.gz && tar -xzf *.tar.gz
-
-service httpd start
-chkconfig httpd on
-
 service mca start
-
