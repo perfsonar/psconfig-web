@@ -71,8 +71,9 @@ cd $RPM_BUILD_ROOT/opt/mca/shared && npm_install_and_tar
 cd $RPM_BUILD_ROOT/opt/mca/profile && npm_install_and_tar
 
 %pre
-/usr/sbin/groupadd mca
-/usr/sbin/useradd -g mca mca
+#create only if mca doesn't exist
+id -g mca &>/dev/null || /usr/sbin/groupadd mca
+id -u mca &>/dev/null || /usr/sbin/useradd -g mca mca
 
 %post
 cd /opt/mca/mca && tar -xzf node_modules.tgz && rm node_modules.tgz
@@ -86,6 +87,10 @@ npm install pm2 -g
 %preun
 su - mca -c "pm2 delete /opt/mca/mca/deploy/mca.json"
 su - mca -c "pm2 save"
+
+#su - mca -c "pm2 kill" #so that I can remove mca user
+#/usr/sbin/userdel mca
+#/usr/sbin/groupdel mca
 
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT

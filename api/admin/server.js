@@ -32,9 +32,12 @@ app.use('/', require('./controllers'));
 app.use(expressWinston.errorLogger(config.logger.winston)); 
 app.use(function(err, req, res, next) {
     logger.error(err);
-    logger.error(err.stack);
+    if(err.stack) {
+        logger.error(err.stack);
+        err.stack = "hidden"; //hide for ui
+    }
     res.status(err.status || 500);
-    res.json({message: err.message, /*stack: err.stack*/}); //let's hide callstack for now
+    res.json(err);
 });
 
 process.on('uncaughtException', function (err) {

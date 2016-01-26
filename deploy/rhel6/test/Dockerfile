@@ -4,8 +4,10 @@ COPY x86_64 /x86_64
 
 RUN yum install -y vim wget curl htop
 
-RUN yum install -y epel-release #for node
-RUN yum install -y centos-release-scl #for postgresql92
+#for node
+RUN yum install -y epel-release 
+#for postgresql92
+RUN yum install -y centos-release-scl 
 #RUN yum install -y http://yum.postgresql.org/9.4/redhat/rhel-6-x86_64/pgdg-centos94-9.4-1.noarch.rpm
 RUN yum install -y /x86_64/*
 
