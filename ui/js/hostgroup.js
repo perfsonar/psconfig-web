@@ -182,9 +182,7 @@ app.directive('hostfilter', function($q, $http, appconf) {
     return {
         require: 'ngModel',
         link: function(scope, elm, attrs, ctrl) {
-
             var p = scope.$parent.$parent; //TODO - this feels very icky..
-
             ctrl.$asyncValidators.hostfilter = function(modelValue, viewValue) {
                 //TODO this doesn't fire if empty.
                 if (ctrl.$isEmpty(modelValue)) {
@@ -200,6 +198,7 @@ app.directive('hostfilter', function($q, $http, appconf) {
                     p.hostgroup._hosts = res.data.recs;
                     p.host_filter_alert = null;
                     def.resolve();
+                    console.dir(res.data);
                 }, function(res) {
                     //toaster.error(res.data.message);
                     p.hostgroup._hosts = null;

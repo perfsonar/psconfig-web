@@ -25,7 +25,11 @@ function load_profiles(cb) {
     } else {
         //console.log("caching profiles");
         profile.getall(function(err, profiles) {
-            if(err) return cb(err);
+            if(err) {
+                if(cb) cb(err);
+                else logger.err(err);
+                return;
+            }
             profile_cache = profiles;
             profile_cache_time = d;
             if(cb) cb(null, profiles);

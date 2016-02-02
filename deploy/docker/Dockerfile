@@ -1,9 +1,10 @@
+
 FROM centos:7
+
 MAINTAINER Soichi Hayashi <hayashis@iu.edu>
 
 RUN yum install -y epel-release; yum -y clean all
 RUN yum install -y git tar whichi; yum -y clean all
-
 RUN yum install -y sqlite sqlite-devel; yum -y clean all
 
 #install npm & bower
@@ -25,7 +26,7 @@ RUN git clone https://github.com/soichih/sca-profile.git /opt/mca/profile
 RUN git clone https://github.com/soichih/sca-shared.git /opt/mca/shared
 
 #install pm2 script
-COPY mca.json /opt/mca/
+COPY _common/mca.json /opt/mca/
 
 #install npm modules
 RUN yum install -y postgresql-devel make; yum -y clean all
@@ -42,17 +43,17 @@ RUN cd /opt/mca/shared/ui && bower install --allow-root
 RUN cd /opt/mca/profile/ui && bower install --allow-root
 
 #install test ssl certs
-COPY ssl/server/self.key.pem /etc/grid-security/http/
-COPY ssl/server/self.cert.pem /etc/grid-security/http/
+COPY _conf/ssl/server/self.key.pem /etc/grid-security/http/
+COPY _conf/ssl/server/self.cert.pem /etc/grid-security/http/
 
 #install configs
-COPY conf/mca /opt/mca/mca
-COPY conf/auth /opt/mca/auth
-COPY conf/shared /opt/mca/shared
-COPY conf/profile /opt/mca/profile
+COPY _conf/mca /opt/mca/mca
+COPY _conf/auth /opt/mca/auth
+COPY _conf/shared /opt/mca/shared
+COPY _conf/profile /opt/mca/profile
 
 #install apache config
-COPY apache-mca.conf /etc/httpd/conf.d/mca.conf
+COPY _common/apache-mca.conf /etc/httpd/conf.d/mca.conf
 RUN mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.disabled
 
 #install igtf certs
@@ -68,3 +69,4 @@ EXPOSE 80 443 9443
 
 COPY boot.sh /
 CMD ["/boot.sh"]
+

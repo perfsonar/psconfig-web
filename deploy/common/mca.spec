@@ -57,7 +57,7 @@ cd $RPM_BUILD_ROOT/opt/mca/profile/ui && bower install -p --allow-root
 
 cp -r $RPM_BUILD_ROOT/opt/mca/mca/deploy/conf/*  $RPM_BUILD_ROOT/opt/mca
 ln -sf /opt/mca/mca/deploy/rhel6/mca.init $RPM_BUILD_ROOT/etc/init.d/mca
-ln -sf /opt/mca/mca/deploy/apache-mca.conf $RPM_BUILD_ROOT/etc/httpd/conf.d/apache-mca.conf
+ln -sf /opt/mca/mca/deploy/common/apache-mca.conf $RPM_BUILD_ROOT/etc/httpd/conf.d/apache-mca.conf
 
 npm install node-gyp -g #need by auth/bcrypt (and others?)
 function npm_install_and_tar {
@@ -85,7 +85,7 @@ chown -R mca:mca /opt/mca
 npm install pm2 -g
 
 %preun
-su - mca -c "pm2 delete /opt/mca/mca/deploy/mca.json"
+su - mca -c "pm2 delete /opt/mca/mca/deploy/common/mca.json"
 su - mca -c "pm2 save"
 
 #su - mca -c "pm2 kill" #so that I can remove mca user

@@ -13,14 +13,7 @@ RUN npm install -g --allow-root bower
 #for debugging
 #RUN yum install -y vim man wget telnet
 
-#use local copy instead of git -- I keep run into a case where rpm is built with outdated content
-#COPY ~/git/meshconfig /mca
-
-COPY mca.spec /root/mca.spec
+COPY _common/mca.spec /root/mca.spec
 RUN rpmbuild -bb /root/mca.spec
 
-#installing mca
-#RUN yum localinstall -y http://yum.postgresql.org/9.4/redhat/rhel-6-x86_64/pgdg-centos94-9.4-1.noarch.rpm
-#RUN yum install -y /root/rpmbuild/RPMS/x86_64/*
 
-#EXPOSE 80 443 9443

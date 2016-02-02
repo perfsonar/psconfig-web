@@ -19,23 +19,28 @@ exports.resolveHostGroup = function(js, type, cb) {
         ],
         where: {type: type}
     }).then(function(recs) {
-        var sandbox = new Sandbox();
+        var sandbox = new Sandbox(/*{timeout: 1000*10}*/);
         var matches = [];
-        var code = "JSON.stringify("+JSON.stringify(recs)+".filter(function(service) {var host = service.Host||{};\n"+js+"\n}));";
-        //var code = "JSON.stringify("+JSON.stringify(recs)+".filter(function(service) {"+js+"\n}));";
+        var code = "JSON.stringify("+JSON.stringify(recs)+".filter("+
+            "function(service) {"+
+            "   var host = service.Host||{};\n"+
+            "   try {\n"+
+            js+"\n"+
+            "   } catch(e) {\n"+
+            "   console.log(e.toString());\n"+
+            "   }\n"+
+            "}))";
+        //console.log(code);
         sandbox.run(code, function(res) {
-            var _recs = res.result.slice(1, -1);
+            //console.dir(res);
+            var _recs = res.result.slice(1, -1); //remove first and last double quotes..
             try {
-                //console.log("parsing");
-                //console.log(_recs);
                 var precs = JSON.parse(_recs);
-                //console.log("parsed - pulling uuids");
                 var ids = [];
                 precs.forEach(function(prec) { ids.push(prec.uuid); }); //just pull uuids
                 //console.dir(precs);
                 cb(null, {recs: ids, c: res['console']});
             } catch(e) {
-                //logger.error("parse error happens if _recs is not array", e);
                 cb(_recs);
             }
         });

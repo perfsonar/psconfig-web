@@ -41,7 +41,7 @@ router.get('/services-js', jwt({secret: config.admin.jwt.pub}), function(req, re
     var type = req.query.type;
 
     common.filter.resolveHostGroup(js, type, function(err, hosts) {
-        if(err) return next(new Error(err));
+        if(err) return next(err);
         res.json(hosts);
     });
 });
