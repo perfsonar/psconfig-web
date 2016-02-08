@@ -20,7 +20,7 @@ Requires: httpd
 Requires: mod_ssl
 
 %{?el6:Requires: postgresql92}
-%{?el7:Requires: postgresql}
+%{?el7:Requires: postgresql-server}
 
 Requires: npm
 Requires: nodejs

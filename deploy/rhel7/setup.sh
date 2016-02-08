@@ -1,20 +1,20 @@
 #This script is used by "service mca setup" to setup DB / access tokens, etc..
 
 #initialize postgresql (with md5 host auth)
-su - postgres -c "scl enable postgresql \"initdb --auth-host=md5 -D /opt/rh/postgresql/root/var/lib/pgsql/data\""
+su - postgres -c "initdb --auth-host=md5 -D /var/lib/pgsql/data"
 
 #start postgresql and enable
-systemctl start postgresql-postgresql
-systemctl enable postgresql-postgresql
+systemctl start postgresql
+systemctl enable postgresql
 
 #create mca user/db
 if [ ! -f /opt/mca/mca/api/config/db.js ]; then
     password=$RANDOM.$RANDOM.$RANDOM
     su - postgres -c "echo \"CREATE ROLE mca PASSWORD '$password' CREATEDB INHERIT LOGIN;\" > cmd"
     if [ $? -eq 0 ]; then
-        su - postgres -c "scl enable postgresql \"psql -f cmd\""
-        su - postgres -c "scl enable postgresql \"rm cmd\""
-        su - postgres -c "scl enable postgresql \"psql -c 'CREATE DATABASE mcadmin OWNER mca'\""
+        su - postgres -c "psql -f cmd"
+        su - postgres -c "rm cmd"
+        su - postgres -c "psql -c 'CREATE DATABASE mcadmin OWNER mca'"
         echo "//autogeneated by mca rpm" > /opt/mca/mca/api/config/db.js
         echo "module.exports = 'postgres://mca:$password@localhost/mcadmin'" >> /opt/mca/mca/api/config/db.js
     fi
