@@ -1,3 +1,4 @@
+#!/bin/bash
 #This script is used by "service mca setup" to setup DB / access tokens, etc..
 
 #initialize postgresql (with md5 host auth)
