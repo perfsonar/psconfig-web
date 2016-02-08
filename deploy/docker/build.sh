@@ -5,4 +5,4 @@ rm -rf _conf
 cp -r ../common _common
 cp -r ../conf _conf
 
-docker build -t soichih/mca .
+docker build --no-cache -t soichih/mca .

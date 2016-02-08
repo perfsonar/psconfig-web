@@ -6,8 +6,7 @@ RUN yum install -y rpm-build
 RUN yum install -y epel-release
 
 #install BuildRequires
-RUN yum install -y git which postgresql-devel tar
-RUN yum install -y npm
+RUN yum install -y git which postgresql-devel tar make npm
 RUN npm install -g --allow-root bower
 
 #for debugging

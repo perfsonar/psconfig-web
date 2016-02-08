@@ -1,5 +1,5 @@
 #docker pull centos:6
-docker build -t mca.rhel6.test test
+docker build --no-cache -t mca.rhel6.test test
 
 docker rm -f mca-rhel6-test
 docker run \
