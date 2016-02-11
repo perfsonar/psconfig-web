@@ -32,6 +32,7 @@ fi
 
 #need to disable mod_ssl default conf
 mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.disabled
+echo "#disabled by mca setup.sh" > /etc/httpd/conf.d/ssl.conf
 
 #install igtf certs
 mkdir -p /etc/grid-security/certificates

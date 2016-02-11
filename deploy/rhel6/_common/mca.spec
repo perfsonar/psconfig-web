@@ -3,7 +3,7 @@
 
 Name: mca
 Version: 2.0
-Release: 34%{?dist}
+Release: 38%{?dist}
 Summary: Meshconfig administration web UI and publisher
 
 License: MIT
@@ -20,7 +20,7 @@ Requires: httpd
 Requires: mod_ssl
 
 %{?el6:Requires: postgresql92}
-%{?el7:Requires: postgresql}
+%{?el7:Requires: postgresql-server}
 
 Requires: npm
 Requires: nodejs

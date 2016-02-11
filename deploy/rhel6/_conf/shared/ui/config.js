@@ -10,7 +10,7 @@
         {
             id: "doc",
             label: "Documentation",
-            url: "http://soichi7.ppa.iu.edu/pdoc/mca.html"
+            url: "deploy/rhel6/_conf/shared/ui/config.js",
         },
         {
             id: "user",
