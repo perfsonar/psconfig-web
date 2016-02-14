@@ -26,6 +26,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
             hostgroups.forEach(function(hostgroup) {
                 hostgroup.canedit = false;
                 if(req.user) {
+                    //console.dir(hostgroup.admins);
                     if(~req.user.scopes.mca.indexOf('admin') || ~hostgroup.admins.indexOf(req.user.sub)) {
                         hostgroup.canedit = true;
                     }
@@ -94,7 +95,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             var admins = [];
             //console.log(JSON.stringify(req.body, null, 4));
             req.body.admins.forEach(function(admin) {
-                admins.push(admin.sub);
+                admins.push(admin.id);
             });
             hostgroup.admins = admins;
             //console.log(JSON.stringify(hostgroup, null, 4));
@@ -117,7 +118,7 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     //convert admin objects to list of subs
     var admins = [];
     req.body.admins.forEach(function(admin) {
-        admins.push(admin.sub);
+        admins.push(admin.id);
     });
     req.body.admins = admins;
 

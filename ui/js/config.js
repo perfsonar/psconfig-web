@@ -77,8 +77,8 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, $routeParams, $
             users.then(function(_users) { 
                 $scope.users = _users;
                 $scope.users_a = [];
-                for(var sub in $scope.users) {
-                    $scope.users_a.push($scope.users[sub]);
+                for(var id in $scope.users) {
+                    $scope.users_a.push($scope.users[id]);
                 }
                 //cb(jwtHelper.decodeToken(jwt));
                 cb();
@@ -126,6 +126,12 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, $routeParams, $
     */
 
     $scope.submit = function() {
+
+        /*
+        //make sure URL doesn't conflict
+        toaster.error("boo");
+        return;
+        */
 
         //some test paramter can be empty (like nagroup) which needs to be null not an empty string
         $scope.config.Tests.forEach(function(test) {

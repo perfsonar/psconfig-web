@@ -18,9 +18,9 @@ if [ ! -f /opt/mca/auth/api/config/auth.pub ]; then
     cd /opt/mca/auth/api/config && ./genkey.sh
 fi
 
-#generate profile.jwt for mca admin
-if [ ! -f /opt/mca/mca/api/config/profile.jwt ]; then
-    cd /opt/mca/auth/bin && ./auth.js issue --scopes '{ "mca": [] }' --sub 'mca_service' --out /opt/mca/mca/api/config/profile.jwt
+#generate auth.jwt for mca admin
+if [ ! -f /opt/mca/mca/api/config/auth.jwt ]; then
+    cd /opt/mca/auth/bin && ./auth.js issue --scopes '{ "mca": [] }' --sub 'mca_service' --out /opt/mca/mca/api/config/auth.jwt
 fi
 
 #start apache

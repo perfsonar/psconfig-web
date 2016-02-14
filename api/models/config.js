@@ -14,7 +14,7 @@ var logger = new winston.Logger(config.logger.winston);
 module.exports = function(sequelize, DataTypes) {
     return sequelize.define('Config', {
         desc: Sequelize.STRING,
-        url: Sequelize.STRING, //like "us-atlas"
+        url: { type: Sequelize.STRING, unique: true},
         
         /*
         tests: {

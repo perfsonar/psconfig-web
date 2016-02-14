@@ -10,12 +10,6 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, users, $modal, 
 
     users.then(function(_users) {
         $scope.users = _users;
-        /*
-        return $http.get(appconf.api+'/hostgroups').then(function(res) {
-            $scope.hostgroups = res.data;
-            return $scope.hostgroups;  //just to be more promise-ish
-        });
-        */
         hostgroups.then(function(_hostgroups) { $scope.hostgroups = _hostgroups});
     });
 
@@ -82,7 +76,6 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, users, $modal, 
         });
         modalInstance.result.then(function() {
             console.log("adding hostgroupu to list");
-            //console.dir(hostgroup);
             $scope.hostgroups.push(hostgroup); 
         }, function (code) {
             //console.log("dismiss code"+code);
@@ -95,29 +88,16 @@ function($scope, appconf, toaster, $http, $modalInstance, hostgroup, title, serv
     $scope.hostgroup = hostgroup;
     $scope.title = title;
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
-
     //profiles.then(function(_profiles) { $scope.profiles = _profiles; }); //for admin list
     services.then(function(_services) { $scope.services = _services; }); //for host list
 
     users.then(function(_users) {
         $scope.users = _users;
         $scope.users_a = [];
-        for(var sub in $scope.users) {
-            $scope.users_a.push($scope.users[sub]);
+        for(var id in $scope.users) {
+            $scope.users_a.push($scope.users[id]);
         }
     });
-
-    /*
-    function getdata() {
-        //create a copy of $scope.testspec so that UI doesn't break while saving.. (why just admins?)
-        var data = angular.copy($scope.hostgroup);
-        data.admins = [];
-        $scope.hostgroup.admins.forEach(function(admin) {
-            if(admin) data.admins.push(admin.sub);
-        });
-        return data;
-    }
-    */
 
     $scope.submit = function() {
         //find active tab

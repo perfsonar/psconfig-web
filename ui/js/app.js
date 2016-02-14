@@ -5,6 +5,7 @@ var app = angular.module('app', [
     'ngRoute',
     'ngAnimate',
     'ngCookies',
+    //'ngMessages',
     'toaster',
     'angular-loading-bar',
     'angular-jwt',
@@ -204,59 +205,19 @@ function(appconf, $http, jwtHelper, $sce, scaMessage, scaMenu, toaster) {
         },
         top: scaMenu,
         user: null, //to-be-loaded
-        _profile: null, //to-be-loaded
+        //_profile: null, //to-be-loaded
     };
     if(appconf.icon_url) menu.header.icon = $sce.trustAsHtml("<img src=\""+appconf.icon_url+"\">");
     if(appconf.home_url) menu.header.url = appconf.home_url
     if(jwt) menu.user = jwtHelper.decodeToken(jwt);
 
     /*
-    //TODO - maybe I should set up interval inside application.run()
-    var jwt = localStorage.getItem(appconf.jwt_id);
-    if(jwt) {
-        var expdate = jwtHelper.getTokenExpirationDate(jwt);
-        var ttl = expdate - Date.now();
-        if(ttl < 0) {
-            toaster.error("Your login session has expired. Please re-sign in");
-            localStorage.removeItem(appconf.jwt_id);
-        } else {
-            if(ttl < 3600*1000) {
-                //jwt expring in less than an hour! refresh!
-                console.log("jwt expiring in an hour.. refreshing first");
-                $http({
-                    url: appconf.auth_api+'/refresh',
-                    //skipAuthorization: true,  //prevent infinite recursion
-                    //headers: {'Authorization': 'Bearer '+jwt},
-                    method: 'POST'
-                }).then(function(response) {
-                    var jwt = response.data.jwt;
-                    localStorage.setItem(appconf.jwt_id, jwt);
-                    menu.user = jwtHelper.decodeToken(jwt);
-                });
-            }
-        }
-    }
-    */
-
     if(menu.user) {
         $http.get(appconf.profile_api+'/public/'+menu.user.sub).then(function(res) {
             menu._profile = res.data;
-            /* 
-            //TODO this is a bad place to do this, because requested page will still be loaded
-            //and flashes the scaMessage added below
-            if(menu.user) {
-                //logged in, but does user has email?
-                if(!res.data.email) {
-                    //force user to update profile
-                    //TODO - do I really need to?
-                    scaMessage.info("Please update your profile before using application.");
-                    sessionStorage.setItem('profile_settings_redirect', window.location.toString());
-                    document.location = appconf.profile_url;
-                }
-            }
-            */
         });
     }
+    */
     return menu;
 }]);
 

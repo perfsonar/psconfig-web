@@ -42,7 +42,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
 //config detail
 router.get('/:id', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
     var id = parseInt(req.params.id);
-    logger.debug("retrieving "+id);
+    //logger.debug("retrieving "+id);
     db.Config.findOne({
         where: {id: id},
         include: [ db.Test ],
@@ -84,45 +84,58 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
         where: {id: id}
     }).then(function(config) {
         if(!config) return next(new Error("can't find a config with id:"+id));
-        //only superadmin or admin of this test spec can update
-        if(~req.user.scopes.mca.indexOf('admin') || ~config.admins.indexOf(req.user.sub)) {
-            config.desc = req.body.desc;
-            config.url = req.body.url;
-            var admins = [];
-            req.body.admins.forEach(function(admin) {
-                admins.push(admin.sub);
-            });
-            config.admins = admins;
-            config.save().then(function() {
-                //upsert tests
-                var tests = [];
-                async.eachSeries(req.body.Tests, function(test, next) {
-                    if(test.id) {
-                        logger.debug("updating test with following--------------");
-                        logger.debug(test);
-                        db.Test.update(test, {where: {id: test.id}}).then(function() {
-                            tests.push(test.id); //TODO will this work?
-                            next();
-                        });
-                    } else {
-                        db.Test.create(test).then(function(_test) {
-                            tests.push(_test);
-                            next();
-                        });
-                    }
-                }, function(err) {
-                    if(err) return next(err);
-                    config.setTests(tests).then(function() {
-                        res.json({status: "ok"});
-                    }, next); //TODO - not sure if this is correct way to handle err for sequelize?
+
+        //make sure specified url doesn't conflict with other config
+        check_duplicate_url(req.body.url, config.id, function(err) {
+            if(err) return next(err);
+            console.log("ok");
+            //only superadmin or admin of this test spec can update
+            if(~req.user.scopes.mca.indexOf('admin') || ~config.admins.indexOf(req.user.sub)) {
+                config.desc = req.body.desc;
+                config.url = req.body.url;
+                var admins = [];
+                req.body.admins.forEach(function(admin) {
+                    admins.push(admin.id);
                 });
-            }).catch(function(err) {
-                next(err);
-            });    
-            
-        } else return res.status(401).end();
+                config.admins = admins;
+                config.save().then(function() {
+                    //upsert tests
+                    var tests = [];
+                    async.eachSeries(req.body.Tests, function(test, next) {
+                        if(test.id) {
+                            //logger.debug("updating test with following--------------");
+                            //logger.debug(test);
+                            db.Test.update(test, {where: {id: test.id}}).then(function() {
+                                tests.push(test.id); //TODO will this work?
+                                next();
+                            });
+                        } else {
+                            db.Test.create(test).then(function(_test) {
+                                tests.push(_test);
+                                next();
+                            });
+                        }
+                    }, function(err) {
+                        if(err) return next(err);
+                        config.setTests(tests).then(function() {
+                            res.json({status: "ok"});
+                        }, next); //TODO - not sure if this is correct way to handle err for sequelize?
+                    });
+                }).catch(function(err) {
+                    next(err);
+                });    
+                
+            } else return res.status(401).end();
+        });
     }); 
 });
+
+function check_duplicate_url(url, ownid, cb) {
+    db.Config.findOne({where: { url: url } }).then(function(rec) {
+        if(rec && rec.id != ownid) return cb("The URL specified is already used by another config. Please choose a different URL.");
+        cb(null);
+    });
+}
 
 //new config
 router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
@@ -131,25 +144,33 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     //convert admin objects to list of subs
     var admins = [];
     req.body.admins.forEach(function(admin) {
-        admins.push(admin.sub);
+        admins.push(admin.id);
     });
     req.body.admins = admins;
 
-    db.Config.create(req.body).then(function(config) {
-        //create tests
-        var tests = [];
-        async.eachSeries(req.body.Tests, function(test, next) {
-            db.Test.create(test).then(function(_test) {
-                tests.push(_test);
-                next();
+    //make sure specified url doesn't conflict with other config
+    check_duplicate_url(req.body.url, null, function(err) {
+        if(err) return next(err);
+        
+        db.Config.create(req.body).then(function(config) {
+            //create tests
+            var tests = [];
+            async.eachSeries(req.body.Tests, function(test, next) {
+                db.Test.create(test).then(function(_test) {
+                    tests.push(_test);
+                    next();
+                });
+            }, function(err) {
+                //then 
+                config.setTests(tests).then(function() {
+                    res.json({status: "ok"});
+                }, next); //TODO - not sure if this is correct way to handle err for sequelize?
             });
-        }, function(err) {
-            //then 
-            config.setTests(tests).then(function() {
-                res.json({status: "ok"});
-            }, next); //TODO - not sure if this is correct way to handle err for sequelize?
+        }).catch(function(err) {
+            next(err);      
         });
     });
+
 });
 
 module.exports = router;

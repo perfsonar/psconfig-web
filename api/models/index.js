@@ -27,7 +27,7 @@ if(typeof config.db === 'string') {
     //assume object
     var sequelize = new Sequelize(config.db.database, config.db.username, config.db.password, config.db);
 }
-var db        = {};
+var db = {};
 
 fs
   .readdirSync(__dirname)

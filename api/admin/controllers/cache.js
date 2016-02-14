@@ -104,6 +104,7 @@ router.put('/host/:uuid', jwt({secret: config.admin.jwt.pub}), function(req, res
     });
 });
 
+/*
 //used for admin list editor
 router.get('/profiles', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     logger.debug("requested profiles");
@@ -112,6 +113,7 @@ router.get('/profiles', jwt({secret: config.admin.jwt.pub}), function(req, res, 
         res.json(profiles);
     });
 });
+*/
 
 /*
 //update service cache immediately

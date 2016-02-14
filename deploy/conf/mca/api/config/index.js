@@ -30,9 +30,12 @@ exports.pub = {
 
 exports.common = {
     //profile service api
-    profile_api: 'http://localhost:12402',
+    //profile_api: 'http://localhost:12402',
     //jwt needed to access profile service - use auth/bin/auth.js to create the token
-    profile_jwt: fs.readFileSync(__dirname+'/profile.jwt'),
+    //profile_jwt: fs.readFileSync(__dirname+'/profile.jwt'),
+
+    auth_api: 'http://localhost:12000',
+    auth_jwt: fs.readFileSync(__dirname+'/auth.jwt'),
 };
 
 

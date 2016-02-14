@@ -36,8 +36,8 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, $location, users, $
             users.then(function(_users) { 
                 $scope.users = _users;
                 $scope.users_a = [];
-                for(var sub in $scope.users) {
-                    $scope.users_a.push($scope.users[sub]);
+                for(var id in $scope.users) {
+                    $scope.users_a.push($scope.users[id]);
                 }
                 load(jwtHelper.decodeToken(jwt));
             });

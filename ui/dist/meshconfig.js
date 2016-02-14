@@ -5,6 +5,7 @@ var app = angular.module('app', [
     'ngRoute',
     'ngAnimate',
     'ngCookies',
+    //'ngMessages',
     'toaster',
     'angular-loading-bar',
     'angular-jwt',
@@ -204,59 +205,19 @@ function(appconf, $http, jwtHelper, $sce, scaMessage, scaMenu, toaster) {
         },
         top: scaMenu,
         user: null, //to-be-loaded
-        _profile: null, //to-be-loaded
+        //_profile: null, //to-be-loaded
     };
     if(appconf.icon_url) menu.header.icon = $sce.trustAsHtml("<img src=\""+appconf.icon_url+"\">");
     if(appconf.home_url) menu.header.url = appconf.home_url
     if(jwt) menu.user = jwtHelper.decodeToken(jwt);
 
     /*
-    //TODO - maybe I should set up interval inside application.run()
-    var jwt = localStorage.getItem(appconf.jwt_id);
-    if(jwt) {
-        var expdate = jwtHelper.getTokenExpirationDate(jwt);
-        var ttl = expdate - Date.now();
-        if(ttl < 0) {
-            toaster.error("Your login session has expired. Please re-sign in");
-            localStorage.removeItem(appconf.jwt_id);
-        } else {
-            if(ttl < 3600*1000) {
-                //jwt expring in less than an hour! refresh!
-                console.log("jwt expiring in an hour.. refreshing first");
-                $http({
-                    url: appconf.auth_api+'/refresh',
-                    //skipAuthorization: true,  //prevent infinite recursion
-                    //headers: {'Authorization': 'Bearer '+jwt},
-                    method: 'POST'
-                }).then(function(response) {
-                    var jwt = response.data.jwt;
-                    localStorage.setItem(appconf.jwt_id, jwt);
-                    menu.user = jwtHelper.decodeToken(jwt);
-                });
-            }
-        }
-    }
-    */
-
     if(menu.user) {
         $http.get(appconf.profile_api+'/public/'+menu.user.sub).then(function(res) {
             menu._profile = res.data;
-            /* 
-            //TODO this is a bad place to do this, because requested page will still be loaded
-            //and flashes the scaMessage added below
-            if(menu.user) {
-                //logged in, but does user has email?
-                if(!res.data.email) {
-                    //force user to update profile
-                    //TODO - do I really need to?
-                    scaMessage.info("Please update your profile before using application.");
-                    sessionStorage.setItem('profile_settings_redirect', window.location.toString());
-                    document.location = appconf.profile_url;
-                }
-            }
-            */
         });
     }
+    */
     return menu;
 }]);
 
@@ -349,9 +310,15 @@ app.factory('hosts', ['appconf', '$http', 'jwtHelper', function(appconf, $http, 
     });
 }]);
 app.factory('users', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
-    return $http.get(appconf.api+'/cache/profiles')
+    return $http.get(appconf.auth_api+'/profiles')
+    //return $http.get(appconf.api+'/cache/profiles')
     .then(function(res) {
-        return res.data;
+        var users = {};
+        res.data.forEach(function(user) {
+            user.id = user.id.toString(); //id needs to be string for legacy reason
+            users[user.id] = user;
+        });
+        return users;
     }, function(res) {
         //console.log(res.statusText);
     });
@@ -452,7 +419,23 @@ function($scope, appconf, menu, serverconf, scaMessage, toaster, jwtHelper) {
     $scope.appconf = appconf;
 }]);
 
-
+/*
+app.directive('checkDuplicate', function() {
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function(scope, element, attr, ctrl) {
+            var taken = attr.checkDuplicate;
+            ctrl.$validators.checkDuplicate = function(modelValue, viewValue) {
+                if(~taken.indexOf(modelValue)) {
+                    return false;
+                }
+                return true;
+            }
+        }
+    }
+});
+*/
 
 
 app.controller('HostgroupsController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'serverconf', 'users', '$modal', 'scaMessage', 'hostgroups',
@@ -466,12 +449,6 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, users, $modal, 
 
     users.then(function(_users) {
         $scope.users = _users;
-        /*
-        return $http.get(appconf.api+'/hostgroups').then(function(res) {
-            $scope.hostgroups = res.data;
-            return $scope.hostgroups;  //just to be more promise-ish
-        });
-        */
         hostgroups.then(function(_hostgroups) { $scope.hostgroups = _hostgroups});
     });
 
@@ -538,7 +515,6 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, users, $modal, 
         });
         modalInstance.result.then(function() {
             console.log("adding hostgroupu to list");
-            //console.dir(hostgroup);
             $scope.hostgroups.push(hostgroup); 
         }, function (code) {
             //console.log("dismiss code"+code);
@@ -551,29 +527,16 @@ function($scope, appconf, toaster, $http, $modalInstance, hostgroup, title, serv
     $scope.hostgroup = hostgroup;
     $scope.title = title;
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
-
     //profiles.then(function(_profiles) { $scope.profiles = _profiles; }); //for admin list
     services.then(function(_services) { $scope.services = _services; }); //for host list
 
     users.then(function(_users) {
         $scope.users = _users;
         $scope.users_a = [];
-        for(var sub in $scope.users) {
-            $scope.users_a.push($scope.users[sub]);
+        for(var id in $scope.users) {
+            $scope.users_a.push($scope.users[id]);
         }
     });
-
-    /*
-    function getdata() {
-        //create a copy of $scope.testspec so that UI doesn't break while saving.. (why just admins?)
-        var data = angular.copy($scope.hostgroup);
-        data.admins = [];
-        $scope.hostgroup.admins.forEach(function(admin) {
-            if(admin) data.admins.push(admin.sub);
-        });
-        return data;
-    }
-    */
 
     $scope.submit = function() {
         //find active tab
@@ -807,8 +770,8 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, $location, users, $
             users.then(function(_users) { 
                 $scope.users = _users;
                 $scope.users_a = [];
-                for(var sub in $scope.users) {
-                    $scope.users_a.push($scope.users[sub]);
+                for(var id in $scope.users) {
+                    $scope.users_a.push($scope.users[id]);
                 }
                 load(jwtHelper.decodeToken(jwt));
             });
@@ -1033,8 +996,8 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, $routeParams, $
             users.then(function(_users) { 
                 $scope.users = _users;
                 $scope.users_a = [];
-                for(var sub in $scope.users) {
-                    $scope.users_a.push($scope.users[sub]);
+                for(var id in $scope.users) {
+                    $scope.users_a.push($scope.users[id]);
                 }
                 //cb(jwtHelper.decodeToken(jwt));
                 cb();
@@ -1082,6 +1045,12 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, $routeParams, $
     */
 
     $scope.submit = function() {
+
+        /*
+        //make sure URL doesn't conflict
+        toaster.error("boo");
+        return;
+        */
 
         //some test paramter can be empty (like nagroup) which needs to be null not an empty string
         $scope.config.Tests.forEach(function(test) {

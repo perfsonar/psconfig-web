@@ -43,9 +43,15 @@ app.factory('hosts', ['appconf', '$http', 'jwtHelper', function(appconf, $http, 
     });
 }]);
 app.factory('users', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
-    return $http.get(appconf.api+'/cache/profiles')
+    return $http.get(appconf.auth_api+'/profiles')
+    //return $http.get(appconf.api+'/cache/profiles')
     .then(function(res) {
-        return res.data;
+        var users = {};
+        res.data.forEach(function(user) {
+            user.id = user.id.toString(); //id needs to be string for legacy reason
+            users[user.id] = user;
+        });
+        return users;
     }, function(res) {
         //console.log(res.statusText);
     });
@@ -146,4 +152,20 @@ function($scope, appconf, menu, serverconf, scaMessage, toaster, jwtHelper) {
     $scope.appconf = appconf;
 }]);
 
-
+/*
+app.directive('checkDuplicate', function() {
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function(scope, element, attr, ctrl) {
+            var taken = attr.checkDuplicate;
+            ctrl.$validators.checkDuplicate = function(modelValue, viewValue) {
+                if(~taken.indexOf(modelValue)) {
+                    return false;
+                }
+                return true;
+            }
+        }
+    }
+});
+*/

@@ -69,7 +69,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             testspec.specs = req.body.specs;
             var admins = [];
             req.body.admins.forEach(function(admin) {
-                admins.push(admin.sub);
+                admins.push(admin.id);
             });
             testspec.admins = admins;
             testspec.save().then(function() {
@@ -92,7 +92,7 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     //convert admin objects to list of subs
     var admins = [];
     req.body.admins.forEach(function(admin) {
-        admins.push(admin.sub);
+        admins.push(admin.id);
     });
     req.body.admins = admins;
     //console.dir(req.body);

@@ -36,36 +36,35 @@ exports.cache = function(cb) {
 
 //proxy for profile/users API
 exports.getall = function(cb) { 
-    //return profiles 
-    //cb(null, profiles);
     request.get({
-        url: config.common.profile_api+"/users",
+        url: config.common.auth_api+"/profiles",
         json: true,
-        headers: { 'Authorization': 'Bearer '+config.common.profile_jwt }
+        headers: { 'Authorization': 'Bearer '+config.common.auth_jwt }
     }, function (err, res, profiles) {
         if(err) return cb(err);
         if (res.statusCode != 200) {
             return cb({message: "couldn't load user profiles from profile service:", code: res.statusCode});
         }
-        //convert to array of objecdt keyed by subs
+        //convert to array of objecdt keyed by user ids
         var ps = {};
         profiles.forEach(function(p) {
-            p.public.sub = p.sub; //copy sub from key to inside the public profile
-            ps[p.sub] = p.public;
+            //p.public.sub = p.id;
+            ps[p.id] = p;
         });
+        //console.dir(ps);
         cb(null, ps);
     });
 };
 
 //synchrnoous because user has to provide profiles array
-exports.select = function(profiles, subs) {
+exports.select = function(profiles, ids) {
     //console.log(JSON.stringify(profiles, null, 4));
     var ps = [];
-    subs.forEach(function(sub) {
-        if(profiles[sub] === undefined) {
-            logger.warn("couldn't find user with sub:"+sub+" in profiles cache");
+    ids.forEach(function(id) {
+        if(profiles[id] === undefined) {
+            logger.warn("couldn't find user with id:"+id+" in profiles cache");
         } else {
-            var p = profiles[sub];
+            var p = profiles[id];
             ps.push(p);
         } 
     });
