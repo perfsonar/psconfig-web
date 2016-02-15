@@ -42,13 +42,5 @@ cd /etc/grid-security/certificates && wget https://dist.igtf.net/distribution/cu
 service httpd start
 chkconfig httpd on
 
-#now I should be able to start everything
-#su - mca -c "pm2 start /opt/mca/mca/deploy/mca.json"
-#su - mca -c "pm2 save"
-
-#persist pm2 session over reboot
-#TODO - this somehow hoses up the script when run from init script
-#pm2 startup redhat -u mca
-
 service mca start
 chkconfig mca on

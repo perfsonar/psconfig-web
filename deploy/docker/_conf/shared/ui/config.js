@@ -10,7 +10,7 @@
         {
             id: "doc",
             label: "Documentation",
-            url: "http://docs.perfsonar.net/mca.html",
+            url: "http://docs.perfsonar.net/mca.html"
         },
         {
             id: "user",

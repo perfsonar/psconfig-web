@@ -15,8 +15,8 @@ angular.module('app.config', []).constant('appconf', {
     //pub_url: '../pub',
     pub_url: 'http://'+location.hostname+location.pathname+'../pub',
 
-    profile_api: '../api/profile',
-    profile_url: '../profile',
+    //profile_api: '../api/profile',
+    //profile_url: '../profile',
 
     //shared servive api and ui urls (for menus and stuff)
     shared_api: '../api/shared',

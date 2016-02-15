@@ -10,7 +10,7 @@
 ### END INIT INFO
 
 user=mca
-pm2json=/opt/mca/mca/deploy/mca.json
+pm2json=/opt/mca/mca/deploy/common/mca.json
 #name=`basename $0`
 
 case "$1" in

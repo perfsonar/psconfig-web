@@ -10,7 +10,7 @@
         {
             id: "doc",
             label: "Documentation",
-            url: "deploy/rhel6/_conf/shared/ui/config.js",
+            url: "http://docs.perfsonar.net/mca.html"
         },
         {
             id: "user",

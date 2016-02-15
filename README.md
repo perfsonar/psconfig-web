@@ -21,7 +21,6 @@ when config is removed, test records will be orphaned - should be cascaded?
 
 * Prevent user from removing hostgroups / testspecs currently used by a config
 * Prevent user from orphaning config / testspecs / hostsgroups by removing all admins
-* Prevent user from entering config with duplicate url
 
 * profile service needs to announce any updates made by user to all other services caching profile info
 * Display which config/test users each hostgroup / testspecs
