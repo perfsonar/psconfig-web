@@ -616,13 +616,14 @@ app.directive('hostfilter', function($q, $http, appconf) {
                 .then(function(res) {
                     p.hostgroup._hosts = res.data.recs;
                     p.host_filter_alert = null;
+                    p.host_filter_console = res.data.c;
                     def.resolve();
                     console.dir(res.data);
                 }, function(res) {
-                    //toaster.error(res.data.message);
                     p.hostgroup._hosts = null;
+                    p.host_filter_alert = null;
+                    p.host_filter_console = null;
                     if(res.data.message) p.host_filter_alert = res.data.message;
-                    //console.dir(res);
                     def.reject();
                 });   
                 return def.promise;

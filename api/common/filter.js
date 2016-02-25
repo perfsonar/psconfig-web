@@ -27,13 +27,12 @@ exports.resolveHostGroup = function(js, type, cb) {
             "   try {\n"+
             js+"\n"+
             "   } catch(e) {\n"+
-            "   console.log(e.toString());\n"+
+            "   console.log(host.hostname+' - '+e.toString());\n"+
             "   }\n"+
             "}))";
-        //console.log(code);
         sandbox.run(code, function(res) {
             //console.dir(res);
-            var _recs = res.result.slice(1, -1); //remove first and last double quotes..
+            var _recs = res.result.slice(1, -1); //remove first and last double quotes (not sure how I can get rid of it)
             try {
                 var precs = JSON.parse(_recs);
                 var ids = [];
