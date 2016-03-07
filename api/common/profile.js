@@ -36,6 +36,7 @@ exports.cache = function(cb) {
 
 //proxy for profile/users API
 exports.getall = function(cb) { 
+        //console.dir({ 'Authorization': 'Bearer '+config.common.auth_jwt });
     request.get({
         url: config.common.auth_api+"/profiles",
         json: true,

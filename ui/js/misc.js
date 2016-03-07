@@ -71,28 +71,28 @@ app.factory('hostgroups', ['appconf', '$http', 'jwtHelper', function(appconf, $h
 
 app.directive('mcAdmins', function() {
     return {
-        scope: { admins: '=', },
+        scope: { admins: '<', },
         templateUrl: 't/admins.html',
     } 
 });
 
 app.directive('mcSpecs', function() {
     return {
-        scope: { specs: '=', },
+        scope: { specs: '<', },
         templateUrl: 't/specs.html',
     } 
 });
 
 app.directive('mcService', function() {
     return {
-        scope: { ls: '=', service: '=', },
+        scope: { ls: '<', service: '<', },
         templateUrl: 't/service.html',
     } 
 });
 
 app.directive('mcTests', function() {
     return {
-        scope: { tests: '=', servicetypes: '=', /*testspecs: '=', hostgroups: '='*/},
+        scope: { tests: '<', servicetypes: '<', /*testspecs: '=', hostgroups: '='*/},
         templateUrl: 't/tests.html',
         controller: function($scope, services) {
             services.then(function(_services) { 
@@ -114,7 +114,7 @@ app.directive('mcTests', function() {
 
 app.directive('mcHostlist', ['services', function(services) {
     return {
-        scope: { hosts: '=', serviceid: '='},
+        scope: { hosts: '<', serviceid: '<'},
         templateUrl: 't/hostlist.html',
         link: function(scope, element, attrs) {
             //link only gets executed once. I need to watch hosts list myself in case it changes
@@ -152,20 +152,4 @@ function($scope, appconf, menu, serverconf, scaMessage, toaster, jwtHelper) {
     $scope.appconf = appconf;
 }]);
 
-/*
-app.directive('checkDuplicate', function() {
-    return {
-        restrict: 'A',
-        require: 'ngModel',
-        link: function(scope, element, attr, ctrl) {
-            var taken = attr.checkDuplicate;
-            ctrl.$validators.checkDuplicate = function(modelValue, viewValue) {
-                if(~taken.indexOf(modelValue)) {
-                    return false;
-                }
-                return true;
-            }
-        }
-    }
-});
-*/
+

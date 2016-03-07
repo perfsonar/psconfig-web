@@ -5,7 +5,6 @@ var app = angular.module('app', [
     'ngRoute',
     'ngAnimate',
     'ngCookies',
-    //'ngMessages',
     'toaster',
     'angular-loading-bar',
     'angular-jwt',
@@ -45,23 +44,6 @@ app.directive('ngConfirmClick', [
         };
     }
 ])
-
-/* attempt to get ui-select's required flag working.. didn't work
-app.directive('uiSelect', function() {
-    return {
-        restrict: 'EA',
-        require: '?ngModel',
-        link: function (scope, element, attrs, ctrl) {
-            //if (ctrl && angular.isDefined(attrs.multiple)) {
-            if (ctrl) {
-                ctrl.$isEmpty = function(value) {
-                    return !value || value.length === 0;
-                };
-            }
-        }
-    };
-});
-*/
 
 //http://stackoverflow.com/questions/14852802/detect-unsaved-changes-and-alert-user-using-angularjs
 app.directive('confirmOnExit', function() {
@@ -144,26 +126,11 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         templateUrl: 't/hosts.html',
         controller: 'HostsController'
     })
-    /*
-    .when('/success', {
-        templateUrl: 't/empty.html',
-        controller: 'SuccessController'
-    })
-    .when('/resetpass', {
-        templateUrl: 't/resetpass.html',
-        controller: 'ResetpassController'
-    })
-    */
     .otherwise({
         redirectTo: '/about'
     });
-    
-    //console.dir($routeProvider);
 }]).run(['$rootScope', '$location', 'jwtHelper', 'appconf', 'scaMessage',
 function($rootScope, $location, jwtHelper, appconf, scaMessage) {
-
-    //console.log("application starting");
-
     $rootScope.$on("$routeChangeStart", function(event, next, current) {
         //console.log("route changed from "+current+" to :"+next);
         //redirect to /login if user hasn't authenticated yet
@@ -196,28 +163,14 @@ function(appconf, $http, jwtHelper, $sce, scaMessage, scaMenu, toaster) {
 
     var jwt = localStorage.getItem(appconf.jwt_id);
     var menu = {
-        header: {
-            //label: appconf.title,
-            /*
-            icon: $sce.trustAsHtml("<img src=\""+appconf.icon_url+"\">"),
-            url: appconf.home_url,
-            */
-        },
+        header: {},
         top: scaMenu,
         user: null, //to-be-loaded
-        //_profile: null, //to-be-loaded
     };
     if(appconf.icon_url) menu.header.icon = $sce.trustAsHtml("<img src=\""+appconf.icon_url+"\">");
     if(appconf.home_url) menu.header.url = appconf.home_url
     if(jwt) menu.user = jwtHelper.decodeToken(jwt);
 
-    /*
-    if(menu.user) {
-        $http.get(appconf.profile_api+'/public/'+menu.user.sub).then(function(res) {
-            menu._profile = res.data;
-        });
-    }
-    */
     return menu;
 }]);
 

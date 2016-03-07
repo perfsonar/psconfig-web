@@ -5,7 +5,6 @@ var app = angular.module('app', [
     'ngRoute',
     'ngAnimate',
     'ngCookies',
-    //'ngMessages',
     'toaster',
     'angular-loading-bar',
     'angular-jwt',
@@ -45,23 +44,6 @@ app.directive('ngConfirmClick', [
         };
     }
 ])
-
-/* attempt to get ui-select's required flag working.. didn't work
-app.directive('uiSelect', function() {
-    return {
-        restrict: 'EA',
-        require: '?ngModel',
-        link: function (scope, element, attrs, ctrl) {
-            //if (ctrl && angular.isDefined(attrs.multiple)) {
-            if (ctrl) {
-                ctrl.$isEmpty = function(value) {
-                    return !value || value.length === 0;
-                };
-            }
-        }
-    };
-});
-*/
 
 //http://stackoverflow.com/questions/14852802/detect-unsaved-changes-and-alert-user-using-angularjs
 app.directive('confirmOnExit', function() {
@@ -144,26 +126,11 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         templateUrl: 't/hosts.html',
         controller: 'HostsController'
     })
-    /*
-    .when('/success', {
-        templateUrl: 't/empty.html',
-        controller: 'SuccessController'
-    })
-    .when('/resetpass', {
-        templateUrl: 't/resetpass.html',
-        controller: 'ResetpassController'
-    })
-    */
     .otherwise({
         redirectTo: '/about'
     });
-    
-    //console.dir($routeProvider);
 }]).run(['$rootScope', '$location', 'jwtHelper', 'appconf', 'scaMessage',
 function($rootScope, $location, jwtHelper, appconf, scaMessage) {
-
-    //console.log("application starting");
-
     $rootScope.$on("$routeChangeStart", function(event, next, current) {
         //console.log("route changed from "+current+" to :"+next);
         //redirect to /login if user hasn't authenticated yet
@@ -196,28 +163,14 @@ function(appconf, $http, jwtHelper, $sce, scaMessage, scaMenu, toaster) {
 
     var jwt = localStorage.getItem(appconf.jwt_id);
     var menu = {
-        header: {
-            //label: appconf.title,
-            /*
-            icon: $sce.trustAsHtml("<img src=\""+appconf.icon_url+"\">"),
-            url: appconf.home_url,
-            */
-        },
+        header: {},
         top: scaMenu,
         user: null, //to-be-loaded
-        //_profile: null, //to-be-loaded
     };
     if(appconf.icon_url) menu.header.icon = $sce.trustAsHtml("<img src=\""+appconf.icon_url+"\">");
     if(appconf.home_url) menu.header.url = appconf.home_url
     if(jwt) menu.user = jwtHelper.decodeToken(jwt);
 
-    /*
-    if(menu.user) {
-        $http.get(appconf.profile_api+'/public/'+menu.user.sub).then(function(res) {
-            menu._profile = res.data;
-        });
-    }
-    */
     return menu;
 }]);
 
@@ -338,28 +291,28 @@ app.factory('hostgroups', ['appconf', '$http', 'jwtHelper', function(appconf, $h
 
 app.directive('mcAdmins', function() {
     return {
-        scope: { admins: '=', },
+        scope: { admins: '<', },
         templateUrl: 't/admins.html',
     } 
 });
 
 app.directive('mcSpecs', function() {
     return {
-        scope: { specs: '=', },
+        scope: { specs: '<', },
         templateUrl: 't/specs.html',
     } 
 });
 
 app.directive('mcService', function() {
     return {
-        scope: { ls: '=', service: '=', },
+        scope: { ls: '<', service: '<', },
         templateUrl: 't/service.html',
     } 
 });
 
 app.directive('mcTests', function() {
     return {
-        scope: { tests: '=', servicetypes: '=', /*testspecs: '=', hostgroups: '='*/},
+        scope: { tests: '<', servicetypes: '<', /*testspecs: '=', hostgroups: '='*/},
         templateUrl: 't/tests.html',
         controller: function($scope, services) {
             services.then(function(_services) { 
@@ -381,7 +334,7 @@ app.directive('mcTests', function() {
 
 app.directive('mcHostlist', ['services', function(services) {
     return {
-        scope: { hosts: '=', serviceid: '='},
+        scope: { hosts: '<', serviceid: '<'},
         templateUrl: 't/hostlist.html',
         link: function(scope, element, attrs) {
             //link only gets executed once. I need to watch hosts list myself in case it changes
@@ -419,23 +372,7 @@ function($scope, appconf, menu, serverconf, scaMessage, toaster, jwtHelper) {
     $scope.appconf = appconf;
 }]);
 
-/*
-app.directive('checkDuplicate', function() {
-    return {
-        restrict: 'A',
-        require: 'ngModel',
-        link: function(scope, element, attr, ctrl) {
-            var taken = attr.checkDuplicate;
-            ctrl.$validators.checkDuplicate = function(modelValue, viewValue) {
-                if(~taken.indexOf(modelValue)) {
-                    return false;
-                }
-                return true;
-            }
-        }
-    }
-});
-*/
+
 
 
 app.controller('HostgroupsController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'serverconf', 'users', '$modal', 'scaMessage', 'hostgroups',
