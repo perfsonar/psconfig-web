@@ -48,7 +48,8 @@ app.factory('users', ['appconf', '$http', 'jwtHelper', function(appconf, $http, 
     .then(function(res) {
         var users = {};
         res.data.forEach(function(user) {
-            user.id = user.id.toString(); //id needs to be string for legacy reason
+            //user.id = user.id.toString(); //id needs to be string for legacy reason
+            user.id = user.id;
             users[user.id] = user;
         });
         return users;
