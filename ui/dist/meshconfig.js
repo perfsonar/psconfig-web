@@ -80,6 +80,10 @@ app.directive('stopEvent', function () {
     };
 });
 
+app.config(function(uiSelectConfig) {
+  uiSelectConfig.dropdownPosition = 'down';
+})
+
 //show loading bar at the top
 app.config(['cfpLoadingBarProvider', '$logProvider', function(cfpLoadingBarProvider, $logProvider) {
     cfpLoadingBarProvider.includeSpinner = false;
@@ -215,6 +219,16 @@ app.filter('propsFilter', function() {
 app.filter('specname',function(){
     return function(input){
         if(input) return input.replace(new RegExp('_', 'g'), ' ');
+    }
+});
+
+app.filter('trim_locator', function() {
+    return function(input) {
+        var b = input.indexOf("//");
+        if(~b) input = input.substr(b+2);
+        var e = input.indexOf(":");
+        if(~e) input = input.substr(0, e);
+        return input;
     }
 });
 

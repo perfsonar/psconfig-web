@@ -20,7 +20,7 @@
         <div class="form-group">
             <label for="admins" class="col-sm-2 control-label">Admins</label>
             <div class="col-sm-10">
-                <ui-select multiple ng-model="hostgroup.admins" ng-disabled="disabled">
+                <ui-select multiple ng-model="hostgroup.admins">
                     <ui-select-match placeholder="Select admins who can update this test spec">
                         <img gravatar-src="$item.email" gravatar-size="17"/>
                         <b>{{$item.fullname}}</b> <span class="email">&lt;{{$item.email}}&gt;</span>
@@ -38,7 +38,7 @@
             <div class="col-sm-10">
                 <tabset>
                     <tab heading="Static" active="tabs['static'].active">
-                        <ui-select multiple ng-model="hostgroup.hosts" ng-disabled="disabled" style="margin-top: 5px;">
+                        <ui-select multiple ng-model="hostgroup.hosts" style="margin-top: 5px;">
                             <ui-select-match placeholder="Enter hostname">
                                 <mc-service ls="services.lss[$item.lsid]" service="$item"></mc-service>
                             </ui-select-match>

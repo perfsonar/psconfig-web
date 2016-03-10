@@ -95,8 +95,26 @@ ul.hosts {
     z-order: 1;
 }
 .ui-select-match-close {
-color: #222;
+    color: #222;
 }
+.ui-select-multiple {
+    /*
+    > div {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    */
+    &.ui-select-bootstrap .ui-select-match-item {
+        margin: 0 2px 1px 0;
+    }
+    &.ui-select-bootstrap {
+        padding: 2px 2px 1px;
+    }
+    span.btn-xs {
+        padding: 2px;
+    }
+}
+
 .host {
     background-color: #f0f0f0;
     padding: 4px 6px;
