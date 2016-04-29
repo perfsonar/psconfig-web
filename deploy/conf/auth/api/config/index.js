@@ -45,7 +45,8 @@ exports.x509 = {
 
 exports.db = {
     "dialect": "sqlite", 
-    "storage": "/var/lib/mca/auth.sqlite"
+    "storage": "/var/lib/mca/auth.sqlite",
+    "logging": false
 }
 
 //comment this out to disable iucas auth
