@@ -41,6 +41,7 @@ load_profiles();
 //construct meshconfig
 router.get('/:url', function(req, res, next) {
     var url = req.params.url;
+    var ma_override = req.query.ma_override;
     db.Config.findOne({
         where: {url: url},
         include: [ 
@@ -88,6 +89,13 @@ router.get('/:url', function(req, res, next) {
             }).then(function(services) {
                 config.services = services;
 
+                //override MA endpoint
+                if(ma_override) {
+                    services.forEach(function(service) {
+                        service.MA = {locator: ma_override};
+                    });
+                }
+
                 //load all mas involved
                 var uuids = [];
                 services.forEach(function(service) {
@@ -101,6 +109,7 @@ router.get('/:url', function(req, res, next) {
                     where: {client_uuid: {$in: uuids}, type: "ma" },
                 }).then(function(mas) {
                     config.mas = mas;
+                    console.dir(config);
 
                     //finally.. construct meshconfig
                     res.json(meshconfig.generate(config));

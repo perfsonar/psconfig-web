@@ -152,7 +152,6 @@ function get_type(service_type) {
 }
 
 function generate_mainfo(service) {
-    
     return {
         //ma: service.MA,
         read_url: service.MA.locator,
