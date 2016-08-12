@@ -4,9 +4,12 @@ var winston = require('winston');
 
 exports.auth = {
     //user scopes to give to all new users
-    default_scopes: {
-        sca: ["user"], //needed for most sca service
-        mca: ["user"], //needed because mca depends on it
+    default: {
+        scopes: {
+            sca: ["user"], //needed for most sca service
+            mca: ["user"], //needed because mca depends on it
+        },
+        gids: [], 
     },
 
     //isser to use for generated jwt token
