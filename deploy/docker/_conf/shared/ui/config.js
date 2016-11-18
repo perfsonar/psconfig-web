@@ -1,6 +1,11 @@
 (function() {
     'use strict';
     var sca = angular.module('sca-shared.menu', []);
+
+    sca.constant('scaSharedConfig', {
+        shared_url: '/meshconfig/shared', 
+    });
+
     sca.constant('scaMenu', [
         {
             id: "meshconfig",

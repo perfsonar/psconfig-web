@@ -1,6 +1,6 @@
 {
   "name": "perfsonar-meshconfig-admin",
-  "version": "2.0.19",
+  "version": "2.1.0",
   "description": "Tools to generate / publish meshconfig",
   "scripts": {
     "test": "mocha"
@@ -12,28 +12,27 @@
     "url": "https://github.com/soichih/meshconfig-admin"
   },
   "dependencies": {
-    "async": "^1.4.2",
+    "async": "^2.1.2",
     "body-parser": "^1.13.3",
     "compression": "^1.6.1",
     "express": "^4.13.3",
-    "express-jwt": "^3.0.1",
-    "express-validator": "^2.14.2",
-    "express-winston": "^0.3.1",
-    "pg": "^4.4.3",
+    "express-jwt": "^5.1.0",
+    "express-winston": "^2.0.0",
+    "pg": "^6.1.0",
     "pg-hstore": "^2.3.2",
     "pg-native": "^1.9.0",
     "promise": "^7.0.4",
-    "request": "^2.64.0",
+    "request": "^2.78.0",
     "sandbox": "^0.8.6",
-    "sequelize": "^3.18.0",
-    "sqlite3": "^3.0.10",
+    "sequelize": "^3.26.0",
+    "sqlite3": "^3.1.8",
     "underscore": "^1.8.3",
-    "winston": "^1.0.2"
+    "winston": "^2.3.0"
   },
   "devDependencies": {
-    "assert": "~1.3.0",
+    "assert": "^1.4.1",
     "chai": "^3.4.1",
-    "jsonwebtoken": "^5.4.1",
-    "supertest": "~1.1.0"
+    "jsonwebtoken": "^7.1.9",
+    "supertest": "~2.0.1"
   }
 }

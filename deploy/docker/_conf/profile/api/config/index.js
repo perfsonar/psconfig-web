@@ -13,7 +13,8 @@ exports.profile = {
 
 exports.db = {
     dialect: 'sqlite',
-    storage: '/var/lib/mca/profile.sqlite'
+    storage: '/var/lib/mca/profile.sqlite',
+    logging: false,
 }
 
 exports.express = {

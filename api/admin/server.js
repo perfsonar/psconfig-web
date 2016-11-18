@@ -1,26 +1,25 @@
 #!/usr/bin/node
 
 //node
-var fs = require('fs');
-var path = require('path');
+const fs = require('fs');
+const path = require('path');
 
 //contrib
-var express = require('express');
-var bodyParser = require('body-parser');
-var winston = require('winston');
-var expressWinston = require('express-winston');
-var compression = require('compression');
+const express = require('express');
+const bodyParser = require('body-parser');
+const winston = require('winston');
+const expressWinston = require('express-winston');
+const compression = require('compression');
 
 //mine
-var config = require('../config');
-var logger = new winston.Logger(config.logger.winston);
-var db = require('../models');
-var migration = require('./migration');
-//var slscache = require('./slscache');
-var common = require('../common');
+const config = require('../config');
+const logger = new winston.Logger(config.logger.winston);
+const db = require('../models');
+const migration = require('./migration');
+const common = require('../common');
 
 //init express
-var app = express();
+const app = express();
 app.use(compression());
 app.use(bodyParser.json()); //parse application/json
 app.use(expressWinston.logger(config.logger.winston));
@@ -32,11 +31,16 @@ app.use('/', require('./controllers'));
 app.use(expressWinston.errorLogger(config.logger.winston)); 
 app.use(function(err, req, res, next) {
     if(typeof err == "string") err = {message: err};
-    logger.error(err);
-    if(err.stack) {
-        logger.error(err.stack);
-        err.stack = "hidden"; //hide for ui
+
+    //log this error
+    logger.info(err);
+    if(err.name) switch(err.name) {
+    case "UnauthorizedError":
+        logger.info(req.headers); //dump headers for debugging purpose..
+        break;
     }
+
+    if(err.stack) err.stack = "hidden"; //don't sent call stack to UI - for security reason
     res.status(err.status || 500);
     res.json(err);
 });

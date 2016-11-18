@@ -5,7 +5,7 @@
     <p ng-if="hosts_num == 0" class="help-block">No hosts / services cached yet. Is MeshConfig Admin cache service configured properly and running?</p>
     <ul class="list-group">
     <li class="list-group-item" 
-        ng-repeat="(client_uuid, host) in hosts | orderObjectBy: '_detail.sitename'">
+        ng-repeat="(client_uuid, host) in hosts">
         <div class="row">
             <div class="col-md-7">
                 <h4>
@@ -24,7 +24,7 @@
                     </small>
                 </h4>
                 <ul class="list-group">
-                    <li class="list-group-item" ng-repeat="service in host.services | filter:{type:'!ma'} | orderObjectBy: 'name'">
+                    <li class="list-group-item" ng-repeat="service in host.services | filter:{type:'!ma'}">
                         <div class="host">
                             <!-- if the lsid for this service is different from the first one we picked, then add label to indicate that it's from different ls --> 
                             <span ng-if="service.lsid != host.services[0].lsid" class="label {{services.lss[service.lsid].label_class}}"> {{services.lss[service.lsid].label}}</span>

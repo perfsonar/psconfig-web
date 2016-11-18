@@ -6,15 +6,15 @@
     <meta name="viewport" content="initial-scale=1, width=device-width">
     <title ng-bind="title">Loading..</title>
 
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="bower_components/bootswatch/yeti/bootstrap.min.css">
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="node_modules/bootswatch/yeti/bootstrap.min.css">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:400,700">
-    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" href="bower_components/angular-loading-bar/build/loading-bar.min.css">
-    <link rel="stylesheet" href="bower_components/angularjs-toaster/toaster.min.css">
-    <link rel="stylesheet" href="bower_components/angular/angular-csp.css">
-    <!--<link rel="stylesheet" href="bower_components/simple-sidebar/css/simple-sidebar.css">-->
-    <link rel="stylesheet" href="bower_components/ui-select/dist/select.min.css">
+    <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="node_modules/angular-loading-bar/build/loading-bar.min.css">
+    <link rel="stylesheet" href="node_modules/angularjs-toaster/toaster.min.css">
+    <link rel="stylesheet" href="node_modules/angular/angular-csp.css">
+    <!--<link rel="stylesheet" href="node_modules/simple-sidebar/css/simple-sidebar.css">-->
+    <link rel="stylesheet" href="node_modules/ui-select/dist/select.min.css">
 
     <link rel="stylesheet" href="../shared/css/style.css"><!--TODO should be configurable-->
     <link rel="stylesheet" href="css/style.css">
@@ -24,37 +24,36 @@
     <toaster-container toaster-options="{'position-class': 'toast-bottom-right'}"></toaster-container>
     <ng-view></ng-view>
     <ng-include src="'t/footer.html'"></ng-include> <!--should this be part of view?-->
+    
+    <!--pre angular-->
+    <script src="node_modules/jquery/dist/jquery.min.js"></script><!--bootstrap requires jquery-->
+    <script src="node_modules/ace-builds/src-min-noconflict/ace.js"></script>
+    <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 
-    <script src="bower_components/jquery/dist/jquery.min.js"></script><!--bootstrap requires jquery-->
-    <script src="bower_components/angular/angular.min.js"></script>
-    <script src="bower_components/angular-route/angular-route.min.js"></script>
-    <script src="bower_components/angular-jwt/dist/angular-jwt.min.js"></script>
-    <script src="bower_components/angular-animate/angular-animate.min.js"></script>
-    <script src="bower_components/angular-cookies/angular-cookies.min.js"></script>
-    <script src="bower_components/angular-loading-bar/build/loading-bar.min.js"></script>
-    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
-    <script src="bower_components/ui-select/dist/select.min.js"></script>
-    <script src="bower_components/angularjs-toaster/toaster.min.js"></script>
-    <script src="bower_components/angular-order-object-by/src/ng-order-object-by.js"></script>
-    <script src="bower_components/angular-gravatar/build/angular-gravatar.js"></script>
-    <script src="bower_components/ace-builds/src-min-noconflict/ace.js"></script>
-    <script src="bower_components/angular-ui-ace/ui-ace.min.js"></script>
+    <!--angular-->
+    <script src="node_modules/angular/angular.min.js"></script>
+    <script src="node_modules/angular-route/angular-route.min.js"></script>
+    <script src="node_modules/angular-jwt/dist/angular-jwt.min.js"></script>
+    <script src="node_modules/angular-animate/angular-animate.min.js"></script>
+    <script src="node_modules/angular-cookies/angular-cookies.min.js"></script>
+    <script src="node_modules/angular-loading-bar/build/loading-bar.min.js"></script>
+    <script src="node_modules/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+    <!--<script src="node_modules/angular-order-object-by/src/ng-order-object-by.js"></script>-->
+    <script src="node_modules/angular-gravatar/build/angular-gravatar.js"></script>
+    <script src="node_modules/angularjs-toaster/toaster.min.js"></script>
+    <script src="node_modules/ui-select/dist/select.min.js"></script>
+    <script src="node_modules/angular-ui-ace/src/ui-ace.js"></script>
 
     <script src="config.js"></script> 
 
-    <!-- TODO make this configurable? don't forget the shared/css/style.css -->
     <script src="../shared/config.js"></script> 
     <script src="../shared/dist/shared.js"></script> 
 
-    <!--
     <script src="js/app.js"></script>
     <script src="js/misc.js"></script>
     <script src="js/config.js"></script>
     <script src="js/testspec.js"></script>
+    <script src="js/host.js"></script>
     <script src="js/hostgroup.js"></script>
-    <script src="js/service.js"></script>
-    -->
-    <script src="dist/meshconfig.js"></script>
 </body>
 </html>
