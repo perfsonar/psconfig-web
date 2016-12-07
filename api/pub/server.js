@@ -29,11 +29,15 @@ app.use('/', require('./controllers'));
 //error handling
 app.use(expressWinston.errorLogger(config.logger.winston)); 
 app.use(function(err, req, res, next) {
-    logger.error(err);
-    if(err.stack) {
-        logger.error(err.stack);
-        err.stack = "hidden"; //for ui
+    if(typeof err == "string") err = {message: err};
+    logger.info(err);
+    if(err.name) switch(err.name) {
+    case "UnauthorizedError":
+        logger.info(req.headers); //dump headers for debugging purpose..
+        break;
     }
+
+    if(err.stack) err.stack = "hidden"; //don't sent call stack to UI - for security reason
     res.status(err.status || 500);
     res.json(err);
 });
@@ -46,19 +50,13 @@ process.on('uncaughtException', function (err) {
 
 exports.app = app;
 exports.start = function(cb) {
-    //db.sequelize
-    //let mcadmin do the sync
-    //.sync(/*{force: true}*/)
-    //.then(profile.start)
-    //.then(function() {
-        //start server
-        var port = process.env.PORT || config.pub.port || '8080';
-        var host = process.env.HOST || config.pub.host || 'localhost';
+    var port = process.env.PORT || config.pub.port || '8080';
+    var host = process.env.HOST || config.pub.host || 'localhost';
+    db.init(function(err) {
+        if(err) return cb(err);
         app.listen(port, host, function() {
-            logger.info("meshconfig pub service running on %s:%d in %s mode", host, port, app.settings.env);
-            //setInterval(common.profile.cache, 1000*60);
-            //common.profile.cache(cb);
+            logger.info("pub service running on %s:%d in %s mode", host, port, app.settings.env);
         });
-    //});
+    });
 }
 

@@ -1,34 +1,81 @@
-<sca-menutab fluid="true" menu="appconf.menu" active="'testspecs'" user="user"></sca-menutab>
-<div class="container-fluid">
-    <!--<h3>test specs</h3>-->
-    <div class="panel panel-default" ng-repeat="(service_id, service) in serverconf.service_types">
-        <div class="panel-heading">
-            {{service.label}}
-        </div>
-
-        <ul class="list-group">
-        <li class="list-group-item"
-            ng-repeat="testspec in testspecs | filter:{service_type: service_id} | orderBy: 'id'">
-            <div class="row">
-                <div class="col-md-7">
-                    <h4><small>{{testspec.id}}</small> {{testspec.desc}}</h4>
-                    <mc-specs specs="testspec.specs"></mc-specs>
-                </div>
-                <div class="col-md-5">
-                    <h5>Admins<small> (who can edit)</small></h5>
-                    <mc-admins admins="testspec.admins"></mc-admins>
-                </div>
+<!--<sca-menutab fluid="true" menu="appconf.menu" active="'testspecs'" user="user"></sca-menutab>-->
+<ng-include src="'t/sidebar.html'"></ng-include>
+<div class="sca-sidebar-page">
+    <div class="subbar">
+        <div style="padding-left: 20px; margin-bottom: 10px;">
+            <h2>Testspecs</h2>
+            <p class="help-block">Showing registered test specs</p>
+            <br>
+            <div class="btn-group pull-right" style="left: -20px;top: -5px;">
+                <button class="btn btn-xs btn-default dropdown-toggle" 
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Type <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                <li><a href>All</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href>Latency</a></li>
+                <li><a href>Bandwidth</a></li>
+                <li><a href>Traceroute</a></li>
+                <li><a href>Pinger</a></li>
+                </ul>
             </div>
-            <div class="pull-right edit_button" ng-if="testspec.canedit">
-                <button type="button" ng-click="edit(testspec)" class="btn btn-xs pull-right"><i class="fa fa-pencil-square-o"></i></button>
+            <span class="text-muted">{{testspecs.length}} specs</span>
+        </div>
+        <hr style="margin: 0px;">
+
+        <div class="subbar-list">
+            <p class="alert alert-info" ng-if="jobs.length == 0">Please register a testspec.</p>
+            <div class="subbar-list-item" 
+                ng-repeat="(service_id, service) in serverconf.service_types"
+                ng-class="{'active': selected == service_id}"
+                ng-click="select(service_id)">
+
+                <div class="list-header">{{service.name}}</div>
+                <small>
+                    <time class="text-muted" style="position: relative; top: -4px;">{{service.create_date | date}}</time>
+                    <!--
+                    <p>
+                        <code>dwi</code>{{job.config._form.dwi|filename}}
+                        <code>t1</code>{{job.config._form.t1|filename}}
+                    </p>
+                    -->
+                    {{service.desc}}
+                </small>
+            </div>
+        </div><!--workflow-->
+    </div><!--subbar-->
+
+    <div class="subbar-content">
+        <div class="panel panel-default" ng-repeat="(service_id, service) in serverconf.service_types">
+            <div class="panel-heading">
+                {{service.label}}
             </div>
 
-        </li>
-        </ul>
-        <div class="panel-body" style="background-color: #fafafa;">
-            <button class="btn btn-sm" ng-click="add(service_id)">Add New <span class="text-muted">{{service.label}}</span></button>
-        </div>
-    </div><!--panel-->
-</div>
+            <ul class="list-group">
+            <li class="list-group-item"
+                ng-repeat="testspec in testspecs | filter:{service_type: service_id} | orderBy: 'id'">
+                <div class="row">
+                    <div class="col-md-7">
+                        <h4><small>{{testspec.id}}</small> {{testspec.desc}}</h4>
+                        <mc-specs specs="testspec.specs"></mc-specs>
+                    </div>
+                    <div class="col-md-5">
+                        <h5>Admins<small> (who can edit)</small></h5>
+                        <mc-admins admins="testspec.admins"></mc-admins>
+                    </div>
+                </div>
+                <div class="pull-right edit_button" ng-if="testspec._canedit">
+                    <button type="button" ng-click="edit(testspec)" class="btn btn-xs pull-right"><i class="fa fa-pencil-square-o"></i></button>
+                </div>
+            </li>
+            </ul>
+            <div class="panel-body" style="background-color: #fafafa;">
+                <button class="btn btn-sm" ng-click="add(service_id)">Add New <span class="text-muted">{{service.label}}</span></button>
+            </div>
+        </div><!--panel-->
+    </div><!--subbar-content-->
+
+</div><!--sca-sidebar-page-->
 
 

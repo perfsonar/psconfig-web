@@ -1,17 +1,12 @@
 
-app.controller('ConfigsController', ['$scope', 'appconf', 'toaster', '$http', 'serverconf', '$location', 'scaMessage', 'services', 'jwtHelper', 'hosts',
-function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, services, jwtHelper, hosts) {
+app.controller('ConfigsController', 
+function($scope, appconf, toaster, $http, $location, scaMessage, services, hosts) {
     scaMessage.show(toaster);
-    serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
     hosts.then(function(_hosts) { $scope.hosts = _hosts; });
-
     $scope.appconf = appconf;
-    //$scope.pub_url_base = location.hostname+location.pathname;
+    $scope.active_menu = "configs";
 
-    var jwt = localStorage.getItem(appconf.jwt_id);
-    if(jwt && jwtHelper.decodeToken(jwt)) {
-        $scope.cancreate = true;
-    }
+    if($scope.user) $scope.cancreate = true; //TODO - just check for $scope.user instead?
     
     //start loading stuff
     var testspecs, hostgroups;
@@ -48,10 +43,10 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, ser
         var address = host.hostname || host.ip;
         document.location = appconf.pub_url+"/auto/"+address;
     }
-}]);
+});
 
-app.controller('ConfigController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'serverconf', '$routeParams', '$location', 'services', 'users', 'testspecs', 'hostgroups',
-function($scope, appconf, toaster, $http, jwtHelper, serverconf, $routeParams, $location, services, users, testspecs, hostgroups) {
+app.controller('ConfigController', 
+function($scope, appconf, toaster, $http, jwtHelper, $routeParams, $location, services, users, testspecs, hostgroups) {
     $scope.id = $routeParams.id;
     $scope.appconf = appconf;
 
@@ -207,6 +202,6 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, $routeParams, $
         delete test.nagroup;
         delete test.TestspecId;
     }
-}]);
+});
 
 

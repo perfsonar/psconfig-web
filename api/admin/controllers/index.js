@@ -25,7 +25,8 @@ router.get('/config', jwt({secret: config.admin.jwt.pub, credentialsRequired: fa
 
 router.use('/configs', require('./configs'));
 router.use('/testspecs', require('./testspecs'));
-router.use('/cache', require('./cache'));
+router.use('/services', require('./services'));
+router.use('/hosts', require('./hosts'));
 router.use('/hostgroups', require('./hostgroups'));
 
 module.exports = router;

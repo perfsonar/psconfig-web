@@ -3,14 +3,14 @@
 app.controller('TestspecsController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', '$location', 'serverconf', 'scaMessage', 'users', 'testspecs', 
 function($scope, appconf, $route, toaster, $http, jwtHelper, $location, serverconf, scaMessage, users, testspecs) {
     scaMessage.show(toaster);
-    //menu.then(function(_menu) { $scope.menu = _menu; });
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
     $scope.appconf = appconf;
 
-    //TODO - will fail for guest user
     users.then(function(_users) {
         $scope.users = _users;
-        testspecs.then(function(_testspecs) { $scope.testspecs = _testspecs; });
+        testspecs.then(function(_testspecs) { 
+            $scope.testspecs = _testspecs; 
+        });
     });
 
     $scope.add = function(service_id) {
@@ -18,7 +18,7 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, $location, serverco
     }
 
     $scope.edit = function(testspec) {
-        $location.url("/testspec/"+testspec.id);
+        $location.url("/testspec/"+testspec._id);
     }
 }]);
 
@@ -53,20 +53,14 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, $location, users, $
     }
 
     function find_testspec() {
-        /*
-        $http.get(appconf.api+'/testspecs/'+$routeParams.id).then(function(res) {
-            $scope.testspec = res.data;
-            watch();
-        });
-        */
         //find the testscope that user wants to view/edit
         $scope.testspecs.forEach(function(testspec) {
-            if(testspec.id == $routeParams.id) {
+            if(testspec._id == $routeParams.id) {
                 //create a deep copy so that user's temporary change won't affect the testspecs content (until submitted)
                 $scope.testspec = angular.copy(testspec);
             }
         });
-        watch();
+        //watch();
     }
     function load(user) {
         if($scope.id == "new") {
@@ -78,30 +72,24 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, $location, users, $
                 specs: $scope.serverconf.defaults.testspecs[service_type],
                 desc: "",
             };
-            watch();
+            //watch();
         } else {
             //update
             find_testspec();
         }
     }
 
-    function watch() {
-        //some special behaviors on form
-        $scope.$watch(function() { 
-            return $scope.testspec.specs.ipv4_only 
-        }, function(nv, ov) {
-            if(nv) {
-                delete $scope.testspec.specs.ipv6_only;
-            }
-        });
-        $scope.$watch(function() { 
-            return $scope.testspec.specs.ipv6_only 
-        }, function(nv, ov) {
-            if(nv) {
-                delete $scope.testspec.specs.ipv4_only;
-            }
-        });
-    }
+    //some special behaviors on form
+    $scope.$watch('testspec.specs.ipv4_only', function(nv, ov) {
+        if(nv) {
+            delete $scope.testspec.specs.ipv6_only;
+        }
+    });
+    $scope.$watch('testspec.specs.ipv6_only', function(nv, ov) {
+        if(nv) {
+            delete $scope.testspec.specs.ipv4_only;
+        }
+    });
 
     $scope.submit = function() {
         //remove parameter set to empty string
@@ -117,12 +105,12 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, $location, users, $
             }
         }
 
-        if(!$scope.testspec.id) {
+        if(!$scope.testspec._id) {
             //create 
             $http.post(appconf.api+'/testspecs/', $scope.testspec)
             .then(function(res, status, headers, config) {
-                $scope.testspec.id = res.data.id;
-                $scope.testspec.canedit = res.data.canedit;
+                $scope.testspec._id = res.data._id;
+                $scope.testspec._canedit = res.data.canedit;
                 $scope.testspecs.push($scope.testspec);
                 $scope.form.$setPristine();
                 $location.path("/testspecs");
@@ -133,19 +121,19 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, $location, users, $
             });           
         } else {
             //update
-            $http.put(appconf.api+'/testspecs/'+$scope.testspec.id, $scope.testspec)
+            $http.put(appconf.api+'/testspecs/'+$scope.testspec._id, $scope.testspec)
             .then(function(res, status, headers, config) {
                 
                 //find the item user was editing
                 $scope.testspecs.forEach(function(testspec) {
-                    if(testspec.id == $scope.testspec.id) {   
+                    if(testspec._id == $scope.testspec._id) {   
                         //apply updates
                         for(var k in $scope.testspec) {
                             testspec[k] = $scope.testspec[k];
                         }
                         //console.dir($scope.testspecs);
                         //console.dir(res.data);
-                        testspec.canedit = res.data.canedit;
+                        testspec._canedit = res.data.canedit;
                     }
                 });
 
@@ -162,11 +150,11 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, $location, users, $
         $location.path("/testspecs");
     }
     $scope.remove = function() {
-        $http.delete(appconf.api+'/testspecs/'+$scope.testspec.id, $scope.testspec)
+        $http.delete(appconf.api+'/testspecs/'+$scope.testspec._id, $scope.testspec)
         .then(function(res, status, headers, config) {
             //find testspec and remove
             for(var i = 0;i < $scope.testspecs.length; ++i) {
-                if($scope.testspecs[i].id == $scope.testspec.id) {
+                if($scope.testspecs[i]._id == $scope.testspec._id) {
                     $scope.testspecs.splice(i, 1);
                     break;
                 }

@@ -12,6 +12,7 @@ var logger = new winston.Logger(config.logger.winston);
 var db = require('../../models');
 var profile = require('../../common').profile;
 var meshconfig = require('../meshconfig');
+//var request = require('request');
 
 //we want to cache profile up to 60 seconds
 var profile_cache = [];
@@ -24,6 +25,23 @@ function load_profiles(cb) {
         cb(null, profile_cache);
     } else {
         //console.log("caching profiles");
+
+        /*
+        request({
+            url: config.common.auth_api+"/profiles", 
+            headers: { Authorization: "Bearer "+config.common.auth_jwt },
+            json: true
+        }, function(err, res, profiles) {
+            if(err) return cb(err);
+            if(res.statusCode != 200) {
+                return cb("failed to cache profiles.. statuscode:"+res.statusCode);
+            }
+            profile_cache = profiles;
+            profile_cache_time = d;
+            if(cb) cb(null, profiles);
+        });
+        */
+
         profile.getall(function(err, profiles) {
             if(err) {
                 if(cb) cb(err);
@@ -34,6 +52,7 @@ function load_profiles(cb) {
             profile_cache_time = d;
             if(cb) cb(null, profiles);
         });
+        
     }
 }
 load_profiles();

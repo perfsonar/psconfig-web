@@ -24,6 +24,7 @@ angular.module('app.config', []).constant('appconf', {
 
     jwt_id: 'jwt',
     
+    /*
     menu: [
         {
             id: "about",
@@ -62,5 +63,6 @@ angular.module('app.config', []).constant('appconf', {
             }
         },
     ]
+    */
 });
 

@@ -1,48 +1,50 @@
-<sca-menutab fluid="true" menu="appconf.menu" active="'configs'" user="user"></sca-menutab>
-<div class="container-fluid">
-    <ul class="list-group">
-    <li class="list-group-item" style="background-color: #fafafa">
-        <br>
-        <h4>Auto Mesh Config</h4>
-        <p>Enter hostname of perfSONAR toolkit instance to generate a mesh config URL containing tests for that instance as test endpoints.</p>
-        <ui-select ng-model="autoconf_select" on-select="autoconf($item)">
-            <ui-select-match placeholder="Enter hostname">
-                <div style="padding-top: 2px; font-size: 12px">
-                    <b>{{$select.selected.sitename}}</b> ({{$select.selected.hostname}})
-                </div>
-            </ui-select-match>
-            <ui-select-choices repeat="host.uuid as host in hosts | filter: $select.search">
-                <b>{{host.sitename}}</b> (<span ng-if="host.hostname">{{host.hostname}}</span><span ng-if="!host.hostname && host.ip">{{host.ip}}</span>)
-            </ui-select-choices>
-        </ui-select>
-        <br>
-    </li>
-    <li class="list-group-item" ng-repeat="config in configs | orderBy:'id' ">
-        <!--ng-click="edit(config)">-->
-        <div class="row">
-            <div class="col-lg-8">
-                <h4>
-                    <small>{{config.id}}</small> 
-                    {{config.desc}}
-                    <small><a href="{{appconf.pub_url}}/config/{{config.url}}" target="_blank">/{{config.url}}</a></small>
-                </h4>
-                <mc-tests tests="config.Tests" servicetypes="serverconf.service_types"></mc-tests>
-            </div>
-            <div class="col-md-4">
-                <h5>Admins<small> (who can edit)</small></h5>
-                <mc-admins admins="config.admins"></mc-admins>
-                <!--<p ng-if="!config._admins">(Please login to see admins)</p>-->
-            </div>
-        </div>
-        <div class="pull-right edit_button" ng-if="config.canedit">
-            <button type="button" ng-click="edit(config)" class="btn btn-xs pull-right"><i class="fa fa-pencil-square-o"></i></button>
-        </div>
-        <div class="pull-right edit_button" ng-if="!config.canedit">
-            <button type="button" ng-click="edit(config)" class="btn btn-xs pull-right"><i class="fa fa-eye"></i></button>
-        </div>
-    </li>
-    </ul><!--list-group-->
-    <button type="button" ng-click="addconfig()" ng-if="cancreate" class="btn btn-sm">Add New</button>
-</div>
+<!--<sca-menutab fluid="true" menu="appconf.menu" active="'configs'" user="user"></sca-menutab>-->
+<ng-include src="'t/sidebar.html'"></ng-include>
+<div class="sca-sidebar-page">
+    <div class="margin30">
 
+        <br>
+        <ul class="list-group">
+        <li class="list-group-item" style="background-color: #fafafa">
+            <br>
+            <h4>Auto Mesh Config</h4>
+            <p>Enter hostname of perfSONAR toolkit instance to generate a mesh config URL containing tests for that instance as test endpoints.</p>
+            <ui-select ng-model="autoconf_select" on-select="autoconf($item)">
+                <ui-select-match placeholder="Enter hostname">
+                    <div style="padding-top: 2px; font-size: 12px">
+                        <b>{{$select.selected.sitename}}</b> ({{$select.selected.hostname}})
+                    </div>
+                </ui-select-match>
+                <ui-select-choices repeat="host.uuid as host in hosts | filter: $select.search">
+                    <b>{{host.sitename}}</b> (<span ng-if="host.hostname">{{host.hostname}}</span><span ng-if="!host.hostname && host.ip">{{host.ip}}</span>)
+                </ui-select-choices>
+            </ui-select>
+            <br>
+        </li>
+        <li class="list-group-item" ng-repeat="config in configs | orderBy:'id' ">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h4>
+                        <small>{{config.id}}</small> 
+                        {{config.desc}}
+                        <small><a href="{{appconf.pub_url}}/config/{{config.url}}" target="_blank">/{{config.url}}</a></small>
+                    </h4>
+                    <mc-tests tests="config.Tests" servicetypes="serverconf.service_types"></mc-tests>
+                </div>
+                <div class="col-md-4">
+                    <h5>Admins<small> (who can edit)</small></h5>
+                    <mc-admins admins="config.admins"></mc-admins>
+                </div>
+            </div>
+            <div class="pull-right edit_button" ng-if="config.canedit">
+                <button type="button" ng-click="edit(config)" class="btn btn-xs pull-right"><i class="fa fa-pencil-square-o"></i></button>
+            </div>
+            <div class="pull-right edit_button" ng-if="!config.canedit">
+                <button type="button" ng-click="edit(config)" class="btn btn-xs pull-right"><i class="fa fa-eye"></i></button>
+            </div>
+        </li>
+        </ul>
+        <button type="button" ng-click="addconfig()" ng-if="cancreate" class="btn btn-sm">Add New</button>
+    </div><!--margin30-->
+</div><!--sca-sidebar-page-->
 

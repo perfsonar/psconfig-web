@@ -1,11 +1,16 @@
 
-app.controller('HostsController', ['$scope', 'appconf', 'toaster', '$http', 'serverconf', '$location', 'scaMessage', 'services', 'hosts', '$modal', 
-function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, services, hosts, $modal) {
+app.controller('HostsController', function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hosts, $modal) {
     scaMessage.show(toaster);
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
     $scope.appconf = appconf;
+    $scope.active_menu = "hosts";
 
     $scope.loading = true;
+    hosts.getAll().then(function(_hosts) {
+        $scope.hosts = _hosts;
+        $scope.loading = false;
+    });
+    /*
     var mas = {};
     services.then(function(_services) { 
         $scope.services = _services;
@@ -19,9 +24,6 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, ser
         hosts.then(function(_hosts) {
             _hosts.forEach(function(host) {
             
-                //massage toolkit_url
-                //if(host.toolkit_url == 'auto') host._toolkit_url = "http://"+(host.hostname||host.ip);
-                
                 var services = [];
                 //find all services that belongs to this host (and set _has_localma.. if the host has ma service)
                 for(var service_id in _services.recs) {
@@ -45,6 +47,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, ser
         if(!service.ma) return;
         service.MA = mas[service.ma];
     }
+    */
 
     $scope.edit = function(host) {
         var _host = angular.copy(host);
@@ -72,7 +75,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, ser
             //failed?
         });
     }
-}]);
+});
 
 app.controller('HostModalController', ['$scope', 'appconf', 'toaster', '$http', '$modalInstance', 'host', 'title', 'services', 
 function($scope, appconf, toaster, $http, $modalInstance, host, title, services) {

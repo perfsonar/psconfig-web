@@ -1,68 +1,102 @@
-<sca-menutab fluid="true" menu="appconf.menu" active="'hosts'" user="user"></sca-menutab>
-<div class="container-fluid">
-    <p ng-if="loading" class="help-block"><i class="fa fa-circle-o-notch fa-spin"></i> Loading..</p>
-    <!--<p ng-if="hosts_num > 0" class="help-block">Only administrators can update host information</p>-->
-    <p ng-if="hosts_num == 0" class="help-block">No hosts / services cached yet. Is MeshConfig Admin cache service configured properly and running?</p>
-    <ul class="list-group">
-    <li class="list-group-item" 
-        ng-repeat="(client_uuid, host) in hosts">
-        <div class="row">
-            <div class="col-md-7">
-                <h4>
-                    <small>{{host._detail.id}}</small>
-                    <!-- assume all services comes from the same ls.. so pick the first one (we will mark servie that didn't come from it individually later -->
-                    <Small><span class="label {{services.lss[host.services[0].lsid].label_class}}"> {{services.lss[host.services[0].lsid].label}}</span></small>
-                    {{host._detail.sitename}}
-                    <small>
-                        <span ng-if="host._detail.hostname">{{host._detail.hostname}}</span>
-                        <span ng-if="!host._detail.hostname && host._detail.ip">{{host._detail.ip}}</span>
-                        <a ng-if="host._detail.toolkit_url != 'auto'" href="{{host._detail.toolkit_url}}" target="_blank"><i class="fa fa-external-link"></i></a>
-                        <!--
-                        <a ng-if="host._detail.toolkit_url == 'auto'" href="http://{{host._detail.hostname || host._detail.ip}}" target="_blank"><i class="fa fa-external-link"></i><i class="fa fa-external-link"></i></a>
-                        -->
-                        <span class="label label-danger" ng-if="host._detail.no_agent">No Agent</span>
-                    </small>
-                </h4>
-                <ul class="list-group">
-                    <li class="list-group-item" ng-repeat="service in host.services | filter:{type:'!ma'}">
-                        <div class="host">
-                            <!-- if the lsid for this service is different from the first one we picked, then add label to indicate that it's from different ls --> 
-                            <span ng-if="service.lsid != host.services[0].lsid" class="label {{services.lss[service.lsid].label_class}}"> {{services.lss[service.lsid].label}}</span>
-                            {{service.type}}
-                            <span ng-if="service.old" class="label label-warning">Stale</span>
-                        </div>
-                        <div style="display: inline-block; opacity: 0.5" ng-if="!service.MA && host._detail._has_localma"> 
-                            <i class="fa fa-arrow-right"></i> 
-                            <div class="host">local ma</div>
-                        </div>
-                        <div style="display: inline-block;" ng-if="service.MA"> 
-                            <i class="fa fa-arrow-right"></i> MA 
-                            <div class="host">
-                                <mc-service ls="services.lss[service.MA.lsid]" service="service.MA"></mc-service>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-            </div><!--col-md-7-->
-            <div class="col-md-3">
-                <h5>Host Information</h5>
-                <mc-specs specs="host._detail.info"></mc-specs>
-            </div>
-            <div class="col-md-2">
-                <h5>Location</h5>
-                <mc-specs specs="host._detail.location"></mc-specs>
-                <h5>Communities</h5>
-                <p class="help-block" ng-if="!host._detail.communities">No Communities</p>
-                <ul class="specs">
-                    <li ng-repeat="com in host._detail.communities">{{com}}</li>
+<!--<sca-menutab fluid="true" menu="appconf.menu" active="'hosts'" user="user"></sca-menutab>-->
+<ng-include src="'t/sidebar.html'"></ng-include>
+<div class="sca-sidebar-page">
+    <div class="subbar">
+        <div style="padding-left: 20px; margin-bottom: 10px;">
+            <h2>Hosts</h2>
+            <p class="help-block">Showing all toolkit hosts you can use</p>
+            <br>
+            <div class="btn-group pull-right" style="left: -20px;top: -5px;">
+                <button class="btn btn-xs btn-default dropdown-toggle" 
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Datasource <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                <li><a href>All</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href>Latency</a></li>
+                <li><a href>Bandwidth</a></li>
+                <li><a href>Traceroute</a></li>
+                <li><a href>Pinger</a></li>
                 </ul>
             </div>
-        </div><!--row-->
-        <div class="pull-right edit_button" ng-if="host._detail.canedit">
-            <button type="button" ng-click="edit(host)" class="btn btn-xs pull-right"><i class="fa fa-pencil-square-o"></i></button>
+            <span class="text-muted">{{hosts.length}} hosts</span>
         </div>
-    </li>
-    </ul>
+        <hr style="margin: 0px;">
+
+        <div class="subbar-list">
+            <p class="alert alert-default" ng-if="loading"><i class="fa fa-circle-o-notch fa-spin"></i> Loading..</p>
+            <p class="alert alert-info" ng-if="hosts.length == 0">Please register the first meshconfig.</p>
+            <div class="subbar-list-item" 
+                ng-repeat="host in hosts"
+                ng-class="{'active': selected == host}"
+                ng-click="select(host)">
+
+                <span class="label label-default">{{host.sitename}}</span><br>
+                <pre>{{host.hostname}}</pre>
+            </div>
+        </div><!--subbar-list-->
+    </div><!--subbar-->
+    <div class="subbar-content">
+        <div class="margin30">
+            <p ng-if="hosts_num == 0" class="help-block">No hosts / services cached yet. Is MeshConfig Admin cache service configured properly and running?</p>
+            <ul class="list-group">
+            <li class="list-group-item" 
+                ng-repeat="(client_uuid, host) in hosts">
+                <div class="row">
+                    <div class="col-md-7">
+                        <h4>
+                            <small>{{host._detail.id}}</small>
+                            <Small><span class="label {{services.lss[host.services[0].lsid].label_class}}"> {{services.lss[host.services[0].lsid].label}}</span></small>
+                            {{host._detail.sitename}}
+                            <small>
+                                <span ng-if="host._detail.hostname">{{host._detail.hostname}}</span>
+                                <span ng-if="!host._detail.hostname && host._detail.ip">{{host._detail.ip}}</span>
+                                <a ng-if="host._detail.toolkit_url != 'auto'" href="{{host._detail.toolkit_url}}" target="_blank"><i class="fa fa-external-link"></i></a>
+                                                    <span class="label label-danger" ng-if="host._detail.no_agent">No Agent</span>
+                            </small>
+                        </h4>
+                        <ul class="list-group">
+                            <li class="list-group-item" ng-repeat="service in host.services | filter:{type:'!ma'}">
+                                <div class="host">
+                                    <span ng-if="service.lsid != host.services[0].lsid" class="label {{services.lss[service.lsid].label_class}}"> {{services.lss[service.lsid].label}}</span>
+                                    {{service.type}}
+                                    <span ng-if="service.old" class="label label-warning">Stale</span>
+                                </div>
+                                <div style="display: inline-block; opacity: 0.5" ng-if="!service.MA && host._detail._has_localma"> 
+                                    <i class="fa fa-arrow-right"></i> 
+                                    <div class="host">local ma</div>
+                                </div>
+                                <div style="display: inline-block;" ng-if="service.MA"> 
+                                    <i class="fa fa-arrow-right"></i> MA 
+                                    <div class="host">
+                                        <mc-service ls="services.lss[service.MA.lsid]" service="service.MA"></mc-service>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div><!--col-md-7-->
+                    <div class="col-md-3">
+                        <h5>Host Information</h5>
+                        <mc-specs specs="host._detail.info"></mc-specs>
+                    </div>
+                    <div class="col-md-2">
+                        <h5>Location</h5>
+                        <mc-specs specs="host._detail.location"></mc-specs>
+                        <h5>Communities</h5>
+                        <p class="help-block" ng-if="!host._detail.communities">No Communities</p>
+                        <ul class="specs">
+                            <li ng-repeat="com in host._detail.communities">{{com}}</li>
+                        </ul>
+                    </div>
+                </div><!--row-->
+                <div class="pull-right edit_button" ng-if="host._detail.canedit">
+                    <button type="button" ng-click="edit(host)" class="btn btn-xs pull-right"><i class="fa fa-pencil-square-o"></i></button>
+                </div>
+            </li>
+            </ul>
+        </div><!--margin30-->
+    </div><!--subbar-content-->
 </div>
 
 

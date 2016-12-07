@@ -1,4 +1,4 @@
-<sca-menutab fluid="true" menu="appconf.menu" active="'configs'" user="user"></sca-menutab>
+<!--<sca-menutab fluid="true" menu="appconf.menu" active="'configs'" user="user"></sca-menutab>-->
 <div class="container-fluid">
     <form ng-submit="submit()" class="form-horizontal" name="form" confirm-on-exit>
         <div class="form-group">
@@ -24,7 +24,6 @@
                         <b>{{$item.fullname}}</b> <span class="email">&lt;{{$item.email}}&gt;</span>
                     </ui-select-match>
                     <ui-select-choices repeat="user in users_a | propsFilter: {fullname: $select.search, email: $select.search}">
-                      <!--<div ng-bind-html="user.fullname | highlight: $select.search"></div>-->
                       <img gravatar-src="user.email" gravatar-size="17"/>
                       <b>{{user.fullname}}</b> <small>&lt;{{user.email}}&gt;</small>
                     </ui-select-choices>

@@ -15,7 +15,6 @@ const compression = require('compression');
 const config = require('../config');
 const logger = new winston.Logger(config.logger.winston);
 const db = require('../models');
-const migration = require('./migration');
 const common = require('../common');
 
 //init express
@@ -31,8 +30,6 @@ app.use('/', require('./controllers'));
 app.use(expressWinston.errorLogger(config.logger.winston)); 
 app.use(function(err, req, res, next) {
     if(typeof err == "string") err = {message: err};
-
-    //log this error
     logger.info(err);
     if(err.name) switch(err.name) {
     case "UnauthorizedError":
@@ -53,20 +50,18 @@ process.on('uncaughtException', function (err) {
 
 exports.app = app;
 exports.start = function(cb) {
-    //TODO - should mcadin remove old readyfile, or let startup script do that?
-    //fs.unlinkSync(config.admin.readyfile);
-    
-    //logger.info("initializing");
-    db.sequelize
-    .sync(/*{force: true}*/) //create missing tables - if it doesn't exist
-    .then(migration.run)
-    .then(function() {
-        var port = process.env.PORT || config.admin.port || '8081';
-        var host = process.env.HOST || config.admin.host || 'localhost';
+    var port = process.env.PORT || config.admin.port || '8081';
+    var host = process.env.HOST || config.admin.host || 'localhost';
+    db.init(function(err) {
+        if(err) return cb(err);
         app.listen(port, host, function() {
-            logger.info("meshconfig admin/api service running on %s:%d in %s mode", host, port, app.settings.env);
-            fs.writeFileSync(config.admin.readyfile, "ready");
+            logger.info("admin listening on port %d in %s mode", port, app.settings.env);
+            //cache profile from profile service
+            //setInterval(profile.cache, 1000*300); //5 minutes?
+            //profile.cache(cb);
         });
     });
+
 }
+
 

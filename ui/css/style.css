@@ -4,7 +4,9 @@
 }
 
 body {
-  font-family: 'Lato', serif;
+  /*font-family: 'Lato', serif;*/
+  color: #383838;
+  font-size: 14px;
 }
 .center-block {
   display: block;
@@ -17,12 +19,6 @@ body {
   box-shadow: 0px 0px 15px #666;
   border-radius: 5px;
 }
-/*
-.logo {
-    margin:30px 0px;
-    width: 100%;
-}
-*/
 .list-group .list-group-item-heading {
   margin-bottom: 0px;
 }
@@ -116,4 +112,19 @@ div.well-detail {
 }
 .ace_editor {
   height: 100px;
+}
+.subbar-content {
+  margin-left: 350px;
+  overflow-x: hidden;
+}
+.subbar-content .fixed-top {
+  left: 450px;
+}
+.subbar-content .workflow .workflow-item .item-header {
+  font-size: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.margin30 {
+  margin: 0px 20px;
 }

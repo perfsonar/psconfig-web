@@ -1,4 +1,4 @@
-<sca-menutab fluid="true" menu="appconf.menu" active="'testspecs'" user="user"></sca-menutab>
+<!--<sca-menutab fluid="true" menu="appconf.menu" active="'testspecs'" user="user"></sca-menutab>-->
 <div class="container-fluid">
     <form ng-submit="submit()" class="form-horizontal" name="form" confirm-on-exit>
         <!--
@@ -43,14 +43,14 @@
 
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-                <button type="button" class="btn btn-danger btn-sm" ng-if="testspec.id"
+                <button type="button" class="btn btn-danger btn-sm" ng-if="testspec._id"
                     confirmed-click="remove()" 
                     ng-confirm-click="Are you sure you want to remove this test spec?">
                     <i class="fa fa-times"></i> Remove
                 </button>
                 <div class="pull-right">
-                    <button type="submit" class="btn btn-primary" ng-if="testspec.id">Update</button>
-                    <button type="submit" class="btn btn-primary" ng-if="!testspec.id">Create</button>
+                    <button type="submit" class="btn btn-primary" ng-if="testspec._id">Update</button>
+                    <button type="submit" class="btn btn-primary" ng-if="!testspec._id">Create</button>
                     <button type="button" class="btn" ng-click="cancel()">Cancel</button>
                 </div>
             </div>

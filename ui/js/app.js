@@ -131,7 +131,7 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         controller: 'HostsController'
     })
     .otherwise({
-        redirectTo: '/about'
+        redirectTo: '/configs'
     });
 }]).run(['$rootScope', '$location', 'jwtHelper', 'appconf', 'scaMessage',
 function($rootScope, $location, jwtHelper, appconf, scaMessage) {
@@ -161,22 +161,6 @@ function(appconf, $httpProvider, jwtInterceptorProvider) {
     $httpProvider.interceptors.push('jwtInterceptor');
 }]);
  
-//load menu and profile by promise chaining
-app.factory('menu', ['appconf', '$http', 'jwtHelper', '$sce', 'scaMessage', 'scaMenu', 'toaster',
-function(appconf, $http, jwtHelper, $sce, scaMessage, scaMenu, toaster) {
-
-    var jwt = localStorage.getItem(appconf.jwt_id);
-    var menu = {
-        header: {},
-        top: scaMenu,
-        user: null, //to-be-loaded
-    };
-    if(appconf.icon_url) menu.header.icon = $sce.trustAsHtml("<img src=\""+appconf.icon_url+"\">");
-    if(appconf.home_url) menu.header.url = appconf.home_url
-    if(jwt) menu.user = jwtHelper.decodeToken(jwt);
-
-    return menu;
-}]);
 
 //http://plnkr.co/edit/juqoNOt1z1Gb349XabQ2?p=preview
 /**

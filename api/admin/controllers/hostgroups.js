@@ -14,10 +14,8 @@ var db = require('../../models');
 var profile = require('../../common').profile;
 
 router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
-    db.Hostgroup.findAll({
-        /*include: [{ model: db.Admin}]*/
-        //raw: true, //return raw object instead of sequelize objec that I can't modify..
-    }).then(function(hostgroups) {
+    db.Hostgroup.find({}, function(err, hostgroups) {
+        if(err) return next(err);
         //convert to normal javascript object so that I can add stuff to it (why can't I for sequelize object?)
         hostgroups = JSON.parse(JSON.stringify(hostgroups));
         profile.getall(function(err, profiles) {
