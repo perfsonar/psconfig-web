@@ -18,6 +18,7 @@
     "express": "^4.13.3",
     "express-jwt": "^5.1.0",
     "express-winston": "^2.0.0",
+    "mongoose": "^4.7.1",
     "promise": "^7.0.4",
     "request": "^2.78.0",
     "sandbox": "^0.8.6",

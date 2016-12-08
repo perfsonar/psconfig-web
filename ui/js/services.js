@@ -59,16 +59,49 @@ app.factory('services', ['appconf', '$http', 'jwtHelper', function(appconf, $htt
 
 app.factory('hosts', function(appconf, $http, toaster) {
     var hosts = [];
-    var load_promise = $http.get(appconf.api+'/hosts?select=uuid sitename hostname&limit=100000')
-    .then(function(res) {
-        hosts = res.data.hosts;
-        return res.data.hosts;
-    }, function(res) {
-        toaster.error("Failed to query hosts");
-    });
+    var all_promise = null;
+    var ma_promise = null;
 
     return {
-        getAll: function() { return load_promise; },
+        //return basic (uuid, sitename, hostname, lsid) host info for all hosts
+        getAll: function() { 
+            if(all_promise) return all_promise;
+            all_promise = $http.get(appconf.api+'/hosts?select=sitename hostname lsid&sort=sitename hostname&limit=100000')
+            .then(function(res) {
+                hosts = res.data.hosts;
+                return res.data.hosts;
+            }, function(res) {
+                toaster.error("Failed to query hosts");
+            });
+            return all_promise; 
+        },
+
+        //load host detail (add to existing host object)
+        getDetail: function(host) {
+            return $http.get(appconf.api+'/hosts?find='+JSON.stringify({_id: host._id})).then(function(res) {
+                var _host = res.data.hosts[0];
+                //console.dir(_host);
+                for(var k in _host) host[k] = _host[k];
+                return host;
+            }, function(res) {
+                toaster.error("Failed to load host detail");
+            });
+        },
+
+        //list of all hosts with MA service
+        getMAs: function() {
+            if(ma_promise) return ma_promise;
+            ma_promise = $http.get(appconf.api+'/hosts?select=sitename hostname&sort=sitename hostname&find='+JSON.stringify({
+                "services.type": "ma"
+            })).then(function(res) {
+                console.log("mas");
+                console.dir(res.data.hosts);
+                return res.data.hosts;
+            }, function(res) {
+                toaster.error("Failed to load ma hosts");
+            });
+            return ma_promise;
+        }
     }
 });
 

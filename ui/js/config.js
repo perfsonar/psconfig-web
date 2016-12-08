@@ -1,8 +1,8 @@
 
 app.controller('ConfigsController', 
-function($scope, appconf, toaster, $http, $location, scaMessage, services, hosts) {
+function($scope, appconf, toaster, $http, $location, scaMessage, hosts) {
     scaMessage.show(toaster);
-    hosts.then(function(_hosts) { $scope.hosts = _hosts; });
+    hosts.getAll().then(function(_hosts) { $scope.hosts = _hosts; });
     $scope.appconf = appconf;
     $scope.active_menu = "configs";
 
@@ -46,7 +46,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, services, hosts
 });
 
 app.controller('ConfigController', 
-function($scope, appconf, toaster, $http, jwtHelper, $routeParams, $location, services, users, testspecs, hostgroups) {
+function($scope, appconf, toaster, $http, jwtHelper, $routeParams, $location, users, testspecs, hostgroups) {
     $scope.id = $routeParams.id;
     $scope.appconf = appconf;
 
@@ -54,8 +54,8 @@ function($scope, appconf, toaster, $http, jwtHelper, $routeParams, $location, se
     //TODO while we are loading stuff, config template gets rendered and ui-select does odd things if the users list aren't loaded yet
     //doc talks about using resolver inside the route config, but I want to keep stuff inside the controller.. how can I?
     maybe_load_users(function() {
-        services.then(function(_services) { 
-            $scope.services = _services; 
+        //services.then(function(_services) { 
+        //    $scope.services = _services; 
             testspecs.then(function(testspecs) { 
                 $scope.testspecs = testspecs;
                 hostgroups.then(function(hostgroups) { 
@@ -63,7 +63,7 @@ function($scope, appconf, toaster, $http, jwtHelper, $routeParams, $location, se
                     load_config();
                 });
             });
-        });
+        //});
     });
 
     function maybe_load_users(cb) {

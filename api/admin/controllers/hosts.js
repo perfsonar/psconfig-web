@@ -13,6 +13,18 @@ var logger = new winston.Logger(config.logger.winston);
 var db = require('../../models');
 var common = require('../../common');
 
+function canedit(user, host) {
+    console.dir(user);
+    if(user) {
+        if(~user.scopes.mca.indexOf('admin')) {
+            return true;
+        }
+        //TODO - see if user is listed under admin
+
+    }
+    return false;
+}
+
 router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
     var find = {};
     if(req.query.find) find = JSON.parse(req.query.find);
@@ -32,20 +44,15 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
     .limit(req.query.limit || 100)
     .skip(req.query.skip || 0)
     .sort(req.query.sort || '_id')
+    .lean() //so that I can add _canedit later
     .exec(function(err, hosts) {
         if(err) return next(err);
         db.Host.count(find).exec(function(err, count) {
             if(err) return next(err);
             
             //append canedit flag
-            //TODO - for now, mca admin can edit all hosts but no others
             hosts.forEach(function(host) {
-                host._canedit = false;
-                if(req.user) {
-                    if(~req.user.scopes.mca.indexOf('admin')) {
-                        host._canedit = true;
-                    }
-                }
+                host._canedit = canedit(req.user, host);
             });
            
             res.json({hosts: hosts, count: count});
@@ -71,18 +78,21 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
 
 router.put('/:uuid', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var uuid = req.params.uuid;
-    var _detail = req.body._detail;
-    if(!~req.user.scopes.mca.indexOf('admin')) return res.status(401).end();
+    //var newhost = req.body._detail;
+    //if(!~req.user.scopes.mca.indexOf('admin')) return res.status(401).end();
 
     //update host info
-    db.Host.findOne({where: {uuid: uuid}}).then(function(host) {
-        host.no_agent = req.body._detail.no_agent;
-        host.toolkit_url = req.body._detail.toolkit_url;
-        
-        //console.dir(req.body._detail);
-        //console.dir(host);
+    db.Host.findById(uuid).then(function(host) {
+        if(!host) return res.status(404).end();
+        if(!canedit(req.user, host)) return res.status(401).end();
+
+        //things to allow updates
+        host.no_agent = req.body.no_agent;
+        host.toolkit_url = req.body.toolkit_url;
+        host.services = req.body.services; //should restrict to just MAs?
         host.save().then(function() {
-            
+            res.json({status: "ok"});
+            /*
             //update ma pointers for each child services
             db.Service.findAll({
                 where: {client_uuid: uuid},
@@ -102,6 +112,7 @@ router.put('/:uuid', jwt({secret: config.admin.jwt.pub}), function(req, res, nex
                     res.json({status: "ok"});
                 }); 
             });
+            */
         });
     });
 });

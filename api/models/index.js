@@ -33,7 +33,9 @@ var serviceSchema = mongoose.Schema({
     name: String, //from service-name
     locator: String, // like "tcp://ps-latency.atlas.unimelb.edu.au:861" (used to pull hostname)
 
-    
+    //ma to send data to. if not set, it uses local ma
+    ma: {type: mongoose.Schema.Types.ObjectId, ref: 'Host'},
+
     //client_uuid: String, //used as host id
     //sitename: String, //from location-sitename
     //location: mongoose.Schema.Types.Mixed,

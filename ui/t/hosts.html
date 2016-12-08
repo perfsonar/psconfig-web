@@ -31,70 +31,112 @@
                 ng-repeat="host in hosts"
                 ng-class="{'active': selected == host}"
                 ng-click="select(host)">
-
-                <span class="label label-default">{{host.sitename}}</span><br>
-                <pre>{{host.hostname}}</pre>
+                <div class="list-header">
+                    <small><span class="label label-default">{{host.lsid}}</span> {{host.sitename}} 
+                        <!--<span class="text-muted">/</span>-->
+                    </small>
+                </div>
+                <small class="help-block">{{host.hostname}}</small>
             </div>
         </div><!--subbar-list-->
     </div><!--subbar-->
     <div class="subbar-content">
-        <div class="margin30">
-            <p ng-if="hosts_num == 0" class="help-block">No hosts / services cached yet. Is MeshConfig Admin cache service configured properly and running?</p>
-            <ul class="list-group">
-            <li class="list-group-item" 
-                ng-repeat="(client_uuid, host) in hosts">
-                <div class="row">
-                    <div class="col-md-7">
-                        <h4>
-                            <small>{{host._detail.id}}</small>
-                            <Small><span class="label {{services.lss[host.services[0].lsid].label_class}}"> {{services.lss[host.services[0].lsid].label}}</span></small>
-                            {{host._detail.sitename}}
-                            <small>
-                                <span ng-if="host._detail.hostname">{{host._detail.hostname}}</span>
-                                <span ng-if="!host._detail.hostname && host._detail.ip">{{host._detail.ip}}</span>
-                                <a ng-if="host._detail.toolkit_url != 'auto'" href="{{host._detail.toolkit_url}}" target="_blank"><i class="fa fa-external-link"></i></a>
-                                                    <span class="label label-danger" ng-if="host._detail.no_agent">No Agent</span>
-                            </small>
-                        </h4>
-                        <ul class="list-group">
-                            <li class="list-group-item" ng-repeat="service in host.services | filter:{type:'!ma'}">
-                                <div class="host">
-                                    <span ng-if="service.lsid != host.services[0].lsid" class="label {{services.lss[service.lsid].label_class}}"> {{services.lss[service.lsid].label}}</span>
-                                    {{service.type}}
-                                    <span ng-if="service.old" class="label label-warning">Stale</span>
-                                </div>
-                                <div style="display: inline-block; opacity: 0.5" ng-if="!service.MA && host._detail._has_localma"> 
-                                    <i class="fa fa-arrow-right"></i> 
-                                    <div class="host">local ma</div>
-                                </div>
-                                <div style="display: inline-block;" ng-if="service.MA"> 
-                                    <i class="fa fa-arrow-right"></i> MA 
-                                    <div class="host">
-                                        <mc-service ls="services.lss[service.MA.lsid]" service="service.MA"></mc-service>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div><!--col-md-7-->
-                    <div class="col-md-3">
-                        <h5>Host Information</h5>
-                        <mc-specs specs="host._detail.info"></mc-specs>
-                    </div>
-                    <div class="col-md-2">
-                        <h5>Location</h5>
-                        <mc-specs specs="host._detail.location"></mc-specs>
-                        <h5>Communities</h5>
-                        <p class="help-block" ng-if="!host._detail.communities">No Communities</p>
-                        <ul class="specs">
-                            <li ng-repeat="com in host._detail.communities">{{com}}</li>
-                        </ul>
-                    </div>
-                </div><!--row-->
-                <div class="pull-right edit_button" ng-if="host._detail.canedit">
-                    <button type="button" ng-click="edit(host)" class="btn btn-xs pull-right"><i class="fa fa-pencil-square-o"></i></button>
+        <div class="margin30" ng-if="selected">
+            <div class="fixed-top">
+                <h2 class="page-heading">
+                    {{selected.sitename}}<br>
+                    <small class="text-muted">
+                        {{selected.hostname}}
+                        <span class="label label-danger" ng-if="selected.no_agent">No Agent</span>
+                    </small>
+                    <button type="button" 
+                        style="position: relative; top: -10px;"
+                        ng-disabled="!selected._canedit" 
+                        ng-click="edit(selected)"   
+                        class="btn btn-sm pull-right">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </button>
+                </h2>
+            </div>
+            <div style="padding-top: 70px">
+                <!--
+                <small><span class="label {{services.lss[host.services[0].lsid].label_class}}"> {{services.lss[host.services[0].lsid].label}}</span></small>
+                -->
+                <!--
+                <small>
+                    <a ng-if="selected.toolkit_url != 'auto'" href="{{selected.toolkit_url}}" target="_blank">
+                        <i class="fa fa-external-link"></i>
+                    </a>
+                </small>
+                -->
+
+                <h3>Services / MA endpoints</h3>
+                <p class="help-block">All services running under this host and which measurement archive the data should be sent to</p>
+                <ul class="list-group">
+                    <li class="list-group-item" ng-repeat="service in selected.services">
+                        <div class="host">
+                            <!--
+                            <span ng-if-dis="selected.lsid != host.services[0].lsid" 
+                                class="label {{services.lss[service.lsid].label_class}}"> 
+                                {{services.lss[service.lsid].label}}
+                            </span>
+                            -->
+                            {{service.type}}
+                            <small class="text-muted">{{service.locator}}</small>
+                            <span ng-if="service.old" class="label label-warning">Stale</span>
+                        </div>
+                        <div style="display: inline-block; opacity: 0.5" ng-if="service.type != 'ma' && !service.ma && selected._default_ma"> 
+                            <i class="fa fa-arrow-right"></i> 
+                            <div class="host">local ma</div>
+                        </div>
+                        <div style="display: inline-block;" ng-if="service.type != 'ma' && service.ma"> 
+                            <i class="fa fa-arrow-right"></i> 
+                            <div class="host">
+                                <!--<mc-service ls="services.lss[service.MA.lsid]" service="service.MA"></mc-service>-->
+                                {{hosts_o[service.ma].sitename}} <code>{{hosts_o[service.ma].hostname}}</code>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <h3>Host Detail</h3>
+                <mc-specs specs="selected.info"></mc-specs>
+
+                <h3>Administrators</h3>
+                <mc-admins admins="selected.admins"></mc-admins>
+
+                <h3>Location</h3>
+                <a class="pull-right" 
+                    href="https://www.google.com/maps/place/{{selected.location.latitude}},{{selected.location.longitude}}">
+                    <i class="fa fa-map-marker" aria-hidden="true"></i> Google Map
+                </a>
+                <mc-specs specs="selected.location"></mc-specs>
+
+                <h3>Communities</h3>
+                <p class="help-block" ng-if="!selected.communities">No Communities</p>
+                <ul class="specs">
+                    <li ng-repeat="com in selected.communities">{{com}}</li>
+                </ul>
+
+                <h3>Datasource</h3>
+                <span class="label label-default">{{selected.lsid}}</span> <pre>{{selected.url}}</pre>
+
+                <h3>Addresses</h3>
+                <ul class="list-group">
+                    <li class="list-group-item" ng-repeat="address in selected.addresses">
+                        {{address|json}}
+                    </li>
+                </ul>
+
+                <div ng-if="selected.toolkit_url != 'auto'">
+                    Toolkit URL Override: <a href="{{selected.toolkit_url}}" target="_blank">{{selected.toolkit_url}}</a>
                 </div>
-            </li>
-            </ul>
+
+                <br><br>
+                
+                <h3>Debug</h3>
+                <pre>{{selected|json}}</pre>
+            </div><!--padding-top-->
         </div><!--margin30-->
     </div><!--subbar-content-->
 </div>

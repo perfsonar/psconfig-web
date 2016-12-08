@@ -11,9 +11,9 @@ var app = angular.module('app', [
     'ui.bootstrap',
     'ui.select',
     'sca-shared',
-//    'ngOrderObjectBy',
     'ui.gravatar',
     'ui.ace',
+    'ngLocationUpdate'
 ]);
 
 //can't quite do the slidedown animation through pure angular/css.. borrowing slideDown from jQuery..
@@ -126,7 +126,7 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         templateUrl: 't/config.html',
         controller: 'ConfigController'
     })
-    .when('/hosts', {
+    .when('/hosts/:id?', {
         templateUrl: 't/hosts.html',
         controller: 'HostsController'
     })
@@ -200,6 +200,23 @@ app.filter('propsFilter', function() {
   };
 });
 
+//https://gist.github.com/Shipow/7880369
+app.filter('orderObjectBy', function(){
+    return function(input, attribute) {
+        if (!angular.isObject(input)) return input;
+        var array = [];
+        for(var objectKey in input) {
+            array.push(input[objectKey]);
+        }
+        array.sort(function(a, b){
+            a = parseInt(a[attribute]);
+            b = parseInt(b[attribute]);
+            return a - b;
+        });
+        return array;
+    }
+});
+
 app.filter('specname',function(){
     return function(input){
         if(input) return input.replace(new RegExp('_', 'g'), ' ');
@@ -215,3 +232,4 @@ app.filter('trim_locator', function() {
         return input;
     }
 });
+

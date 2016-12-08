@@ -17,6 +17,7 @@
     "angular-gravatar": "^0.4.2",
     "angular-jwt": "^0.1.8",
     "angular-loading-bar": "^0.9.0",
+    "angular-location-update": "0.0.2",
     "angular-route": "^1.5.8",
     "angular-ui-ace": "^0.2.3",
     "angularjs-toaster": "^2.1.0",
