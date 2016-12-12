@@ -25,7 +25,8 @@
         <hr style="margin: 0px;">
 
         <div class="subbar-list">
-            <p class="alert alert-info" ng-if="jobs.length == 0">Please register a testspec.</p>
+            <p class="alert alert-info" ng-if="testspecs.length == 0">Please register a testspec.</p>
+            <!--
             <div class="subbar-list-item" 
                 ng-repeat="(service_id, service) in serverconf.service_types"
                 ng-class="{'active': selected == service_id}"
@@ -34,19 +35,26 @@
                 <div class="list-header">{{service.name}}</div>
                 <small>
                     <time class="text-muted" style="position: relative; top: -4px;">{{service.create_date | date}}</time>
-                    <!--
                     <p>
                         <code>dwi</code>{{job.config._form.dwi|filename}}
                         <code>t1</code>{{job.config._form.t1|filename}}
                     </p>
-                    -->
                     {{service.desc}}
                 </small>
+            </div>
+            -->
+            <div class="subbar-list-item" ng-repeat="testspec in testspecs">
+                {{testspec}}
+            </div>
+            <div class="list-addbutton" ng-click="add()">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i> 
             </div>
         </div><!--workflow-->
     </div><!--subbar-->
 
     <div class="subbar-content">
+        {{selected}}
+        <!--
         <div class="panel panel-default" ng-repeat="(service_id, service) in serverconf.service_types">
             <div class="panel-heading">
                 {{service.label}}
@@ -73,7 +81,8 @@
             <div class="panel-body" style="background-color: #fafafa;">
                 <button class="btn btn-sm" ng-click="add(service_id)">Add New <span class="text-muted">{{service.label}}</span></button>
             </div>
-        </div><!--panel-->
+        </div>
+        -->
     </div><!--subbar-content-->
 
 </div><!--sca-sidebar-page-->

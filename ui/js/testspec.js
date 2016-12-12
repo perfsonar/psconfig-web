@@ -1,33 +1,97 @@
 
 //show all testspecs
-app.controller('TestspecsController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', '$location', 'serverconf', 'scaMessage', 'users', 'testspecs', 
-function($scope, appconf, $route, toaster, $http, jwtHelper, $location, serverconf, scaMessage, users, testspecs) {
+app.controller('TestspecsController', function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMessage, users, testspecs, $modal) {
     scaMessage.show(toaster);
-    serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
-    $scope.appconf = appconf;
+    $scope.active_menu = "testspecs";
 
-    users.then(function(_users) {
+    users.getAll().then(function(_users) {
         $scope.users = _users;
-        testspecs.then(function(_testspecs) { 
+        testspecs.getAll().then(function(_testspecs) { 
             $scope.testspecs = _testspecs; 
         });
     });
 
     $scope.add = function(service_id) {
-        $location.url("/testspec/new/"+service_id);
+        //$location.url("/testspec/new/"+service_id);
+        var modal = $modal.open({
+            animation: true,
+            templateUrl: 't/testspec.html',
+            controller: 'TestspecModalController',
+            size: 'lg',
+            resolve: {
+                testspec: function() { return {admins: [ $scope.user.sub ] }; },
+                //title: function() { return _host.sitename + " (" +(host.hostname || host.ip) + ")"; },
+            }
+        });
+        modal.result.then(function(testspec) {
+            //for(var k in _host) $scope.selected[k] = spec[k]; 
+            //register new testspec and add to the list, and select it
+            console.log("submitted with");
+            console.dir(testspec);
+
+            if(!testspec._id) {
+                //create 
+                testspecs.post(testspec).then(function() {
+                    toaster.success("Testspec created successfully!");
+                });
+            }
+            /*
+            } else {
+                //update
+                $http.put(appconf.api+'/testspecs/'+$scope.testspec._id, $scope.testspec)
+                .then(function(res, status, headers, config) {
+                    
+                    //find the item user was editing
+                    $scope.testspecs.forEach(function(testspec) {
+                        if(testspec._id == $scope.testspec._id) {   
+                            //apply updates
+                            for(var k in $scope.testspec) {
+                                testspec[k] = $scope.testspec[k];
+                            }
+                            //console.dir($scope.testspecs);
+                            //console.dir(res.data);
+                            testspec._canedit = res.data.canedit;
+                        }
+                    });
+
+                    $scope.form.$setPristine();
+                    $location.path("/testspecs");
+                    toaster.success("Updated Successfully!");
+
+                }, function(res, status, headers, config) {
+                    toaster.error("Update failed!");
+                });   
+            }
+            */
+            //$scope.form.$setPristine();
+        }, function(action) {
+            //failed?
+            console.log("dismissed with "+action);
+        });
     }
 
     $scope.edit = function(testspec) {
-        $location.url("/testspec/"+testspec._id);
+        //$location.url("/testspec/"+testspec._id);
     }
-}]);
+});
 
 //test spec editor
-app.controller('TestspecController', ['$scope', 'appconf', '$route', 'toaster', '$http', 'jwtHelper', '$location', 'users', '$routeParams', 'testspecs',
-function($scope, appconf, $route, toaster, $http, jwtHelper, $location, users, $routeParams, testspecs) {
-    $scope.id = $routeParams.id;
-    $scope.appconf = appconf;
+app.controller('TestspecModalController', function($scope, serverconf, appconf, $route, toaster, $http, jwtHelper, $location, users, $routeParams, testspec, $modalInstance, users) {
+    serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
 
+    //$scope.id = $routeParams.id;
+    $scope.testspec = testspec;
+
+    $scope.setdefault = function(type) {
+        var def = $scope.serverconf.defaults.testspecs[type];
+        $scope.testspec.specs = angular.copy(def);
+    }
+
+    users.getAll().then(function(profiles) {
+        $scope.profiles = profiles;
+        //console.dir(profiles);
+    });
+    /*
     testspecs.then(function(_testspecs) {
         $scope.testspecs = _testspecs;
 
@@ -45,13 +109,15 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, $location, users, $
             find_testspec();
         }
     });
+    */
 
-    if($scope.id == 'new') {
+    if(!testspec._id) {
         $scope.title = "New Test Spec";
     } else {
         $scope.title = "Update Test Spec";
     }
 
+    /*
     function find_testspec() {
         //find the testscope that user wants to view/edit
         $scope.testspecs.forEach(function(testspec) {
@@ -78,7 +144,8 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, $location, users, $
             find_testspec();
         }
     }
-
+    */
+    
     //some special behaviors on form
     $scope.$watch('testspec.specs.ipv4_only', function(nv, ov) {
         if(nv) {
@@ -105,51 +172,15 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, $location, users, $
             }
         }
 
-        if(!$scope.testspec._id) {
-            //create 
-            $http.post(appconf.api+'/testspecs/', $scope.testspec)
-            .then(function(res, status, headers, config) {
-                $scope.testspec._id = res.data._id;
-                $scope.testspec._canedit = res.data.canedit;
-                $scope.testspecs.push($scope.testspec);
-                $scope.form.$setPristine();
-                $location.path("/testspecs");
-                toaster.success("Testspec created successfully!");
-
-            }, function(res, status, headers, config) {
-                toaster.error("Creation failed!");
-            });           
-        } else {
-            //update
-            $http.put(appconf.api+'/testspecs/'+$scope.testspec._id, $scope.testspec)
-            .then(function(res, status, headers, config) {
-                
-                //find the item user was editing
-                $scope.testspecs.forEach(function(testspec) {
-                    if(testspec._id == $scope.testspec._id) {   
-                        //apply updates
-                        for(var k in $scope.testspec) {
-                            testspec[k] = $scope.testspec[k];
-                        }
-                        //console.dir($scope.testspecs);
-                        //console.dir(res.data);
-                        testspec._canedit = res.data.canedit;
-                    }
-                });
-
-                $scope.form.$setPristine();
-                $location.path("/testspecs");
-                toaster.success("Updated Successfully!");
-
-            }, function(res, status, headers, config) {
-                toaster.error("Update failed!");
-            });   
-        }
+        $modalInstance.close(testspec);
     }
     $scope.cancel = function() {
-        $location.path("/testspecs");
+        //$location.path("/testspecs");
+        $modalInstance.dismiss('cancel');
     }
     $scope.remove = function() {
+        $modalInstance.dismiss('remove');
+        /*
         $http.delete(appconf.api+'/testspecs/'+$scope.testspec._id, $scope.testspec)
         .then(function(res, status, headers, config) {
             //find testspec and remove
@@ -166,7 +197,8 @@ function($scope, appconf, $route, toaster, $http, jwtHelper, $location, users, $
         }, function(res, status, headers, config) {
             toaster.error("Deletion failed!");
         });       
+        */
     }
-}]);
+});
 
 

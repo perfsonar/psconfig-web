@@ -1,4 +1,5 @@
 
+/* - use users service instead?
 app.factory('profile', function(appconf, $http) {
     var profile_cache = {};
     return {
@@ -14,6 +15,7 @@ app.factory('profile', function(appconf, $http) {
         }
     }
 });
+*/
 
 //just a service to load all users from auth service
 app.factory('serverconf', ['appconf', '$http', function(appconf, $http) {
@@ -106,41 +108,73 @@ app.factory('hosts', function(appconf, $http, toaster) {
 });
 
 app.factory('users', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
-    return $http.get(appconf.auth_api+'/profile')
-    .then(function(res) {
-        var users = {};
-        res.data.profiles.forEach(function(user) {
-            //user.id = user.id.toString(); //id needs to be string for legacy reason
-            user.id = user.id;
-            users[user.id] = user;
-        });
-        return users;
-    }, function(res) {
-        //console.log(res.statusText);
-    });
+    var all_promise = null;
+    return {
+        //return basic (uuid, sitename, hostname, lsid) host info for all hosts
+        getAll: function() { 
+            if(all_promise) return all_promise;
+            all_promise = $http.get(appconf.auth_api+'/profile')
+            .then(function(res) {
+                return res.data.profiles;
+            }, function(res) {
+                toaster.error("Failed to query profiles");
+            });
+            return all_promise; 
+        }
+    }
 }]);
 
 app.factory('testspecs', function(appconf, $http, jwtHelper, users, $q) {
-    var deferred = $q.defer();
-
-    //first load profiles
-    users.then(function(profiles) {
-        //then load testspecs
-        $http.get(appconf.api+'/testspecs')
-        .then(function(res) {
-            
-            //lookup users
-            res.data.forEach(function(t) {
-                var as = [];
-                t.admins.forEach(function(a) {
-                    as.push(profiles[a]);
-                });
-                t.admins = as; 
+    var testspecs = null;
+    var all_promise = null;
+    return {
+        getAll: function() {
+            if(all_promise) return all_promise;
+            all_promise = $http.get(appconf.api+'/testspecs')
+            .then(function(res) {
+                testspecs = res.data.testspecs;
+                console.dir(testspecs);
+                return res.data.testspecs;
+            }, function(res) {
+                console.error("Failed to query testspecs");
             });
-            deferred.resolve(res.data);
-        });
-    });
-    return deferred.promise;
+            return all_promise; 
+            /*
+            var deferred = $q.defer();
+
+            //first load profiles
+            //users.getAll().then(function(profiles) {
+                //then load testspecs
+                $http.get(appconf.api+'/testspecs')
+                .then(function(res) {
+                    
+                    //lookup users
+                    res.data.forEach(function(t) {
+                        var as = [];
+                        t.admins.forEach(function(a) {
+                            as.push(profiles[a]);
+                        });
+                        t.admins = as; 
+                    });
+                    deferred.resolve(res.data);
+                });
+            //});
+            return deferred.promise;
+        *   */
+        },
+        post: function(testspec) {
+            return $http.post(appconf.api+'/testspecs/', testspec)
+            .then(function(res, status, headers, config) {
+                //add it 
+                testspec._id = res.data._id;
+                testspec._canedit = res.data._canedit;
+                testspecs.push(testspec);
+                return testspec;
+            }, function(res, status, headers, config) {
+                console.error("failed to register testspec");
+            });   
+        }
+    }
 });
 
 app.factory('hostgroups', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {

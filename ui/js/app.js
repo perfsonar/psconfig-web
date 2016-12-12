@@ -142,7 +142,8 @@ function($rootScope, $location, jwtHelper, appconf, scaMessage) {
             var jwt = localStorage.getItem(appconf.jwt_id);
             if(jwt == null || jwtHelper.isTokenExpired(jwt)) {
                 scaMessage.info("Please login first");
-                sessionStorage.setItem('auth_redirect', window.location.toString());
+                sessionStorage.setItem('auth_redirect', $location.absUrl());
+                //sessionStorage.setItem('auth_redirect', window.location.toString());
                 window.location = appconf.auth_url;
                 event.preventDefault();
             }

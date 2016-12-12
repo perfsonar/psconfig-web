@@ -11,31 +11,39 @@ var async = require('async');
 var config = require('../../config');
 var logger = new winston.Logger(config.logger.winston);
 var db = require('../../models');
-//var profile = require('../../common').profile;
+
+function canedit(user, testspec) {
+    if(user) {
+        if(~user.scopes.mca.indexOf('admin')) {
+            return true;
+        }
+        if(~testspec.admins.indexOf(user.sub)) {
+            return true;
+        }
+    }
+    return false;
+}
 
 router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
-    db.Testspec.find({}, function(err, testspecs) {
-        if(err) return next(err);
-            
-        //convert to normal javascript object so that I can add stuff to it (why can't I for sequelize object?)
-        var json = JSON.stringify(testspecs);
-        testspecs = JSON.parse(json);
-        
-        //TODO - I should deprecate profile and let client do this .. like onere UI?
-        //profile.getall(function(err, profiles) {
+    var find = {};
+    if(req.query.find) find = JSON.parse(req.query.find);
 
-        //set _canedit flag for each specs
-        testspecs.forEach(function(testspec) {
-            testspec.canedit = false;
-            if(req.user) {
-                if(~req.user.scopes.mca.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
-                    testspec._canedit = true;
-                }
-            }
-            //testspec.admins = profile.select(profiles, testspec.admins);
+    db.Testspec.find(find)
+    .select(req.query.select)
+    .limit(req.query.limit || 100)
+    .skip(req.query.skip || 0)
+    .sort(req.query.sort || '_id')
+    .lean() //so that I can add _canedit later
+    .exec(function(err, testspecs) {
+        if(err) return next(err);
+        db.Host.count(find).exec(function(err, count) { 
+            if(err) return next(err);
+            //set _canedit flag for each specs
+            testspecs.forEach(function(testspec) {
+                testspec._canedit = canedit(req.user, testspec);
+            });
+            res.json({testspecs: testspecs, count: count});
         });
-        res.json(testspecs);
-        //});
     }); 
 });
 
@@ -45,7 +53,7 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
         if(err) return next(err);
         if(!testspec) return next(new Error("can't find a testspec with id:"+id));
         //only superadmin or admin of this test spec can update
-        if(~req.user.scopes.mca.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
+        if(canedit(req.user, testspec)) {
             testspec.remove().then(function() {
                 res.json({status: "ok"});
             }); 
@@ -55,29 +63,20 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
 
 //update
 router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    //var id = parseInt(req.params.id);
     db.Testspec.findById(req.params.id, function(err, testspec) {
         if(err) return next(err);
         if(!testspec) return next(new Error("can't find a testspec with id:"+id));
         //only superadmin or admin of this test spec can update
-        if(~req.user.scopes.mca.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
-
+        if(canedit(req.user, testspec)) {
             //do update fields
+            testspec.service_type = req.body.service_type;
             testspec.desc = req.body.desc;
             testspec.specs = req.body.specs;
-            var admins = [];
-            req.body.admins.forEach(function(admin) {
-                admins.push(admin.id);
-            });
-            testspec.admins = admins;
+            testspec.admins = req.body.admins;
+            testspec.update_date = new Date();
             testspec.save(function(err) {
                 if(err) return next(err);
-
-                var canedit = false;
-                if(~req.user.scopes.mca.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
-                    var canedit = true;
-                }
-                res.json({status: "ok", canedit: canedit});
+                res.json({status: "ok", _canedit: canedit(req.user, testspec)});
             });
         } else return res.status(401).end();
     }); 
@@ -85,22 +84,9 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
 
 router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     if(!~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
-    
-    //convert admin objects to list of subs
-    var admins = [];
-    req.body.admins.forEach(function(admin) {
-        admins.push(admin.id);
-    });
-    req.body.admins = admins;
-
     db.Testspec.create(req.body, function(err, testspec) {
         if(err) return next(err);
-
-        var canedit = false;
-        if(~req.user.scopes.mca.indexOf('admin') || ~testspec.admins.indexOf(req.user.sub)) {
-            var canedit = true;
-        }
-        res.json({status: "ok", canedit: canedit, id: testspec.id});
+        res.json({status: "ok", _canedit: canedit(req.user, testspec), id: testspec.id});
     });
 });
 

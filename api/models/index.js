@@ -92,8 +92,6 @@ var hostSchema = mongoose.Schema({
 
     admins: [ String ], //from host-administrators (TODO not used yet - will be auth sub)
 
-    //count: Number, //number of time this record was touched (needed to force sequelize update the updateAt time)
-    
     //debug 
     lsid: String,  //source LS instance (mainly to help ui)
     url: String, //source ls url
@@ -124,7 +122,6 @@ var hostgroupSchema = mongoose.Schema({
     host_filter: String,
 
     admins: [ String ], //array of user ids (sub string in auth service)
-
     create_date: {type: Date, default: Date.now },
     update_date: {type: Date, default: Date.now },
 });

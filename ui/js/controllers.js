@@ -1,8 +1,9 @@
 
 app.controller('HeaderController', function($scope, appconf, $route, serverconf, jwtHelper, $location) {
-    $scope.title = appconf.title;
+    $scope.title = appconf.title; //used?
     serverconf.then(function(_c) { $scope.serverconf = _c; });
     $scope.active_menu = "unknown";
+    $scope.appconf = appconf;
 
     var jwt = localStorage.getItem(appconf.jwt_id);
     if(jwt) {

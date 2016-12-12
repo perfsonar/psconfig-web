@@ -14,13 +14,13 @@ var db = require('../../models');
 var common = require('../../common');
 
 function canedit(user, host) {
-    console.dir(user);
     if(user) {
         if(~user.scopes.mca.indexOf('admin')) {
             return true;
         }
-        //TODO - see if user is listed under admin
-
+        if(~host.admins.indexOf(user.sub)) { //TODO not tested yet
+            return true;
+        }
     }
     return false;
 }

@@ -23,6 +23,7 @@ i[onclick] {
     cursor: hover;
 }
 
+/*
 .fixed-top {
     position: fixed;
     top: 0px;
@@ -30,7 +31,13 @@ i[onclick] {
     right: 20px;
     background-color: white;
 }
+*/
 
+@media (min-width: 992px) {
+    .modal-lg {
+        width: 1100px;
+    }
+}
 
 .center-block {
     display: block;
@@ -174,3 +181,23 @@ div.well-detail {
     margin: 0px 20px;
 }
 
+.list-addbutton {
+    font-size: 50px;
+    position: fixed;
+    bottom: 10px;
+    left: 350px;
+    cursor: pointer;
+    color: #999;
+    background-color: white;
+    border-radius: 25px;
+    line-height: 100%;
+
+    transition: 0.2s ease all;
+
+    &:hover {
+        font-size: 70px;
+        bottom: 0px;
+        left: 340px;
+        color: #008cba;
+    }
+}
