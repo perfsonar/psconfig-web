@@ -13,59 +13,55 @@ var logger = new winston.Logger(config.logger.winston);
 var db = require('../../models');
 var profile = require('../../common').profile;
 
+function canedit(user, hostgroup) {
+    if(user) {
+        if(~user.scopes.mca.indexOf('admin')) {
+            return true;
+        }
+        if(~hostgroup.admins.indexOf(user.sub)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
-    db.Hostgroup.find({}, function(err, hostgroups) {
+    var find = {};
+    if(req.query.find) find = JSON.parse(req.query.find);
+
+    db.Hostgroup.find(find)
+    .select(req.query.select)
+    .limit(req.query.limit || 100)
+    .skip(req.query.skip || 0)
+    .sort(req.query.sort || '_id')
+    .lean() //so that I can add _canedit later
+    .exec(function(err, hostgroups) {
         if(err) return next(err);
-        //convert to normal javascript object so that I can add stuff to it (why can't I for sequelize object?)
-        hostgroups = JSON.parse(JSON.stringify(hostgroups));
-        profile.getall(function(err, profiles) {
+        db.Hostgroup.count(find).exec(function(err, count) { 
             if(err) return next(err);
-            //set canedit flag and admin profiles
             hostgroups.forEach(function(hostgroup) {
-                hostgroup.canedit = false;
-                if(req.user) {
-                    //console.dir(hostgroup.admins);
-                    if(~req.user.scopes.mca.indexOf('admin') || ~hostgroup.admins.indexOf(req.user.sub)) {
-                        hostgroup.canedit = true;
-                    }
-                }
-                hostgroup.admins = profile.select(profiles, hostgroup.admins);
+                hostgroup._canedit = canedit(req.user, hostgroup);
             });
-            res.json(hostgroups);
+            res.json({hostgroups: hostgroups, count: count});
         });
     }); 
 });
 
-/* deprecated?
-router.get('/:id', function(req, res, next) {
-    var id = parseInt(req.params.id);
-    db.Hostgroup.findOne({
-        where: {id: id}
-    }).then(function(hostgroup) {
-        profile.getall(function(err, profiles) {
-            if(err) return next(err);
-            hostgroup.admins = profile.select(profiles, hostgroup.admins);
-            res.json(hostgroup);
-        });
-    }); 
-});
-*/
 
 router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    var id = parseInt(req.params.id);
-    db.Hostgroup.findOne({
-        where: {id: id}
-    }).then(function(hostgroup) {
-        if(!hostgroup) return next(new Error("can't find the hostgroup with id:"+id));
+    db.Hostgroup.findById(req.params.id, function(err, hostgroup) {
+        if(err) return next(err);
+        if(!hostgroup) return next(new Error("can't find the hostgroup with id:"+req.params.id));
         //only superadmin or admin of this test spec can update
-        if(~req.user.scopes.mca.indexOf('admin') || ~hostgroup.admins.indexOf(req.user.sub)) {
-            hostgroup.destroy().then(function() {
+        if(canedit(req.user, hostgroup)) {
+            hostgroup.remove().then(function() {
                 res.json({status: "ok"});
             }); 
         } else return res.status(401).end();
     });
 });
 
+/*
 //remove null items from an array
 function filter_null(a) {
     var ret = [];
@@ -75,34 +71,30 @@ function filter_null(a) {
     });
     return ret;
 }
+*/
 
 router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var id = parseInt(req.params.id);
-    db.Hostgroup.findOne({
-        where: {id: id}
-    }).then(function(hostgroup) {
-        if(!hostgroup) return next(new Error("can't find a hostgroup with id:"+id));
+    db.Hostgroup.findById(req.params.id, function(err, hostgroup) {
+        if(err) return next(err);
+        if(!hostgroup) return next(new Error("can't find a hostgroup with id:"+req.params.id));
         //only superadmin or admin of this test spec can update
-        if(~req.user.scopes.mca.indexOf('admin') || ~hostgroup.admins.indexOf(req.user.sub)) {
+        if(canedit(req.user, hostgroup)) {
+            hostgroup.service_type = req.body.service_type;
             hostgroup.desc = req.body.desc;
 
             hostgroup.type = req.body.type; //not service type, the host type (static, dynamic, etc..)
-            hostgroup.hosts = filter_null(req.body.hosts);
+            //hostgroup.hosts = filter_null(req.body.hosts);
+            hostgroup.hosts = req.body.hosts;
             hostgroup.host_filter = req.body.host_filter;
 
-            var admins = [];
-            //console.log(JSON.stringify(req.body, null, 4));
-            req.body.admins.forEach(function(admin) {
-                admins.push(admin.id);
-            });
-            hostgroup.admins = admins;
-            //console.log(JSON.stringify(hostgroup, null, 4));
-            hostgroup.save().then(function() {
-                var canedit = false;
-                if(~req.user.scopes.mca.indexOf('admin') || ~hostgroup.admins.indexOf(req.user.sub)) {
-                    canedit = true;
-                }
-                res.json({status: "ok", canedit: canedit});
+            hostgroup.admins = req.body.admins;
+            hostgroup.update_date = new Date();
+            hostgroup.save(function(err) {
+                if(err) return next(err);
+                hostgroup = JSON.parse(JSON.stringify(hostgroup));
+                hostgroup._canedit = canedit(req.user, hostgroup);
+                res.json(hostgroup);
             }).catch(function(err) {
                 next(err);
             });
@@ -112,20 +104,11 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
 
 router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     if(!~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
-   
-    //convert admin objects to list of subs
-    var admins = [];
-    req.body.admins.forEach(function(admin) {
-        admins.push(admin.id);
-    });
-    req.body.admins = admins;
-
-    db.Hostgroup.create(req.body).then(function(hostgroup) {
-        var canedit = false;
-        if(~req.user.scopes.mca.indexOf('admin') || ~hostgroup.admins.indexOf(req.user.sub)) {
-            canedit = true;
-        }
-        res.json({status: "ok", canedit: canedit, id: hostgroup.id});
+    db.Hostgroup.create(req.body, function(err, hostgroup) {
+        if(err) return next(err);
+        hostgroup = JSON.parse(JSON.stringify(hostgroup));
+        hostgroup._canedit = canedit(req.user, hostgroup);
+        res.json(hostgroup);
     });
 });
 

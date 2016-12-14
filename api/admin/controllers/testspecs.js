@@ -36,7 +36,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
     .lean() //so that I can add _canedit later
     .exec(function(err, testspecs) {
         if(err) return next(err);
-        db.Host.count(find).exec(function(err, count) { 
+        db.Testspec.count(find).exec(function(err, count) { 
             if(err) return next(err);
             //set _canedit flag for each specs
             testspecs.forEach(function(testspec) {
@@ -51,7 +51,7 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
     //var id = parseInt(req.params.id);
     db.Testspec.findById(req.params.id, function(err, testspec) {
         if(err) return next(err);
-        if(!testspec) return next(new Error("can't find a testspec with id:"+id));
+        if(!testspec) return next(new Error("can't find a testspec with id:"+req.params.id));
         //only superadmin or admin of this test spec can update
         if(canedit(req.user, testspec)) {
             testspec.remove().then(function() {
@@ -65,7 +65,7 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
 router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     db.Testspec.findById(req.params.id, function(err, testspec) {
         if(err) return next(err);
-        if(!testspec) return next(new Error("can't find a testspec with id:"+id));
+        if(!testspec) return next(new Error("can't find a testspec with id:"+req.params.id));
         //only superadmin or admin of this test spec can update
         if(canedit(req.user, testspec)) {
             //do update fields
@@ -80,6 +80,8 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
                 testspec = JSON.parse(JSON.stringify(testspec));
                 testspec._canedit = canedit(req.user, testspec);
                 res.json(testspec);
+            }).catch(function(err) {
+                next(err);
             });
         } else return res.status(401).end();
     }); 

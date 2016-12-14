@@ -1,24 +1,104 @@
 
-app.controller('HostgroupsController', ['$scope', 'appconf', 'toaster', '$http', 'jwtHelper', 'serverconf', 'users', '$modal', 'scaMessage', 'hostgroups',
-function($scope, appconf, toaster, $http, jwtHelper, serverconf, users, $modal, scaMessage, hostgroups) {
+app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelper, serverconf, users, $modal, scaMessage, $routeParams, $location, hostgroups, hosts) {
     scaMessage.show(toaster);
-    serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
-    $scope.appconf = appconf;
+    $scope.active_menu = "hostgroups";
 
-    var jwt = localStorage.getItem(appconf.jwt_id);
-    var user = jwtHelper.decodeToken(jwt);
+    //serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
+    //$scope.appconf = appconf;
 
-    users.then(function(_users) {
+    //var jwt = localStorage.getItem(appconf.jwt_id);
+    //var user = jwtHelper.decodeToken(jwt);
+
+    users.getAll().then(function(_users) {
         $scope.users = _users;
-        hostgroups.then(function(_hostgroups) { $scope.hostgroups = _hostgroups});
+        hosts.getAll({select: 'hostname services sitename'}).then(function(_hosts) {
+        
+            //organize by service provided
+            $scope.hosts = {}; 
+            _hosts.forEach(function(host) {
+                if(host.services) host.services.forEach(function(service) {
+                    if(!$scope.hosts[service.type]) $scope.hosts[service.type] = [];
+                    //console.log(service.type+" "+host._id);
+                    $scope.hosts[service.type].push(host);
+                });
+            });
+
+            //console.dir($scope.hosts["bwctl"]);
+            //check for duplicates
+            //$scope.hosts["bwctl"].forEach(function(host) {
+
+            hostgroups.getAll().then(function(_hostgroups) { 
+                $scope.hostgroups = _hostgroups; 
+                if($routeParams.id) {
+                    $scope.hostgroups.forEach(function(hostgroup) {
+                        if(hostgroup._id == $routeParams.id) $scope.select(hostgroup);
+                    });
+                } else {
+                    //select first one
+                    if($scope.hostgroups.length > 0) $scope.select($scope.hostgroups[0]);
+                }
+            });
+        });
     });
 
-    $scope.edit = function(_hostgroup) {
-        if(!_hostgroup.canedit) {
-            toaster.error("You need to be listed as an admin in order to edit this testspec");
-            return;
+    $scope.selected = null;
+    $scope.select = function(hostgroup) {
+        $scope.selected = hostgroup; 
+        
+        //hide subbar if it's hidden optionally for narrow view
+        if($(".subbar").hasClass("subbar-shown")) {
+            $(".subbar").removeClass("subbar-shown");
         }
 
+        $location.update_path("/hostgroups/"+hostgroup._id);
+        window.scrollTo(0,0);
+    }
+
+    $scope.add = function() {
+        $scope.selected = hostgroups.add();
+        /*
+            var hostgroup = {
+            service_type: service_type,
+            admins: [ $scope.users[user.sub] ], //select current user as admin
+            type: 'static',
+            hosts: [],
+            host_filter: "return false; //select none",
+            desc: "",
+        };
+        var modalInstance = $modal.open({
+            animation: true,
+            templateUrl: 't/hostgroup.html',
+            controller: 'HostgroupModalController',
+            size: 'lg',
+            resolve: {
+                hostgroup: function () {
+                    return hostgroup;
+                },
+                title: function() {
+                    return "New Hostgroup";
+                },
+            }
+        });
+        modalInstance.result.then(function() {
+            console.log("adding hostgroupu to list");
+            $scope.hostgroups.push(hostgroup); 
+        }, function (code) {
+            //console.log("dismiss code"+code);
+        });
+        */
+    }
+
+    $scope.submit = function() {
+        if(!$scope.selected._id) {
+            hostgroups.create($scope.selected).then(function() {
+                toaster.success("Hostgroup created successfully!");
+            });
+        } else {
+            hostgroups.update($scope.selected).then(function() {
+                toaster.success("Hostgroup updated successfully!");
+            });
+        }
+        /*
         var hostgroup = angular.copy(_hostgroup);
         var modalInstance = $modal.open({
             animation: true,
@@ -49,46 +129,26 @@ function($scope, appconf, toaster, $http, jwtHelper, serverconf, users, $modal, 
                 }
             }
         });
+        */
+    }
+    $scope.cancel = function() {
+        location.reload();
     }
 
-    $scope.create = function(service_type) {
-        var hostgroup = {
-            service_type: service_type,
-            admins: [ $scope.users[user.sub] ], //select current user as admin
-            type: 'static',
-            hosts: [],
-            host_filter: "return false; //select none",
-            desc: "",
-        };
-        var modalInstance = $modal.open({
-            animation: true,
-            templateUrl: 't/hostgroup.html',
-            controller: 'HostgroupModalController',
-            size: 'lg',
-            resolve: {
-                hostgroup: function () {
-                    return hostgroup;
-                },
-                title: function() {
-                    return "New Hostgroup";
-                },
-            }
-        });
-        modalInstance.result.then(function() {
-            console.log("adding hostgroupu to list");
-            $scope.hostgroups.push(hostgroup); 
-        }, function (code) {
-            //console.log("dismiss code"+code);
+    $scope.remove = function() {
+        hostgroups.remove($scope.selected).then(function() {
+            toaster.success("Removed successfully");
+            $scope.selected = null;
         });
     }
-}]);
+});
 
+/*
 app.controller('HostgroupModalController', ['$scope', 'appconf', 'toaster', '$http', '$modalInstance', 'hostgroup', 'title', 'services', 'serverconf', 'users',
 function($scope, appconf, toaster, $http, $modalInstance, hostgroup, title, services, serverconf, users) {
     $scope.hostgroup = hostgroup;
     $scope.title = title;
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
-    //profiles.then(function(_profiles) { $scope.profiles = _profiles; }); //for admin list
     services.then(function(_services) { $scope.services = _services; }); //for host list
 
     users.then(function(_users) {
@@ -156,6 +216,7 @@ function($scope, appconf, toaster, $http, $modalInstance, hostgroup, title, serv
     };
     $scope.tabs[hostgroup.type].active = true;
 }]);
+*/
 
 //validator for host_filter ace
 app.directive('hostfilter', function($q, $http, appconf) {

@@ -87,8 +87,6 @@ function create_hostrec(service, uri, cb) {
 
     //reconstruct the url for the host record
     var url = uri.protocol+"//"+uri.host+pathname+'/'+service['service-host'][0];
-    //logger.debug("caching host:"+service['service-host'][0]);
-    //logger.debug("caching host:"+url);
     request({url: url, timeout: 1000*10, json: true}, function(err, res, host) {
         if(err) return cb(err);
         if(res.statusCode != 200) return cb(new Error("failed to cache host from:"+url+" statusCode:"+res.statusCode));
@@ -192,11 +190,23 @@ function cache_ls(ls, lsid, cb) {
                 }
                 if(!host) return next(); //continue... failed to create host rec.. ignore all services for that host
 
+                //host information may come from more than 1 datasource (or duplicate within the single source..)
+                //we need to make sure we don't register more than 1 service for each type per host
+                var exist = false;
+                var type = service['service-type'][0];
+                host.services.forEach(function(_service) {
+                    if(_service.type == type) exist = true;
+                });
+                if(exist) {
+                    logger.error("duplicate service for type:"+type+" uuid:"+uuid);
+                    return next();
+                }
+                
                 //construct service record
                 host.services.push({
                     //client_uuid: uuid,
                     //uuid: uuid+'.'+service['service-type'][0],
-                    type: service['service-type'][0],
+                    type: type,
                     name: service['service-name'][0],
                     locator: service['service-locator'][0], //locator is now a critical information needed to generate the config
                     //lsid: lsid, //make it easier for ui
@@ -209,6 +219,8 @@ function cache_ls(ls, lsid, cb) {
                     //admins: service['service-administrators'],
                     //$inc: { count: 1 }, //number of times updated (exists to allow updateTime update)
                 });
+
+
 
                 next();
             });
@@ -225,81 +237,6 @@ function cache_ls(ls, lsid, cb) {
                 cb();
             });
         });
-
-        /*
-        var count_new = 0;
-        var count_update = 0;
-        var host_uuids = []; //list of all host_uuids cached for this round
-        async.eachSeries(services, function(service, next) {
-            //TODO apply exclusion
-
-            //ignore record with no client-uuid (probably old toolkit instance?)
-            if(service['client-uuid'] === undefined) {
-                logger.error("client-uuid not set (old toolkit instance?) - skipping");
-                logger.error(service);
-                return next();//continue to next service
-            }
-            var uuid = service['client-uuid'][0]; 
-            logger.debug("caching service:"+service['service-locator'][0] + " on "+uuid);
-
-            var rec = {
-                client_uuid: uuid,
-                uuid: uuid+'.'+service['service-type'][0],
-                name: service['service-name'][0],
-                type: service['service-type'][0],
-                locator: service['service-locator'][0], //locator is now a critical information needed to generate the config
-                lsid: lsid, //make it easier for ui
-
-                sitename: service['location-sitename'][0],
-                location: get_location(service),
-                
-                //TODO - I need to query the real admin records from the cache (gocdb2sls service already genenrates contact records)
-                //I just have to store them in our table
-                admins: service['service-administrators'],
-
-                $inc: { count: 1 }, //number of times updated (exists to allow updateTime update)
-                //count: 0, //number of times updated (exists to allow updateTime update)
-            };
-
-            if(net.isIP(rec.locator)) {
-                dns.reverse(rec.locator, function(err, _hostnames) {
-                    if(err) {
-                        logger.error("couldn't reverse lookup ip: "+rec.locator);
-                        logger.error(err);  //continue though
-                    } else {
-                        if(_hostnames.length > 0) rec.locator = _hostnames[0]; //only using the first entry?
-                    }
-                    upsertService();
-                }); 
-            } else {
-                upsertService();
-            }
-
-            function upsertService() {
-                //first make sure we have stored host (oitherwise it will violate foreign key constraint "Services_client_uuid_fkey")
-                maybe_cache_host(function(err) {
-                    if(err) {
-                        logger.error("couldn't cache host info for client_uuid:"+uuid+" - can't store service without host");
-                        logger.error(err.toString());
-                        return next(); //continue
-                    }
-                    db.Service.findOneAndUpdate({uuid: rec.uuid}, rec, {upsert: true}, next);
-                });            
-            }
-            function maybe_cache_host(cb) {
-                if(~host_uuids.indexOf(uuid)) return cb(); //already cached
-                var uri = res.request.uri;
-                cache_host(service, uri, function(err) {
-                    if(err) return cb(err);
-                    host_uuids.push(uuid);
-                    cb();
-                });
-            }
-        }, function(err) {
-            logger.info("loaded "+services.length+" services for "+ls.label+" from "+ls.url + " updated:"+count_update+" new:"+count_new);
-            cb();
-        });
-        */
     })
 }
 

@@ -34,6 +34,7 @@
                 <div class="list-header">
                     <small><span class="label label-default">{{host.lsid}}</span> {{host.sitename}} 
                         <!--<span class="text-muted">/</span>-->
+                        <i ng-if="!host._canedit" class="fa fa-lock text-muted"></i>
                     </small>
                 </div>
                 <small class="help-block">{{host.hostname}}</small>

@@ -1,4 +1,3 @@
-<!--<sca-menutab fluid="true" menu="appconf.menu" active="'testspecs'" user="user"></sca-menutab>-->
 <ng-include src="'t/sidebar.html'"></ng-include>
 <div class="sca-sidebar-page">
     <div class="subbar">
@@ -26,38 +25,22 @@
 
         <div class="subbar-list">
             <p class="alert alert-info" ng-if="testspecs.length == 0">Please register a testspec.</p>
-            <!--
-            <div class="subbar-list-item" 
-                ng-repeat="(service_id, service) in serverconf.service_types"
-                ng-class="{'active': selected == service_id}"
-                ng-click="select(service_id)">
-
-                <div class="list-header">{{service.name}}</div>
-                <small>
-                    <time class="text-muted" style="position: relative; top: -4px;">{{service.create_date | date}}</time>
-                    <p>
-                        <code>dwi</code>{{job.config._form.dwi|filename}}
-                        <code>t1</code>{{job.config._form.t1|filename}}
-                    </p>
-                    {{service.desc}}
-                </small>
-            </div>
-            -->
             <div class="subbar-list-item" 
                 ng-repeat="testspec in testspecs" 
                 ng-class="{active: selected == testspec}"
                 ng-click="select(testspec)">
                 <time class="help-block pull-right">{{testspec.create_date|date}}</time>
-                <h4 style="margin: 0px">
-                    <small class="label label-info">{{testspec.service_type}}</small>
-                    {{testspec.desc}}
-                    <small><i ng-if="!testspec._canedit" class="fa fa-lock text-muted"></i></small>
-                </h4>
+                <div class="list-header">
+                    <small>
+                        <span class="label label-info">{{testspec.service_type}}</span> {{testspec.desc}}
+                        <i ng-if="!testspec._canedit" class="fa fa-lock text-muted"></i>
+                    </small>
+                </div>
             </div>
             <div class="list-addbutton" ng-click="add()">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> 
             </div>
-        </div><!--workflow-->
+        </div>
     </div><!--subbar-->
 
     <div class="subbar-content">
@@ -90,21 +73,11 @@
                     </div>
                 </div>
                 <hr style="margin-bottom: 0px;">
-            </div>
+            </div><!--fixed-top-->
+
             <div style="padding-top: 150px" class="margin30">
-
-                <!--
-                <div class="col-sm-offset-2 col-sm-10">
-                    <hr>
-                </div>
-                -->
-
                 <div class="form-group">
                     <label for="admins" class="col-sm-2 control-label">Admins</label>
-                    <!--
-                    <pre>{{users|json}}</pre>
-                    <pre>{{selected.admins|json}}</pre>
-                    -->
                     <div class="col-sm-10">
                         <ui-select multiple ng-model="selected.admins" ng-disabled="!selected._canedit">
                             <ui-select-match placeholder="Select admins who can update this test spec">
@@ -127,50 +100,18 @@
                             ng-disabled="!selected._canedit"
                             ng-model="selected.service_type" 
                             ng-change="setdefault(selected.service_type)" required>
-                            <option value="bwctl">Bandwidth Test Controller (bwctl)</option>
-                            <option value="owamp">One-Way Ping (owamp)</option>
-                            <option value="traceroute">Traceroute</option>
-                            <option value="ping">Ping</option>
+                            <option ng-repeat="(sid, item) in serverconf.service_types" value="{{sid}}">{{item.label}}</option>
                         </select>
                     </div>
                 </div>
                 <ng-include ng-if="selected.service_type" src="'t/testspec-'+selected.service_type+'.html'"></ng-include>
+
                 <!--
                 <pre>{{selected|json}}</pre>
                 -->
             </div><!--nonfixed-->
         </form>  
-      <!--
-        <div class="panel panel-default" ng-repeat="(service_id, service) in serverconf.service_types">
-            <div class="panel-heading">
-                {{service.label}}
-            </div>
-
-            <ul class="list-group">
-            <li class="list-group-item"
-                ng-repeat="testspec in testspecs | filter:{service_type: service_id} | orderBy: 'id'">
-                <div class="row">
-                    <div class="col-md-7">
-                        <h4><small>{{testspec.id}}</small> {{testspec.desc}}</h4>
-                        <mc-specs specs="testspec.specs"></mc-specs>
-                    </div>
-                    <div class="col-md-5">
-                        <h5>Admins<small> (who can edit)</small></h5>
-                        <mc-admins admins="testspec.admins"></mc-admins>
-                    </div>
-                </div>
-                <div class="pull-right edit_button" ng-if="testspec._canedit">
-                    <button type="button" ng-click="edit(testspec)" class="btn btn-xs pull-right"><i class="fa fa-pencil-square-o"></i></button>
-                </div>
-            </li>
-            </ul>
-            <div class="panel-body" style="background-color: #fafafa;">
-                <button class="btn btn-sm" ng-click="add(service_id)">Add New <span class="text-muted">{{service.label}}</span></button>
-            </div>
-        </div>
-        -->
     </div><!--subbar-content-->
-
 </div><!--sca-sidebar-page-->
 
 

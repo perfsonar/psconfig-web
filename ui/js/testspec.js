@@ -23,6 +23,12 @@ app.controller('TestspecsController', function($scope, $route, toaster, $http, j
     $scope.selected = null;
     $scope.select = function(testspec) {
         $scope.selected = testspec; 
+        
+        //hide subbar if it's hidden optionally for narrow view
+        if($(".subbar").hasClass("subbar-shown")) {
+            $(".subbar").removeClass("subbar-shown");
+        }
+
         $location.update_path("/testspecs/"+testspec._id);
         window.scrollTo(0,0);
     }
@@ -54,8 +60,7 @@ app.controller('TestspecsController', function($scope, $route, toaster, $http, j
             if($scope.selected.specs[k] === '') delete $scope.selected.specs[k];
         }
 
-        //TODO - remove parameters that aren't shown on the UI
-        console.dir($scope.form);
+        //remove parameters that aren't shown on the UI
         for(var k in $scope.selected.specs) {
             if($scope.form[k] === undefined) {
                 console.log("no such field:"+k+" removing (maybe from bad default?)");
@@ -64,12 +69,10 @@ app.controller('TestspecsController', function($scope, $route, toaster, $http, j
         }
 
         if(!$scope.selected._id) {
-            //new
             testspecs.create($scope.selected).then(function() {
                 toaster.success("Testspec created successfully!");
             });
         } else {
-            //update
             testspecs.update($scope.selected).then(function() {
                 toaster.success("Testspec updated successfully!");
             });
@@ -111,8 +114,6 @@ app.controller('TestspecsController', function($scope, $route, toaster, $http, j
             toaster.success("Removed successfully");
             $scope.selected = null;
         });
-        /*
-        */
     }
 });
 

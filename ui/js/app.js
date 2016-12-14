@@ -91,29 +91,22 @@ app.config(['cfpLoadingBarProvider', '$logProvider', function(cfpLoadingBarProvi
 
 //configure route
 app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
-    //console.log("router provider");
     $routeProvider.
     when('/about', {
         templateUrl: 't/about.html',
         controller: 'AboutController'
     })
-    /*
-    .when('/home', {
-        templateUrl: 't/home.html',
-        controller: 'HomeController',
-        requiresLogin: true,
-    })
-    */
     .when('/testspecs/:id?', {
         templateUrl: 't/testspecs.html',
         controller: 'TestspecsController',
         requiresLogin: true,
     })
-    .when('/hostgroups', {
+    .when('/hostgroups/:id?', {
         templateUrl: 't/hostgroups.html',
         controller: 'HostgroupsController',
         requiresLogin: true,
     })
+
     .when('/configs', {
         templateUrl: 't/configs.html',
         controller: 'ConfigsController'
@@ -122,6 +115,7 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         templateUrl: 't/config.html',
         controller: 'ConfigController'
     })
+
     .when('/hosts/:id?', {
         templateUrl: 't/hosts.html',
         controller: 'HostsController'
@@ -157,7 +151,6 @@ function(appconf, $httpProvider, jwtInterceptorProvider) {
     }
     $httpProvider.interceptors.push('jwtInterceptor');
 }]);
- 
 
 //http://plnkr.co/edit/juqoNOt1z1Gb349XabQ2?p=preview
 /**

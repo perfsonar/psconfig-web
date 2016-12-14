@@ -66,9 +66,11 @@ app.factory('hosts', function(appconf, $http, toaster) {
 
     return {
         //return basic (uuid, sitename, hostname, lsid) host info for all hosts
-        getAll: function() { 
+        getAll: function(opts) { 
             if(all_promise) return all_promise;
-            all_promise = $http.get(appconf.api+'/hosts?select=sitename hostname lsid&sort=sitename hostname&limit=100000')
+            var select = "sitename hostname lsid";
+            if(opts && opts.select) select = opts.select;
+            all_promise = $http.get(appconf.api+'/hosts?select='+select+'&sort=sitename hostname&limit=100000')
             .then(function(res) {
                 hosts = res.data.hosts;
                 return res.data.hosts;
@@ -214,17 +216,73 @@ app.factory('testspecs', function(appconf, $http, jwtHelper, users, $q) {
     }
 });
 
-app.factory('hostgroups', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
-    return $http.get(appconf.api+'/hostgroups')
-    .then(function(res) {
-        return res.data;
-    });
-}]);
+app.factory('hostgroups', function(appconf, $http, jwtHelper, users, $q) {
+    var hostgroups = null;
+    var all_promise = null;
+    return {
+        getAll: function() {
+            if(all_promise) return all_promise;
+            all_promise = $http.get(appconf.api+'/hostgroups')
+            .then(function(res) {
+                hostgroups = res.data.hostgroups;
+                return res.data.hostgroups;
+            }, function(res) {
+                console.error("Failed to query hostgroups");
+            });
+            return all_promise; 
+        },
+        add: function() {
+            var hostgroup = {
+                desc: "New Hostgroup",
+                admins: [],
+                type: "static",
+                hosts: [],
+                host_filter: "return false; //select none",
+            };
+            var jwt = localStorage.getItem(appconf.jwt_id);
+            if(jwt) {
+                var user = jwtHelper.decodeToken(jwt);
+                hostgroup.admins.push(user.sub.toString());
+                hostgroup._canedit = true;
+            }
+            hostgroups.push(hostgroup);
+            return hostgroup;
+        },
+        create: function(hostgroup) {
+            return $http.post(appconf.api+'/hostgroups/', hostgroup)
+            .then(function(res, status, headers, config) {
+                hostgroup._id = res.data._id;
+                hostgroup._canedit = res.data._canedit;
+                hostgroup.create_date = res.data.create_date;
+                return hostgroup;
+            }, function(res, status, headers, config) {
+                console.error("failed to register hostgroup");
+            });   
+        },
+        update: function(hostgroup) {
+            return $http.put(appconf.api+'/hostgroups/'+hostgroup._id, hostgroup)
+            .then(function(res) {
+                hostgroup._canedit = res.data._canedit;
+                return hostgroup;
+            }, function(res, status, headers, config) {
+                console.error("failed to update hostgroup");
+            });   
+        },
+        remove: function(hostgroup) {
+            return $http.delete(appconf.api+'/hostgroups/'+hostgroup._id)
+            .then(function(res) {
+                hostgroups.splice(hostgroups.indexOf(hostgroup), 1);
+                //$scope.form.$setPristine();//ignore all changed made
+            }, function(res) {
+                console.error("Deletion failed!");
+            });       
+        }
+    }
+});
 
 //TODO - deprecate this?
 //load menu and profile by promise chaining
-app.factory('menu', ['appconf', '$http', 'jwtHelper', '$sce', 'scaMessage', 'scaMenu', 'toaster',
-function(appconf, $http, jwtHelper, $sce, scaMessage, scaMenu, toaster) {
+app.factory('menu', function(appconf, $http, jwtHelper, $sce, scaMessage, scaMenu, toaster) {
 
     var jwt = localStorage.getItem(appconf.jwt_id);
     var menu = {
@@ -237,5 +295,5 @@ function(appconf, $http, jwtHelper, $sce, scaMessage, scaMenu, toaster) {
     if(jwt) menu.user = jwtHelper.decodeToken(jwt);
 
     return menu;
-}]);
+});
 
