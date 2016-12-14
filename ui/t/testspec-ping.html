@@ -2,7 +2,9 @@
     <label for="test_interval" class="col-sm-2 control-label">Test Interval *</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="test_interval" ng-model="testspec.specs.test_interval" required>
+            <input type="text" class="form-control" name="test_interval" 
+                ng-disabled="!selected._canedit"
+                ng-model="selected.specs.test_interval" required>
             <div class="input-group-addon">seconds</div>
         </div>
         <p class="help-block">Number of seconds between each test</p>
@@ -10,7 +12,9 @@
     <label for="random_start_percentage" class="col-sm-2 control-label">Random Start Percentage</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="random_start_percentage" ng-model="testspec.specs.random_start_percentage" placeholder="10">
+            <input type="text" class="form-control" name="random_start_percentage" 
+                ng-disabled="!selected._canedit"
+                ng-model="selected.specs.random_start_percentage" placeholder="10">
             <div class="input-group-addon">%</div>
         </div>
         <p class="help-block">The percentage to randomize the start time of test. Valid values are between 0 and 50 (inclusive). Example: interval of 7200 (2 hours) and random_start_percentage 50 means that a test can start anywhere between 1 hour and 3 hours after the previous test completes.</p>
@@ -20,7 +24,9 @@
     <label for="packet_count" class="col-sm-2 control-label">Packet Count</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="packet_count" ng-model="testspec.specs.packet_count">
+            <input type="text" class="form-control" name="packet_count" 
+                ng-disabled="!selected._canedit"
+                ng-model="selected.specs.packet_count">
             <div class="input-group-addon">packets</div>
         </div>
         <p class="help-block">The number of packets to send per test. This multiplied by packet_interval is the duration of the test.</p>
@@ -28,7 +34,9 @@
     <label for="packet_interval" class="col-sm-2 control-label">Packet Interval</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="packet_interval" ng-model="testspec.specs.packet_interval">
+            <input type="text" class="form-control" name="packet_interval" 
+                ng-disabled="!selected._canedit"
+                ng-model="selected.specs.packet_interval">
             <div class="input-group-addon">seconds</div>
         </div>
         <p class="help-block">The average time between packets. A decimal value less than one means to send multiple packets per second (e.g. .1 means 10 packets per second). This multiplied by packet_count is the duration of the test.</p>
@@ -39,7 +47,9 @@
     <label for="packet_size" class="col-sm-2 control-label">Packet Size</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="packet_size" ng-model="testspec.specs.packet_size">
+            <input type="text" class="form-control" name="packet_size" 
+                ng-disabled="!selected._canedit"
+                ng-model="selected.specs.packet_size">
             <div class="input-group-addon">bytes</div>
         </div>
         <p class="help-block">The size of packets in bytes.</p>
@@ -47,7 +57,9 @@
     <label for="packet_ttl" class="col-sm-2 control-label">Packet TTL</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="packet_ttl" ng-model="testspec.specs.packet_ttl">
+            <input type="text" class="form-control" name="packet_ttl" 
+                ng-disabled="!selected._canedit"
+                ng-model="selected.specs.packet_ttl">
             <div class="input-group-addon">hops</div>
         </div>
         <p class="help-block">The TTL to set in the IP header of outgoing packets</p>
@@ -57,14 +69,26 @@
 <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
         <div class="checkbox">
-            <label> <input type="checkbox" name="force_bidirectional" ng-model="testspec.specs.force_bidirectional"> Do Bidirectional test</label>
+            <label> 
+                <input type="checkbox" name="force_bidirectional" 
+                    ng-disabled="!selected._canedit"
+                    ng-model="selected.specs.force_bidirectional"> Do Bidirectional test
+            </label>
             <p class="help-block">Forces each endpoint to initiate the test in both directions. This will lead to redundant tests being run on each side.</p>
         </div>
         <div class="checkbox">
-            <label> <input type="checkbox" name="ipv4_only" ng-model="testspec.specs.ipv4_only"> IPv4 Only</label>
+            <label> 
+                <input type="checkbox" name="ipv4_only" 
+                    ng-disabled="!selected._canedit"
+                    ng-model="selected.specs.ipv4_only"> IPv4 Only
+            </label>
         </div>
         <div class="checkbox">
-            <label> <input type="checkbox" name="ipv6_only" ng-model="testspec.specs.ipv6_only"> IPv6 Only</label>
+            <label> 
+                <input type="checkbox" name="ipv6_only" 
+                    ng-disabled="!selected._canedit"
+                    ng-model="selected.specs.ipv6_only"> IPv6 Only
+            </label>
             <p class="help-block">Forces each side to use IPv4/6. Test will fail if no IPv4/6 address can be determined for either endpoint</p>
         </div>
     </div>

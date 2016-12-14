@@ -3,8 +3,8 @@
 <div class="sca-sidebar-page">
     <div class="subbar">
         <div style="padding-left: 20px; margin-bottom: 10px;">
-            <h2>Testspecs</h2>
-            <p class="help-block">Showing registered test specs</p>
+            <h2>Test specs</h2>
+            <p class="help-block">Showing registered test specifications</p>
             <br>
             <div class="btn-group pull-right" style="left: -20px;top: -5px;">
                 <button class="btn btn-xs btn-default dropdown-toggle" 
@@ -20,7 +20,7 @@
                 <li><a href>Pinger</a></li>
                 </ul>
             </div>
-            <span class="text-muted">{{testspecs.length}} specs</span>
+            <span class="text-muted">{{testspecs.length}} testspecs</span>
         </div>
         <hr style="margin: 0px;">
 
@@ -43,8 +43,16 @@
                 </small>
             </div>
             -->
-            <div class="subbar-list-item" ng-repeat="testspec in testspecs">
-                {{testspec}}
+            <div class="subbar-list-item" 
+                ng-repeat="testspec in testspecs" 
+                ng-class="{active: selected == testspec}"
+                ng-click="select(testspec)">
+                <time class="help-block pull-right">{{testspec.create_date|date}}</time>
+                <h4 style="margin: 0px">
+                    <small class="label label-info">{{testspec.service_type}}</small>
+                    {{testspec.desc}}
+                    <small><i ng-if="!testspec._canedit" class="fa fa-lock text-muted"></i></small>
+                </h4>
             </div>
             <div class="list-addbutton" ng-click="add()">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> 
@@ -53,8 +61,81 @@
     </div><!--subbar-->
 
     <div class="subbar-content">
-        {{selected}}
-        <!--
+        <div class="container-fluid">
+            <br><br>
+            <p class="alert alert-info" ng-if="!selected">Please select testspec</p>
+            <form ng-submit="submit()" class="form-horizontal" name="form" ng-show="selected">
+                <div class="form-group">
+                    <label for="desc" class="col-sm-2 control-label">Name *</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="desc" ng-model="selected.desc" 
+                            ng-disabled="!selected._canedit"
+                            placeholder="Name for this test spec" required>
+                    </div>
+                </div>
+
+                <!--
+                <div class="col-sm-offset-2 col-sm-10">
+                    <hr>
+                </div>
+                -->
+
+                <div class="form-group">
+                    <label for="admins" class="col-sm-2 control-label">Admins</label>
+                    <!--
+                    <pre>{{users|json}}</pre>
+                    <pre>{{selected.admins|json}}</pre>
+                    -->
+                    <div class="col-sm-10">
+                        <ui-select multiple ng-model="selected.admins" ng-disabled="!selected._canedit">
+                            <ui-select-match placeholder="Select admins who can update this test spec">
+                                <img gravatar-src="$item.email" gravatar-size="17"/>
+                                <b>{{$item.fullname}}</b> <span class="email">&lt;{{$item.email}}&gt;</span>
+                            </ui-select-match>
+                            <ui-select-choices repeat="user.id as user in users | propsFilter: {fullname: $select.search, email: $select.search}">
+                              <img gravatar-src="user.email" gravatar-size="17"/>
+                              <b>{{user.fullname}}</b> <small>&lt;{{user.email}}&gt;</small>
+                            </ui-select-choices>
+                        </ui-select>
+                        <p class="help-block">Users who can update this test spec</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="desc" class="col-sm-2 control-label">Service Type *</label>
+                    <div class="col-sm-10">
+                        <select class="form-control" 
+                            ng-disabled="!selected._canedit"
+                            ng-model="selected.service_type" 
+                            ng-change="setdefault(selected.service_type)" required>
+                            <option value="bwctl">Bandwidth Test Controller (bwctl)</option>
+                            <option value="owamp">One-Way Ping (owamp)</option>
+                            <option value="traceroute">Traceroute</option>
+                            <option value="ping">Ping</option>
+                        </select>
+                    </div>
+                </div>
+                <ng-include ng-if="selected.service_type" src="'t/testspec-'+selected.service_type+'.html'"></ng-include>
+                <div class="col-sm-offset-2 col-sm-10" ng-if="selected._canedit" style="padding-bottom: 50px;">
+                    <hr>
+                    <button type="button" class="btn btn-danger btn-sm" ng-if="selected._id"
+                        confirmed-click="remove()" 
+                        ng-confirm-click="Are you sure you want to remove this test spec?">
+                        <i class="fa fa-times"></i> Remove
+                    </button>
+                    <div class="pull-right">
+                        <button type="submit" class="btn btn-primary" ng-if="selected._id">Update</button>
+                        <button type="submit" class="btn btn-primary" ng-if="!selected._id">Create</button>
+                        <button type="button" class="btn" ng-click="cancel()">Cancel</button>
+                    </div>
+                </div>
+            
+                <!--
+                <pre>{{selected|json}}</pre>
+                -->
+            </form>  
+        </div>
+      <!--
         <div class="panel panel-default" ng-repeat="(service_id, service) in serverconf.service_types">
             <div class="panel-heading">
                 {{service.label}}

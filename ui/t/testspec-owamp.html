@@ -2,7 +2,7 @@
     <label for="bucket_width" class="col-sm-2 control-label">Bucket Width *</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="bucket_width" ng-model="testspec.specs.bucket_width" required>
+            <input type="text" class="form-control" name="bucket_width" ng-disabled="!selected._canedit" ng-model="selected.specs.bucket_width" required>
             <div class="input-group-addon">Seconds</div>
         </div>
         <p class="help-block">The bin size for histogram calculations in terms of seconds. For example a value such as .001 means all histogram bins will be in milliseconds.</p>
@@ -10,7 +10,7 @@
     <label for="packet_interval" class="col-sm-2 control-label">Packet Interval *</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="packet_interval" ng-model="testspec.specs.packet_interval" required>
+            <input type="text" class="form-control" name="packet_interval" ng-disabled="!selected._canedit" ng-model="selected.specs.packet_interval" required>
             <div class="input-group-addon">Packets Per Second</div>
         </div>
         <p class="help-block">The mean average time between packets in seconds. For example, .1 means send 10 packets per second.</p>
@@ -20,7 +20,7 @@
     <label for="sample_count" class="col-sm-2 control-label">Sample Count *</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="sample_count" ng-model="testspec.specs.sample_count" required>
+            <input type="text" class="form-control" name="sample_count" ng-disabled="!selected._canedit" ng-model="selected.specs.sample_count" required>
             <div class="input-group-addon">tests</div>
         </div>
         <p class="help-block">The number of packets contained in each summary. This combined with packet_interval determines how often data is stored. For example, a packet_interval of .1 (10 packets per second) and sample_count of 600 stores a result every 60 seconds.</p>
@@ -28,7 +28,7 @@
     <label for="packet_padding" class="col-sm-2 control-label">Packet Padding</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="packet_padding" ng-model="testspec.specs.packet_padding" placeholder="0">
+            <input type="text" class="form-control" name="packet_padding" ng-disabled="!selected._canedit" ng-model="selected.specs.packet_padding" placeholder="0">
             <div class="input-group-addon">bytes</div>
         </div>
         <p class="help-block">The size of the padding added to each packet in bytes (not including the IP/UDP headers)</p>
@@ -37,22 +37,16 @@
 <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
         <div class="checkbox">
-            <label> <input type="checkbox" name="force_bidirectional" ng-model="testspec.specs.force_bidirectional"> Do Bidirectional test</label>
+            <label> <input type="checkbox" name="force_bidirectional" ng-disabled="!selected._canedit" ng-model="selected.specs.force_bidirectional"> Do Bidirectional test</label>
             <p class="help-block">Forces each endpoint to initiate the test in both directions. This will lead to redundant tests being run on each side.</p>
         </div>
         <div class="checkbox">
-            <label> <input type="checkbox" name="ipv4_only" ng-model="testspec.specs.ipv4_only"> IPv4 Only</label>
+            <label> <input type="checkbox" name="ipv4_only" ng-disabled="!selected._canedit" ng-model="selected.specs.ipv4_only"> IPv4 Only</label>
         </div>
         <div class="checkbox">
-            <label> <input type="checkbox" name="ipv6_only" ng-model="testspec.specs.ipv6_only"> IPv6 Only</label>
+            <label> <input type="checkbox" name="ipv6_only" ng-disabled="!selected._canedit" ng-model="selected.specs.ipv6_only"> IPv6 Only</label>
             <p class="help-block">Forces each side to use IPv4 / IPv6. Test will fail if no IPv4/IPv6 address can be determined for either endpoint</p>
         </div>
     </div>
 </div>
-</div>
-<!--
-    <div class="panel-heading">Advanced Options</div>
-    <div class="panel-body">
-    </div>
-</div>
--->
+

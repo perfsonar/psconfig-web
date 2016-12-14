@@ -2,7 +2,7 @@
     <label for="test_interval" class="col-sm-2 control-label">Test Interval *</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="test_interval" ng-model="testspec.specs.test_interval" required>
+            <input type="text" class="form-control" name="test_interval" ng-disabled="!selected._canedit" ng-model="selected.specs.test_interval" required>
             <div class="input-group-addon">seconds</div>
         </div>
         <p class="help-block">Number of seconds between each test</p>
@@ -10,7 +10,7 @@
     <label for="random_start_percentage" class="col-sm-2 control-label">Random Start Percentage</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="random_start_percentage" ng-model="testspec.specs.random_start_percentage" placeholder="10">
+            <input type="text" class="form-control" name="random_start_percentage" ng-disabled="!selected._canedit" ng-model="selected.specs.random_start_percentage" placeholder="10">
             <div class="input-group-addon">%</div>
         </div>
         <p class="help-block">The percentage to randomize the start time of test. Valid values are between 0 and 50 (inclusive). Example: interval of 7200 (2 hours) and random_start_percentage 50 means that a test can start anywhere between 1 hour and 3 hours after the previous test completes.</p>
@@ -19,7 +19,7 @@
 <div class="form-group">
     <label for="tool" class="col-sm-2 control-label">Tool</label>
     <div class="col-sm-4">
-        <select class="form-control" ng-model="testspec.specs.tool" name="tool">
+        <select class="form-control" ng-disabled="!selected._canedit" ng-model="selected.specs.tool" name="tool">
             <option value="traceroute">traceroute (default)</option>
             <option value="tracepath">tracepath</option>
             <option value="paris-traceroute">paris-traceroute</option>
@@ -34,18 +34,18 @@
     <label for="timeout" class="col-sm-2 control-label">Timeout</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="timeout" ng-model="testspec.specs.timeout">
+            <input type="text" class="form-control" name="timeout" ng-disabled="!selected._canedit" ng-model="selected.specs.timeout">
             <div class="input-group-addon">Seconds</div>
         </div>
         <p class="help-block">The maximum amount of time to wait in seconds for the traceroute to complete</p>
     </div>
 </div>
 
-<div class="form-group" ng-if="testspec.specs.tool == 'traceroute'">
+<div class="form-group" ng-if="selected.specs.tool == 'traceroute'">
     <label for="first_ttl" class="col-sm-2 control-label">First TTL</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="first_ttl" ng-model="testspec.specs.first_ttl" placeholder="1">
+            <input type="text" class="form-control" name="first_ttl" ng-disabled="!selected._canedit" ng-model="selected.specs.first_ttl" placeholder="1">
             <div class="input-group-addon">hops</div>
         </div>
         <p class="help-block">The first hop to look at starting at 1. This can be used to hide local routers.</p>
@@ -53,17 +53,17 @@
     <label for="max_ttl" class="col-sm-2 control-label">Max TTL</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="max_ttl" ng-model="testspec.specs.max_ttl" placeholder="30">
+            <input type="text" class="form-control" name="max_ttl" ng-disabled="!selected._canedit" ng-model="selected.specs.max_ttl" placeholder="30">
             <div class="input-group-addon">hops</div>
         </div>
         <p class="help-block">The maximum number of hops before a traceroute fails.</p>
     </div>
 </div>
 
-<div class="form-group" ng-if="testspec.specs.tool == 'traceroute'">
+<div class="form-group" ng-if="selected.specs.tool == 'traceroute'">
     <label for="protocol" class="col-sm-2 control-label">Protocol</label>
     <div class="col-sm-4">
-        <select class="form-control" ng-model="testspec.specs.protocol" name="protocol">
+        <select class="form-control" ng-disabled="!selected._canedit" ng-model="selected.specs.protocol" name="protocol">
             <option value="icmp">ICMP (Default)</option>
             <option value="udp">UDP</option>
         </select>
@@ -72,7 +72,7 @@
     <label for="packet_size" class="col-sm-2 control-label">Packet Size</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="packet_size" ng-model="testspec.specs.packet_size" placeholder="(Tool Default)">
+            <input type="text" class="form-control" name="packet_size" ng-disabled="!selected._canedit" ng-model="selected.specs.packet_size" placeholder="(Tool Default)">
             <div class="input-group-addon">bytes</div>
         </div>
         <p class="help-block">The size of packets to send in bytes when performing the traceroute.</p>
@@ -82,14 +82,14 @@
 <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
         <div class="checkbox">
-            <label> <input type="checkbox" name="force_bidirectional" ng-model="testspec.specs.force_bidirectional"> Do Bidirectional test</label>
+            <label> <input type="checkbox" name="force_bidirectional" ng-disabled="!selected._canedit" ng-model="selected.specs.force_bidirectional"> Do Bidirectional test</label>
             <p class="help-block">Forces each endpoint to initiate the test in both directions. This will lead to redundant tests being run on each side.</p>
         </div>
         <div class="checkbox">
-            <label> <input type="checkbox" name="ipv4_only" ng-model="testspec.specs.ipv4_only"> IPv4 Only</label>
+            <label> <input type="checkbox" name="ipv4_only" ng-disabled="!selected._canedit" ng-model="selected.specs.ipv4_only"> IPv4 Only</label>
         </div>
         <div class="checkbox">
-            <label> <input type="checkbox" name="ipv6_only" ng-model="testspec.specs.ipv6_only"> IPv6 Only</label>
+            <label> <input type="checkbox" name="ipv6_only" ng-disabled="!selected._canedit" ng-model="selected.specs.ipv6_only"> IPv6 Only</label>
             <p class="help-block">Forces each side to use IPv4/6. Test will fail if no IPv4/6 address can be determined for either endpoint</p>
         </div>
     </div>

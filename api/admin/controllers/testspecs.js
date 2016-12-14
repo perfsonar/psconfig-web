@@ -76,7 +76,10 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             testspec.update_date = new Date();
             testspec.save(function(err) {
                 if(err) return next(err);
-                res.json({status: "ok", _canedit: canedit(req.user, testspec)});
+                //res.json({status: "ok", _canedit: canedit(req.user, testspec)});
+                testspec = JSON.parse(JSON.stringify(testspec));
+                testspec._canedit = canedit(req.user, testspec);
+                res.json(testspec);
             });
         } else return res.status(401).end();
     }); 
@@ -86,7 +89,10 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     if(!~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
     db.Testspec.create(req.body, function(err, testspec) {
         if(err) return next(err);
-        res.json({status: "ok", _canedit: canedit(req.user, testspec), id: testspec.id});
+        //res.json({status: "ok", _canedit: canedit(req.user, testspec), id: testspec.id});
+        testspec = JSON.parse(JSON.stringify(testspec));
+        testspec._canedit = canedit(req.user, testspec);
+        res.json(testspec);
     });
 });
 

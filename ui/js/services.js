@@ -96,8 +96,8 @@ app.factory('hosts', function(appconf, $http, toaster) {
             ma_promise = $http.get(appconf.api+'/hosts?select=sitename hostname&sort=sitename hostname&find='+JSON.stringify({
                 "services.type": "ma"
             })).then(function(res) {
-                console.log("mas");
-                console.dir(res.data.hosts);
+                //console.log("mas");
+                //console.dir(res.data.hosts);
                 return res.data.hosts;
             }, function(res) {
                 toaster.error("Failed to load ma hosts");
@@ -115,6 +115,10 @@ app.factory('users', ['appconf', '$http', 'jwtHelper', function(appconf, $http, 
             if(all_promise) return all_promise;
             all_promise = $http.get(appconf.auth_api+'/profile')
             .then(function(res) {
+                //convert IDs to string
+                res.data.profiles.forEach(function(profile) {
+                    profile.id = profile.id.toString();
+                });
                 return res.data.profiles;
             }, function(res) {
                 toaster.error("Failed to query profiles");
@@ -133,7 +137,7 @@ app.factory('testspecs', function(appconf, $http, jwtHelper, users, $q) {
             all_promise = $http.get(appconf.api+'/testspecs')
             .then(function(res) {
                 testspecs = res.data.testspecs;
-                console.dir(testspecs);
+                //console.dir(testspecs);
                 return res.data.testspecs;
             }, function(res) {
                 console.error("Failed to query testspecs");
@@ -162,17 +166,50 @@ app.factory('testspecs', function(appconf, $http, jwtHelper, users, $q) {
             return deferred.promise;
         *   */
         },
-        post: function(testspec) {
+        add: function() {
+            var testspec = {
+                desc: "New Testspec",
+                admins: [],
+            };
+            var jwt = localStorage.getItem(appconf.jwt_id);
+            if(jwt) {
+                var user = jwtHelper.decodeToken(jwt);
+                testspec.admins.push(user.sub.toString());
+                testspec._canedit = true;
+            }
+            testspecs.push(testspec);
+            return testspec;
+        },
+        create: function(testspec) {
             return $http.post(appconf.api+'/testspecs/', testspec)
             .then(function(res, status, headers, config) {
-                //add it 
                 testspec._id = res.data._id;
                 testspec._canedit = res.data._canedit;
-                testspecs.push(testspec);
+                testspec.create_date = res.data.create_date;
                 return testspec;
             }, function(res, status, headers, config) {
                 console.error("failed to register testspec");
             });   
+        },
+        update: function(testspec) {
+            return $http.put(appconf.api+'/testspecs/'+testspec._id, testspec)
+            .then(function(res) {
+                testspec._canedit = res.data._canedit;
+                return testspec;
+            }, function(res, status, headers, config) {
+                console.error("failed to update testspec");
+            });   
+        },
+        remove: function(testspec) {
+            return $http.delete(appconf.api+'/testspecs/'+testspec._id)
+            .then(function(res, status, headers, config) {
+                testspecs.splice(testspecs.indexOf(testspec), 1);
+                //$scope.form.$setPristine();//ignore all changed made
+                //$location.path("/testspecs");
+                //toaster.success("Deleted Successfully!");
+            }, function(res, status, headers, config) {
+                console.error("Deletion failed!");
+            });       
         }
     }
 });
