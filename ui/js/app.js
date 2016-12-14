@@ -104,14 +104,10 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         requiresLogin: true,
     })
     */
-    .when('/testspecs', {
+    .when('/testspecs/:id?', {
         templateUrl: 't/testspecs.html',
         controller: 'TestspecsController',
         requiresLogin: true,
-    })
-    .when('/testspec/:id/:service_type?', {
-        templateUrl: 't/testspec.html',
-        controller: 'TestspecController'
     })
     .when('/hostgroups', {
         templateUrl: 't/hostgroups.html',

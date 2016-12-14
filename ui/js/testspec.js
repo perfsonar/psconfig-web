@@ -1,6 +1,6 @@
 
 //show all testspecs
-app.controller('TestspecsController', function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMessage, users, testspecs, $modal) {
+app.controller('TestspecsController', function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMessage, users, testspecs, $modal, $routeParams) {
     scaMessage.show(toaster);
     $scope.active_menu = "testspecs";
 
@@ -8,13 +8,23 @@ app.controller('TestspecsController', function($scope, $route, toaster, $http, j
         $scope.users = _users;
         testspecs.getAll().then(function(_testspecs) { 
             $scope.testspecs = _testspecs; 
-            //TODO select $routeParams.id or first one
+            //find task specified
+            if($routeParams.id) {
+                $scope.testspecs.forEach(function(testspec) {
+                    if(testspec._id == $routeParams.id) $scope.select(testspec);
+                });
+            } else {
+                //select first one
+                if($scope.testspecs.length > 0) $scope.select($scope.testspecs[0]);
+            }
         });
     });
 
     $scope.selected = null;
     $scope.select = function(testspec) {
         $scope.selected = testspec; 
+        $location.update_path("/testspecs/"+testspec._id);
+        window.scrollTo(0,0);
     }
 
     $scope.setdefault = function(type) {

@@ -61,18 +61,37 @@
     </div><!--subbar-->
 
     <div class="subbar-content">
-        <div class="container-fluid">
-            <br><br>
-            <p class="alert alert-info" ng-if="!selected">Please select testspec</p>
-            <form ng-submit="submit()" class="form-horizontal" name="form" ng-show="selected">
+        <p class="alert alert-info" ng-if="!selected">Please select testspec</p>
+        <form ng-submit="submit()" class="form-horizontal" name="form" ng-show="selected">
+            <div class="fixed-top">
+                <h2>
+                    <i class="fa fa-trash-o clickable" aria-hidden="true" ng-if="selected._id && selected._canedit"
+                        ng-confirm-click="Are you sure you want to remove this test spec?"
+                        confirmed-click="remove()"></i>&nbsp;&nbsp;&nbsp;
+                    <i class="fa fa-info-circle" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
+                    <i class="fa fa-star-o" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
+                    <i class="fa fa-share-alt" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
+
+                    <div class="pull-right" ng-if="selected._canedit" style="padding-right: 20px;">
+                        <button type="submit" class="btn btn-primary" ng-if="selected._id">Update</button>
+                        <button type="submit" class="btn btn-primary" ng-if="!selected._id">Create</button>
+                        <button type="button" class="btn" ng-click="cancel()">Cancel</button>
+                    </div>
+                </h2>
+                <br clear="right">
                 <div class="form-group">
-                    <label for="desc" class="col-sm-2 control-label">Name *</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" id="desc" ng-model="selected.desc" 
-                            ng-disabled="!selected._canedit"
-                            placeholder="Name for this test spec" required>
+                    <div class="margin30">
+                        <label for="desc" class="col-sm-2 control-label"><strong>Name *</strong></label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="desc" ng-model="selected.desc" 
+                                ng-disabled="!selected._canedit"
+                                placeholder="Name for this test spec" required>
+                        </div>
                     </div>
                 </div>
+                <hr style="margin-bottom: 0px;">
+            </div>
+            <div style="padding-top: 150px" class="margin30">
 
                 <!--
                 <div class="col-sm-offset-2 col-sm-10">
@@ -116,25 +135,11 @@
                     </div>
                 </div>
                 <ng-include ng-if="selected.service_type" src="'t/testspec-'+selected.service_type+'.html'"></ng-include>
-                <div class="col-sm-offset-2 col-sm-10" ng-if="selected._canedit" style="padding-bottom: 50px;">
-                    <hr>
-                    <button type="button" class="btn btn-danger btn-sm" ng-if="selected._id"
-                        confirmed-click="remove()" 
-                        ng-confirm-click="Are you sure you want to remove this test spec?">
-                        <i class="fa fa-times"></i> Remove
-                    </button>
-                    <div class="pull-right">
-                        <button type="submit" class="btn btn-primary" ng-if="selected._id">Update</button>
-                        <button type="submit" class="btn btn-primary" ng-if="!selected._id">Create</button>
-                        <button type="button" class="btn" ng-click="cancel()">Cancel</button>
-                    </div>
-                </div>
-            
                 <!--
                 <pre>{{selected|json}}</pre>
                 -->
-            </form>  
-        </div>
+            </div><!--nonfixed-->
+        </form>  
       <!--
         <div class="panel panel-default" ng-repeat="(service_id, service) in serverconf.service_types">
             <div class="panel-heading">
