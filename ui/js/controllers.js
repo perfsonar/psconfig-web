@@ -33,7 +33,7 @@ app.controller('HeaderController', function($scope, appconf, $route, serverconf,
 
     //relocate out of the app..
     $scope.relocate = function(url, newtab) {
-        if(newtab) window.open(url, '_blank');
+        if(newtab) return window.open(url, '_blank');
         document.location = url;
     }
 

@@ -1,17 +1,17 @@
 'use strict';
 
 //contrib
-var express = require('express');
-var router = express.Router();
-var winston = require('winston');
-var jwt = require('express-jwt');
-var async = require('async');
+const express = require('express');
+const router = express.Router();
+const winston = require('winston');
+const jwt = require('express-jwt');
+const async = require('async');
 
 //mine
-var config = require('../../config');
-var logger = new winston.Logger(config.logger.winston);
-var db = require('../../models');
-var profile = require('../../common').profile;
+const config = require('../../config');
+const logger = new winston.Logger(config.logger.winston);
+const db = require('../../models');
+const common = require('../../common');
 
 function canedit(user, hostgroup) {
     if(user) {
@@ -110,6 +110,23 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
         hostgroup._canedit = canedit(req.user, hostgroup);
         res.json(hostgroup);
     });
+});
+
+router.get('/dynamic', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
+    //TODO - let's allow anyone who is logged in.. (should limit more?)
+    //if(!~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
+    common.dynamic.resolve(req.query.js, req.query.type, function(err, resp) {
+        if(err) return res.status(500).json(err);
+        res.json(resp);
+    });
+    /*
+    db.Hostgroup.create(req.body, function(err, hostgroup) {
+        if(err) return next(err);
+        hostgroup = JSON.parse(JSON.stringify(hostgroup));
+        hostgroup._canedit = canedit(req.user, hostgroup);
+        res.json(hostgroup);
+    });
+    */
 });
 
 module.exports = router;

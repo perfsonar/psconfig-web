@@ -129,12 +129,11 @@
                                     </ui-select-choices>
                                 </ui-select>
                             </tab>
-                            <tab heading="Dynamic" active="tabs['dynamic'].active">
+                            <tab heading="Dynamic" active="tabs['dynamic'].active" select="run_dynamic()">
                                 <div style="margin-top: 5px; border: 1px solid #ccc; padding: 5px;">
-                                    <div ui-ace="{ mode: 'javascript' }" 
-                                        name="host_filter"
-                                        ng-model="selected.host_filter" 
-                                        hostfilter service_type="{{selected.service_type}}" ng-model-options="{ debounce: 250 }" 
+                                    <div name="host_filter"
+                                        ui-ace="{ mode: 'javascript' }" ng-model="selected.host_filter" 
+                                        service_type="{{selected.service_type}}" ng-model-options="{ debounce: 250 }" 
                                         style="margin-bottom: 5px;" required></div>
                                     <alert type="danger" ng-if="host_filter_alert" style="margin-bottom: 0px;">{{host_filter_alert}}</alert>
                                     <alert type="warning" ng-if="host_filter_console[0]" style="margin-bottom: 0px;">{{host_filter_console[0]}}</alert>

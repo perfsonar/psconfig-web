@@ -11,7 +11,7 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
 
     users.getAll().then(function(_users) {
         $scope.users = _users;
-        hosts.getAll({select: 'hostname services sitename'}).then(function(_hosts) {
+        hosts.getAll({select: 'hostname sitename services lsid'}).then(function(_hosts) {
         
             //organize by service provided
             $scope.hosts = {}; 
@@ -141,6 +141,28 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
             $scope.selected = null;
         });
     }
+
+    $scope.run_dynamic = function() {
+        console.log("need to run dynamic hostgroup");
+        //console.log($scope.selected.host_filter);
+        $http.get($scope.appconf.api+'/hostgroups/dynamic', {
+            params: { type: $scope.selected.service_type, js: $scope.selected.host_filter, }
+        })
+        .then(function(res) {
+            $scope.selected.hostgroup._hosts = res.data.recs;
+            $scope.selected.host_filter_alert = null;
+            $scope.selected.host_filter_console = res.data.c;
+            //def.resolve();
+            //console.dir(res.data);
+        }, function(res) {
+            //failed..
+            $scope.selected.hostgroup._hosts = null;
+            $scope.selected.host_filter_alert = null;
+            $scope.selected.host_filter_console = null;
+            if(res.data.message) $scope.selected.host_filter_alert = res.data.message;
+            //def.reject();
+        });       
+    }
 });
 
 /*
@@ -219,6 +241,7 @@ function($scope, appconf, toaster, $http, $modalInstance, hostgroup, title, serv
 */
 
 //validator for host_filter ace
+/*
 app.directive('hostfilter', function($q, $http, appconf) {
     return {
         require: 'ngModel',
@@ -253,5 +276,6 @@ app.directive('hostfilter', function($q, $http, appconf) {
         }
     };
 });
+*/
 
 
