@@ -96,18 +96,11 @@
 
                 <div class="form-group">
                     <label for="desc" class="col-sm-2 control-label">Service Type *</label>
-                    <!--
-                    <div class="col-sm-10">
-                        <select ng-model="selected.service_type" class="form-control" disabled>
-                            <option ng-repeat="(sid, item) in serverconf.service_types" value="{{sid}}">{{item.label}}</option>
-                        </select>
-                    </div>
-                    -->
                     <div class="col-sm-10">
                         <select class="form-control" 
                             ng-disabled="!selected._canedit"
-                            ng-model="selected.service_type" 
-                            ng-change="setdefault(selected.service_type)" required>
+                            ng-change="run_dynamic()"
+                            ng-model="selected.service_type" required>
                             <option ng-repeat="(sid, item) in serverconf.service_types" value="{{sid}}">{{item.label}}</option>
                         </select>
                     </div>
@@ -132,15 +125,16 @@
                             <tab heading="Dynamic" active="tabs['dynamic'].active" select="run_dynamic()">
                                 <div style="margin-top: 5px; border: 1px solid #ccc; padding: 5px;">
                                     <div name="host_filter"
-                                        ui-ace="{ mode: 'javascript' }" ng-model="selected.host_filter" 
-                                        service_type="{{selected.service_type}}" ng-model-options="{ debounce: 250 }" 
+                                        ui-ace="{ mode: 'javascript' }" 
+                                        ng-change="run_dynamic()"
+                                        ng-model="selected.host_filter" 
+                                        ng-model-options="{ debounce: 250 }" 
                                         style="margin-bottom: 5px;" required></div>
-                                    <alert type="danger" ng-if="host_filter_alert" style="margin-bottom: 0px;">{{host_filter_alert}}</alert>
-                                    <alert type="warning" ng-if="host_filter_console[0]" style="margin-bottom: 0px;">{{host_filter_console[0]}}</alert>
-                                    <div ng-if="selected._hosts"
-                                        style="max-height: 150px; overflow: auto; margin-bottom: 0px; opacity:0.85;" class="well well-sm">
-                                        <p ng-if="selected._hosts" class="help-block">{{selected._hosts.length}} hosts match above criteria</p>
-                                        <mc-hostlist ng-if="selected._hosts" serviceid="selected.service_type" hosts="selected._hosts"></mc-hostlist>
+                                    <alert type="danger" ng-if="selected.host_filter_alert" style="margin-bottom: 0px;">{{selected.host_filter_alert}}</alert>
+                                    <alert type="warning" ng-if="selected.host_filter_console[0]" style="margin-bottom: 0px;">{{selected.host_filter_console[0]}}</alert>
+                                    <div ng-if="selected._hosts" style="max-height: 150px; overflow: auto; margin-bottom: 0px; opacity:0.85;" class="well well-sm">
+                                        <p class="help-block">{{selected._hosts.length}} hosts match above query</p>
+                                        <mc-hostlist hostids="selected._hosts"></mc-hostlist>
                                     </div>
                                 </div>
                                 <p class="help-block">Please see <a target="_target" href="http://docs.perfsonar.net/mca_userguide_hostgroup.html#dynamic-host-groups">Dynamic Host Groups</a> for more detail.</p>
@@ -156,102 +150,7 @@
             </div><!--non fixed-->
         </form>
 
-        <!--
-        <form ng-submit="submit()" class="form-horizontal" name="form" ng-show="selected">
-            <div class="fixed-top">
-                <h2>
-                    <i class="fa fa-trash-o clickable" aria-hidden="true" ng-if="selected._id && selected._canedit"
-                        ng-confirm-click="Are you sure you want to remove this test spec?"
-                        confirmed-click="remove()"></i>&nbsp;&nbsp;&nbsp;
-                    <i class="fa fa-info-circle" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
-                    <i class="fa fa-star-o" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
-                    <i class="fa fa-share-alt" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
-
-                    <div class="pull-right" ng-if="selected._canedit" style="padding-right: 20px;">
-                        <button type="submit" class="btn btn-primary" ng-if="selected._id">Update</button>
-                        <button type="submit" class="btn btn-primary" ng-if="!selected._id">Create</button>
-                        <button type="button" class="btn" ng-click="cancel()">Cancel</button>
-                    </div>
-                </h2>
-                <br clear="right">
-                <div class="form-group">
-                    <div class="margin30">
-                        <label for="desc" class="col-sm-2 control-label"><strong>Name *</strong></label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="desc" ng-model="selected.desc" 
-                                ng-disabled="!selected._canedit"
-                                placeholder="Name for this test spec" required>
-                        </div>
-                    </div>
-                </div>
-                <hr style="margin-bottom: 0px;">
-            </div>
-            <div style="padding-top: 150px" class="margin30">
-                <div class="form-group">
-                    <label for="admins" class="col-sm-2 control-label">Admins</label>
-                    <div class="col-sm-10">
-                        <ui-select multiple ng-model="selected.admins" ng-disabled="!selected._canedit">
-                            <ui-select-match placeholder="Select admins who can update this test spec">
-                                <img gravatar-src="$item.email" gravatar-size="17"/>
-                                <b>{{$item.fullname}}</b> <span class="email">&lt;{{$item.email}}&gt;</span>
-                            </ui-select-match>
-                            <ui-select-choices repeat="user.id as user in users | propsFilter: {fullname: $select.search, email: $select.search}">
-                              <img gravatar-src="user.email" gravatar-size="17"/>
-                              <b>{{user.fullname}}</b> <small>&lt;{{user.email}}&gt;</small>
-                            </ui-select-choices>
-                        </ui-select>
-                        <p class="help-block">Users who can update this test spec</p>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="desc" class="col-sm-2 control-label">Service Type *</label>
-                    <div class="col-sm-10">
-                        <select class="form-control" 
-                            ng-disabled="!selected._canedit"
-                            ng-model="selected.service_type" 
-                            ng-change="setdefault(selected.service_type)" required>
-                            <option value="bwctl">Bandwidth Test Controller (bwctl)</option>
-                            <option value="owamp">One-Way Ping (owamp)</option>
-                            <option value="traceroute">Traceroute</option>
-                            <option value="ping">Ping</option>
-                        </select>
-                    </div>
-                </div>
-                <ng-include ng-if="selected.service_type" src="'t/testspec-'+selected.service_type+'.html'"></ng-include>
-            </div>
-        </form>  
-        -->
     </div><!--subbar-content-->
 </div><!--sca-sidebar-page-->
 
-<!--
-<div class="container-fluid">
-        <ul class="list-group">
-            <li class="list-group-item" 
-                ng-repeat="hostgroup in hostgroups | filter:{service_type:service_id} | orderBy:'id' ">
-                <div class="row">
-                    <div class="col-md-8">
-                        <h4>
-                            <small>{{hostgroup.id}}</small> 
-                            <span class="label label-default" ng-if="hostgroup.type == 'dynamic'">Dynamic</span>
-                            {{hostgroup.desc}}
-                        </h4>
-                        <mc-hostlist serviceid="service_id" hosts="hostgroup.hosts"></mc-hostlist>
-                    </div>
-                    <div class="col-md-4">
-                        <h5>Admins<small> (who can edit)</small></h5>
-                        <mc-admins admins="hostgroup.admins"></mc-admins>
-                    </div>
-                </div>
-                <div class="pull-right edit_button" ng-if="hostgroup.canedit">
-                    <button type="button" ng-click="edit(hostgroup)" class="btn btn-xs pull-right"><i class="fa fa-pencil-square-o"></i></button>
-                </div>
-            </li>
-        </ul>
-        <div class="panel-body" style="background-color: #fafafa;">
-            <button class="btn btn-sm" ng-click="create(service_id)">Add New <span class="text-muted">{{service.label}}</span></button>
-        </div>
-    </div>
-</div>
--->
+

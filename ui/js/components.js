@@ -15,31 +15,27 @@ app.directive('scaprofile', function() {
     }
 });
 
-app.directive('mcHostlist', ['services', function(services) {
+app.directive('mcHostlist', function(hosts) {
     return {
-        scope: { hosts: '<', serviceid: '<'},
+        scope: { hostids: '<' },
         templateUrl: 't/hostlist.html',
-        link: function(scope, element, attrs) {
+        link: function($scope, element, attrs) {
             //link only gets executed once. I need to watch hosts list myself in case it changes
-            function update() {
-                scope._hosts = [];
-                services.then(function(_services) {
-                    scope.services = _services;
-                    //convert list of host ids to service record
-                    scope.hosts.forEach(function(id) {
-                        //look for the serviceid
-                        _services.recs[scope.serviceid].forEach(function(rec) {
-                            if(rec.uuid == id) scope._hosts.push(rec);
-                        });
-                    });
+            $scope._hosts = [];
+            hosts.getAll({select: 'hostname sitename lsid'}).then(function(_hosts) {
+                $scope.hosts = {}; //key by host._id
+                _hosts.forEach(function(host) {
+                    $scope.hosts[host._id] = host;
                 });
-            }
+            });
+            /*
             scope.$watch('hosts', function(nv, ov) {
                 update();
             });
+            */
         }
     } 
-}]);
+});
 
 app.directive('mcService', function() {
     return {

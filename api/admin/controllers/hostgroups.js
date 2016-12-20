@@ -116,7 +116,7 @@ router.get('/dynamic', jwt({secret: config.admin.jwt.pub}), function(req, res, n
     //TODO - let's allow anyone who is logged in.. (should limit more?)
     //if(!~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
     common.dynamic.resolve(req.query.js, req.query.type, function(err, resp) {
-        if(err) return res.status(500).json(err);
+        if(err) return next(err);
         res.json(resp);
     });
     /*

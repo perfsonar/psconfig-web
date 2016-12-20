@@ -3,6 +3,11 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
     scaMessage.show(toaster);
     $scope.active_menu = "hostgroups";
 
+    $scope.tabs = {
+        static: {},
+        dynamic: {},
+    };
+
     //serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
     //$scope.appconf = appconf;
 
@@ -141,141 +146,29 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
             $scope.selected = null;
         });
     }
+    
+    //$scope.$watch("selected.host_filter", $scope.run_dynamic);
+    //$scope.$watch("selected.service_type", $scope.run_dynamic);
 
     $scope.run_dynamic = function() {
-        console.log("need to run dynamic hostgroup");
-        //console.log($scope.selected.host_filter);
+        console.log("pre");
+        if(!$scope.tabs.dynamic.active) return;
+
+        console.log("running dynamic query");
         $http.get($scope.appconf.api+'/hostgroups/dynamic', {
             params: { type: $scope.selected.service_type, js: $scope.selected.host_filter, }
         })
         .then(function(res) {
-            $scope.selected.hostgroup._hosts = res.data.recs;
             $scope.selected.host_filter_alert = null;
+            $scope.selected._hosts = res.data.recs;
             $scope.selected.host_filter_console = res.data.c;
-            //def.resolve();
-            //console.dir(res.data);
         }, function(res) {
             //failed..
-            $scope.selected.hostgroup._hosts = null;
+            $scope.selected._hosts = null;
             $scope.selected.host_filter_alert = null;
             $scope.selected.host_filter_console = null;
             if(res.data.message) $scope.selected.host_filter_alert = res.data.message;
-            //def.reject();
         });       
     }
 });
-
-/*
-app.controller('HostgroupModalController', ['$scope', 'appconf', 'toaster', '$http', '$modalInstance', 'hostgroup', 'title', 'services', 'serverconf', 'users',
-function($scope, appconf, toaster, $http, $modalInstance, hostgroup, title, services, serverconf, users) {
-    $scope.hostgroup = hostgroup;
-    $scope.title = title;
-    serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
-    services.then(function(_services) { $scope.services = _services; }); //for host list
-
-    users.then(function(_users) {
-        $scope.users = _users;
-        $scope.users_a = [];
-        for(var id in $scope.users) {
-            $scope.users_a.push($scope.users[id]);
-        }
-    });
-
-    $scope.submit = function() {
-        //find active tab
-        for(var type in $scope.tabs) {
-            if($scope.tabs[type].active) $scope.hostgroup.type = type;
-        }
-
-        //dynamic uses hosts as cache of the latest query result. let's use the validation result
-        if($scope.hostgroup.type == 'dynamic') {
-            $scope.hostgroup.hosts = $scope.hostgroup._hosts||[];
-            //console.dir($scope.hostgroup.hosts);
-        }
-
-        if(!$scope.hostgroup.id) {
-            //create 
-            $http.post(appconf.api+'/hostgroups/', $scope.hostgroup)
-            .then(function(res) {
-                $modalInstance.close();
-                toaster.success("Hostgroup created successfully!");
-                $scope.hostgroup.canedit = res.data.canedit;
-                $scope.hostgroup.id = res.data.id;
-            }, function(res) {
-                toaster.error(res.data.message);
-            });           
-        } else {
-            //edit
-            $http.put(appconf.api+'/hostgroups/'+$scope.hostgroup.id, $scope.hostgroup)
-            .then(function(res) {
-                $modalInstance.close();
-                toaster.success("Updated Successfully!");
-                $scope.hostgroup.canedit = res.data.canedit;
-            }, function(res) {
-                toaster.error(res.data.message);
-            });   
-        }
-    }
-
-    $scope.cancel = function() {
-        $modalInstance.dismiss('cancel');
-    }
-
-    $scope.remove = function() {
-        $http.delete(appconf.api+'/hostgroups/'+$scope.hostgroup.id)
-        .then(function(res) {
-            $modalInstance.dismiss('remove');
-            toaster.success("Deleted Successfully!");
-        }, function(res) {
-            toaster.error(res.data.message);
-        });       
-    }
-    
-    //pick active tab
-    $scope.tabs = {
-        static: {active: false},
-        dynamic: {active: false},
-    };
-    $scope.tabs[hostgroup.type].active = true;
-}]);
-*/
-
-//validator for host_filter ace
-/*
-app.directive('hostfilter', function($q, $http, appconf) {
-    return {
-        require: 'ngModel',
-        link: function(scope, elm, attrs, ctrl) {
-            var p = scope.$parent.$parent; //TODO - this feels very icky..
-            ctrl.$asyncValidators.hostfilter = function(modelValue, viewValue) {
-                //TODO this doesn't fire if empty.
-                if (ctrl.$isEmpty(modelValue)) {
-                    console.log("empty");
-                    return $q.when();
-                }
-
-                var def = $q.defer();
-                $http.get(appconf.api+'/cache/services-js/', {
-                    params: { type: attrs.serviceType, js: modelValue, }
-                })
-                .then(function(res) {
-                    p.hostgroup._hosts = res.data.recs;
-                    p.host_filter_alert = null;
-                    p.host_filter_console = res.data.c;
-                    def.resolve();
-                    console.dir(res.data);
-                }, function(res) {
-                    p.hostgroup._hosts = null;
-                    p.host_filter_alert = null;
-                    p.host_filter_console = null;
-                    if(res.data.message) p.host_filter_alert = res.data.message;
-                    def.reject();
-                });   
-                return def.promise;
-            };
-        }
-    };
-});
-*/
-
 
