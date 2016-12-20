@@ -45,18 +45,16 @@
         <div class="margin30" ng-if="selected">
             <div class="fixed-top">
                 <h2 class="page-heading">
+                    <button type="button" class="btn btn-primary pull-right"
+                        ng-disabled="!selected._canedit" 
+                        ng-click="edit(selected)">
+                        <i class="fa fa-pencil-square-o"></i> Edit
+                    </button>
                     {{selected.sitename}}<br>
                     <small class="text-muted">
                         {{selected.hostname}}
                         <span class="label label-danger" ng-if="selected.no_agent">No Agent</span>
                     </small>
-                    <button type="button" 
-                        style="position: relative; top: -10px;"
-                        ng-disabled="!selected._canedit" 
-                        ng-click="edit(selected)"   
-                        class="btn btn-sm pull-right">
-                        <i class="fa fa-pencil-square-o"></i> Edit
-                    </button>
                 </h2>
             </div>
             <div style="padding-top: 70px">

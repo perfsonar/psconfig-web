@@ -71,10 +71,12 @@ app.controller('TestspecsController', function($scope, $route, toaster, $http, j
         if(!$scope.selected._id) {
             testspecs.create($scope.selected).then(function() {
                 toaster.success("Testspec created successfully!");
+                $scope.form.$setPristine();
             });
         } else {
             testspecs.update($scope.selected).then(function() {
                 toaster.success("Testspec updated successfully!");
+                $scope.form.$setPristine();
             });
             /*
             } else {

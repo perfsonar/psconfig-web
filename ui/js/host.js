@@ -121,7 +121,13 @@ app.controller('HostModalController', function($scope, appconf, toaster, $http, 
     });
 
     $scope.cancel = function() {
-        $modalInstance.dismiss('cancel');
+        if($scope.form.$dirty) {
+            if(confirm("Do you want to abondon unsaved changes?")) {
+                $modalInstance.dismiss('cancel');
+            }
+        } else {
+            $modalInstance.dismiss('cancel');
+        }
     }
 
     $scope.submit = function() {
@@ -129,6 +135,7 @@ app.controller('HostModalController', function($scope, appconf, toaster, $http, 
         .then(function(res) {
             $modalInstance.close();
             toaster.success("Updated Successfully!");
+            $scope.form.$setPristine();
         }, function(res) {
             toaster.error(res.data.message);
         });   

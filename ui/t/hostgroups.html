@@ -32,7 +32,7 @@
                 <time class="help-block pull-right">{{hostgroup.create_date|date}}</time>
                 <div class="list-header">
                     <small>
-                        <span class="label label-info">{{hostgroup.service_type}}</span> {{hostgroup.desc}}
+                        <span class="label label-default">{{hostgroup.service_type}}</span> {{hostgroup.desc}}
                         <i ng-if="!hostgroup._canedit" class="fa fa-lock text-muted"></i>
                     </small>
                 </div>
@@ -46,6 +46,9 @@
     <div class="subbar-content">
         <p class="alert alert-info" ng-if="!selected">Please select hostgroup</p>
         <form name="form" class="form-horizontal" ng-submit="submit()" ng-show="selected">
+            <div confirm-on-exit="form.$dirty" 
+                confirm-message-window="All your changes will be lost." 
+                confirm-message-route="All your changes will be lost. Are you sure you want to do this?">
             <div class="fixed-top">
                 <h2>
                     <i class="fa fa-trash-o clickable" aria-hidden="true" ng-if="selected._id && selected._canedit"
@@ -55,7 +58,7 @@
                     <i class="fa fa-star-o" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
                     <i class="fa fa-share-alt" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
 
-                    <div class="pull-right" ng-if="selected._canedit" style="padding-right: 20px;">
+                    <div class="pull-right" ng-if="form.$dirty && selected._canedit" style="padding-right: 20px;">
                         <button type="submit" class="btn btn-primary" ng-if="selected._id">Update</button>
                         <button type="submit" class="btn btn-primary" ng-if="!selected._id">Create</button>
                         <button type="button" class="btn" ng-click="cancel()">Cancel</button>
@@ -101,7 +104,7 @@
                             ng-disabled="!selected._canedit"
                             ng-change="run_dynamic()"
                             ng-model="selected.service_type" required>
-                            <option ng-repeat="(sid, item) in serverconf.service_types" value="{{sid}}">{{item.label}}</option>
+                            <option ng-repeat="(sid, item) in serverconf.service_types" value="{{sid}}">{{item.label}} ({{sid}})</option>
                         </select>
                     </div>
                 </div>

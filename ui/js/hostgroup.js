@@ -97,10 +97,12 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
         if(!$scope.selected._id) {
             hostgroups.create($scope.selected).then(function() {
                 toaster.success("Hostgroup created successfully!");
+                $scope.form.$setPristine();
             });
         } else {
             hostgroups.update($scope.selected).then(function() {
                 toaster.success("Hostgroup updated successfully!");
+                $scope.form.$setPristine();
             });
         }
         /*

@@ -59,6 +59,10 @@ app.directive('confirmOnExit', function() {
                 if ($scope.form.$dirty) {
                     if(!confirm("Do you want to abondon unsaved changes?")) {
                         event.preventDefault();
+                    } else {
+                        $scope.form.$setPristine();
+                        
+                        //TODO - I should revert the form content to previous state.. but that requires a bit more coding
                     }
                 }
             });
@@ -215,6 +219,7 @@ app.filter('specname',function(){
 
 app.filter('trim_locator', function() {
     return function(input) {
+        if(!input) return input;
         var b = input.indexOf("//");
         if(~b) input = input.substr(b+2);
         var e = input.indexOf(":");
