@@ -37,6 +37,7 @@ exports.dynamic = {
         var services = {};
         db.Host.find({"services.type": type}, function(err, recs) {
             if(err) return cb(err);
+            logger.debug("running dynamic hostgroup query on "+recs.length);
             var sandbox = new Sandbox(/*{timeout: 1000*10}*/);
             var matches = [];
             var code = "JSON.stringify("+JSON.stringify(recs)+".filter("+
@@ -51,10 +52,13 @@ exports.dynamic = {
             sandbox.run(code, function(res) {
                 var _recs = res.result.slice(1, -1); //remove first and last double quotes (not sure how I can get rid of it)
                 try {
-                    var ids = JSON.parse(_recs).map(function(rec) { return rec._id; }); //just pull _id
+                    var hosts = JSON.parse(_recs);
+                    var ids = hosts.map(function(host) { return host._id; }); //just pull _id
                     cb(null, {recs: ids, c: res.console});
                 } catch(e) {
-                    cb("couldn't parse sanbox output");
+                    logger.debug(e);
+                    //logger.debug(res.console);
+                    cb("couldn't parse sanbox output or cb error");
                 }
             });
         });

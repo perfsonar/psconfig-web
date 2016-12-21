@@ -128,11 +128,11 @@ var testSchema = mongoose.Schema({
     desc: String,
 
     mesh_type: String,
-    center: {type: mongoose.Schema.Types.ObjectId, ref: 'Host'}, //only used for mesh_type == star
-
     agroup: {type: mongoose.Schema.Types.ObjectId, ref: 'Hostgroup'}, 
     bgroup: {type: mongoose.Schema.Types.ObjectId, ref: 'Hostgroup'}, 
-    nagroup: {type: mongoose.Schema.Types.ObjectId, ref: 'Hostgroup'}, 
+
+    center: {type: mongoose.Schema.Types.ObjectId, ref: 'Host'}, //only used for mesh_type == star
+    nahosts: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Host'} ], //let's not use hostgroup for this..
 
     testspec: {type: mongoose.Schema.Types.ObjectId, ref: 'Testspec'}, 
 

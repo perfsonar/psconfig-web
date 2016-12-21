@@ -39,13 +39,13 @@
                     </small>
                 </div>
             </div>
-            <div class="list-addbutton" ng-click="add()">
+            <div class="list-addbutton" ng-click="add()" style="bottom: 180px">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> 
             </div>
         </div>
 
-        <div class="autoconfig" style="position: fixed; bottom: 0px; width: 350px; height: 160px; background-color: #eee; padding: 5px 10px; box-shadow: inset 0px 4px 10px #ccc">
-            <h4>Auto Mesh Config</h4>
+        <div class="autoconfig">
+            <h3 style="margin-top: 15px;">Auto Mesh Config</h3>
             <p class="help-block">Enter hostname of perfSONAR toolkit instance to generate a mesh config URL containing tests for that instance as test endpoints.</p>
             <ui-select 
                 ng-model="autoconf_select" on-select="autoconf($item)">
@@ -66,10 +66,31 @@
 
     <div class="subbar-content">
         <p class="alert alert-info" ng-if="!selected">Please select config</p>
-
         <form name="form" class="form-horizontal" ng-submit="submit()" ng-show="selected">
+            <div confirm-on-exit="form.$dirty" 
+                confirm-message-window="All your changes will be lost." 
+                confirm-message-route="All your changes will be lost. Are you sure you want to do this?">
             <div class="fixed-top">
-                <h2>h2 he3re </h2>
+                <h2>
+                    <i class="fa fa-trash-o clickable" aria-hidden="true" ng-if="selected._id && selected._canedit"
+                        ng-confirm-click="Are you sure you want to remove this test spec?"
+                        confirmed-click="remove()"></i>&nbsp;&nbsp;&nbsp;
+                    <!--
+                    <i class="fa fa-info-circle" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
+                    <i class="fa fa-star-o" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
+                    <i class="fa fa-share-alt" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
+                    -->
+                    <i class="fa fa-external-link clickable" 
+                        aria-hidden="true" 
+                        ng-if="selected._id" 
+                        ng-click="relocate(appconf.pub_url+'config/'+selected.url, true)"></i>
+
+                    <div class="pull-right" ng-if="form.$dirty && selected._canedit" style="padding-right: 20px;">
+                        <button type="submit" class="btn btn-primary" ng-if="selected._id">Update</button>
+                        <button type="submit" class="btn btn-primary" ng-if="!selected._id">Create</button>
+                        <button type="button" class="btn" ng-click="cancel()">Cancel</button>
+                    </div>
+                </h2>
                 <br clear="right">
                 <div class="form-group">
                     <div class="margin30">
@@ -85,7 +106,52 @@
             </div><!--fixed-top-->
 
             <div style="padding-top: 150px" class="margin30">
-                <h1>form</h1>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">URL</label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <span class="input-group-addon">{{appconf.pub_url}}</span>
+                            <input type="text" name="url" class="form-control" id="url" 
+                                ng-model="selected.url" 
+                                placeholder="Enter path to expose this config" 
+                                ng-disabled="!selected._canedit" required>
+                            <!--
+                            <span class="input-group-btn" ng-if="selected._id">
+                                <button class="btn btn-primary" type="button" ng-click="relocate(appconf.pub_url+selected.url, true)">
+                                    <i class="fa fa-external-link" aria-hidden="true"></i>
+                                </button>
+                            </span>
+                            -->
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">Admins</label>
+                    <div class="col-sm-10">
+                        <ui-select multiple ng-model="selected.admins" ng-disabled="!selected._canedit">
+                            <ui-select-match placeholder="Select admins who can update this mesh config?">
+                                <img gravatar-src="$item.email" gravatar-size="17"/>
+                                <b>{{$item.fullname}}</b> <span class="email">&lt;{{$item.email}}&gt;</span>
+                            </ui-select-match>
+                            <ui-select-choices repeat="user.id as user in users | propsFilter: {fullname: $select.search, email: $select.search}">
+                              <img gravatar-src="user.email" gravatar-size="17"/>
+                              <b>{{user.fullname}}</b> <small>&lt;{{user.email}}&gt;</small>
+                            </ui-select-choices>
+                        </ui-select>
+                        <p class="help-block">Users who can update this configuration</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">Tests</label>
+                    <div class="col-sm-10">
+                        <ul class="list-group" ng-if="selected.tests.length > 0">
+                            <li class="list-group-item slide-down" ng-repeat="test in selected.tests" ng-class="{disabled: !test.enabled}">
+                                <ng-include src="'t/testeditor.html'"></ng-include>
+                            </li>
+                        </ul>
+                        <button type="button" ng-click="addtest()" ng-show="selected._canedit" class="btn btn-sm">Add New Test</button>
+                    </div>
+                </div>
 
                 <br>
                 <br>

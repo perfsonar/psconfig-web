@@ -1,10 +1,10 @@
 <div class="form-group">
     <div class="col-sm-offset-2 col-sm-8">
         <div class="checkbox">
-            <label> <input type="checkbox" ng-model="test.enabled" ng-disabled="!config.canedit"> Enabled (include in this mesh config)</label>
+            <label> <input type="checkbox" ng-model="test.enabled" ng-disabled="!selected._canedit"> Enabled (include in mesh config)</label>
         </div>
     </div>
-    <div class="col-sm-2" ng-if="config.canedit">
+    <div class="col-sm-2" ng-if="selected._canedit">
         <button type="button" class="btn btn-danger btn-xs pull-right" ng-click="removetest(test)"><i class="fa fa-times"></i> Remove Test</button>
     </div>
 </div>
@@ -12,26 +12,28 @@
 <div class="form-group">
     <label class="col-sm-2 control-label">Test Name</label>
     <div class="col-sm-10">
-        <input type="text" class="form-control" ng-model="test.desc" placeholder="Enter test name / description" 
-            ng-disabled="!config.canedit" required>
+        <input type="text" class="form-control" 
+            ng-model="test.desc" 
+            placeholder="Enter test name / description" 
+            ng-disabled="!selected._canedit" required>
     </div>
 </div>
 
 <div class="form-group">
     <label class="col-sm-2 control-label">Service Type</label>
     <div class="col-sm-4">
-        <select class="form-control" ng-model="test.service_type" name="service_type" 
-            ng-disabled="!config.canedit" 
+        <select class="form-control" ng-model="test.service_type" 
+            ng-disabled="!selected._canedit" 
             ng-change="reset_servicetype(test)" required>
-            <option value="">(Select Service Type)</option>
-            <option ng-repeat="(id, type) in serverconf.service_types" value="{{id}}">{{type.label}}</option>
+            <!--<option value="">(Select Service Type)</option>-->
+            <option ng-repeat="(id, type) in serverconf.service_types" value="{{id}}">{{type.label}} ({{id}})</option>
         </select>
     </div>
     <label class="col-sm-2 control-label">Mesh Type</label>
     <div class="col-sm-4">
-        <select class="form-control" ng-model="test.mesh_type" name="mesh_type" 
-            ng-disabled="!config.canedit" required>
-            <option value="">(Select Mesh Type)</option>
+        <select class="form-control" ng-model="test.mesh_type" 
+            ng-disabled="!selected._canedit" required>
+            <!--<option value="">(Select Mesh Type)</option>-->
             <option ng-repeat="(id, type) in serverconf.mesh_types" value="{{id}}">{{type.label}}</option>
         </select>
     </div>
@@ -40,24 +42,13 @@
 <div class="form-group" ng-if="test.service_type && test.mesh_type == 'star'">
     <label for="center_address" class="col-sm-2 control-label">Star Center</label>
     <div class="col-sm-10">
-        <ui-select ng-model="test.center_address" ng-disabled="!config.canedit" ng-required>
-            <ui-select-match placeholder="Pick a host to be the center">
-                <div style="padding-top: 2px; font-size: 12px">
-                    <!--
-                    <span class="label {{services.lss[$select.selected.lsid].label_class}}"> {{services.lss[$select.selected.lsid].label}}</span>
-                    <b>{{$select.selected.name}}</b> ({{$select.selected.locator}})
-                    <span ng-if="$select.selected.old" class="label label-warning">Stale</span>
-                    -->
-                    <mc-service ls="services.lss[$select.selected.lsid]" service="$select.selected"></mc-service>
-                </div>
+        <ui-select ng-model="test.center" ng-disabled="!selected._canedit" ng-required>
+            <ui-select-match placeholder="Pick a center host">
+                <strong>{{$select.selected.sitename}}</strong> {{$select.selected.hostname}}
             </ui-select-match>
-            <ui-select-choices repeat="service.uuid as service in services.recs[test.service_type] | filter: $select.search">
-                <!--
-                <span class="label {{services.lss[service.lsid].label_class}}">{{services.lss[service.lsid].label}}</span>&nbsp;
-                <b>{{service.name}}</b> ({{service.locator}})
-                <span ng-if="service.old" class="label label-warning">Stale</span>
-                -->
-                <mc-service ls="services.lss[service.lsid]" service="service"></mc-service>
+            <!--can't filter by host.service_type == test.service_type because we aren't loading services-->
+            <ui-select-choices repeat="host._id as host in hosts | propsFilter: {sitename: $select.search, hostname: $select.search}">
+                <b>{{host.sitename}}</b> <span>{{host.hostname|trim_locator}}</span>
             </ui-select-choices>
         </ui-select>
     </div>
@@ -66,12 +57,23 @@
 <div class="form-group" ng-if="test.service_type">
     <label class="col-sm-2 control-label">Host Group A</label>
     <div class="col-sm-10">
-        <select class="form-control" ng-model="test.agroup" name="agroup" ng-disabled="!config.canedit" required>
+        <select class="form-control" 
+            ng-model="test.agroup" 
+            ng-disabled="!selected._canedit" required>
             <option value="">(Select Host Group)</option>
-            <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group.id}}">{{group.desc}}</option>
+            <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group._id}}">{{group.desc}}</option>
         </select>
-        <div class="well well-sm well-detail" ng-if="test.agroup">
-            <mc-hostlist serviceid="test.service_type" hosts="get_hostgroup(test.agroup).hosts"></mc-hostlist>
+        <div ng-if="test.agroup">
+            <div ng-if="gethostgroup(test.agroup).type == 'static'"
+                class="well well-sm well-detail" 
+                style="max-height: 100px; overflow: auto;">
+                <mc-hostlist hostids="gethostgroup(test.agroup).hosts"></mc-hostlist>
+            </div>
+            <div ng-if="gethostgroup(test.agroup).type == 'dynamic'"
+                style="margin-top: 5px; border: 1px solid #ccc; padding: 5px;">
+                <div name="host_filter" ui-ace="{ mode: 'javascript' }" readonly
+                    ng-model="gethostgroup(test.agroup).host_filter"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -79,40 +81,55 @@
 <div class="form-group" ng-if="test.service_type && test.mesh_type == 'disjoint'">
     <label class="col-sm-2 control-label">Host Group B</label>
     <div class="col-sm-10">
-        <select class="form-control" ng-model="test.bgroup" name="bgroup" ng-disabled="!config.canedit" required>
+        <select class="form-control" 
+            ng-model="test.bgroup" 
+            ng-disabled="!selected._canedit" required>
             <option value="">(Select Host Group)</option>
-            <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group.id}}">{{group.desc}}</option>
+            <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group._id}}">{{group.desc}}</option>
         </select>
-        <div class="well well-sm well-detail" ng-if="test.bgroup">
-            <mc-hostlist serviceid="test.service_type" hosts="get_hostgroup(test.bgroup).hosts"></mc-hostlist>
+        <div ng-if="test.bgroup">
+            <div ng-if="gethostgroup(test.bgroup).type == 'static'"
+                class="well well-sm well-detail" 
+                style="max-height: 100px; overflow: auto;">
+                <mc-hostlist hostids="gethostgroup(test.bgroup).hosts"></mc-hostlist>
+            </div>
+            <div ng-if="gethostgroup(test.bgroup).type == 'dynamic'"
+                style="margin-top: 5px; border: 1px solid #ccc; padding: 5px;">
+                <div name="host_filter" ui-ace="{ mode: 'javascript' }" readonly
+                    ng-model="gethostgroup(test.bgroup).host_filter"></div>
+            </div>
         </div>
     </div>
 </div>
 
+<div class="form-group" ng-if="test.service_type && test.mesh_type">
+    <label class="col-sm-2 control-label">No Agent Hosts <span class="text-muted">(Optional)</span></label>
+    <div class="col-sm-10">
+        <ui-select multiple ng-model="test.nahosts" style="margin-top: 5px;">
+            <ui-select-match placeholder="Enter Hostnames">
+                <b>{{$item.sitename}}</b> <span>{{$item.hostname|trim_locator}}</span>
+            </ui-select-match>
+            <!--can't filter by service_type because we aren't loading service_type detail for hosts-->
+            <ui-select-choices repeat="host._id as host in hosts | propsFilter: {sitename: $select.search, hostname: $select.search}">
+                <b>{{host.sitename}}</b> <span>{{host.hostname|trim_locator}}</span>
+            </ui-select-choices>
+        </ui-select>
+        <p class="help-block">
+        Defines an address that will not initiate tests when used in this group. This will override the no_agent field specified in the host directive if defined. It is recommended you use the host directive to define this if a address cannot initiate tests for any group. Only use this form if you want a host to initiate tests when used in some groups but not others.
+        </p>
+    </div>
+</div>
 <div class="form-group" ng-if="test.service_type">
     <label class="col-sm-2 control-label">Testspec</label>
     <div class="col-sm-10">
-        <select class="form-control" ng-model="test.TestspecId" name="testspecid" ng-disabled="!config.canedit" required>
+        <select class="form-control" ng-model="test.testspec" ng-disabled="!selected._canedit" required>
             <option value="">(Select Test Spec)</option>
-            <option ng-repeat="spec in testspecs | filter:{service_type:test.service_type}" value="{{spec.id}}">{{spec.desc}} </option>
+            <option ng-repeat="spec in testspecs | filter:{service_type:test.service_type}" value="{{spec._id}}">{{spec.desc}} </option>
         </select>
-        <div class="well well-sm well-detail" ng-if="test.TestspecId">
-            <mc-specs specs="get_selected_testspec(test.TestspecId).specs"></mc-specs>
+        <div class="well well-sm well-detail" ng-if="test.testspec">
+            <mc-specs specs="getselectedtestspec(test).specs"></mc-specs>
         </div>
     </div>
 </div>
 
-<!-- no_agent doesn't seem to work https://github.com/perfsonar/mesh-config/issues/23
-<div class="form-group">
-    <label class="col-sm-2 control-label">No Agent Group <span class="text-muted">(Optional)</span></label>
-    <div class="col-sm-10">
-        <select class="form-control" ng-model="test.nagroup" name="nagroup" ng-disabled="!config.canedit">
-            <option value="">(Select Host Group to not initiate tests from)</option>
-            <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group.id}}">{{group.desc}}</option>
-        </select>
-        <div class="well well-sm well-detail" ng-if="test.nagroup">
-            <mc-hostlist serviceid="test.service_type" hosts="get_hostgroup(test.nagroup).hosts"></mc-hostlist>
-        </div>
-    </div>
-</div>
--->
+

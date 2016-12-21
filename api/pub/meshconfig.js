@@ -3,141 +3,105 @@
 //contrib
 var express = require('express');
 var router = express.Router();
-var _ = require('underscore');
+var _ = require('underscore'); //used?
 var winston = require('winston');
+var async = require('async');
 
 //mine
 var config = require('../config');
-//var logger = new winston.Logger(config.logger.winston);
+var logger = new winston.Logger(config.logger.winston);
+var db = require('../models');
+var common = require('../common');
 
-function generate_members(group, services) {
-    var members = [];
-    group.hosts.forEach(function(_host) {
-        var host = services[_host].Host;
-        members.push(host.hostname || host.ip);
+var profile_cache = null;
+function load_profile(cb) {
+    logger.info("reloading profiles");
+    common.profile.getall(function(err, profiles) {
+        if(err) logger.error(err);
+        else profile_cache = profiles;
     });
-    return members;
+}
+//load profile for the first time
+load_profile();
+setInterval(load_profile, 10*60*1000); //reload every 10 minutes
+
+//convert list of UIDs to list of profile objects
+function resolve_users(uids) {
+    var users = [];
+    uids.forEach(function(uid) {
+        users.push(profile_cache[uid]);  
+    });
+    return users;
 }
 
-//synchronous function to construct meshconfig from admin config
-function generate(config) {
-    
-    //create uuid service mapping
-    var services = {};
-    config.services.forEach(function(service) {
-        services[service.uuid] = service;
+function resolve_testspec(id, cb) {
+    db.Testspec.findById(id).exec(cb);
+}
+function resolve_ma(host, next) {
+    //find local MA
+    //logger.debug("resolving ma");
+    var local_ma = null;
+    host.services.forEach(function(service) {
+        if(service.type == "ma") local_ma = service;
     });
-
-    //meshconfig root template
-    var mc = {
-        organizations: [],
-        tests: [],
-        administrators: [],
-        description: config.desc,
-        //_debug: config //debug
-    };
-    
-    //set meshconfig admins
-    if(config.admins) config.admins.forEach(function(admin) {
-        mc.administrators.push({name: admin.fullname, email: admin.email});
-    });
-
-    //convert services to sites/hosts entries
-    //let's put all sites under a single organization - since I currently don't handle the concept of organization
-    var org = {
-        sites: [],
-        administrators: [],
-        //description: "",
-    };
-    mc.organizations.push(org);
-
-    var hosts = {}; //to keep up with already defined host (we can't list the same host multiple time - even with different ip address / hostname)
-
-    config.services.forEach(function(service) {
-        //var _address = service._address;
-        var _address = service.Host.hostname||service.Host.ip;
-
-        if(!service.MA) {
-            //MA not specified.. find local MA
-            config.mas.forEach(function(ma) {
-                if(ma.client_uuid == service.client_uuid) {
-                    service.MA = ma;
-                }
-            });
-        }
-
-        if(hosts[service.client_uuid]) {
-            var host = hosts[service.client_uuid];
-            if(!~host.addresses.indexOf(_address)) host.addresses.push(_address);
-            if(service.MA) host.measurement_archives.push(generate_mainfo(service));
-            host.description += "/"+service.type; //service.name;
+    //replace ma with the actual ma service
+    async.eachSeries(host.services, function(service, next_service) {
+        if(!service.ma || service.ma == host._id) {
+            service.ma = local_ma; //use local if not set
+            next_service();
         } else {
-            var host = {
-                //administrators: [], //TODO host admins
-                addresses: [ _address ], 
-                measurement_archives: [ ], 
-                //description: service.name,
-                description: service.sitename+' '+service.type,
-                toolkit_url: service.Host.toolkit_url,//"auto",
-            };
-            if(service.Host.no_agent) host.no_agent = 1;
-            if(service.MA) host.measurement_archives.push(generate_mainfo(service));
-            hosts[service.client_uuid] = host;
-
-            var site = {
-                hosts: [ host ],
-                //administrators: [], //TODO site admins (not needed?)
-                location: service.location,
-                description: service.sitename
-            };
-            org.sites.push(site);
-        }
-    });
-
-    //now the most interesting part..
-    config.Tests.forEach(function(test) {
-        var members = {
-            type: test.mesh_type
-        };
-        switch(test.mesh_type) { 
-        case "disjoint":
-            members.a_members = generate_members(test.HostGroupA, services);
-            members.b_members = generate_members(test.HostGroupB, services);
-            break;
-        case "mesh":
-            members.members = generate_members(test.HostGroupA, services);
-            break;
-        case "star":
-            members.members = generate_members(test.HostGroupA, services);
-            if(test.center_address) {
-                var host = services[test.center_address].Host;
-                members.center_address = host.hostname || host.ip;
-            }
-            break;
-        case "ordered_mesh": 
-            members.members = generate_members(test.HostGroupA, services);
-            break;
-        }
-        if(test.HostGroupNA) {
-            members.no_agent = generate_members(test.HostGroupNA, services);
-            //TODO - not sure yet what to do with NA host group
-        }
-
-        //testspec should never be null.. but
-        if(test.Testspec) {
-            var parameters = test.Testspec.specs;
-
-            parameters.type = get_type(test.service_type);
-            mc.tests.push({
-                members: members,
-                parameters: parameters,
-                description: test.desc,
+            //find the host
+            resolve_host(service.ma, function(err, _host) {
+                if(err) return next_service(err);
+                //find the ma service 
+                _host.services.forEach(function(_service) {
+                    if(_service.type == "ma") service.ma = _service;
+                });
+                next_service();
             });
         }
+    }, function(err) {
+        next(err, host);
     });
+}
+function resolve_host(id, cb) {
+    db.Host.findById(id).exec(function(err, host) {
+        if(err) return cb(err);
+        resolve_ma(host, cb);
+    });
+}
+function resolve_hosts(ids, cb) {
+    db.Host.find({_id: {$in: ids}}).lean().exec(function(err, hosts) {
+        if(err) return cb(err);
+        async.eachSeries(hosts, resolve_ma, function(err) {
+            cb(err, hosts);
+        });
+    });
+}
+function resolve_hostgroup(id, cb) {
+    db.Hostgroup.findById(id).exec(function(err, hostgroup) {
+        if(err) return cb(err);
+        if(!hostgroup) return cb("can't find hostgroup:"+id);
+        if(hostgroup.type == "static") {
+            resolve_hosts(hostgroup.hosts, function(err, hosts) {
+                if(err) return cb(err);
+                cb(null, hosts);
+            }); 
+        } else {
+            logger.debug("resolving dynamic hostgroup");
+            logger.debug(hostgroup.host_filter);
+            logger.debug(hostgroup.service_type);
+            common.dynamic.resolve(hostgroup.host_filter, hostgroup.service_type, cb);
+        }
+    });
+}
 
-    //mc.debug = config;
-    return mc;
+function generate_members(hosts) {
+    var members = [];
+    hosts.forEach(function(host) {
+        members.push(host.hostname);
+    });
+    return members;
 }
 
 function get_type(service_type) {
@@ -153,11 +117,213 @@ function get_type(service_type) {
 
 function generate_mainfo(service) {
     return {
-        //ma: service.MA,
-        read_url: service.MA.locator,
-        write_url: service.MA.locator,
-        type: "perfsonarbuoy/"+service.type, //get_type(service.type)
+        read_url: service.ma.locator,
+        write_url: service.ma.locator,
+        type: "perfsonarbuoy/"+service.type, 
     };
+}
+
+//synchronous function to construct meshconfig from admin config
+function generate(config, cb) {
+
+    //catalog of all hosts referenced in member groups keyed by uuid
+    var host_catalog = {}; 
+
+    //resolve all db entries first
+    config.admins = resolve_users(config.admins);
+    async.eachSeries(config.tests, function(test, next_test) {
+        if(!test.enabled) return next_test();
+        async.parallel([
+            function(next) {
+                //a group
+                if(!test.agroup) return next();
+                resolve_hostgroup(test.agroup, function(err, hosts) {
+                    if(err) return next(err);
+                    test.agroup = hosts;
+                    hosts.forEach(function(host) { host_catalog[host.uuid] = host; });
+                    next();
+                });
+            },
+            function(next) {
+                //b group
+                if(!test.bgroup) return next();
+                resolve_hostgroup(test.bgroup, function(err, res) {
+                    if(err) return next(err);
+                    resolve_hosts(res.recs, function(err, hosts) {
+                        test.bgroup = hosts;
+                        hosts.forEach(function(host) { host_catalog[host.uuid] = host; });
+                        next();
+                    });
+                });
+            },
+            function(next) {
+                if(!test.nahosts) return next();
+                resolve_hosts(test.nahosts, function(err, hosts) {
+                    if(err) return next(err);
+                    test.nahosts = hosts;
+                    hosts.forEach(function(host) { host_catalog[host.uuid] = host; });
+                    next();
+                });
+            },
+            function(next) {
+                //star center
+                if(!test.center) return next();
+                resolve_host(test.center, function(err, host) {
+                    if(err) return next(err);
+                    test.ceneter = host;
+                    host_catalog[host.uuid] = host;
+                    next();
+                });
+            },
+            function(next) {
+                //testspec
+                if(!test.testspec) return next();
+                resolve_testspec(test.testspec, function(err, testspec) {
+                    if(err) return next(err);
+                    test.testspec = testspec;
+                    next();
+                });
+            }
+        ], next_test);
+    }, function(err) {
+        if(err) return logger.error(err);
+
+        //meshconfig root template
+        var mc = {
+            organizations: [],
+            tests: [],
+            administrators: [],
+            description: config.desc,
+            //_debug: config //debug
+        };
+    
+        //set meshconfig admins
+        if(config.admins) config.admins.forEach(function(admin) {
+            mc.administrators.push({name: admin.fullname, email: admin.email});
+        });
+    
+        //convert services to sites/hosts entries
+        //mca currently doesn't handle the concept of organization
+        var org = {
+            sites: [],
+            administrators: [],
+            //description: "",
+        };
+
+        //register sites(hosts)
+        for(var uuid in host_catalog) {
+            var _host = host_catalog[uuid];
+            var host = {
+                //administrators: [], //TODO host admins
+                addresses: [ _host.hostname ], 
+                measurement_archives: [ ], 
+                description: _host.sitename,
+                toolkit_url: _host.toolkit_url,
+            };
+            if(_host.no_agent) host.no_agent = 1;
+
+            //crete ma entry for each service
+            _host.services.forEach(function(service) {
+                //don't need to add ma info for some services (TODO - confirm)
+                if(service.type == "mp-bwctl") return;
+                if(service.type == "ma") return;
+                if(service.type == "mp-owamp") return;
+
+                if(service.ma) {
+                    host.measurement_archives.push(generate_mainfo(service));
+                } else {
+                    logger.error("NO MA service running for ");
+                    logger.debug(service);
+                }
+            });
+
+            var site = {
+                hosts: [ host ],
+                //administrators: [], //TODO site admins (not needed?)
+                location: _host.location,
+                //description: _host.sitename //needed?
+            };
+            org.sites.push(site);
+            //console.log(JSON.stringify(site, null, 4));
+
+            /*
+            if(hosts[service.client_uuid]) {
+                var host = hosts[service.client_uuid];
+                if(!~host.addresses.indexOf(_address)) host.addresses.push(_address);
+                if(service.MA) host.measurement_archives.push(generate_mainfo(service));
+                host.description += "/"+service.type; //service.name;
+            } else {
+                var host = {
+                    //administrators: [], //TODO host admins
+                    addresses: [ _address ], 
+                    measurement_archives: [ ], 
+                    //description: service.name,
+                    description: service.sitename+' '+service.type,
+                    toolkit_url: service.Host.toolkit_url,//"auto",
+                };
+                if(service.Host.no_agent) host.no_agent = 1;
+                if(service.MA) host.measurement_archives.push(generate_mainfo(service));
+                hosts[service.client_uuid] = host;
+
+                var site = {
+                    hosts: [ host ],
+                    //administrators: [], //TODO site admins (not needed?)
+                    location: service.location,
+                    description: service.sitename
+                };
+                org.sites.push(site);
+            }
+            */
+        }
+        mc.organizations.push(org);
+        
+        //now the most interesting part..
+        config.tests.forEach(function(test) {
+            if(!test.enabled) return;
+            var members = {
+                type: test.mesh_type
+            };
+            switch(test.mesh_type) { 
+            case "disjoint":
+                members.a_members = generate_members(test.agroup);
+                members.b_members = generate_members(test.bgroup);
+                break;
+            case "mesh":
+                members.members = generate_members(test.agroup);
+                break;
+            case "star":
+                members.members = generate_members(test.agroup);
+                if(test.center) members.center_address = test.center.hostname; // || test.center.ip;
+                break;
+            case "ordered_mesh": 
+                members.members = generate_members(test.agroup);
+                break;
+            }
+            if(test.nahosts && test.nahosts.length > 0) {
+                members.no_agents = generate_members(test.nahosts);
+            }
+
+            var parameters = test.testspec.specs;
+            parameters.type = get_type(test.service_type);
+            mc.tests.push({
+                members: members,
+                parameters: parameters,
+                description: test.desc,
+            });
+        });
+
+        //all done
+        cb(null, mc);
+    });
+
+    /*
+    //create uuid service mapping
+    var services = {};
+    config.services.forEach(function(service) {
+        services[service.uuid] = service;
+    });
+    */
+    //mc.debug = config;
 }
 
 exports.generate = generate;

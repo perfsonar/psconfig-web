@@ -57,6 +57,7 @@ i[onclick] {
         margin-bottom: 0px;
     }
     .list-group-item {
+        margin-top: 10px;
         h4 {
             margin-top: 0px;
         }
@@ -200,5 +201,24 @@ div.well-detail {
         bottom: 0px;
         left: 340px;
         color: #008cba;
+    }
+}
+
+.autoconfig {
+    position: fixed; 
+    bottom: 0px; 
+    width: 350px; 
+    height: 160px; 
+    background-color: #eee; 
+    padding: 5px 15px; 
+    box-shadow: inset 0px 4px 10px #ccc
+}
+
+@media screen and (max-width: 1200px) {
+    .list-addbutton {
+        left: 320px;
+        &:hover {
+            left: 310px;
+        }
     }
 }

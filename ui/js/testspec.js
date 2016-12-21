@@ -23,14 +23,14 @@ app.controller('TestspecsController', function($scope, $route, toaster, $http, j
     $scope.selected = null;
     $scope.select = function(testspec) {
         $scope.selected = testspec; 
-        
-        //hide subbar if it's hidden optionally for narrow view
-        if($(".subbar").hasClass("subbar-shown")) {
-            $(".subbar").removeClass("subbar-shown");
-        }
-
+        $scope.closesubbar();
         $location.update_path("/testspecs/"+testspec._id);
         window.scrollTo(0,0);
+    }
+
+    $scope.add = function() {
+        $scope.selected = testspecs.add();
+        $scope.closesubbar();
     }
 
     $scope.setdefault = function(type) {
@@ -50,9 +50,6 @@ app.controller('TestspecsController', function($scope, $route, toaster, $http, j
         }
     });
 
-    $scope.add = function() {
-        $scope.selected = testspecs.add();
-    }
 
     $scope.submit = function() {
         //remove parameter set to empty string
@@ -72,40 +69,16 @@ app.controller('TestspecsController', function($scope, $route, toaster, $http, j
             testspecs.create($scope.selected).then(function() {
                 toaster.success("Testspec created successfully!");
                 $scope.form.$setPristine();
+            }).catch(function(res) {
+                toaster.error(res.data.message||res.data.errmsg); 
             });
         } else {
             testspecs.update($scope.selected).then(function() {
                 toaster.success("Testspec updated successfully!");
                 $scope.form.$setPristine();
+            }).catch(function(res) {
+                toaster.error(res.data.message||res.data.errmsg); 
             });
-            /*
-            } else {
-                //update
-                $http.put(appconf.api+'/testspecs/'+$scope.testspec._id, $scope.testspec)
-                .then(function(res, status, headers, config) {
-                    
-                    //find the item user was editing
-                    $scope.testspecs.forEach(function(testspec) {
-                        if(testspec._id == $scope.testspec._id) {   
-                            //apply updates
-                            for(var k in $scope.testspec) {
-                                testspec[k] = $scope.testspec[k];
-                            }
-                            //console.dir($scope.testspecs);
-                            //console.dir(res.data);
-                            testspec._canedit = res.data.canedit;
-                        }
-                    });
-
-                    $scope.form.$setPristine();
-                    $location.path("/testspecs");
-                    toaster.success("Updated Successfully!");
-
-                }, function(res, status, headers, config) {
-                    toaster.error("Update failed!");
-                });   
-            }
-            */
         }
     }
     $scope.cancel = function() {

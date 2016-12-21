@@ -48,96 +48,53 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
 
     $scope.selected = null;
     $scope.select = function(hostgroup) {
-        $scope.selected = hostgroup; 
-        
-        //hide subbar if it's hidden optionally for narrow view
-        if($(".subbar").hasClass("subbar-shown")) {
-            $(".subbar").removeClass("subbar-shown");
+        switch(hostgroup.type) {
+        case "static": $scope.tabs.static.active = true; break;
+        case "dynamic": $scope.tabs.dynamic.active = true; break;
         }
-
+        $scope.selected = hostgroup; 
+        $scope.closesubbar();
         $location.update_path("/hostgroups/"+hostgroup._id);
         window.scrollTo(0,0);
     }
 
     $scope.add = function() {
         $scope.selected = hostgroups.add();
-        /*
-            var hostgroup = {
-            service_type: service_type,
-            admins: [ $scope.users[user.sub] ], //select current user as admin
-            type: 'static',
-            hosts: [],
-            host_filter: "return false; //select none",
-            desc: "",
-        };
-        var modalInstance = $modal.open({
-            animation: true,
-            templateUrl: 't/hostgroup.html',
-            controller: 'HostgroupModalController',
-            size: 'lg',
-            resolve: {
-                hostgroup: function () {
-                    return hostgroup;
-                },
-                title: function() {
-                    return "New Hostgroup";
-                },
-            }
-        });
-        modalInstance.result.then(function() {
-            console.log("adding hostgroupu to list");
-            $scope.hostgroups.push(hostgroup); 
-        }, function (code) {
-            //console.log("dismiss code"+code);
-        });
-        */
+        $scope.closesubbar();
+    }
+
+    $scope.changetype = function(type) {
+        if(!$scope.selected) return;
+        if($scope.selected.type != type) {
+            $scope.selected.type = type;
+            $scope.form.$setDirty();
+            if(type == "dynamic") $scope.run_dynamic();
+        }
     }
 
     $scope.submit = function() {
+        /*
+        if($scope.tabs.static.active) $scope.selected.type = "static";
+        if($scope.tabs.dynamic.active) $scope.selected.type = "dynamic";
+        */
+
         if(!$scope.selected._id) {
             hostgroups.create($scope.selected).then(function() {
                 toaster.success("Hostgroup created successfully!");
                 $scope.form.$setPristine();
+            }).catch(function(res) {
+                toaster.error(res.data.message||res.data.errmsg); 
             });
         } else {
             hostgroups.update($scope.selected).then(function() {
                 toaster.success("Hostgroup updated successfully!");
                 $scope.form.$setPristine();
+            }).catch(function(res) {
+                toaster.error(res.data.message||res.data.errmsg); 
             });
         }
-        /*
-        var hostgroup = angular.copy(_hostgroup);
-        var modalInstance = $modal.open({
-            animation: true,
-            templateUrl: 't/hostgroup.html',
-            controller: 'HostgroupModalController',
-            size: 'lg',
-            resolve: {
-                hostgroup: function () {
-                    return hostgroup;
-                },
-                title: function() {
-                    return "Update Host Group";
-                },
-            }
-        });
-        modalInstance.result.then(function() {
-            //apply change
-            for(var k in hostgroup) {
-                _hostgroup[k] = hostgroup[k];
-            }
-        }, function (code) {
-            if(code == "remove") {
-                for(var i = 0;i < $scope.hostgroups.length; ++i) {
-                    if($scope.hostgroups[i].id == hostgroup.id) {
-                        $scope.hostgroups.splice(i, 1);
-                        break;
-                    }
-                }
-            }
-        });
-        */
     }
+
     $scope.cancel = function() {
         location.reload();
     }

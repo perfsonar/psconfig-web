@@ -61,21 +61,20 @@ app.factory('services', ['appconf', '$http', 'jwtHelper', function(appconf, $htt
 
 app.factory('hosts', function(appconf, $http, toaster) {
     var hosts = [];
-    var all_promise = null;
+    //var all_promise = null;
     var ma_promise = null;
 
     return {
         //return basic (uuid, sitename, hostname, lsid) host info for all hosts
         getAll: function(opts) { 
-            if(all_promise) return all_promise;
+            //if(all_promise) return all_promise;
             var select = "sitename hostname lsid";
             if(opts && opts.select) select = opts.select;
-            all_promise = $http.get(appconf.api+'/hosts?select='+select+'&sort=sitename hostname&limit=100000')
+            return $http.get(appconf.api+'/hosts?select='+select+'&sort=sitename hostname&limit=100000')
             .then(function(res) {
                 hosts = res.data.hosts;
                 return res.data.hosts;
             });
-            return all_promise; 
         },
 
         //load host detail (add to existing host object)
@@ -122,7 +121,7 @@ app.factory('users', function(appconf, $http, jwtHelper) {
     }
 });
 
-app.factory('testspecs', function(appconf, $http, jwtHelper, users, $q) {
+app.factory('testspecs', function(appconf, $http, jwtHelper) {
     var testspecs = null;
     var all_promise = null;
     return {
@@ -135,28 +134,6 @@ app.factory('testspecs', function(appconf, $http, jwtHelper, users, $q) {
                 return res.data.testspecs;
             });
             return all_promise; 
-            /*
-            var deferred = $q.defer();
-
-            //first load profiles
-            //users.getAll().then(function(profiles) {
-                //then load testspecs
-                $http.get(appconf.api+'/testspecs')
-                .then(function(res) {
-                    
-                    //lookup users
-                    res.data.forEach(function(t) {
-                        var as = [];
-                        t.admins.forEach(function(a) {
-                            as.push(profiles[a]);
-                        });
-                        t.admins = as; 
-                    });
-                    deferred.resolve(res.data);
-                });
-            //});
-            return deferred.promise;
-        *   */
         },
         add: function() {
             var testspec = {
@@ -174,7 +151,7 @@ app.factory('testspecs', function(appconf, $http, jwtHelper, users, $q) {
         },
         create: function(testspec) {
             return $http.post(appconf.api+'/testspecs/', testspec)
-            .then(function(res, status, headers, config) {
+            .then(function(res) {
                 testspec._id = res.data._id;
                 testspec._canedit = res.data._canedit;
                 testspec.create_date = res.data.create_date;
@@ -190,7 +167,7 @@ app.factory('testspecs', function(appconf, $http, jwtHelper, users, $q) {
         },
         remove: function(testspec) {
             return $http.delete(appconf.api+'/testspecs/'+testspec._id)
-            .then(function(res, status, headers, config) {
+            .then(function(res) {
                 testspecs.splice(testspecs.indexOf(testspec), 1);
                 //$scope.form.$setPristine();//ignore all changed made
                 //$location.path("/testspecs");
@@ -200,41 +177,28 @@ app.factory('testspecs', function(appconf, $http, jwtHelper, users, $q) {
     }
 });
 
-app.factory('configs', function(appconf, $http, toaster) {
+app.factory('configs', function(appconf, $http, toaster, jwtHelper) {
     var configs = [];
-    var all_promise = null;
+    //var all_promise = null;
     var ma_promise = null;
 
     return {
         //return basic (uuid, sitename, hostname, lsid) config info for all configs
         getAll: function(opts) { 
-            if(all_promise) return all_promise;
-            var select = "url desc";
+            //if(all_promise) return all_promise;
+            var select = "url desc admins tests create_date";
             if(opts && opts.select) select = opts.select;
-            all_promise = $http.get(appconf.api+'/configs?select='+select+'&sort=desc&limit=100000')
+            return $http.get(appconf.api+'/configs?select='+select+'&sort=desc&limit=100000')
             .then(function(res) {
                 configs = res.data.configs;
                 return res.data.configs;
             });
-            return all_promise; 
         },
-
-        /*
-        //load config detail (add to existing config object)
-        getDetail: function(config) {
-            return $http.get(appconf.api+'/configs?find='+JSON.stringify({_id: config._id})).then(function(res) {
-                var _config = res.data.configs[0];
-                //console.dir(_config);
-                for(var k in _config) config[k] = _config[k];
-                return config;
-            }, function(res) {
-                toaster.error("Failed to load config detail");
-            });
-        },
-        */
         add: function() {
             var config = {
                 desc: "New Config",
+                admins: [],
+                tests: [],
             };
             var jwt = localStorage.getItem(appconf.jwt_id);
             if(jwt) {
@@ -247,7 +211,7 @@ app.factory('configs', function(appconf, $http, toaster) {
         },
         create: function(config) {
             return $http.post(appconf.api+'/configs/', config)
-            .then(function(res, status, headers, config) {
+            .then(function(res) {
                 config._id = res.data._id;
                 config._canedit = res.data._canedit;
                 config.create_date = res.data.create_date;
@@ -263,14 +227,14 @@ app.factory('configs', function(appconf, $http, toaster) {
         },
         remove: function(config) {
             return $http.delete(appconf.api+'/configs/'+config._id)
-            .then(function(res, status, headers, config) {
+            .then(function(res) {
                 configs.splice(configs.indexOf(config), 1);
             });
         }
     }
 });
 
-app.factory('hostgroups', function(appconf, $http, jwtHelper, users, $q) {
+app.factory('hostgroups', function(appconf, $http, jwtHelper) {
     var hostgroups = null;
     var all_promise = null;
     return {
@@ -302,7 +266,7 @@ app.factory('hostgroups', function(appconf, $http, jwtHelper, users, $q) {
         },
         create: function(hostgroup) {
             return $http.post(appconf.api+'/hostgroups/', hostgroup)
-            .then(function(res, status, headers, config) {
+            .then(function(res) {
                 hostgroup._id = res.data._id;
                 hostgroup._canedit = res.data._canedit;
                 hostgroup.create_date = res.data.create_date;

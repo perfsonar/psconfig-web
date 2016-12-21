@@ -111,15 +111,10 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         requiresLogin: true,
     })
 
-    .when('/configs', {
+    .when('/configs/:id?', {
         templateUrl: 't/configs.html',
         controller: 'ConfigsController'
     })
-    .when('/config/:id', {
-        templateUrl: 't/config.html',
-        controller: 'ConfigController'
-    })
-
     .when('/hosts/:id?', {
         templateUrl: 't/hosts.html',
         controller: 'HostsController'

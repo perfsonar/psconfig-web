@@ -41,6 +41,11 @@ app.controller('HeaderController', function($scope, appconf, $route, serverconf,
     $scope.opensubbar = function() {
         $(".subbar").toggleClass('animated slideInLeft subbar-shown');
     }
+    $scope.closesubbar = function() {
+        if($(".subbar").hasClass("subbar-shown")) {
+            $(".subbar").removeClass("subbar-shown");
+        }
+    }
 
     $scope.toast_error = function(res) {
         if(res.data && res.data.message) toaster.error(res.data.message);
