@@ -1,13 +1,32 @@
 
 app.controller('ConfigsController', 
-function($scope, appconf, toaster, $http, $location, scaMessage, hosts) {
+function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, configs) {
     scaMessage.show(toaster);
-    hosts.getAll().then(function(_hosts) { $scope.hosts = _hosts; });
-    $scope.appconf = appconf;
+    //hosts.getAll().then(function(_hosts) { $scope.hosts = _hosts; });
+    //$scope.appconf = appconf;
     $scope.active_menu = "configs";
 
-    if($scope.user) $scope.cancreate = true; //TODO - just check for $scope.user instead?
+    users.getAll().then(function(_users) {
+        $scope.users = _users;
+        hosts.getAll().then(function(_hosts) {
+            $scope.hosts = _hosts;
+            configs.getAll().then(function(_configs) { 
+                $scope.configs = _configs; 
+                //console.dir($scope.configs);
+                //find task specified
+                if($routeParams.id) {
+                    $scope.configs.forEach(function(config) {
+                        if(config._id == $routeParams.id) $scope.select(config);
+                    });
+                } else {
+                    //select first one
+                    if($scope.configs.length > 0) $scope.select($scope.configs[0]);
+                }
+            });
+        });
+    });
     
+    /*
     //start loading stuff
     var testspecs, hostgroups;
     $http.get(appconf.api+'/testspecs/').then(function(res) {
@@ -32,19 +51,34 @@ function($scope, appconf, toaster, $http, $location, scaMessage, hosts) {
             });
         });
     });
-    
+    */
+
+    $scope.selected = null;
+    $scope.select = function(config) {
+        $scope.selected = config; 
+        
+        //hide subbar if it's hidden optionally for narrow view
+        if($(".subbar").hasClass("subbar-shown")) {
+            $(".subbar").removeClass("subbar-shown");
+        }
+        $location.update_path("/configs/"+config._id);
+        window.scrollTo(0,0);
+    }
+
+
+    /*
     $scope.addconfig = function() {
         $location.url("/config/new");
     }
-    $scope.edit = function(config) {
-        $location.url("/config/"+config.id);
-    }
+
     $scope.autoconf = function(host) {
         var address = host.hostname || host.ip;
         document.location = appconf.pub_url+"/auto/"+address;
     }
+    */
 });
 
+/*
 app.controller('ConfigController', 
 function($scope, appconf, toaster, $http, jwtHelper, $routeParams, $location, users, testspecs, hostgroups) {
     $scope.id = $routeParams.id;
@@ -111,23 +145,7 @@ function($scope, appconf, toaster, $http, jwtHelper, $routeParams, $location, us
         $location.url("/configs");
     }
 
-    /*
-    //is this needed still?
-    function getdata() {
-        //create a copy of $scope.testspec so that UI doesn't break while saving.. (just admins?)
-        var data = angular.copy($scope.config);
-        return data;
-    }
-    */
-
     $scope.submit = function() {
-
-        /*
-        //make sure URL doesn't conflict
-        toaster.error("boo");
-        return;
-        */
-
         //some test paramter can be empty (like nagroup) which needs to be null not an empty string
         $scope.config.Tests.forEach(function(test) {
             for(var k in test) {
@@ -203,5 +221,5 @@ function($scope, appconf, toaster, $http, jwtHelper, $routeParams, $location, us
         delete test.TestspecId;
     }
 });
-
+*/
 

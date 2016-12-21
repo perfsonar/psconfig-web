@@ -74,8 +74,6 @@ app.factory('hosts', function(appconf, $http, toaster) {
             .then(function(res) {
                 hosts = res.data.hosts;
                 return res.data.hosts;
-            }, function(res) {
-                toaster.error("Failed to query hosts");
             });
             return all_promise; 
         },
@@ -87,8 +85,6 @@ app.factory('hosts', function(appconf, $http, toaster) {
                 //console.dir(_host);
                 for(var k in _host) host[k] = _host[k];
                 return host;
-            }, function(res) {
-                toaster.error("Failed to load host detail");
             });
         },
 
@@ -101,15 +97,13 @@ app.factory('hosts', function(appconf, $http, toaster) {
                 //console.log("mas");
                 //console.dir(res.data.hosts);
                 return res.data.hosts;
-            }, function(res) {
-                toaster.error("Failed to load ma hosts");
             });
             return ma_promise;
         }
     }
 });
 
-app.factory('users', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
+app.factory('users', function(appconf, $http, jwtHelper) {
     var all_promise = null;
     return {
         //return basic (uuid, sitename, hostname, lsid) host info for all hosts
@@ -122,13 +116,11 @@ app.factory('users', ['appconf', '$http', 'jwtHelper', function(appconf, $http, 
                     profile.id = profile.id.toString();
                 });
                 return res.data.profiles;
-            }, function(res) {
-                toaster.error("Failed to query profiles");
             });
             return all_promise; 
         }
     }
-}]);
+});
 
 app.factory('testspecs', function(appconf, $http, jwtHelper, users, $q) {
     var testspecs = null;
@@ -141,8 +133,6 @@ app.factory('testspecs', function(appconf, $http, jwtHelper, users, $q) {
                 testspecs = res.data.testspecs;
                 //console.dir(testspecs);
                 return res.data.testspecs;
-            }, function(res) {
-                console.error("Failed to query testspecs");
             });
             return all_promise; 
             /*
@@ -189,18 +179,14 @@ app.factory('testspecs', function(appconf, $http, jwtHelper, users, $q) {
                 testspec._canedit = res.data._canedit;
                 testspec.create_date = res.data.create_date;
                 return testspec;
-            }, function(res, status, headers, config) {
-                console.error("failed to register testspec");
-            });   
+            });
         },
         update: function(testspec) {
             return $http.put(appconf.api+'/testspecs/'+testspec._id, testspec)
             .then(function(res) {
                 testspec._canedit = res.data._canedit;
                 return testspec;
-            }, function(res, status, headers, config) {
-                console.error("failed to update testspec");
-            });   
+            });
         },
         remove: function(testspec) {
             return $http.delete(appconf.api+'/testspecs/'+testspec._id)
@@ -209,9 +195,77 @@ app.factory('testspecs', function(appconf, $http, jwtHelper, users, $q) {
                 //$scope.form.$setPristine();//ignore all changed made
                 //$location.path("/testspecs");
                 //toaster.success("Deleted Successfully!");
-            }, function(res, status, headers, config) {
-                console.error("Deletion failed!");
-            });       
+            });
+        }
+    }
+});
+
+app.factory('configs', function(appconf, $http, toaster) {
+    var configs = [];
+    var all_promise = null;
+    var ma_promise = null;
+
+    return {
+        //return basic (uuid, sitename, hostname, lsid) config info for all configs
+        getAll: function(opts) { 
+            if(all_promise) return all_promise;
+            var select = "url desc";
+            if(opts && opts.select) select = opts.select;
+            all_promise = $http.get(appconf.api+'/configs?select='+select+'&sort=desc&limit=100000')
+            .then(function(res) {
+                configs = res.data.configs;
+                return res.data.configs;
+            });
+            return all_promise; 
+        },
+
+        /*
+        //load config detail (add to existing config object)
+        getDetail: function(config) {
+            return $http.get(appconf.api+'/configs?find='+JSON.stringify({_id: config._id})).then(function(res) {
+                var _config = res.data.configs[0];
+                //console.dir(_config);
+                for(var k in _config) config[k] = _config[k];
+                return config;
+            }, function(res) {
+                toaster.error("Failed to load config detail");
+            });
+        },
+        */
+        add: function() {
+            var config = {
+                desc: "New Config",
+            };
+            var jwt = localStorage.getItem(appconf.jwt_id);
+            if(jwt) {
+                var user = jwtHelper.decodeToken(jwt);
+                config.admins.push(user.sub.toString());
+                config._canedit = true;
+            }
+            configs.push(config);
+            return config;
+        },
+        create: function(config) {
+            return $http.post(appconf.api+'/configs/', config)
+            .then(function(res, status, headers, config) {
+                config._id = res.data._id;
+                config._canedit = res.data._canedit;
+                config.create_date = res.data.create_date;
+                return config;
+            });
+        },
+        update: function(config) {
+            return $http.put(appconf.api+'/configs/'+config._id, config)
+            .then(function(res) {
+                config._canedit = res.data._canedit;
+                return config;
+            });
+        },
+        remove: function(config) {
+            return $http.delete(appconf.api+'/configs/'+config._id)
+            .then(function(res, status, headers, config) {
+                configs.splice(configs.indexOf(config), 1);
+            });
         }
     }
 });
@@ -226,8 +280,6 @@ app.factory('hostgroups', function(appconf, $http, jwtHelper, users, $q) {
             .then(function(res) {
                 hostgroups = res.data.hostgroups;
                 return res.data.hostgroups;
-            }, function(res) {
-                console.error("Failed to query hostgroups");
             });
             return all_promise; 
         },
@@ -255,27 +307,21 @@ app.factory('hostgroups', function(appconf, $http, jwtHelper, users, $q) {
                 hostgroup._canedit = res.data._canedit;
                 hostgroup.create_date = res.data.create_date;
                 return hostgroup;
-            }, function(res, status, headers, config) {
-                console.error("failed to register hostgroup");
-            });   
+            });
         },
         update: function(hostgroup) {
             return $http.put(appconf.api+'/hostgroups/'+hostgroup._id, hostgroup)
             .then(function(res) {
                 hostgroup._canedit = res.data._canedit;
                 return hostgroup;
-            }, function(res, status, headers, config) {
-                console.error("failed to update hostgroup");
-            });   
+            });
         },
         remove: function(hostgroup) {
             return $http.delete(appconf.api+'/hostgroups/'+hostgroup._id)
             .then(function(res) {
                 hostgroups.splice(hostgroups.indexOf(hostgroup), 1);
                 //$scope.form.$setPristine();//ignore all changed made
-            }, function(res) {
-                console.error("Deletion failed!");
-            });       
+            });
         }
     }
 });

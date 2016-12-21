@@ -47,7 +47,6 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
     }); 
 });
 
-
 router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     db.Hostgroup.findById(req.params.id, function(err, hostgroup) {
         if(err) return next(err);
@@ -74,7 +73,6 @@ function filter_null(a) {
 */
 
 router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    var id = parseInt(req.params.id);
     db.Hostgroup.findById(req.params.id, function(err, hostgroup) {
         if(err) return next(err);
         if(!hostgroup) return next(new Error("can't find a hostgroup with id:"+req.params.id));
@@ -82,12 +80,9 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
         if(canedit(req.user, hostgroup)) {
             hostgroup.service_type = req.body.service_type;
             hostgroup.desc = req.body.desc;
-
-            hostgroup.type = req.body.type; //not service type, the host type (static, dynamic, etc..)
-            //hostgroup.hosts = filter_null(req.body.hosts);
+            hostgroup.type = req.body.type; 
             hostgroup.hosts = req.body.hosts;
             hostgroup.host_filter = req.body.host_filter;
-
             hostgroup.admins = req.body.admins;
             hostgroup.update_date = new Date();
             hostgroup.save(function(err) {

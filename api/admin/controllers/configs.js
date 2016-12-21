@@ -14,8 +14,41 @@ var logger = new winston.Logger(config.logger.winston);
 var db = require('../../models');
 var profile = require('../../common').profile;
 
+function canedit(user, config) {
+    if(user) {
+        if(~user.scopes.mca.indexOf('admin')) {
+            return true;
+        }
+        if(~config.admins.indexOf(user.sub)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 //just a plain list of configs
 router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
+    var find = {};
+    if(req.query.find) find = JSON.parse(req.query.find);
+
+    db.Config.find(find)
+    .select(req.query.select)
+    .limit(req.query.limit || 100)
+    .skip(req.query.skip || 0)
+    .sort(req.query.sort || '_id')
+    .lean() //so that I can add _canedit later
+    .exec(function(err, configs) {
+        if(err) return next(err);
+        db.Config.count(find).exec(function(err, count) { 
+            if(err) return next(err);
+            configs.forEach(function(config) {
+                config._canedit = canedit(req.user, config);
+            });
+            res.json({configs: configs, count: count});
+        });
+    }); 
+
+    /*
     db.Config.findAll({
         include: [ {
             model: db.Test,
@@ -37,8 +70,10 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
             res.json(configs);
         });
     }); 
+    */
 });
 
+/*
 //config detail
 router.get('/:id', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
     var id = parseInt(req.params.id);
@@ -61,8 +96,21 @@ router.get('/:id', jwt({secret: config.admin.jwt.pub, credentialsRequired: false
         });
     }); 
 });
+*/
 
 router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
+    db.Config.findById(req.params.id, function(err, config) {
+        if(err) return next(err);
+        if(!config) return next(new Error("can't find the config with id:"+req.params.id));
+        //only superadmin or admin of this test spec can update
+        if(canedit(req.user, config)) {
+            config.remove().then(function() {
+                res.json({status: "ok"});
+            }); 
+        } else return res.status(401).end();
+    });
+
+    /*
     var id = parseInt(req.params.id);
     db.Config.findOne({
         where: {id: id}
@@ -75,16 +123,31 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
             }); 
         } else return res.status(401).end();
     });
+    */
 });
 
 //update config
 router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    var id = parseInt(req.params.id);  
-    db.Config.findOne({
-        where: {id: id}
-    }).then(function(config) {
-        if(!config) return next(new Error("can't find a config with id:"+id));
-
+    db.Config.findById(req.params.id, function(err, config) {
+        if(err) return next(err);
+        if(!config) return next(new Error("can't find a config with id:"+req.params.id));
+        //only superadmin or admin of this test spec can update
+        if(canedit(req.user, config)) {
+            config.url = req.body.url;            
+            config.desc = req.body.desc;            
+            config.tests = req.body.tests;            
+            config.admins = req.body.admins;            
+            config.update_date = new Date();
+            config.save(function(err) {
+                if(err) return next(err);
+                config = JSON.parse(JSON.stringify(config));
+                config._canedit = canedit(req.user, config);
+                res.json(config);
+            }).catch(function(err) {
+                next(err);
+            });
+        } else return res.status(401).end();
+        /*
         //make sure specified url doesn't conflict with other config
         check_duplicate_url(req.body.url, config.id, function(err) {
             if(err) return next(err);
@@ -127,20 +190,30 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
                 
             } else return res.status(401).end();
         });
+        */
     }); 
 });
 
+/*
 function check_duplicate_url(url, ownid, cb) {
     db.Config.findOne({where: { url: url } }).then(function(rec) {
         if(rec && rec.id != ownid) return cb("The URL specified is already used by another config. Please choose a different URL.");
         cb(null);
     });
 }
+*/
 
 //new config
 router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
+    if(!~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
+    db.Config.create(req.body, function(err, config) {
+        if(err) return next(err);
+        config = JSON.parse(JSON.stringify(config));
+        config._canedit = canedit(req.user, config);
+        res.json(config);
+    });
+    /*
     //if(!~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
-
     //convert admin objects to list of subs
     var admins = [];
     req.body.admins.forEach(function(admin) {
@@ -170,7 +243,7 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
             next(err);      
         });
     });
-
+    */
 });
 
 module.exports = router;

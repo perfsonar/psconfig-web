@@ -35,35 +35,14 @@ var serviceSchema = mongoose.Schema({
 
     //ma to send data to. if not set, it uses local ma
     ma: {type: mongoose.Schema.Types.ObjectId, ref: 'Host'},
-
-    //client_uuid: String, //used as host id
-    //sitename: String, //from location-sitename
-    //location: mongoose.Schema.Types.Mixed,
-
-    //admins: [ String ], //from service-administrators (TODO not used yet - will be auth sub)
-
-    //count: Number, //number of time this record was touched (needed to force sequelize update the updateAt time)
-    //create_date: {type: Date, default: Date.now },
-    //update_date: {type: Date, default: Date.now },
 });
-//exports.Service = mongoose.model('Service', serviceSchema);
 
 //workflow instance
 var hostSchema = mongoose.Schema({
-    /*
-    workflow_id: String, //"sca-wf-life"
-
-    name: String, //name of the workflow
-    desc: String, //desc of the workflow
-
-    //user that this workflow instance belongs to
-    user_id: {type: String, index: true}, 
-
-    config: mongoose.Schema.Types.Mixed,
-    */
+   
     /////////////////////////////////////////////////////////////////////////////////////////..
     //key
-    uuid: {type: String, index: true }, //client-uuid
+    uuid: {type: String, index: true}, //client-uuid
 
     sitename: String,
 
@@ -76,8 +55,8 @@ var hostSchema = mongoose.Schema({
         })
     ], 
 
-    toolkit_url: { type: String, default: "auto" },
-    no_agent: { type: Boolean, default: false },
+    toolkit_url: {type: String, default: "auto"},
+    no_agent: {type: Boolean, default: false},
 
     //host info (pshost-toolkitversion, host-hardware-memory, host-os-version, host-hadeware-processorspeed, host-hadware-processorcount)
     info: mongoose.Schema.Types.Mixed,
@@ -96,8 +75,8 @@ var hostSchema = mongoose.Schema({
     lsid: String,  //source LS instance (mainly to help ui)
     url: String, //source ls url
 
-    create_date: {type: Date, default: Date.now },
-    update_date: {type: Date, default: Date.now },
+    create_date: {type: Date, default: Date.now},
+    update_date: {type: Date, default: Date.now},
 });
 /*
 //mongoose's pre/post are just too fragile.. it gets call on some and not on others.. (like findOneAndUpdate)
@@ -122,37 +101,54 @@ var hostgroupSchema = mongoose.Schema({
     host_filter: String,
 
     admins: [ String ], //array of user ids (sub string in auth service)
-    create_date: {type: Date, default: Date.now },
-    update_date: {type: Date, default: Date.now },
+    create_date: {type: Date, default: Date.now},
+    update_date: {type: Date, default: Date.now},
 });
 //hostgroupSchema.index({name: 'text', desc: 'text'});
 exports.Hostgroup = mongoose.model('Hostgroup', hostgroupSchema);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-//used to comments on various *things*
 var testspecSchema = mongoose.Schema({
     service_type: String,
     desc: String,
     specs: mongoose.Schema.Types.Mixed,
 
     admins: [ String ], //array of user ids (sub string in auth service)
-    create_date: {type: Date, default: Date.now },
-    update_date: {type: Date, default: Date.now },
+    create_date: {type: Date, default: Date.now},
+    update_date: {type: Date, default: Date.now},
 });
 exports.Testspec = mongoose.model('Testspec', testspecSchema);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-//used to comments on various *things*
-var configSchema = mongoose.Schema({
-    url: { type: String, unique: true },
+//test is now part of config
+var testSchema = mongoose.Schema({
+    service_type: String,
     desc: String,
 
+    mesh_type: String,
+    center: {type: mongoose.Schema.Types.ObjectId, ref: 'Host'}, //only used for mesh_type == star
+
+    agroup: {type: mongoose.Schema.Types.ObjectId, ref: 'Hostgroup'}, 
+    bgroup: {type: mongoose.Schema.Types.ObjectId, ref: 'Hostgroup'}, 
+    nagroup: {type: mongoose.Schema.Types.ObjectId, ref: 'Hostgroup'}, 
+
+    testspec: {type: mongoose.Schema.Types.ObjectId, ref: 'Testspec'}, 
+
+    enabled: {type: Boolean, default: true }, //should I keep this?
+});
+
+var configSchema = mongoose.Schema({
+    url: { type: String, unique: true }, //url used by publish config
+    desc: String,
+
+    tests: [ testSchema ],
+
     admins: [ String ], //array of user ids (sub string in auth service)
-    create_date: {type: Date, default: Date.now },
-    update_date: {type: Date, default: Date.now },
+    create_date: {type: Date, default: Date.now},
+    update_date: {type: Date, default: Date.now},
+
 });
 exports.Config = mongoose.model('Config', configSchema);
-
 
