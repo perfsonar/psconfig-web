@@ -46,7 +46,8 @@ var hostSchema = mongoose.Schema({
 
     sitename: String,
 
-    hostname: String, //fqdn
+    hostname: String, //fqdn (should this be unique?)
+    
     //stores ip address resolved from the hostname using dns.resolve
     addresses: [
         mongoose.Schema({

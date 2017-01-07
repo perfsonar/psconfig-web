@@ -69,9 +69,8 @@
                 style="max-height: 100px; overflow: auto;">
                 <mc-hostlist hostids="gethostgroup(test.agroup).hosts"></mc-hostlist>
             </div>
-            <div ng-if="gethostgroup(test.agroup).type == 'dynamic'"
-                style="margin-top: 5px; border: 1px solid #ccc; padding: 5px;">
-                <div name="host_filter" ui-ace="{ mode: 'javascript' }" readonly
+            <div ng-if="gethostgroup(test.agroup).type == 'dynamic'">
+                <div name="host_filter" ui-ace="{ mode: 'javascript', theme: 'twilight' }" readonly
                     ng-model="gethostgroup(test.agroup).host_filter"></div>
             </div>
         </div>
@@ -93,9 +92,8 @@
                 style="max-height: 100px; overflow: auto;">
                 <mc-hostlist hostids="gethostgroup(test.bgroup).hosts"></mc-hostlist>
             </div>
-            <div ng-if="gethostgroup(test.bgroup).type == 'dynamic'"
-                style="margin-top: 5px; border: 1px solid #ccc; padding: 5px;">
-                <div name="host_filter" ui-ace="{ mode: 'javascript' }" readonly
+            <div ng-if="gethostgroup(test.bgroup).type == 'dynamic'">
+                <div name="host_filter" ui-ace="{ mode: 'javascript', theme: 'twilight' }" readonly
                     ng-model="gethostgroup(test.bgroup).host_filter"></div>
             </div>
         </div>

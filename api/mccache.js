@@ -24,33 +24,6 @@ db.init(function(err) {
     });
 });
 
-/*
-//don't start caching before mcadmin has time to sync db and migrate
-function wait_for_mcadmin() {
-    fs.stat(config.admin.readyfile, function(err, stats) {
-        if(err || !stats.isFile()) {
-            console.log("waiting for mcadmin to start on "+config.admin.readyfile);
-            setTimeout(wait_for_mcadmin, 5000);
-        } else {
-            logger.info("mcadmin is ready");
-            start(function(err) {
-                if(err) throw err;
-                console.log("started cache services");
-            });
-        }
-    });
-}
-*/
-
-/*
-function upsert_host(rec, cb) {
-    //logger.info(rec.uuid);
-    //if(!rec.count) rec.count = 0;
-    //rec.count++;
-    db.Host.findOneAndUpdate({uuid: rec.uuid}, rec, {upsert: true}, cb);
-}
-*/
-
 //resolve ip or hostname into cb(err, hostname, addresses)
 function lookup_addresses(address, cb) {
     var hostname = null;
@@ -269,7 +242,7 @@ function update_dynamic_hostgroup(cb) {
     db.Hostgroup.find({type: 'dynamic'}, function(err, groups) {
         if(err) return cb(err); //TODO -- or should I just lot and continue;
         async.eachSeries(groups, function(group, next) {
-            common.filter.resolveHostGroup(group.host_filter, group.service_type, function(err, hosts) {
+            common.dynamic.resolve(group.host_filter, group.service_type, function(err, hosts) {
                 if(err) return next(err);
                 group.hosts = hosts.recs;
                 group.save().then(function() {

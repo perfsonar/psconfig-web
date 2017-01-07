@@ -124,7 +124,7 @@ function generate_mainfo(service) {
 }
 
 //synchronous function to construct meshconfig from admin config
-function generate(config, cb) {
+exports.generate = function(config, opts, cb) {
 
     //catalog of all hosts referenced in member groups keyed by uuid
     var host_catalog = {}; 
@@ -222,13 +222,14 @@ function generate(config, cb) {
             };
             if(_host.no_agent) host.no_agent = 1;
 
-            //crete ma entry for each service
+            //create ma entry for each service
             _host.services.forEach(function(service) {
-                //don't need to add ma info for some services (TODO - confirm)
                 if(service.type == "mp-bwctl") return;
                 if(service.type == "ma") return;
                 if(service.type == "mp-owamp") return;
-
+                if(opts.ma_override) service.ma = {
+                    locator: opts.ma_override
+                }
                 if(service.ma) {
                     host.measurement_archives.push(generate_mainfo(service));
                 } else {
@@ -276,7 +277,7 @@ function generate(config, cb) {
             */
         }
         mc.organizations.push(org);
-        
+
         //now the most interesting part..
         config.tests.forEach(function(test) {
             if(!test.enabled) return;
@@ -316,14 +317,6 @@ function generate(config, cb) {
         cb(null, mc);
     });
 
-    /*
-    //create uuid service mapping
-    var services = {};
-    config.services.forEach(function(service) {
-        services[service.uuid] = service;
-    });
-    */
     //mc.debug = config;
 }
 
-exports.generate = generate;
