@@ -2,7 +2,7 @@
     <label for="bucket_width" class="col-sm-2 control-label">Bucket Width *</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="bucket_width" ng-disabled="!selected._canedit" ng-model="selected.specs.bucket_width" required>
+            <input type="number" step="0.0001" class="form-control" name="bucket_width" ng-disabled="!selected._canedit" ng-model="selected.specs.bucket_width" required>
             <div class="input-group-addon">Seconds</div>
         </div>
         <p class="help-block">The bin size for histogram calculations in terms of seconds. For example a value such as .001 means all histogram bins will be in milliseconds.</p>
@@ -10,7 +10,7 @@
     <label for="packet_interval" class="col-sm-2 control-label">Packet Interval *</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="packet_interval" ng-disabled="!selected._canedit" ng-model="selected.specs.packet_interval" required>
+            <input type="number" step="0.01" class="form-control" name="packet_interval" ng-disabled="!selected._canedit" ng-model="selected.specs.packet_interval" required>
             <div class="input-group-addon">Packets Per Second</div>
         </div>
         <p class="help-block">The mean average time between packets in seconds. For example, .1 means send 10 packets per second.</p>
@@ -20,7 +20,7 @@
     <label for="sample_count" class="col-sm-2 control-label">Sample Count *</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="sample_count" ng-disabled="!selected._canedit" ng-model="selected.specs.sample_count" required>
+            <input type="number" step="1" class="form-control" name="sample_count" ng-disabled="!selected._canedit" ng-model="selected.specs.sample_count" required>
             <div class="input-group-addon">tests</div>
         </div>
         <p class="help-block">The number of packets contained in each summary. This combined with packet_interval determines how often data is stored. For example, a packet_interval of .1 (10 packets per second) and sample_count of 600 stores a result every 60 seconds.</p>
@@ -28,7 +28,7 @@
     <label for="packet_padding" class="col-sm-2 control-label">Packet Padding</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="packet_padding" ng-disabled="!selected._canedit" ng-model="selected.specs.packet_padding" placeholder="0">
+            <input type="number" step="1" class="form-control" name="packet_padding" ng-disabled="!selected._canedit" ng-model="selected.specs.packet_padding" placeholder="0">
             <div class="input-group-addon">bytes</div>
         </div>
         <p class="help-block">The size of the padding added to each packet in bytes (not including the IP/UDP headers)</p>

@@ -15,7 +15,7 @@
         <label for="omit_interval" class="col-sm-2 control-label">Omit Interval</label>
         <div class="col-sm-4">
             <div class="input-group">
-                <input type="text" class="form-control" name="omit_interval" 
+                <input type="number" step="1" class="form-control" name="omit_interval" 
                     ng-disabled="!selected._canedit"
                     ng-model="selected.specs.omit_interval" placeholder="0">
                 <div class="input-group-addon">seconds</div>
@@ -28,7 +28,7 @@
     <label for="interval" class="col-sm-2 control-label">Interval *</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="interval" 
+            <input type="number" step="1" class="form-control" name="interval" 
                 ng-disabled="!selected._canedit"
                 ng-model="selected.specs.interval" required>
             <div class="input-group-addon">seconds</div>
@@ -38,7 +38,7 @@
     <label for="duration" class="col-sm-2 control-label">Duration *</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="duration" 
+            <input type="number" step="1" class="form-control" name="duration" 
                 ng-disabled="!selected._canedit"
                 ng-model="selected.specs.duration" required>
             <div class="input-group-addon">seconds</div>
@@ -69,10 +69,10 @@
         <label for="window_size" class="col-sm-2 control-label">Window Size</label>
         <div class="col-sm-4">
             <div class="input-group">
-                <input type="text" class="form-control" name="window_size" ng-disabled="!selected._canedit" ng-model="selected.specs.window_size" placeholder="0 (use endpoint host default)">
+                <input type="number" step="1" class="form-control" name="window_size" ng-disabled="!selected._canedit" ng-model="selected.specs.window_size" placeholder="0">
                 <div class="input-group-addon">Bytes</div>
             </div>
-            <p class="help-block">TCP window size (bytes)</p>
+            <p class="help-block">TCP window size (bytes). Set it to 0 to use endpoint host default</p>
         </div>
     </div>
 </div>
@@ -80,7 +80,7 @@
     <label for="random_start_percentage" class="col-sm-2 control-label">Random Start Percentage</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="random_start_percentage" ng-disabled="!selected._canedit" ng-model="selected.specs.random_start_percentage" placeholder="10">
+            <input type="number" step="0.1" class="form-control" name="random_start_percentage" ng-disabled="!selected._canedit" ng-model="selected.specs.random_start_percentage" placeholder="10">
             <div class="input-group-addon">%</div>
         </div>
         <p class="help-block">The percentage to randomize the start time of requests. Valid values are between 0 and 50 (inclusive). Example: interval of 7200 (2 hours) and random_start_percentage 50 means that a test can start anywhere between 1 hour and 3 hours after the previous test completes.</p>
@@ -88,7 +88,7 @@
     <label for="tos_bits" class="col-sm-2 control-label">TOS Bits</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="tos_bits" ng-disabled="!selected._canedit" ng-model="selected.specs.tos_bits">
+            <input type="number" step="1" class="form-control" name="tos_bits" ng-disabled="!selected._canedit" ng-model="selected.specs.tos_bits">
             <div class="input-group-addon">Seconds</div>
         </div>
         <p class="help-block">The type of service to set in the IP header of outgoing packets</p>
@@ -98,7 +98,7 @@
     <label for="buffer_length" class="col-sm-2 control-label">Buffer Length</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="buffer_length" ng-disabled="!selected._canedit" ng-model="selected.specs.buffer_length" placeholder="(system default)">
+            <input type="number" step="1" class="form-control" name="buffer_length" ng-disabled="!selected._canedit" ng-model="selected.specs.buffer_length" placeholder="(system default)">
             <div class="input-group-addon">Bytes</div>
         </div>
         <p class="help-block">Length of read and write buffers</p>
@@ -106,7 +106,7 @@
     <label for="Latest Time" class="col-sm-2 control-label">Latest Time</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="latest_time" ng-disabled="!selected._canedit" ng-model="selected.specs.latest_time">
+            <input type="number" step="1" class="form-control" name="latest_time" ng-disabled="!selected._canedit" ng-model="selected.specs.latest_time">
             <div class="input-group-addon">Seconds</div>
         </div>
         <p class="help-block">The delay in seconds after the test is requested that it is allowed to start. This may be useful on busy hosts where a test cannot be scheduled until further in the future than the default allows. Default: 50% of the interval OR the difference between the interval and duration (whichever is smaller)</p>
@@ -116,7 +116,7 @@
     <label for="report_interval" class="col-sm-2 control-label">Report Interval</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="report_interval" ng-disabled="!selected._canedit" ng-model="selected.specs.report_interval" placeholder="1">
+            <input type="number" step="1" class="form-control" name="report_interval" ng-disabled="!selected._canedit" ng-model="selected.specs.report_interval" placeholder="1">
             <div class="input-group-addon">Seconds</div>
         </div>
         <p class="help-block">The sub-interval at which to report results in seconds.</p>
@@ -124,7 +124,7 @@
     <label for="streams" class="col-sm-2 control-label">Streams</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="streams" ng-disabled="!selected._canedit" ng-model="selected.specs.streams" placeholder="1">
+            <input type="number" step="1" class="form-control" name="streams" ng-disabled="!selected._canedit" ng-model="selected.specs.streams" placeholder="1">
             <div class="input-group-addon">Streams</div>
         </div>
         <p class="help-block">The number of parallel streams to use in the test</p>

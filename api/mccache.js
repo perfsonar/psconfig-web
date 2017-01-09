@@ -81,10 +81,12 @@ function create_hostrec(service, uri, cb) {
             update_date: new Date(),
             //$inc: { count: 1 }, //number of times updated (exists to allow updateTime update)
         };
-        var address = host['host-name'][0]; //could be ip or hostname
-        lookup_addresses(address, function(err, hostname, addresses) {
+        var ip = host['host-name'][0]; //usually ip address
+        var hostname = host['host-name'][1]; //often undefined. if set, it's hostname (always?)
+        if(hostname !== undefined) rec.hostname = hostname;
+        lookup_addresses(ip, function(err, hostname, addresses) {
             if(err) return cb(err); 
-            rec.hostname = hostname;
+            if(hostname) rec.hostname = hostname;
             rec.addresses = addresses;
             cb(null, rec);
         });

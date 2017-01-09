@@ -2,7 +2,7 @@
     <label for="test_interval" class="col-sm-2 control-label">Test Interval *</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="test_interval" 
+            <input type="number" class="form-control" name="test_interval" 
                 ng-disabled="!selected._canedit"
                 ng-model="selected.specs.test_interval" required>
             <div class="input-group-addon">seconds</div>
@@ -12,7 +12,7 @@
     <label for="random_start_percentage" class="col-sm-2 control-label">Random Start Percentage</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="random_start_percentage" 
+            <input type="number" step="0.1" class="form-control" name="random_start_percentage" 
                 ng-disabled="!selected._canedit"
                 ng-model="selected.specs.random_start_percentage" placeholder="10">
             <div class="input-group-addon">%</div>
@@ -24,7 +24,7 @@
     <label for="packet_count" class="col-sm-2 control-label">Packet Count</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="packet_count" 
+            <input type="number" class="form-control" name="packet_count" 
                 ng-disabled="!selected._canedit"
                 ng-model="selected.specs.packet_count">
             <div class="input-group-addon">packets</div>
@@ -34,7 +34,7 @@
     <label for="packet_interval" class="col-sm-2 control-label">Packet Interval</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="packet_interval" 
+            <input type="number" step="0.001" class="form-control" name="packet_interval" 
                 ng-disabled="!selected._canedit"
                 ng-model="selected.specs.packet_interval">
             <div class="input-group-addon">seconds</div>
@@ -47,7 +47,7 @@
     <label for="packet_size" class="col-sm-2 control-label">Packet Size</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="packet_size" 
+            <input type="number" class="form-control" name="packet_size" 
                 ng-disabled="!selected._canedit"
                 ng-model="selected.specs.packet_size">
             <div class="input-group-addon">bytes</div>
@@ -57,7 +57,7 @@
     <label for="packet_ttl" class="col-sm-2 control-label">Packet TTL</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" class="form-control" name="packet_ttl" 
+            <input type="number" class="form-control" name="packet_ttl" 
                 ng-disabled="!selected._canedit"
                 ng-model="selected.specs.packet_ttl">
             <div class="input-group-addon">hops</div>
@@ -78,16 +78,12 @@
         </div>
         <div class="checkbox">
             <label> 
-                <input type="checkbox" name="ipv4_only" 
-                    ng-disabled="!selected._canedit"
-                    ng-model="selected.specs.ipv4_only"> IPv4 Only
+                <input type="checkbox" name="ipv4_only" ng-disabled="!selected._canedit" ng-model="selected.specs.ipv4_only"> IPv4 Only
             </label>
         </div>
         <div class="checkbox">
             <label> 
-                <input type="checkbox" name="ipv6_only" 
-                    ng-disabled="!selected._canedit"
-                    ng-model="selected.specs.ipv6_only"> IPv6 Only
+                <input type="checkbox" name="ipv6_only" ng-disabled="!selected._canedit" ng-model="selected.specs.ipv6_only"> IPv6 Only
             </label>
             <p class="help-block">Forces each side to use IPv4/6. Test will fail if no IPv4/6 address can be determined for either endpoint</p>
         </div>
