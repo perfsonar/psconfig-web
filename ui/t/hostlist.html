@@ -1,6 +1,6 @@
 <ul class="hosts" ng-if="hosts">
     <li ng-repeat="id in hostids">
         <!--<mc-service ls="services.lss[service.lsid]" service="service"></mc-service>-->
-        <b>{{hosts[id].sitename}}</b> <span>{{hosts[id].hostname}}</span>
+        <b>{{hosts[id].sitename}}</b> <span>{{hosts[id].hostname}}</span> <span class="label label-default">{{hosts[id].lsid}}</span>
     </li>
 </ul>

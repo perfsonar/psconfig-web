@@ -98,7 +98,8 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
     $routeProvider.
     when('/about', {
         templateUrl: 't/about.html',
-        controller: 'AboutController'
+        controller: 'AboutController',
+        requiresLogin: true,
     })
     .when('/testspecs/:id?', {
         templateUrl: 't/testspecs.html',
@@ -113,11 +114,13 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
 
     .when('/configs/:id?', {
         templateUrl: 't/configs.html',
-        controller: 'ConfigsController'
+        controller: 'ConfigsController',
+        requiresLogin: true,
     })
     .when('/hosts/:id?', {
         templateUrl: 't/hosts.html',
-        controller: 'HostsController'
+        controller: 'HostsController',
+        requiresLogin: true,
     })
     .otherwise({
         redirectTo: '/configs'
