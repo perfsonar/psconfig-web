@@ -112,18 +112,21 @@ function get_hostinfo(host) {
     for(var key in host) {
         var v = host[key];
 
+        //ignore some things
         if(key == "host-administrators") continue;
         if(key == "host-net-interfaces") continue;
         if(key == "host-name") continue;
         
+        //store all (ps)hosts- things
         ["host-", "pshost-"].forEach(function(prefix) {
             var p = key.indexOf(prefix);
-            if(p === 0) {
-                //var ikey = key.substr(prefix.length);
-                //ikey = ikey.replace(/-/g, '_');
-                info[key] = v[0];
-            }
+            if(p === 0)  info[key] = v[0];
         });
+
+        //also add extra things
+        if(key == "simulated") {
+            info.simulated = true;
+        }
     }
     return info;
 }
@@ -244,7 +247,6 @@ function update_dynamic_hostgroup(cb) {
 }
 
 function run(cb) {
-    logger.info("starting slscache------------------------------------------------------------------------------");
 
     //mca host records keyed by uri (hostname could duplicate)
     //hostname found first will take precedence
@@ -252,7 +254,8 @@ function run(cb) {
     var hosts = {}; 
 
     //go through each LS
-    async.forEachOf(config.datasource.lses, function(service, id, next) {
+    async.eachOfSeries(config.datasource.lses, function(service, id, next) {
+        logger.info("processing datasource:"+id+"................................................................................");
         switch(service.type) {
         case "sls":
             cache_ls(hosts, service, id, next);
@@ -270,22 +273,22 @@ function run(cb) {
         async.eachOfSeries(hosts, function(host, id, next) {
             if(!host) return next(); //ignore null host
             if(host.info.simulated) {
-                //only update if non-simulated record doesn't exist already
-                db.Host.findOneAndUpdate({
+                //simulate record is only entered if absolutely needed
+                db.Host.findOne({
                     hostname: host.hostname, 
-                    'info.simulated': {$exists: false}
-                }, {$set: host}, {upsert: true, setDefaultsOnInsert: true}, function() {
-                    next();
+                }, function(err, _host) {
+                    if(_host) {
+                        //if existing record exits, we need to be careful
+                        if(_host.info.simulated) db.Host.update({hostname: host.hostname}, {$set: host}, next);
+                        else next(null); //non simulated one already exists.. ignore this update
+                    } else {
+                        //insert the simulated record for the first time
+                        var rec = new db.Host(host);
+                        rec.save(next);
+                    }
                 });
             } else {
-                
-                /*
-                if(host.hostname == "psmsu01.aglt2.org") {
-                    console.dir(host);
-                }
-                */
-                //
-                //update with hostname
+                //update the same hostname
                 db.Host.findOneAndUpdate({
                     hostname: host.hostname
                 }, {$set: host}, {upsert: true, setDefaultsOnInsert: true}, function() {

@@ -42,7 +42,7 @@ var hostSchema = mongoose.Schema({
    
     /////////////////////////////////////////////////////////////////////////////////////////..
     //key
-    hostname: {type: String, index: true}, //client-uuid
+    hostname: {type: String, index: true}, 
 
     uuid: String,
     sitename: String,
