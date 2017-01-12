@@ -1,26 +1,27 @@
 #!/usr/bin/node
 'use strict';
 
-var fs = require('fs');
-var dns = require('dns');
-var net = require('net');
-var winston = require('winston');
-var async = require('async');
-var request = require('request');
+const fs = require('fs');
+const dns = require('dns');
+const net = require('net');
+const winston = require('winston');
+const async = require('async');
+const request = require('request');
+const assert = require('assert');
 
 //mine
-var config = require('./config');
-var logger = new winston.Logger(config.logger.winston);
-var db = require('./models');
-var common = require('./common');
+const config = require('./config');
+const logger = new winston.Logger(config.logger.winston);
+const db = require('./models');
+const common = require('./common');
 
 db.init(function(err) {
     if(err) throw err;
     logger.info("connected to db");
-    //wait_for_mcadmin();
-    start(function(err) {
+    run(function(err) {
         if(err) throw err;
-        console.log("started cache services");
+        logger.info("finished caching .. sleeping for an hour");
+        setTimeout(run, 1000*3600);
     });
 });
 
@@ -64,7 +65,6 @@ function create_hostrec(service, uri, cb) {
         if(err) return cb(err);
         if(res.statusCode != 200) return cb(new Error("failed to cache host from:"+url+" statusCode:"+res.statusCode));
         var rec = {
-            uuid: host['client-uuid'][0],
             sitename: host['location-sitename'][0],
             info: get_hostinfo(host),
             location: get_location(host),
@@ -79,8 +79,11 @@ function create_hostrec(service, uri, cb) {
             admins: [],
 
             update_date: new Date(),
-            //$inc: { count: 1 }, //number of times updated (exists to allow updateTime update)
         };
+
+        //toolkit v<3.5 didn't have client-uuid
+        if(host['client-uuid']) rec.uuid = host['client-uuid'][0];
+
         var ip = host['host-name'][0]; //usually ip address
         var hostname = host['host-name'][1]; //often undefined. if set, it's hostname (always?)
         if(hostname !== undefined) rec.hostname = hostname;
@@ -125,40 +128,40 @@ function get_hostinfo(host) {
     return info;
 }
 
-function cache_ls(ls, lsid, cb) {
+function cache_ls(hosts, ls, lsid, cb) {
     logger.debug("caching ls:"+lsid+" from "+ls.url);
     request({url: ls.url, timeout: 1000*10, json: true}, function(err, res, services) {
         if(err) return cb(err);
         if(res.statusCode != 200) return cb(new Error("failed to cahce service from:"+ls.url+" statusCode:"+res.statusCode));
 
-        var hosts = {};  //keyed by uuid
-        function get_host(uuid, service, _cb) {
-            if(hosts[uuid] !== undefined) return _cb(null, hosts[uuid]);              
-            logger.debug("creating hostrecord for uuid"+uuid);
+        function get_host(uri, service, _cb) {
+            if(hosts[uri] !== undefined) return _cb(null, hosts[uri]);              
             create_hostrec(service, res.request.uri, function(err, host) {
                 if(err) {
-                    hosts[uuid] = null; //make it null to signal we failed to create hostrec for this
+                    logger.error("failed to create hostrecord from following service");
+                    logger.error(service);
+                    hosts[uri] = null; //make it null to signal we failed to create hostrec for this
                     return _cb(err);
                 }
+                logger.debug("new hostrecord for uri:"+uri+" hostname:"+host.hostname);
                 host.lsid = lsid;
-                hosts[uuid] = host;
-                //logger.debug("adding "+uuid+" -----------------------------------------------------------------------");
+                hosts[uri] = host;
                 _cb(null, host);
             });
         }
 
-        //populate hosts
+        //go through each services
         async.eachSeries(services, function(service, next) {
-            //ignore record with no client-uuid (probably old toolkit instance?)
-            if(service['client-uuid'] === undefined) {
-                logger.error("client-uuid not set (old toolkit instance?) - skipping");
-                logger.error(service);
-                return next();//continue to next service
-            }
-            var uuid = service['client-uuid'][0]; 
-            //logger.debug("caching service:"+service['service-locator'][0] + " on "+uuid);
-
-            get_host(uuid, service, function(err, host) {
+            //pick client-uuid or service-host(for old version of toolkit) as host id
+            var id;
+            if(!service['client-uuid']) {
+                if(!service['service-host']) {
+                    logger.error("client-uuid nor service-host is set.. can't process this service");
+                    logger.error(JSON.stringify(service, null, 4));
+                    return next();
+                } else id = service['service-host'][0];
+            } else id = service['client-uuid'][0]; 
+            get_host(id, service, function(err, host) {
                 if(err) {
                     logger.error(err);
                     return next(); //continue
@@ -172,50 +175,29 @@ function cache_ls(ls, lsid, cb) {
                 host.services.forEach(function(_service) {
                     if(_service.type == type) exist = true;
                 });
-                if(exist) {
-                    logger.error("duplicate service for type:"+type+" uuid:"+uuid);
-                    return next();
+                if(!exist) {
+                    //construct service record
+                    host.services.push({
+                        type: type,
+                        name: service['service-name'][0],
+                        locator: service['service-locator'][0], //locator is now a critical information needed to generate the config
+                        //lsid: lsid, //make it easier for ui
+
+                        sitename: service['location-sitename'][0],
+                        
+                        //TODO - I need to query the real admin records from the cache (gocdb2sls service already genenrates contact records)
+                        //I just have to store them in our table
+                        //admins: service['service-administrators'],
+                        //$inc: { count: 1 }, //number of times updated (exists to allow updateTime update)
+                    });
                 }
-                
-                //construct service record
-                host.services.push({
-                    //client_uuid: uuid,
-                    //uuid: uuid+'.'+service['service-type'][0],
-                    type: type,
-                    name: service['service-name'][0],
-                    locator: service['service-locator'][0], //locator is now a critical information needed to generate the config
-                    //lsid: lsid, //make it easier for ui
-
-                    sitename: service['location-sitename'][0],
-                    //location: get_location(service),
-                    
-                    //TODO - I need to query the real admin records from the cache (gocdb2sls service already genenrates contact records)
-                    //I just have to store them in our table
-                    //admins: service['service-administrators'],
-                    //$inc: { count: 1 }, //number of times updated (exists to allow updateTime update)
-                });
-
-
-
                 next();
             });
-        }, function(err) {
-            if(err) return cb(err);
-            //console.log(JSON.stringify(hosts, null, 4));
-            async.eachOfSeries(hosts, function(host, uuid, next) {
-                if(!host) return next(); //ignore null host
-                db.Host.findOneAndUpdate({uuid: uuid}, {$set: host}, {upsert: true, setDefaultsOnInsert: true}, function() {
-                    next();
-                });
-            }, function(err) {
-                logger.info("updated "+services.length+" services for "+ls.label+" from "+ls.url + " hosts:"+hosts.length);
-                cb();
-            });
-        });
+        }, cb);
     })
 }
 
-function cache_global_ls(service, id, cb) {
+function cache_global_ls(hosts, service, id, cb) {
     //load activehosts.json
     request(service.activehosts_url, {timeout: 1000*5}, function(err, res, body) {
         if(err) return cb(err);
@@ -230,7 +212,7 @@ function cache_global_ls(service, id, cb) {
                 }
                 //massage the service url so that I can use cache_ls to do the rest
                 service.url = host.locator+service.query;
-                cache_ls(service, id, next);
+                cache_ls(hosts, service, id, next);
             }, cb); 
         } catch (e) {
             //couldn't parse activehosts json..
@@ -261,40 +243,64 @@ function update_dynamic_hostgroup(cb) {
     });
 }
 
-function start(cb) {
+function run(cb) {
     logger.info("starting slscache------------------------------------------------------------------------------");
-    async.forEachOf(config.datasource.services, function(service, id, next) {
-        function run_cache_ls(_next) {
-            cache_ls(service, id, function(err) {
-                if(err) logger.error(err);
-                logger.debug("done processing private ls");
-                update_dynamic_hostgroup(_next);
-            }); 
-        }
 
-        function run_cache_global_ls(_next) {
-            cache_global_ls(service, id, function(err) {
-                if(err) logger.error(err);
-                logger.debug("done processing global ls");
-                update_dynamic_hostgroup(_next);
-            }); 
-        }
+    //mca host records keyed by uri (hostname could duplicate)
+    //hostname found first will take precedence
+    //host.simulated will have less precedence
+    var hosts = {}; 
 
-        var timeout = service.cache || 60*30*1000; //default to 30 minutes
+    //go through each LS
+    async.forEachOf(config.datasource.lses, function(service, id, next) {
         switch(service.type) {
         case "sls":
-            setInterval(run_cache_ls, timeout);
-            run_cache_ls(next); //first time
+            cache_ls(hosts, service, id, next);
             break;
         case "global-sls":
-            setInterval(run_cache_global_ls, timeout);
-            run_cache_global_ls(next); //first time
+            cache_global_ls(hosts, service, id, next);
             break;
         default:
             logger.error("unknown datasource/service type:"+service.type);
         }
+    }, function(err) {
+        if(err) logger.error(err); //continue
 
-    }, cb);
+        //then update if
+        async.eachOfSeries(hosts, function(host, id, next) {
+            if(!host) return next(); //ignore null host
+            if(host.info.simulated) {
+                //only update if non-simulated record doesn't exist already
+                db.Host.findOneAndUpdate({
+                    hostname: host.hostname, 
+                    'info.simulated': {$exists: false}
+                }, {$set: host}, {upsert: true, setDefaultsOnInsert: true}, function() {
+                    next();
+                });
+            } else {
+                
+                /*
+                if(host.hostname == "psmsu01.aglt2.org") {
+                    console.dir(host);
+                }
+                */
+                //
+                //update with hostname
+                db.Host.findOneAndUpdate({
+                    hostname: host.hostname
+                }, {$set: host}, {upsert: true, setDefaultsOnInsert: true}, function() {
+                    next();
+                });
+            }
+        }, function(err) {
+            if(err) logger.error(err);
+            logger.info("updated "+Object.keys(hosts).length+" hosts");
+            
+            //lastly, update dynamic host
+            update_dynamic_hostgroup(cb);
+        });
+        
+    });
 }
 
 

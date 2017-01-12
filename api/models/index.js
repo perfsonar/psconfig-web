@@ -42,11 +42,10 @@ var hostSchema = mongoose.Schema({
    
     /////////////////////////////////////////////////////////////////////////////////////////..
     //key
-    uuid: {type: String, index: true}, //client-uuid
+    hostname: {type: String, index: true}, //client-uuid
 
+    uuid: String,
     sitename: String,
-
-    hostname: String, //fqdn (should this be unique?)
     
     //stores ip address resolved from the hostname using dns.resolve
     addresses: [

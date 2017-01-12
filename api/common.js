@@ -1,13 +1,12 @@
 
-//contrib
-var request = require('request');
-var winston = require('winston');
-var Sandbox = require('sandbox'); //https://github.com/gf3/sandbox
+const request = require('request');
+const winston = require('winston');
+const Sandbox = require('sandbox'); //https://github.com/gf3/sandbox
 
 //mine
-var config = require('./config');
-var logger = new winston.Logger(config.logger.winston);
-var db = require('./models');
+const config = require('./config');
+const logger = new winston.Logger(config.logger.winston);
+const db = require('./models');
 
 exports.profile = {
     getall: function(cb) { 

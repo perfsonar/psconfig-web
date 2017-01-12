@@ -76,13 +76,9 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
     */
 });
 
-router.put('/:uuid', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    var uuid = req.params.uuid;
-    //var newhost = req.body._detail;
-    //if(!~req.user.scopes.mca.indexOf('admin')) return res.status(401).end();
-
+router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     //update host info
-    db.Host.findById(uuid).then(function(host) {
+    db.Host.findById(req.params.id).then(function(host) {
         if(!host) return res.status(404).end();
         if(!canedit(req.user, host)) return res.status(401).end();
 
@@ -92,27 +88,6 @@ router.put('/:uuid', jwt({secret: config.admin.jwt.pub}), function(req, res, nex
         host.services = req.body.services; //should restrict to just MAs?
         host.save().then(function() {
             res.json({status: "ok"});
-            /*
-            //update ma pointers for each child services
-            db.Service.findAll({
-                where: {client_uuid: uuid},
-            }).then(function(services) {
-                req.body.services.forEach(function(_service) {
-                    //find the service record to update
-                    services.forEach(function(service) {
-                        if(service.id == _service.id) service.ma = _service.ma;
-                    });
-                });
-                //and save all
-                async.each(services, function(service, next) {
-                    service.save().then(function() {
-                        next();
-                    }); 
-                }, function(err) {
-                    res.json({status: "ok"});
-                }); 
-            });
-            */
         });
     });
 });

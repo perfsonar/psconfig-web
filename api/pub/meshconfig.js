@@ -44,6 +44,7 @@ function resolve_ma(host, next) {
     host.services.forEach(function(service) {
         if(service.type == "ma") local_ma = service;
     });
+    
     //replace ma with the actual ma service
     async.eachSeries(host.services, function(service, next_service) {
         if(!service.ma || service.ma == host._id) {
@@ -126,7 +127,7 @@ function generate_mainfo(service) {
 //synchronous function to construct meshconfig from admin config
 exports.generate = function(config, opts, cb) {
 
-    //catalog of all hosts referenced in member groups keyed by uuid
+    //catalog of all hosts referenced in member groups keyed by _id
     var host_catalog = {}; 
 
     //resolve all db entries first
@@ -140,7 +141,7 @@ exports.generate = function(config, opts, cb) {
                 resolve_hostgroup(test.agroup, function(err, hosts) {
                     if(err) return next(err);
                     test.agroup = hosts;
-                    hosts.forEach(function(host) { host_catalog[host.uuid] = host; });
+                    hosts.forEach(function(host) { host_catalog[host._id] = host; });
                     next();
                 });
             },
@@ -151,7 +152,7 @@ exports.generate = function(config, opts, cb) {
                     if(err) return next(err);
                     resolve_hosts(res.recs, function(err, hosts) {
                         test.bgroup = hosts;
-                        hosts.forEach(function(host) { host_catalog[host.uuid] = host; });
+                        hosts.forEach(function(host) { host_catalog[host._id] = host; });
                         next();
                     });
                 });
@@ -161,7 +162,7 @@ exports.generate = function(config, opts, cb) {
                 resolve_hosts(test.nahosts, function(err, hosts) {
                     if(err) return next(err);
                     test.nahosts = hosts;
-                    hosts.forEach(function(host) { host_catalog[host.uuid] = host; });
+                    hosts.forEach(function(host) { host_catalog[host._id] = host; });
                     next();
                 });
             },
@@ -171,7 +172,7 @@ exports.generate = function(config, opts, cb) {
                 resolve_host(test.center, function(err, host) {
                     if(err) return next(err);
                     test.ceneter = host;
-                    host_catalog[host.uuid] = host;
+                    host_catalog[host._id] = host;
                     next();
                 });
             },
@@ -211,8 +212,8 @@ exports.generate = function(config, opts, cb) {
         };
 
         //register sites(hosts)
-        for(var uuid in host_catalog) {
-            var _host = host_catalog[uuid];
+        for(var id in host_catalog) {
+            var _host = host_catalog[id];
             var host = {
                 //administrators: [], //TODO host admins
                 addresses: [ _host.hostname ], 
@@ -230,6 +231,7 @@ exports.generate = function(config, opts, cb) {
                 if(opts.ma_override) service.ma = {
                     locator: opts.ma_override
                 }
+                //service.ma is already resolved.. (local vs. remote)
                 if(service.ma) {
                     host.measurement_archives.push(generate_mainfo(service));
                 } else {
@@ -245,36 +247,6 @@ exports.generate = function(config, opts, cb) {
                 //description: _host.sitename //needed?
             };
             org.sites.push(site);
-            //console.log(JSON.stringify(site, null, 4));
-
-            /*
-            if(hosts[service.client_uuid]) {
-                var host = hosts[service.client_uuid];
-                if(!~host.addresses.indexOf(_address)) host.addresses.push(_address);
-                if(service.MA) host.measurement_archives.push(generate_mainfo(service));
-                host.description += "/"+service.type; //service.name;
-            } else {
-                var host = {
-                    //administrators: [], //TODO host admins
-                    addresses: [ _address ], 
-                    measurement_archives: [ ], 
-                    //description: service.name,
-                    description: service.sitename+' '+service.type,
-                    toolkit_url: service.Host.toolkit_url,//"auto",
-                };
-                if(service.Host.no_agent) host.no_agent = 1;
-                if(service.MA) host.measurement_archives.push(generate_mainfo(service));
-                hosts[service.client_uuid] = host;
-
-                var site = {
-                    hosts: [ host ],
-                    //administrators: [], //TODO site admins (not needed?)
-                    location: service.location,
-                    description: service.sitename
-                };
-                org.sites.push(site);
-            }
-            */
         }
         mc.organizations.push(org);
 
