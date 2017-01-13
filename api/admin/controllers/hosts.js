@@ -15,7 +15,7 @@ var common = require('../../common');
 
 function canedit(user, host) {
     if(user) {
-        if(~user.scopes.mca.indexOf('admin')) {
+        if(user.scopes.mca && ~user.scopes.mca.indexOf('admin')) {
             return true;
         }
         if(~host.admins.indexOf(user.sub)) { //TODO not tested yet
@@ -29,16 +29,6 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
     var find = {};
     if(req.query.find) find = JSON.parse(req.query.find);
 
-    /*
-    //handling user_id.
-    if(!req.user.scopes.sca || !~req.user.scopes.sca.indexOf("admin") || find.user_id === undefined) {
-        //non admin, or admin didn't set user_id
-        find.user_id = req.user.sub;
-    } else if(find.user_id == null) {
-        //admin can set it to null and remove user_id filtering all together
-        delete find.user_id;
-    }
-    */
     db.Host.find(find)
     .select(req.query.select)
     .limit(req.query.limit || 100)
@@ -58,22 +48,6 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
             res.json({hosts: hosts, count: count});
         });
     });
-
-    /*
-    db.Host.findAll({raw: true}).then(function(_recs) {
-        var recs = [];
-        _recs.forEach(function(rec) {
-            rec._canedit = false;
-            if(req.user) {
-                if(~req.user.scopes.mca.indexOf('admin')) {
-                    rec._canedit = true;
-                }
-            }
-            recs.push(rec);
-        });
-        res.json(recs);
-    });
-    */
 });
 
 router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {

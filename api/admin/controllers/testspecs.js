@@ -14,7 +14,7 @@ var db = require('../../models');
 
 function canedit(user, testspec) {
     if(user) {
-        if(~user.scopes.mca.indexOf('admin')) {
+        if(user.scopes.mca && ~user.scopes.mca.indexOf('admin')) {
             return true;
         }
         if(~testspec.admins.indexOf(user.sub)) {
@@ -88,10 +88,9 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
 });
 
 router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    if(!~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
+    if(!req.user.scopes.mca || !~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
     db.Testspec.create(req.body, function(err, testspec) {
         if(err) return next(err);
-        //res.json({status: "ok", _canedit: canedit(req.user, testspec), id: testspec.id});
         testspec = JSON.parse(JSON.stringify(testspec));
         testspec._canedit = canedit(req.user, testspec);
         res.json(testspec);

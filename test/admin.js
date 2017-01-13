@@ -1,55 +1,59 @@
 
 //contrib
-var request = require('supertest');
-var assert = require('assert');
-var jwt = require('jsonwebtoken');
-var chai = require('chai');
+const request = require('supertest');
+const assert = require('assert');
+const jwt = require('jsonwebtoken');
+const chai = require('chai');
 
 //mine
-var server = require('../admin/server');
-var config = require('../config');
+const server = require('../api/admin/server');
+const config = require('../api/config');
+const db = require('../api/models');
 
-var user = jwt.decode(config.test.user_jwt);
-var admin = jwt.decode(config.test.admin_jwt);
+const user = jwt.decode(config.test.user_jwt);
+const admin = jwt.decode(config.test.admin_jwt);
 
-describe('rest', function() {
-    describe('#testspecs', function () {
-        /*
-        it('check', function (done) {
-            request(server.app)
-            .get('/testspecs/check')
-            .expect(200, {test: 'hello'}, done);
+describe('admin', function() {
+    before(function(done) {
+        db.init(done); 
+    });
+
+    it('return 200', function(done) {
+        request(server.app)
+        .get('/health')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/) 
+        .end(function(err, res) {
+            if (err) throw err;
+            assert(res.body.status == "ok", "status is not ok");
+            done();
         });
-        */
+    });
+
+    describe('#testspecs', function () {
         var testspec = {
-            desc: 'updated by admin',
             service_type: 'owamp',
-            desc: 'this is a test - updated',
+            desc: 'updated by admin',
             specs: {
                 test1: 'hello',
                 test2: 'world',
                 test3: 'another',
                 test4: 'shouldn happen',
             },
-            admins: [{sub: user.sub}],
+            admins: [user.sub],
         };
 
-        it('add a test testspec', function (done) {
+        it('add a testspec', function (done) {
             request(server.app)
             .post('/testspecs')
             .send(testspec)
             .set('Authorization', 'Bearer '+config.test.user_jwt)
-            /*
-            .expect(function(res) {
-                assert(res.body.status == 'ok');
-            })
-            */
-            //.expect(200, {status: 'ok'})
+            .expect(200)
             .end(function(err, res) {
                 if(err) throw err;
-                assert(res.body.status == 'ok');
-                testspec.id = res.body.testspec.id;
-                testspec.createdAt = res.body.testspec.createdAt;
+                assert(res.body.desc == testspec.desc);
+                testspec._id = res.body._id;
+                testspec.create_date = res.body.create_date;
                 done();
             });
         });

@@ -14,7 +14,7 @@ mongoose.Promise = global.Promise;
 
 exports.init = function(cb) {
     mongoose.connect(config.mongodb, {
-        server: { auto_reconnect: true }
+        server: { auto_reconnect: true, reconnectTries: Number.MAX_VALUE}
     }, function(err) {
         if(err) return cb(err);
         logger.info("connected to mongo");

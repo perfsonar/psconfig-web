@@ -4,8 +4,8 @@ var assert = require('assert');
 var chai = require('chai');
 
 //mine
-var config = require('../config');
-var filter = require('../common').filter;
+var config = require('../api/config');
+var filter = require('../api/common').filter;
 
 describe('filter', function() {
     describe('#hostgroup', function () {

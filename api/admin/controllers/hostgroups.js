@@ -15,7 +15,7 @@ const common = require('../../common');
 
 function canedit(user, hostgroup) {
     if(user) {
-        if(~user.scopes.mca.indexOf('admin')) {
+        if(user.scopes.mca && ~user.scopes.mca.indexOf('admin')) {
             return true;
         }
         if(~hostgroup.admins.indexOf(user.sub)) {
@@ -98,7 +98,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
 });
 
 router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    if(!~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
+    if(!req.user.scopes.mca || !~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
     db.Hostgroup.create(req.body, function(err, hostgroup) {
         if(err) return next(err);
         hostgroup = JSON.parse(JSON.stringify(hostgroup));
@@ -109,19 +109,11 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
 
 router.get('/dynamic', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     //TODO - let's allow anyone who is logged in.. (should limit more?)
-    //if(!~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
+    //if(!req.user.scopes.mca || !~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
     common.dynamic.resolve(req.query.js, req.query.type, function(err, resp) {
         if(err) return next(err);
         res.json(resp);
     });
-    /*
-    db.Hostgroup.create(req.body, function(err, hostgroup) {
-        if(err) return next(err);
-        hostgroup = JSON.parse(JSON.stringify(hostgroup));
-        hostgroup._canedit = canedit(req.user, hostgroup);
-        res.json(hostgroup);
-    });
-    */
 });
 
 module.exports = router;
