@@ -1,41 +1,52 @@
 
-app.controller('HostsController', function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hosts, $modal, $routeParams) {
+app.controller('HostsController', function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hosts, $modal, $routeParams, users) {
     scaMessage.show(toaster);
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
     $scope.appconf = appconf;
     $scope.active_menu = "hosts";
 
     $scope.loading = true;
-    hosts.getAll().then(function(_hosts) {
-        $scope.hosts = _hosts;
 
-        //create _id>host mapping
-        $scope.hosts_o = {};
-        _hosts.forEach(function(host) {
-            $scope.hosts_o[host._id] = host;
-        });
+    //load users for admin
+    users.getAll().then(function(_users) {
 
-        $scope.loading = false;
+        $scope.users = _users;
+        hosts.getAll().then(function(_hosts) {
+            $scope.hosts = _hosts;
 
-        //select specified host
-        if($routeParams.id) {
+            //create _id>host mapping
+            $scope.hosts_o = {};
             _hosts.forEach(function(host) {
-                if(host._id == $routeParams.id) $scope.select(host);
+                $scope.hosts_o[host._id] = host;
             });
-        } else $scope.select(_hosts[0]); //select first one then
+
+            $scope.loading = false;
+
+            //select specified host
+            if($routeParams.id) {
+                _hosts.forEach(function(host) {
+                    if(host._id == $routeParams.id) $scope.select(host);
+                });
+            } else $scope.select(_hosts[0]); //select first one then
+        });
     });
+
+    hosts.getMAs().then(function(hosts) { $scope.mas = hosts; });
 
     $scope.selected = null;
     $scope.select = function(host) {
         $scope.selected = host;
         hosts.getDetail(host).then(function(_host) {
-            //console.log("loaded");
+            /*
             //find ma service
             _host.services.forEach(function(service) {
                 if(service.type == "ma") _host._default_ma = service;
             });    
+            */
+            find_missing_services();    
         });
 
+        //hide subbar if shown
         if($(".subbar").hasClass("subbar-shown")) {
             $(".subbar").removeClass("subbar-shown");
         }
@@ -43,6 +54,33 @@ app.controller('HostsController', function($scope, appconf, toaster, $http, serv
         $location.update_path("/hosts/"+host._id);
         window.scrollTo(0,0);
     }
+
+    function find_missing_services() {
+        //find service that are not yet added
+        $scope.missing_services = [];
+        for(var id in $scope.serverconf.service_types) {
+            //see if this service is already registered
+            var missing = true;
+            $scope.selected.services.forEach(function(used_service) {
+                if(used_service.type == id) missing = false;
+            }); 
+            if(missing) $scope.missing_services.push({
+                id: id, 
+                label: $scope.serverconf.service_types[id].label,
+            });
+        }
+    }
+
+    $scope.addservice = function() {
+        $scope.selected.services.push({
+            type: $scope.addservice_item.id,
+            name: "tdb..", //TODO is service name used? maybe I should deprecate?
+            locator: "",
+        });
+        find_missing_services();    
+        $scope.addservice_item = null;
+    }
+
     /*
     var mas = {};
     services.then(function(_services) { 
@@ -82,16 +120,9 @@ app.controller('HostsController', function($scope, appconf, toaster, $http, serv
     }
     */
 
+    /*
     $scope.edit = function(host) {
         var _host = angular.copy(host);
-
-        /*
-        _host.default_ma = null;
-        scope.services.forEach(function(service) {
-            if(service.client_uuid == _host.uuid) _host.default_ma = service;
-        });
-        */
-        
         var modal = $modal.open({
             animation: true,
             templateUrl: 't/host.html',
@@ -110,6 +141,7 @@ app.controller('HostsController', function($scope, appconf, toaster, $http, serv
             //failed?
         });
     }
+    */
 });
 
 app.controller('HostModalController', function($scope, appconf, toaster, $http, $modalInstance, host, hosts) {

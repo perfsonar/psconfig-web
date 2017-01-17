@@ -70,6 +70,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
         //only superadmin or admin of this test spec can update
         if(canedit(req.user, config)) {
             config.url = req.body.url;            
+            config.name = req.body.name;            
             config.desc = req.body.desc;            
             config.tests = req.body.tests;            
             config.admins = req.body.admins;            

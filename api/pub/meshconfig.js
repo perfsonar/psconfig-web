@@ -194,7 +194,7 @@ exports.generate = function(config, opts, cb) {
             organizations: [],
             tests: [],
             administrators: [],
-            description: config.desc,
+            description: config.name + " / " + config.desc,
             //_debug: config //debug
         };
     
@@ -281,7 +281,7 @@ exports.generate = function(config, opts, cb) {
             mc.tests.push({
                 members: members,
                 parameters: parameters,
-                description: test.desc,
+                description: test.name,
             });
         });
 

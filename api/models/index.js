@@ -44,7 +44,7 @@ var hostSchema = mongoose.Schema({
     //key
     hostname: {type: String, index: true}, 
 
-    uuid: String,
+    uuid: String, //this is now much less important..(maybe I should deprecate?)
     sitename: String,
     
     //stores ip address resolved from the hostname using dns.resolve
@@ -75,6 +75,8 @@ var hostSchema = mongoose.Schema({
     lsid: String,  //source LS instance (mainly to help ui)
     url: String, //source ls url
 
+    adhoc: {type: Boolean, default: false }, //data from sls is not adhoc unless it's simulated
+
     create_date: {type: Date, default: Date.now},
     update_date: {type: Date, default: Date.now},
 });
@@ -92,6 +94,7 @@ exports.Host = mongoose.model('Host', hostSchema);
 
 var hostgroupSchema = mongoose.Schema({
     service_type: String,
+    name: String,
     desc: String,
     type: { type: String, default: 'static' },
 
@@ -111,6 +114,7 @@ exports.Hostgroup = mongoose.model('Hostgroup', hostgroupSchema);
 
 var testspecSchema = mongoose.Schema({
     service_type: String,
+    name: String,
     desc: String,
     specs: mongoose.Schema.Types.Mixed,
 
@@ -125,6 +129,7 @@ exports.Testspec = mongoose.model('Testspec', testspecSchema);
 //test is now part of config
 var testSchema = mongoose.Schema({
     service_type: String,
+    name: String,
     desc: String,
 
     mesh_type: String,
@@ -141,6 +146,7 @@ var testSchema = mongoose.Schema({
 
 var configSchema = mongoose.Schema({
     url: { type: String, unique: true }, //url used by publish config
+    name: String,
     desc: String,
 
     tests: [ testSchema ],

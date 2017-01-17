@@ -13,8 +13,8 @@
     <label class="col-sm-2 control-label">Test Name</label>
     <div class="col-sm-10">
         <input type="text" class="form-control" 
-            ng-model="test.desc" 
-            placeholder="Enter test name / description" 
+            ng-model="test.name" 
+            placeholder="Enter test name" 
             ng-disabled="!selected._canedit" required>
     </div>
 </div>
@@ -61,7 +61,7 @@
             ng-model="test.agroup" 
             ng-disabled="!selected._canedit" required>
             <option value="">(Select Host Group)</option>
-            <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group._id}}">{{group.desc}}</option>
+            <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group._id}}">{{group.name}}</option>
         </select>
         <div ng-if="test.agroup">
             <div ng-if="gethostgroup(test.agroup).type == 'static'"
@@ -84,7 +84,7 @@
             ng-model="test.bgroup" 
             ng-disabled="!selected._canedit" required>
             <option value="">(Select Host Group)</option>
-            <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group._id}}">{{group.desc}}</option>
+            <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group._id}}">{{group.name}}</option>
         </select>
         <div ng-if="test.bgroup">
             <div ng-if="gethostgroup(test.bgroup).type == 'static'"
@@ -122,10 +122,10 @@
     <div class="col-sm-10">
         <select class="form-control" ng-model="test.testspec" ng-disabled="!selected._canedit" required>
             <option value="">(Select Test Spec)</option>
-            <option ng-repeat="spec in testspecs | filter:{service_type:test.service_type}" value="{{spec._id}}">{{spec.desc}} </option>
+            <option ng-repeat="spec in testspecs | filter:{service_type:test.service_type}" value="{{spec._id}}">{{spec.name}} </option>
         </select>
         <div class="well well-sm well-detail" ng-if="test.testspec">
-            <mc-specs specs="getselectedtestspec(test).specs"></mc-specs>
+            <mc-specs readonly="true" specs="getselectedtestspec(test).specs"></mc-specs>
         </div>
     </div>
 </div>

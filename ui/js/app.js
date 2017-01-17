@@ -46,7 +46,7 @@ app.directive('ngConfirmClick', [
 ])
 
 //http://stackoverflow.com/questions/14852802/detect-unsaved-changes-and-alert-user-using-angularjs
-app.directive('confirmOnExit', function() {
+app.directive('confirmOnExit', function($window, $location) {
     return {
         //scope: { form: '=', },
         link: function($scope, elem, attrs) {
@@ -59,10 +59,11 @@ app.directive('confirmOnExit', function() {
                 if ($scope.form.$dirty) {
                     if(!confirm("Do you want to abondon unsaved changes?")) {
                         event.preventDefault();
+                        //TODO controller might have already changed selected item on the menu.. 
+                        //I somehow need to revert, but not sure how..
                     } else {
                         $scope.form.$setPristine();
-                        
-                        //TODO - I should revert the form content to previous state.. but that requires a bit more coding
+                        $window.location.reload();  //to load previous content
                     }
                 }
             });

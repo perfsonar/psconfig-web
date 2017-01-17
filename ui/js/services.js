@@ -68,7 +68,7 @@ app.factory('hosts', function(appconf, $http, toaster) {
         //return basic (uuid, sitename, hostname, lsid) host info for all hosts
         getAll: function(opts) { 
             //if(all_promise) return all_promise;
-            var select = "sitename hostname lsid";
+            var select = "sitename hostname lsid adhoc";
             if(opts && opts.select) select = opts.select;
             return $http.get(appconf.api+'/hosts?select='+select+'&sort=sitename hostname&limit=100000')
             .then(function(res) {
@@ -186,7 +186,7 @@ app.factory('configs', function(appconf, $http, toaster, jwtHelper) {
         //return basic (uuid, sitename, hostname, lsid) config info for all configs
         getAll: function(opts) { 
             //if(all_promise) return all_promise;
-            var select = "url desc admins tests create_date";
+            var select = "url name desc admins tests create_date";
             if(opts && opts.select) select = opts.select;
             return $http.get(appconf.api+'/configs?select='+select+'&sort=desc&limit=100000')
             .then(function(res) {

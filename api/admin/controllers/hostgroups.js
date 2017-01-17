@@ -79,6 +79,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
         //only superadmin or admin of this test spec can update
         if(canedit(req.user, hostgroup)) {
             hostgroup.service_type = req.body.service_type;
+            hostgroup.name = req.body.name;
             hostgroup.desc = req.body.desc;
             hostgroup.type = req.body.type; 
             hostgroup.hosts = req.body.hosts;

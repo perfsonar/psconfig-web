@@ -75,8 +75,22 @@ app.directive('mcAdmins', function() {
 
 app.directive('mcSpecs', function() {
     return {
-        scope: { specs: '<', },
+        scope: { specs: '<', readonly: '<', form: '<' },
         templateUrl: 't/specs.html',
+        controller: function($scope) {
+            $scope.remove = function(key) {
+                if($scope.form) $scope.form.$setDirty();
+                delete $scope.specs[key];
+            }
+            $scope.add = function() {
+                $scope.specs[$scope.k] = $scope.v;
+                
+                //reset
+                $scope.k = "";
+                $scope.v = "";
+                delete $scope.adding;
+            }
+        }
     } 
 });
 

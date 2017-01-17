@@ -70,6 +70,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
         if(canedit(req.user, testspec)) {
             //do update fields
             testspec.service_type = req.body.service_type;
+            testspec.name = req.body.name;
             testspec.desc = req.body.desc;
             testspec.specs = req.body.specs;
             testspec.admins = req.body.admins;

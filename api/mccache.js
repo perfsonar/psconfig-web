@@ -65,7 +65,6 @@ function create_hostrec(service, uri, cb) {
         if(err) return cb(err);
         if(res.statusCode != 200) return cb(new Error("failed to cache host from:"+url+" statusCode:"+res.statusCode));
         var rec = {
-            sitename: host['location-sitename'][0],
             info: get_hostinfo(host),
             location: get_location(host),
             communities: host['group-communities']||[],
@@ -78,11 +77,14 @@ function create_hostrec(service, uri, cb) {
             //admins: host['host-administrators'], //I just have to store them in our table (lookup service could store empty string for 'host-administrators'..)
             admins: [],
 
+            adhoc: (host.simulated?true:false), //simulated records are adhoc
             update_date: new Date(),
         };
 
         //toolkit v<3.5 didn't have client-uuid
         if(host['client-uuid']) rec.uuid = host['client-uuid'][0];
+        if(host['location-sitename']) rec.sitename = host['location-sitename'][0];
+
 
         var ip = host['host-name'][0]; //usually ip address
         var hostname = host['host-name'][1]; //often undefined. if set, it's hostname (always?)
@@ -122,11 +124,6 @@ function get_hostinfo(host) {
             var p = key.indexOf(prefix);
             if(p === 0)  info[key] = v[0];
         });
-
-        //also add extra things
-        if(key == "simulated") {
-            info.simulated = true;
-        }
     }
     return info;
 }
@@ -272,17 +269,17 @@ function run(cb) {
         //then update if
         async.eachOfSeries(hosts, function(host, id, next) {
             if(!host) return next(); //ignore null host
-            if(host.info.simulated) {
-                //simulate record is only entered if absolutely needed
+            if(host.adhoc) {
+                //adhoc record is only entered if absolutely needed
                 db.Host.findOne({
                     hostname: host.hostname, 
                 }, function(err, _host) {
                     if(_host) {
-                        //if existing record exits, we need to be careful
-                        if(_host.info.simulated) db.Host.update({hostname: host.hostname}, {$set: host}, next);
-                        else next(null); //non simulated one already exists.. ignore this update
+                        //if existing record exits, only update if it's adhoc
+                        if(_host.adhoc) db.Host.update({hostname: host.hostname}, {$set: host}, next);
+                        else next(null); //non-adhoc record already exists.. ignore this update
                     } else {
-                        //insert the simulated record for the first time
+                        //insert the adhoc record for the first time
                         var rec = new db.Host(host);
                         rec.save(next);
                     }

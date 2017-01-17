@@ -69,12 +69,12 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     */
 
     $scope.add = function() {
-        //$location.url("/config/new");
         $scope.selected = configs.add();
         $scope.closesubbar();
     }
     $scope.addtest = function() {
         $scope.selected.tests.push({
+            name: "",
             desc: "",
             enabled: true,
             service_type: "owamp",
