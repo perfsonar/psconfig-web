@@ -33,6 +33,7 @@ $ sudo yum check-update
 $ sudo yum install docker-engine
 ```
 
+<!--
 Docker exposes all ports on 0.0.0.0 by default. To make it a bit more secure, you should set default IP.
 
 /etc/docker/daemon.json
@@ -40,10 +41,11 @@ Docker exposes all ports on 0.0.0.0 by default. To make it a bit more secure, yo
 {
     "ip": "127.0.0.1"
 }
+-->
 
 ```
 
-Make sure to enable / start it
+Make sure to enable / start docker engine
 
 ```
 $ systemctl enable docker
