@@ -35,7 +35,7 @@
                     <small><span class="label label-default">{{host.lsid}}</span> {{host.sitename}} 
                         <!--<span class="text-muted">/</span>-->
                         <i ng-if="!host._canedit" class="fa fa-lock text-muted" title="readonly"></i>
-                        <i ng-if="host.adhoc" class="fa fa-pencil text-muted pull-right" title="Adhoc Host Entry"></i>
+                        <span ng-if="host.adhoc" class="label label-warning pull-right">Adhoc</span>
                     </small>
                 </div>
                 <small class="help-block">{{host.hostname}}</small>

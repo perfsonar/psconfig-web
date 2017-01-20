@@ -70,7 +70,6 @@ function create_hostrec(service, uri, cb) {
             communities: host['group-communities']||[],
 
             url: url,
-
             services: [],
 
             //TODO - I need to query the real admin records from the cache (gocdb2sls service already genenrates contact records)
@@ -83,9 +82,16 @@ function create_hostrec(service, uri, cb) {
 
         //toolkit v<3.5 didn't have client-uuid
         if(host['client-uuid']) rec.uuid = host['client-uuid'][0];
+
+        //some site doesn't have sitename configured in lsregistration.conf so I have to mock it.. if it doesn't exist
         if(host['location-sitename']) rec.sitename = host['location-sitename'][0];
-
-
+        else {
+            var mockname = service['service-name'][0];
+            if(host['group-domains']) mockname += " at "+host['group-domains'][0];
+            rec.sitename = "("+mockname+")";
+            logger.error("location-sitename not set!! using mockup name."+mockname);
+        }
+        
         var ip = host['host-name'][0]; //usually ip address
         var hostname = host['host-name'][1]; //often undefined. if set, it's hostname (always?)
         if(hostname !== undefined) rec.hostname = hostname;
@@ -143,7 +149,7 @@ function cache_ls(hosts, ls, lsid, cb) {
                     hosts[uri] = null; //make it null to signal we failed to create hostrec for this
                     return _cb(err);
                 }
-                logger.debug("new hostrecord for uri:"+uri+" hostname:"+host.hostname);
+                logger.debug("creating hostrecord for uri:"+uri+" hostname:"+host.hostname);
                 host.lsid = lsid;
                 hosts[uri] = host;
                 _cb(null, host);
@@ -176,14 +182,13 @@ function cache_ls(hosts, ls, lsid, cb) {
                     if(_service.type == type) exist = true;
                 });
                 if(!exist) {
+                    
                     //construct service record
                     host.services.push({
                         type: type,
                         name: service['service-name'][0],
                         locator: service['service-locator'][0], //locator is now a critical information needed to generate the config
                         //lsid: lsid, //make it easier for ui
-
-                        sitename: service['location-sitename'][0],
                         
                         //TODO - I need to query the real admin records from the cache (gocdb2sls service already genenrates contact records)
                         //I just have to store them in our table
@@ -212,7 +217,10 @@ function cache_global_ls(hosts, service, id, cb) {
                 }
                 //massage the service url so that I can use cache_ls to do the rest
                 service.url = host.locator+service.query;
-                cache_ls(hosts, service, id, next);
+                cache_ls(hosts, service, id, function(err) {
+                    if(err) logger.error(err); //continue
+                    next();
+                });
             }, cb); 
         } catch (e) {
             //couldn't parse activehosts json..
@@ -285,7 +293,8 @@ function run(cb) {
                     }
                 });
             } else {
-                //update the same hostname
+                //upsert existing record
+                if(~host.hostname.indexOf("bu.edu")) logger.debug("upsert:"+host.hostname);
                 db.Host.findOneAndUpdate({
                     hostname: host.hostname
                 }, {$set: host}, {upsert: true, setDefaultsOnInsert: true}, function() {
