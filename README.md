@@ -104,13 +104,13 @@ cat /etc/grid-security/certificates/*.pem > /etc/grid-security/host/trusted.pem
 
 Now we have all configuration files necessary to start MCA servicves.
 
-- Create a docker network to group all MCA containers (so that you don't have --link them)
+1. Create a docker network to group all MCA containers (so that you don't have --link them)
 
 ```
 $ sudo docker network create mca
 ```
 
-- Create mongoDB container. Use -v to persist data on host directory (/usr/local/data/mongo) 
+2. Create mongoDB container. Use -v to persist data on host directory (/usr/local/data/mongo) 
 
 ```bash
 mkdir -p /usr/local/data
@@ -122,7 +122,7 @@ sudo docker run \
         -d mongo
 ```
 
-- Create SCA authentication service container. This service handles user authentication / account/user group management.
+3. Create SCA authentication service container. This service handles user authentication / account/user group management.
 
 ```bash
 sudo docker run \
@@ -137,7 +137,7 @@ sudo docker run \
 > sca-auth container will generate a few files under /config directory when it's first started, so don't mount it with `ro`.
 > I am persisting the user account DB on /usr/local/data/auth.
 
-- Create MCA's main UI/API container.
+4. Create MCA's main UI/API container.
 
 ```bash
 sudo docker run \
@@ -148,7 +148,7 @@ sudo docker run \
     -d soichih/mca-admin
 ```
 
-- Create meshconfig publisher. 
+5. Create meshconfig publisher. 
 
 ```bash
 sudo docker run \
