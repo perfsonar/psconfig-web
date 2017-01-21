@@ -4,3 +4,4 @@ api/config
 api/debug
 **/*.log
 deploy/docker/config
+ui/config.js
