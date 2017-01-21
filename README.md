@@ -55,32 +55,32 @@ downloading and deploying MCA's default configuration files from git repo.
 wget https://github.com/soichih/meshconfig-admin/raw/master/deploy/docker/mca.sample.tar.gz
 tar -xzf mca.sample.tar.gz -C /etc
 ```
-- MCA API Configuration
+1. MCA API Configuration
 
-`/etc/mca/index.js` 
+    `/etc/mca/index.js` 
 
-* Edit defaults `testspecs` if necessary (`meshconfig.defaults.testspecs`)
-* Edit datasource section which determines which host you'd like to load from sLS to construct your host config.
+    * Edit defaults `testspecs` if necessary (`meshconfig.defaults.testspecs`)
+    * Edit datasource section which determines which host you'd like to load from sLS to construct your host config.
 
-- Authentication Service API Configration
+2. Authentication Service API Configration
 
-`/etc/mca/auth/index.js`
+    `/etc/mca/auth/index.js`
 
-Update `from` address to administrator's email address used to send email to confirmation new user accounts. If you'd like to skip email confirmation when user signup, simply comment out the whole email_confirmation section. 
+    Update `from` address to administrator's email address used to send email to confirmation new user accounts. If you'd like to skip email confirmation when user signup, simply comment out the whole email_confirmation section. 
 
-```javascript
-exports.email_confirmation = {
-    subject: 'Meshconfign Account Confirmation',
-    from: 'hayashis@iu.edu',  //most mail server will reject if this is not eplyable address
-};
+    ```javascript
+    exports.email_confirmation = {
+        subject: 'Meshconfign Account Confirmation',
+        from: 'hayashis@iu.edu',  //most mail server will reject if this is not eplyable address
+    };
 
-```
+    ```
 
-- Nginx Configuration
+3. Nginx Configuration
 
-`/etc/mca/nginx`
+    `/etc/mca/nginx`
 
-The default configuration should work, but apply any changes necessary.
+    The default configuration should work, but apply any changes necessary.
 
 #### Host Certificates
 
@@ -96,9 +96,9 @@ trusted.pem
 If not, please request for new certificate.
 
 > trusted.pem was created by running 
-```bash
-cat /etc/grid-security/certificates/*.pem > /etc/grid-security/host/trusted.pem
-```
+> ```bash
+> cat /etc/grid-security/certificates/*.pem > /etc/grid-security/host/trusted.pem
+> ```
 
 ### Container Installation
 
@@ -150,30 +150,30 @@ Now we have all configuration files necessary to start MCA servicves.
 
 5. Create meshconfig publisher. 
 
-```bash
-sudo docker run \
-    --restart=always \
-    --net mca \
-    --name mca-pub1 \
-    -v /etc/mca:/app/api/config:ro \
-    -d soichih/mca-pub
-```
+    ```bash
+    sudo docker run \
+        --restart=always \
+        --net mca \
+        --name mca-pub1 \
+        -v /etc/mca:/app/api/config:ro \
+        -d soichih/mca-pub
+    ```
 
 6. Finally, we install nginx to expose these container via 80/443/9443
 
-```bash
-sudo docker run \
-    --restart=always \
-    --net mca \
-    --name nginx \
-    -v /etc/mca/shared:/shared:ro \
-    -v /etc/mca/nginx:/etc/nginx:ro \
-    -v /etc/grid-security/host:/certs:ro \
-    -p 80:80 \
-    -p 443:443 \
-    -p 9443:9443 \
-    -d nginx
-```
+    ```bash
+    sudo docker run \
+        --restart=always \
+        --net mca \
+        --name nginx \
+        -v /etc/mca/shared:/shared:ro \
+        -v /etc/mca/nginx:/etc/nginx:ro \
+        -v /etc/grid-security/host:/certs:ro \
+        -p 80:80 \
+        -p 443:443 \
+        -p 9443:9443 \
+        -d nginx
+    ```
 
 Now you should see all 5 containers running.
 
