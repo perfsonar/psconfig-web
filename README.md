@@ -14,11 +14,7 @@ Creation of VM is out of scope of this document, but we recommend following spec
 * 4G memory
 * 8G disk
 
->! Note for GOC Staff `devm06 $ mkvm -c 4 -m 4G -p -r c7 meshconfig-itb.3`
-
-Make sure you have the latest RPMs
-
-`yum update`
+> `devm06 $ mkvm -c 4 -m 4G -p -r c7 meshconfig-itb.3`
 
 ### Docker Engine
 
@@ -26,24 +22,24 @@ Follow the official [docker installation doc](https://docs.docker.com/engine/ins
 
 For CentOS7..
 
-```
+```bash
 $ sudo yum-config-manager \
     --add-repo https://docs.docker.com/engine/installation/linux/repo_files/centos/docker.repo
-$ sudo yum check-update
 $ sudo yum install docker-engine
 ```
 
-Before you start the docker engine, you might want to add VM specific configuration. For example, your VM might be using /usr/local to store most of the data (like at GOC), then you should have something like following in /etc/docker/daemon.json
+Before you start the docker engine, you might need to add some VM specific configuration. For example, your VM might be using /usr/local as the primary partition for your VM (like GOC). If so, you should have something like following .
 
+`/etc/docker/daemon.json`
 
-```
+```json
 {
         "graph": "/usr/local/docker"
 }
 
 ```
 
-Finally, enable & start docker engine
+Enable & start the docker engine
 
 ```
 $ systemctl enable docker
@@ -52,27 +48,27 @@ $ systemctl start docker
 
 ### Configuration
 
-Before you install MCA, you should prepare your set of configuration files. You can bootstrap it by
-downloading and deploying MCA's default configuration files from here
+Before we start installing MCA, you should prepare your configuration files first. You can bootstrap it by
+downloading and deploying MCA's default configuration files from git repo.
 
 ```bash
 wget https://github.com/soichih/meshconfig-admin/raw/master/deploy/docker/mca.sample.tar.gz
 tar -xzf mca.sample.tar.gz -C /etc
 ```
-1. MCA API Configuration
+- MCA API Configuration
 
 `/etc/mca/index.js` 
 
-* Edit testspec defaults if necessary (meshconfig.defaults.testspecs)
+* Edit defaults `testspecs` if necessary (`meshconfig.defaults.testspecs`)
 * Edit datasource section which determines which host you'd like to load from sLS to construct your host config.
 
-2. Authentication Service API Configration
+- Authentication Service API Configration
 
 `/etc/mca/auth/index.js`
 
-Update `from` address to administrator's email address. If you'd like to skip email confirmation when user signup, simply comment out the whole email_confirmation section. 
+Update `from` address to administrator's email address used to send email to confirmation new user accounts. If you'd like to skip email confirmation when user signup, simply comment out the whole email_confirmation section. 
 
-```json
+```javascript
 exports.email_confirmation = {
     subject: 'Meshconfign Account Confirmation',
     from: 'hayashis@iu.edu',  //most mail server will reject if this is not eplyable address
@@ -80,7 +76,7 @@ exports.email_confirmation = {
 
 ```
 
-3. Nginx Configuration
+- Nginx Configuration
 
 `/etc/mca/nginx`
 
@@ -90,7 +86,7 @@ The default configuration should work, but apply any changes necessary.
 
 You will need SSL certificates to run nginx. Inside /etc/grid-security/host, you should see your host certificate with following file names.
 
-```
+```bash
 $ ls /etc/grid-security/host
 cert.pem 
 key.pem
@@ -99,19 +95,22 @@ trusted.pem
 
 If not, please request for new certificate.
 
-> trusted.pem was created by running `cat /etc/grid-security/certificates/*.pem > /etc/grid-security/host/trusted.pem`
+> trusted.pem was created by running 
+```bash
+cat /etc/grid-security/certificates/*.pem > /etc/grid-security/host/trusted.pem
+```
 
 ### Container Installation
 
 Now we have all configuration files necessary to start MCA servicves.
 
-1. Create a docker network to group all MCA containers (so that you don't have --link them)
+- Create a docker network to group all MCA containers (so that you don't have --link them)
 
 ```
 $ sudo docker network create mca
 ```
 
-2. Create mongoDB container. Use -v to persist data on host directory (/usr/local/data/mongo) 
+- Create mongoDB container. Use -v to persist data on host directory (/usr/local/data/mongo) 
 
 ```bash
 mkdir -p /usr/local/data
@@ -123,7 +122,7 @@ sudo docker run \
         -d mongo
 ```
 
-3. Create SCA authentication service container. This service handles user authentication / account/user group management.
+- Create SCA authentication service container. This service handles user authentication / account/user group management.
 
 ```bash
 sudo docker run \
@@ -138,7 +137,7 @@ sudo docker run \
 > sca-auth container will generate a few files under /config directory when it's first started, so don't mount it with `ro`.
 > I am persisting the user account DB on /usr/local/data/auth.
 
-4. Create MCA's main UI/API container.
+- Create MCA's main UI/API container.
 
 ```bash
 sudo docker run \
@@ -149,7 +148,7 @@ sudo docker run \
     -d soichih/mca-admin
 ```
 
-5. Create meshconfig publisher. 
+- Create meshconfig publisher. 
 
 ```bash
 sudo docker run \
