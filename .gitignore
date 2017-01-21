@@ -3,12 +3,4 @@ barn
 api/config
 api/debug
 **/*.log
-deploy/rhel6/test/x86_64/
-deploy/rhel6/_conf
-deploy/rhel6/_common
-deploy/rhel7/test/x86_64/
-deploy/rhel7/_conf
-deploy/rhel7/_common
-deploy/docker/_conf
-deploy/docker/_common
-
+deploy/docker/config

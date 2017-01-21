@@ -33,19 +33,7 @@ $ sudo yum check-update
 $ sudo yum install docker-engine
 ```
 
-<!--
-Docker exposes all ports on 0.0.0.0 by default. To make it a bit more secure, you should set default IP.
-
-/etc/docker/daemon.json
-```
-{
-    "ip": "127.0.0.1"
-}
--->
-
-```
-
-Make sure to enable / start docker engine
+Enable & start docker engine
 
 ```
 $ systemctl enable docker
@@ -70,31 +58,120 @@ $ITFAI4 -p tcp --dport 9443 -j ACCEPT
 ```
 -->
 
-### Install Containers
+### Container Preparation
 
-First, create a docker network to group all MCA containers (so that you don't have --link them)
+First, let's create a docker network to group all MCA containers (so that you don't have --link them)
 
 ```
 $ sudo docker network create mca
 ```
 
-Start mongo and persist data on host
+Next, download and deploy MCA's default configuration files
 
 ```bash
+wget https://somewhere.com/mca_config.tar.gz
+tar -xzf mca_config.tar.gz -C /etc
+```
+
+You should see...
+
+```
+TODO
+TODO
+TODO
+TODO
+TODO
+TODO
+TODO
+TODO
+TODO
+TODO
+TODO
+TODO
+```
+
+### Container Installation
+
+First, create mongo DB container and persist data on host directory (/usr/local/data/mongo)
+
+```bash
+mkdir -p /usr/local/data
 docker run \
         --restart=always \
         --net mca \
-        --name mongodb \
-        -v /usr/local/mongodb-data:/data/db \
+        --name mongo \
+        -v /usr/local/data/mongo:/data/db \
         -d mongo
 ```
 
+Create SCA authentication service container. This service handles user authentication / account/user group management.
 
+```bash
+docker run \
+    --restart=always \
+    --net mca \
+    --name sca-auth \
+    -v /etc/mca/auth:/app/api/config \
+    -v /usr/local/data/auth:/db \
+    -d soichih/sca-auth
+```
 
+> Note: sca-auth container will generate a few files under /config directory (don't mount it with :ro)
 
-### MongoDB
+Create MCA's main UI/API container.
 
-MCA uses MongoDB 
+```bash
+docker run \
+    --restart=always \
+    --net mca \
+    --name mca-admin1 \
+    -v /etc/mca:/app/api/config:ro \
+    -d soichih/mca-admin
+```
+
+And meshconfig publisher. 
+
+```bash
+docker run \
+    --restart=always \
+    --net mca \
+    --name mca-pub1 \
+    -v /etc/mca:/app/api/config:ro \
+    -d soichih/mca-pub
+```
+
+Finally, we install nginx to expose these container via 80/443/9443
+
+```bash
+docker run \
+    --restart=always \
+    --net mca \
+    --name nginx \
+    -v /etc/mca/nginx:/etc/nginx:ro \
+    -v /etc/grid-security/host:/certs:ro \
+    -d nginx
+```
+
+Inside /etc/grid-security/host, you should see your host certificate
+
+```
+$ ls /etc/grid-security/host
+cert.pem 
+key.pem
+ca.pem
+```
+
+Now you should see all 5 containers running.
+
+```bash
+$ docker container list
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
+420b93ee7a3d        soichih/mca-pub     "node /app/api/mcp..."   3 seconds ago       Up 2 seconds        8080/tcp            mca-pub1
+f30613ba389e        soichih/mca-admin   "/start.sh"              3 minutes ago       Up 3 minutes        80/tcp, 8080/tcp    mca-admin1
+98527bf31365        soichih/sca-auth    "/app/docker/start.sh"   13 minutes ago      Up 13 minutes       80/tcp, 8080/tcp    sca-auth
+10fdf3b63e4f        mongo               "/entrypoint.sh mo..."   16 minutes ago      Up 16 minutes       27017/tcp           mongo
+```
+
 
 # Reference
 

@@ -26,6 +26,7 @@
     "font-awesome": "^4.7.0",
     "jquery": "^3.1.1",
     "sca-ng-wf": "^1.0.13",
+    "sca-shared": "0.0.3",
     "ui-select": "^0.19.6"
   }
 }
