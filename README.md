@@ -106,47 +106,47 @@ Now we have all configuration files necessary to start MCA servicves.
 
 1. Create a docker network to group all MCA containers (so that you don't have --link them)
 
-```
-$ sudo docker network create mca
-```
+    ```
+    $ sudo docker network create mca
+    ```
 
 2. Create mongoDB container. Use -v to persist data on host directory (/usr/local/data/mongo) 
 
-```bash
-mkdir -p /usr/local/data
-sudo docker run \
-        --restart=always \
-        --net mca \
-        --name mongo \
-        -v /usr/local/data/mongo:/data/db \
-        -d mongo
-```
+    ```bash
+    mkdir -p /usr/local/data
+    sudo docker run \
+            --restart=always \
+            --net mca \
+            --name mongo \
+            -v /usr/local/data/mongo:/data/db \
+            -d mongo
+    ```
 
 3. Create SCA authentication service container. This service handles user authentication / account/user group management.
 
-```bash
-sudo docker run \
-    --restart=always \
-    --net mca \
-    --name sca-auth \
-    -v /etc/mca/auth:/app/api/config \
-    -v /usr/local/data/auth:/db \
-    -d soichih/sca-auth
-```
+    ```bash
+    sudo docker run \
+        --restart=always \
+        --net mca \
+        --name sca-auth \
+        -v /etc/mca/auth:/app/api/config \
+        -v /usr/local/data/auth:/db \
+        -d soichih/sca-auth
+    ```
 
-> sca-auth container will generate a few files under /config directory when it's first started, so don't mount it with `ro`.
-> I am persisting the user account DB on /usr/local/data/auth.
+    > sca-auth container will generate a few files under /config directory when it's first started, so don't mount it with `ro`.
+    > I am persisting the user account DB on /usr/local/data/auth.
 
 4. Create MCA's main UI/API container.
 
-```bash
-sudo docker run \
-    --restart=always \
-    --net mca \
-    --name mca-admin1 \
-    -v /etc/mca:/app/api/config:ro \
-    -d soichih/mca-admin
-```
+    ```bash
+    sudo docker run \
+        --restart=always \
+        --net mca \
+        --name mca-admin1 \
+        -v /etc/mca:/app/api/config:ro \
+        -d soichih/mca-admin
+    ```
 
 5. Create meshconfig publisher. 
 
