@@ -97,12 +97,14 @@ app.config(['cfpLoadingBarProvider', '$logProvider', function(cfpLoadingBarProvi
 //configure route
 app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
     $routeProvider.
+    /*
     when('/about', {
         templateUrl: 't/about.html',
         controller: 'AboutController',
         requiresLogin: true,
     })
-    .when('/testspecs/:id?', {
+    .*/
+    when('/testspecs/:id?', {
         templateUrl: 't/testspecs.html',
         controller: 'TestspecsController',
         requiresLogin: true,

@@ -53,11 +53,12 @@ app.controller('HeaderController', function($scope, appconf, $route, serverconf,
     }
 });
 
+/*
 app.controller('AboutController', 
 function($scope, appconf, serverconf, scaMessage, toaster) {
     scaMessage.show(toaster);
     $scope.appconf = appconf;
     $scope.active_menu = "about";
 });
-
+*/
 

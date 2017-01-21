@@ -52,17 +52,25 @@ $ systemctl start docker
 
 ### Configuration
 
-Before you install MCA, you should prepare your set of configuration file. You can bootstrap it by
+Before you install MCA, you should prepare your set of configuration files. You can bootstrap it by
 downloading and deploying MCA's default configuration files from here
 
 ```bash
-wget https://somewhere.com/mca_config.tar.gz
-tar -xzf mca_config.tar.gz -C /etc
+wget https://github.com/soichih/meshconfig-admin/raw/master/deploy/docker/mca.sample.tar.gz
+tar -xzf mca.sample.tar.gz -C /etc
 ```
+1. MCA API Configuration
 
-1. Authentication Service API Configration
+`/etc/mca/index.js` 
 
-Edit /etc/mca/auth/index.js
+* Edit testspec defaults if necessary (meshconfig.defaults.testspecs)
+* Edit datasource section which determines which host you'd like to load from sLS to construct your host config.
+
+2. Authentication Service API Configration
+
+`/etc/mca/auth/index.js`
+
+Update `from` address to administrator's email address. If you'd like to skip email confirmation when user signup, simply comment out the whole email_confirmation section. 
 
 ```json
 exports.email_confirmation = {
@@ -72,31 +80,11 @@ exports.email_confirmation = {
 
 ```
 
-If you'd like to skip email confirmation after user signup, simply comment out the whole section. Otherwise, update `from` address to whoever you want the email confirmation to be sent. 
+3. Nginx Configuration
 
-2. 
+`/etc/mca/nginx`
 
-
-
-
-
-
-You should see...
-
-```
-TODO
-TODO
-TODO
-TODO
-TODO
-TODO
-TODO
-TODO
-TODO
-TODO
-TODO
-TODO
-```
+The default configuration should work, but apply any changes necessary.
 
 #### Host Certificates
 
@@ -106,12 +94,16 @@ You will need SSL certificates to run nginx. Inside /etc/grid-security/host, you
 $ ls /etc/grid-security/host
 cert.pem 
 key.pem
-ca.pem
+trusted.pem
 ```
 
 If not, please request for new certificate.
 
+> trusted.pem was created by running `cat /etc/grid-security/certificates/*.pem > /etc/grid-security/host/trusted.pem`
+
 ### Container Installation
+
+Now we have all configuration files necessary to start MCA servicves.
 
 1. Create a docker network to group all MCA containers (so that you don't have --link them)
 
