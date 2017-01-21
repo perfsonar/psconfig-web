@@ -147,6 +147,7 @@ docker run \
     --restart=always \
     --net mca \
     --name nginx \
+    -v /etc/mca/shared:/shared:ro \
     -v /etc/mca/nginx:/etc/nginx:ro \
     -v /etc/grid-security/host:/certs:ro \
     -d nginx
@@ -171,7 +172,6 @@ f30613ba389e        soichih/mca-admin   "/start.sh"              3 minutes ago  
 98527bf31365        soichih/sca-auth    "/app/docker/start.sh"   13 minutes ago      Up 13 minutes       80/tcp, 8080/tcp    sca-auth
 10fdf3b63e4f        mongo               "/entrypoint.sh mo..."   16 minutes ago      Up 16 minutes       27017/tcp           mongo
 ```
-
 
 # Reference
 

@@ -31,8 +31,8 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
 
     db.Hostgroup.find(find)
     .select(req.query.select)
-    .limit(req.query.limit || 100)
-    .skip(req.query.skip || 0)
+    .limit(parseInt(req.query.limit) || 100)
+    .skip(parseInt(req.query.skip) || 0)
     .sort(req.query.sort || '_id')
     .lean() //so that I can add _canedit later
     .exec(function(err, hostgroups) {

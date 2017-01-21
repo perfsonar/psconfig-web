@@ -16,7 +16,7 @@ var common = require('../../common');
 function canedit(user, host) {
     if(user) {
         if(user.scopes.mca && ~user.scopes.mca.indexOf('admin')) return true; //admin can edit whaterver..
-        if(~host.admins.indexOf(user.sub)) return true;
+        if(host.admins && ~host.admins.indexOf(user.sub)) return true;
     }
     return false;
 }
@@ -27,8 +27,8 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
 
     db.Host.find(find)
     .select(req.query.select)
-    .limit(req.query.limit || 100)
-    .skip(req.query.skip || 0)
+    .limit(parseInt(req.query.limit) || 100)
+    .skip(parseInt(req.query.skip) || 0)
     .sort(req.query.sort || '_id')
     .lean() //so that I can add _canedit later
     .exec(function(err, hosts) {
