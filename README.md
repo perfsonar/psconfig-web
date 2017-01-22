@@ -194,8 +194,7 @@ aa6471073c01        nginx               "nginx -g 'daemon ..."   11 hours ago   
 
 You should now be able to access MCA by accessing your host on your browser on the host. You should be prompted to the login page. You should signup / confirm your email address, then define host gruops / testspecs, and construct new meshconfig using those test entries.
 
-To update MCA containers to the latest version, do `docker pull` the container you are trying to update and rerun the same `docker run ...` command
-used to start it.
+To update MCA containers to the latest version, do `docker pull` the container you are trying to update and rerun the same `docker run ...` command you used to start it.
 
 ### Firewall
 
