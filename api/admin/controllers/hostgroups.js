@@ -24,9 +24,13 @@ function canedit(user, hostgroup) {
 router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
     var find = {};
     if(req.query.find) find = JSON.parse(req.query.find);
+    
+    //we need to select admins , or can't get _canedit set
+    var select = req.query.select;
+    if(select && !~select.indexOf("admins")) select += " admins";
 
     db.Hostgroup.find(find)
-    .select(req.query.select)
+    .select(select)
     .limit(parseInt(req.query.limit) || 100)
     .skip(parseInt(req.query.skip) || 0)
     .sort(req.query.sort || '_id')

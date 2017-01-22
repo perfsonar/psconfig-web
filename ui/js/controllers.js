@@ -1,5 +1,5 @@
 
-app.controller('HeaderController', function($scope, appconf, $route, serverconf, jwtHelper, $location) {
+app.controller('HeaderController', function($scope, appconf, $route, serverconf, jwtHelper, $location, toaster) {
     $scope.title = appconf.title; //used?
     serverconf.then(function(_c) { $scope.serverconf = _c; });
     $scope.active_menu = "unknown";
@@ -48,8 +48,14 @@ app.controller('HeaderController', function($scope, appconf, $route, serverconf,
     }
 
     $scope.toast_error = function(res) {
-        if(res.data && res.data.message) toaster.error(res.data.message);
-        else toaster.error(res.statusText);
+        if(res.data) {
+            if(res.data.message) toaster.error(res.data.message);
+            if(res.data.errmsg) toaster.error(res.data.errmsg);
+        } else if(res.statusText) {
+            toaster.error(res.statusText);
+        } else {
+            toaster.error(res);
+        } 
     }
 });
 

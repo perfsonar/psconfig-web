@@ -49,7 +49,7 @@ var hostSchema = mongoose.Schema({
    
     /////////////////////////////////////////////////////////////////////////////////////////..
     //key
-    hostname: {type: String, index: true}, 
+    hostname: {type: String, index: { unique: true } }, 
 
     uuid: String, //this is now much less important..(maybe I should deprecate?)
     sitename: String,
@@ -72,8 +72,7 @@ var hostSchema = mongoose.Schema({
     //(location-state, location-city, location-country, etc..)
     location: mongoose.Schema.Types.Mixed,
     
-    //(location-state, location-city, location-country, etc..)
-    communities: mongoose.Schema.Types.Mixed,
+    communities: [ String ],
 
     services: [ serviceSchema ],
 
@@ -84,7 +83,8 @@ var hostSchema = mongoose.Schema({
 
     create_date: {type: Date, default: Date.now},
     update_date: {type: Date, default: Date.now},
-});
+}, {minimize: false}); //let empty info/location object to be set on creation
+
 /*
 //mongoose's pre/post are just too fragile.. it gets call on some and not on others.. (like findOneAndUpdate)
 //I prefer doing this manually anyway, because it will be more visible 

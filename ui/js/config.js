@@ -44,6 +44,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     $scope.add = function() {
         $scope.selected = configs.add();
         $scope.closesubbar();
+        $location.update_path("/configs");
     }
     $scope.addtest = function() {
         $scope.selected.tests.push({
@@ -95,19 +96,16 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
 
     $scope.submit = function() {
         if(!$scope.selected._id) {
-            configs.create($scope.selected).then(function() {
+            configs.create($scope.selected).then(function(config) {
                 toaster.success("config created successfully!");
                 $scope.form.$setPristine();
-            }).catch(function(res) {
-                toaster.error(res.data.message||res.data.errmsg); 
-            });
+                $location.update_path("/configs/"+config._id);
+            }).catch($scope.toast_error);
         } else {
-            configs.update($scope.selected).then(function() {
+            configs.update($scope.selected).then(function(config) {
                 toaster.success("config updated successfully!");
                 $scope.form.$setPristine();
-            }).catch(function(res) {
-                toaster.error(res.data.message||res.data.errmsg); 
-            });
+            }).catch($scope.toast_error);
         }
     }
     $scope.cancel = function() {

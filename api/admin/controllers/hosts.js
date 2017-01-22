@@ -26,8 +26,12 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
     var find = {};
     if(req.query.find) find = JSON.parse(req.query.find);
 
+    //we need to select admins , or can't get _canedit set
+    var select = req.query.select;
+    if(select && !~select.indexOf("admins")) select += " admins";
+
     db.Host.find(find)
-    .select(req.query.select)
+    .select(select)
     .limit(parseInt(req.query.limit) || 100)
     .skip(parseInt(req.query.skip) || 0)
     .sort(req.query.sort || '_id')
@@ -41,7 +45,6 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
             hosts.forEach(function(host) {
                 host._canedit = canedit(req.user, host);
             });
-           
             res.json({hosts: hosts, count: count});
         });
     });
@@ -72,6 +75,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
 
         host.save(function(err) {
             if(err) return next(err);
+            console.dir(host);
             host = JSON.parse(JSON.stringify(host));
             host._canedit = canedit(req.user, host);
             res.json(host);
@@ -94,11 +98,9 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
 });
 
 router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    //var id = parseInt(req.params.id);
-    db.Testspec.findById(req.params.id, function(err, host) {
+    db.Host.findById(req.params.id, function(err, host) {
         if(err) return next(err);
         if(!host) return next(new Error("can't find a host with id:"+req.params.id));
-        //only superadmin or admin of this test spec can update
         if(canedit(req.user, host)) {
             host.remove().then(function() {
                 res.json({status: "ok"});

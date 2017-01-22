@@ -33,6 +33,7 @@ app.controller('TestspecsController', function($scope, $route, toaster, $http, j
     $scope.add = function() {
         $scope.selected = testspecs.add();
         $scope.closesubbar();
+        $location.update_path("/testspecs");
     }
 
     $scope.setdefault = function(type) {
@@ -67,19 +68,16 @@ app.controller('TestspecsController', function($scope, $route, toaster, $http, j
         }
 
         if(!$scope.selected._id) {
-            testspecs.create($scope.selected).then(function() {
+            testspecs.create($scope.selected).then(function(testspec) {
                 toaster.success("Testspec created successfully!");
                 $scope.form.$setPristine();
-            }).catch(function(res) {
-                toaster.error(res.data.message||res.data.errmsg); 
-            });
+                $location.update_path("/testspecs/"+testspec._id);
+            }).catch($scope.toast_error);
         } else {
-            testspecs.update($scope.selected).then(function() {
+            testspecs.update($scope.selected).then(function(testspec) {
                 toaster.success("Testspec updated successfully!");
                 $scope.form.$setPristine();
-            }).catch(function(res) {
-                toaster.error(res.data.message||res.data.errmsg); 
-            });
+            }).catch($scope.toast_error);
         }
     }
     $scope.cancel = function() {

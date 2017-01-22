@@ -56,7 +56,7 @@ app.factory('hosts', function(appconf, $http, jwtHelper) {
                 services: [],
                 info: {},
                 location: {},
-                communities: {},
+                communities: [],
             };
             
             //add user to admin

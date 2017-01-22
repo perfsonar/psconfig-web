@@ -31,6 +31,7 @@
                 ng-repeat="host in hosts"
                 ng-class="{'active': selected == host}"
                 ng-click="select(host)">
+                <time class="help-block pull-right">{{testspec.create_date|date}}</time>
                 <div class="list-header">
                     <small>
                         <span class="label label-info pull-right" ng-if="host.lsid && !host.url">Simulated</span> 
@@ -185,7 +186,6 @@
                 </div>
 
                 <!--service adder-->
-                {{missing_services|json}}
                 <div ng-if="selected._canedit && !selected.lsid && missing_services.length > 0"> 
                     <hr>
                     <div class="row">
@@ -256,8 +256,10 @@
 
                 <br><br>
                 
-                <h3>Debug</h3>
-                <pre>{{selected|json}}</pre>
+                <div ng-if="appconf.debug">
+                    <h3>Debug</h3>
+                    <pre>{{selected|json}}</pre>
+                </div>
             </div><!--padding-top-->
         </form>
     </div><!--subbar-content-->

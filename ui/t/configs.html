@@ -69,12 +69,8 @@
                     <i class="fa fa-trash-o clickable" aria-hidden="true" ng-if="selected._id && selected._canedit"
                         ng-confirm-click="Are you sure you want to remove this test spec?"
                         confirmed-click="remove()"></i>&nbsp;&nbsp;&nbsp;
-                    <!--
-                    <i class="fa fa-info-circle" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
-                    <i class="fa fa-star-o" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
-                    <i class="fa fa-share-alt" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
-                    -->
                     <div class="pull-right" style="padding-right: 20px;">
+                         <i class="fa fa-lock" ng-if="!selected._canedit" title="Read Only"></i>
                          <div ng-if="form.$dirty && selected._canedit" class="display: inline-block;">
                             <button type="submit" class="btn btn-primary" ng-if="selected._id">Update</button>
                             <button type="submit" class="btn btn-primary" ng-if="!selected._id">Create</button>

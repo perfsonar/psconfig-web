@@ -61,6 +61,7 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
     $scope.add = function() {
         $scope.selected = hostgroups.add();
         $scope.closesubbar();
+        $location.update_path("/hostgroups");
     }
 
     $scope.changetype = function(type) {
@@ -73,25 +74,17 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
     }
 
     $scope.submit = function() {
-        /*
-        if($scope.tabs.static.active) $scope.selected.type = "static";
-        if($scope.tabs.dynamic.active) $scope.selected.type = "dynamic";
-        */
-
         if(!$scope.selected._id) {
-            hostgroups.create($scope.selected).then(function() {
+            hostgroups.create($scope.selected).then(function(hostgroup) {
                 toaster.success("Hostgroup created successfully!");
                 $scope.form.$setPristine();
-            }).catch(function(res) {
-                toaster.error(res.data.message||res.data.errmsg); 
-            });
+                $location.update_path("/hostgroups/"+hostgroup._id);
+            }).catch($scope.toast_error);
         } else {
-            hostgroups.update($scope.selected).then(function() {
+            hostgroups.update($scope.selected).then(function(hostgroup) {
                 toaster.success("Hostgroup updated successfully!");
                 $scope.form.$setPristine();
-            }).catch(function(res) {
-                toaster.error(res.data.message||res.data.errmsg); 
-            });
+            }).catch($scope.toast_error);
         }
     }
 

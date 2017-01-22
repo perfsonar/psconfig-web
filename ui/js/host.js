@@ -53,6 +53,7 @@ app.controller('HostsController', function($scope, appconf, toaster, $http, serv
     $scope.add = function() {
         $scope.selected = hosts.add();
         $scope.closesubbar();
+        $location.update_path("/hosts");
         find_missing_services();    
     }
 
@@ -94,19 +95,16 @@ app.controller('HostsController', function($scope, appconf, toaster, $http, serv
         clean_spec($scope.selected.location);
 
         if(!$scope.selected._id) {
-            hosts.create($scope.selected).then(function() {
+            hosts.create($scope.selected).then(function(host) {
                 toaster.success("Host created successfully!");
                 $scope.form.$setPristine();
-            }).catch(function(res) {
-                toaster.error(res.data.message||res.data.errmsg); 
-            });
+                $location.update_path("/hosts/"+host._id);
+            }).catch($scope.toast_error);
         } else {
-            hosts.update($scope.selected).then(function() {
+            hosts.update($scope.selected).then(function(host) {
                 toaster.success("Host updated successfully!");
                 $scope.form.$setPristine();
-            }).catch(function(res) {
-                toaster.error(res.data.message||res.data.errmsg); 
-            });
+            }).catch($scope.toast_error);
         }
     }
     $scope.cancel = function() {
@@ -118,96 +116,5 @@ app.controller('HostsController', function($scope, appconf, toaster, $http, serv
             $scope.selected = null;
         });
     }
-
-    /*
-    var mas = {};
-    services.then(function(_services) { 
-        $scope.services = _services;
-
-        //create id>ma mapping for deref_ma
-        if($scope.services.recs['ma']) $scope.services.recs['ma'].forEach(function(service) {
-            mas[service.id] = service;
-        });
-
-        $scope.hosts = {};
-        hosts.then(function(_hosts) {
-            _hosts.forEach(function(host) {
-            
-                var services = [];
-                //find all services that belongs to this host (and set _has_localma.. if the host has ma service)
-                for(var service_id in _services.recs) {
-                    _services.recs[service_id].forEach(function(service) {
-                        if(service.client_uuid == host.uuid) services.push(service);
-                        if(service.type == 'ma') host._has_localma = true;
-                    });
-                }
-                services.forEach(deref_ma);
-                $scope.hosts[host.uuid] = {
-                    _detail: host,
-                    services: services
-                }
-            });
-            $scope.hosts_num = Object.keys($scope.hosts).length;
-            $scope.loading = false;
-        });
-    });
-
-    function deref_ma(service) {
-        if(!service.ma) return;
-        service.MA = mas[service.ma];
-    }
-    */
-
-    /*
-    $scope.edit = function(host) {
-        var _host = angular.copy(host);
-        var modal = $modal.open({
-            animation: true,
-            templateUrl: 't/host.html',
-            controller: 'HostModalController',
-            size: 'lg',
-            resolve: {
-                host: function() { return _host; },
-                //title: function() { return _host.sitename + " (" +(host.hostname || host.ip) + ")"; },
-            }
-        });
-        modal.result.then(function() {
-            for(var k in _host) $scope.selected[k] = _host[k]; 
-            //$scope.hosts[_host.uuid] = _host;
-            //_host.services.forEach(deref_ma);
-        }, function() {
-            //failed?
-        });
-    }
-    */
 });
 
-/*
-app.controller('HostModalController', function($scope, appconf, toaster, $http, $modalInstance, host, hosts) {
-    $scope.host = host;
-    hosts.getMAs().then(function(hosts) {
-        $scope.mas = hosts;
-    });
-
-    $scope.cancel = function() {
-        if($scope.form.$dirty) {
-            if(confirm("Do you want to abondon unsaved changes?")) {
-                $modalInstance.dismiss('cancel');
-            }
-        } else {
-            $modalInstance.dismiss('cancel');
-        }
-    }
-
-    $scope.submit = function() {
-        $http.put(appconf.api+'/hosts/'+host._id, $scope.host)
-        .then(function(res) {
-            $modalInstance.close();
-            toaster.success("Updated Successfully!");
-            $scope.form.$setPristine();
-        }, function(res) {
-            toaster.error(res.data.message);
-        });   
-    }
-});
-*/
