@@ -15,12 +15,8 @@ const common = require('../../common');
 
 function canedit(user, hostgroup) {
     if(user) {
-        if(user.scopes.mca && ~user.scopes.mca.indexOf('admin')) {
-            return true;
-        }
-        if(~hostgroup.admins.indexOf(user.sub)) {
-            return true;
-        }
+        if(user.scopes.mca && ~user.scopes.mca.indexOf('admin')) return true;
+        if(~hostgroup.admins.indexOf(user.sub.toString())) return true;
     }
     return false;
 }

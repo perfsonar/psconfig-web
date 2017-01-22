@@ -14,9 +14,16 @@ mongoose.Promise = global.Promise;
 
 exports.init = function(cb) {
     mongoose.connect(config.mongodb, {
-        server: { auto_reconnect: true, reconnectTries: Number.MAX_VALUE}
+        server: { reconnectTries: Number.MAX_VALUE}
     }, function(err) {
-        if(err) return cb(err);
+        if(err) {
+            logger.error(err);
+            logger.error("mongodb might not be started yet.. going to retry in 5 seconds");
+            setTimeout(function() {
+                exports.init(cb);
+            }, 5000); 
+            return;
+        }
         logger.info("connected to mongo");
         cb();
     });

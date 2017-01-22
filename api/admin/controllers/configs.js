@@ -16,12 +16,8 @@ var profile = require('../../common').profile;
 
 function canedit(user, config) {
     if(user) {
-        if(user.scopes.mca && ~user.scopes.mca.indexOf('admin')) {
-            return true;
-        }
-        if(~config.admins.indexOf(user.sub)) {
-            return true;
-        }
+        if(user.scopes.mca && ~user.scopes.mca.indexOf('admin')) return true;
+        if(~config.admins.indexOf(user.sub.toString())) return true;
     }
     return false;
 }

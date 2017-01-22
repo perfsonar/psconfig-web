@@ -1,25 +1,21 @@
 'use strict';
 
 //contrib
-var express = require('express');
-var router = express.Router();
-var winston = require('winston');
-var jwt = require('express-jwt');
-var async = require('async');
+const express = require('express');
+const router = express.Router();
+const winston = require('winston');
+const jwt = require('express-jwt');
+const async = require('async');
 
 //mine
-var config = require('../../config');
-var logger = new winston.Logger(config.logger.winston);
-var db = require('../../models');
+const config = require('../../config');
+const logger = new winston.Logger(config.logger.winston);
+const db = require('../../models');
 
 function canedit(user, testspec) {
     if(user) {
-        if(user.scopes.mca && ~user.scopes.mca.indexOf('admin')) {
-            return true;
-        }
-        if(~testspec.admins.indexOf(user.sub)) {
-            return true;
-        }
+        if(user.scopes.mca && ~user.scopes.mca.indexOf('admin')) return true; 
+        if(~testspec.admins.indexOf(user.sub.toString())) return true;
     }
     return false;
 }

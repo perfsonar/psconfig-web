@@ -120,7 +120,8 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label">toolkit_url</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" name="toolkit_url" ng-model="selected.toolkit_url" placeholder="http://perfsonar-lt.grid.iu.edu">
+                        <input type="text" class="form-control" name="toolkit_url" 
+                            ng-disabled="!selected._canedit" ng-model="selected.toolkit_url" placeholder="http://perfsonar-lt.grid.iu.edu">
                         <p class="help-block">For graphical displays that wish to provide a link to more information about the host (like MadDash host label). Enter <i>auto</i> if you'd like to generate this from the hostname.</p>
                     </div>
                 </div>
@@ -128,7 +129,8 @@
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
                         <div class="checkbox">
-                            <label><input type="checkbox" name="no_agent" ng-model="selected.no_agent"> No Agent</label>
+                            <label><input type="checkbox" name="no_agent" 
+                                ng-disabled="!selected._canedit" ng-model="selected.no_agent"> No Agent</label>
                             <p class="help-block">If checked, this host will not read the mesh config. This is significant because it means those that test to it are responsible for initiating tests in both directions and storing the results. If un-checked, it means other testers can assume this host is reading the mesh and will initiate its portion of the tests accordingly.</p>
                         </div>    
                     </div>
@@ -139,7 +141,7 @@
                     <div class="col-sm-10">
                         <!--<mc-admins admins="selected.admins"></mc-admins>-->
                         <ui-select multiple ng-model="selected.admins" ng-disabled="!selected._canedit || !selected.adhoc">
-                            <ui-select-match placeholder="Select admins who can update this test spec">
+                            <ui-select-match placeholder="Select admins who can update this host">
                                 <img gravatar-src="$item.email" gravatar-size="17"/>
                                 <b>{{$item.fullname}}</b> <span class="email">&lt;{{$item.email}}&gt;</span>
                             </ui-select-match>
@@ -148,21 +150,13 @@
                               <b>{{user.fullname}}</b> <small>&lt;{{user.email}}&gt;</small>
                             </ui-select-choices>
                         </ui-select>
-                        <p class="help-block">Users who can update this host</p>
+                        <p class="help-block">Users who can update this host. Empty if information came from sLS.</p>
                     </div>
                 </div>
 
                 <h3>Services / MA endpoints</h3>
                 <p class="help-block">You can request each service to send measurements to non-local MA (Measurment Archive)</p>
                 <div ng-repeat="service in selected.services | orderObjectBy: 'name' ">
-                    <!--
-                    <label class="col-sm-2 control-label">Name *</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" ng-model="service.name" 
-                            ng-readonly="!selected.adhoc"
-                            placeholder="Like.. AGLT2 Owamp" ng-disabled="!selected._canedit" required>
-                    </div>
-                    -->
                     <div class="row" style="margin-bottom: 10px;">
                         <div class="col-md-2">
                             <h4 style="margin-top: 0px;">{{service.type}}</h4>
@@ -233,15 +227,16 @@
 
                 <h3>Host Information</h3>
                 <p class="help-block">Host infomation can be used in a dynamic hostgroup query to create groups based on current information. Host detail may change over time.</p>
-                <mc-specs specs="selected.info" form="form"></mc-specs>
-
+                <mc-specs specs="selected.info" form="form" readonly="!selected._canedit || selected.adhoc"></mc-specs>
 
                 <h3>Location</h3>
+                <p>Communities that this host is configured to be member of.</p>
                 <a class="pull-right" 
+                    target="_blank"
                     href="https://www.google.com/maps/place/{{selected.location.latitude}},{{selected.location.longitude}}">
                     <i class="fa fa-map-marker" aria-hidden="true"></i> Google Map
                 </a>
-                <mc-specs specs="selected.location" form="form"></mc-specs>
+                <mc-specs specs="selected.location" form="form" readonly="!selected._canedit || selected.adhoc"></mc-specs>
 
                 <h3>Communities</h3>
                 <p class="help-block" ng-if="!selected.communities">No Communities</p>
@@ -250,12 +245,20 @@
                 </ul>
 
                 <h3>Datasource</h3>
-                <span class="label label-default">{{selected.lsid}}</span> <pre>{{selected.url}}</pre>
+                <p class="help-block">sLS URL that this host information came from.</p>
+                <!--<span class="label label-default">{{selected.lsid}}</span> <pre>{{selected.url}}</pre>-->
+                <div class="input-group">
+                    <span class="input-group-addon">{{selected.lsid}}</span>
+                    <input type="text" class="form-control" ng-model="selected.url" ng-disabled="!selected._canedit || selected.adhoc">
+                </div>
 
-                <h3>Addresses</h3>
+                <h3>IP Addresses</h3>
+                <p class="help-block">IP addresses <b>{{selected.hostname}}</b> can be reached at.</p>
                 <ul class="list-group">
                     <li class="list-group-item" ng-repeat="address in selected.addresses">
-                        {{address|json}}
+                        <span class="label label-primary" ng-if="address.family == 4">IPv4</span>
+                        <span class="label label-danger" ng-if="address.family == 6">IPv6</span>
+                        {{address.address}}
                     </li>
                 </ul>
 
