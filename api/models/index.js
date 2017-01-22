@@ -54,6 +54,7 @@ var hostSchema = mongoose.Schema({
     uuid: String, //this is now much less important..(maybe I should deprecate?)
     sitename: String,
     
+    //TODO - right now I don't know what I can use this information for..
     //stores ip address resolved from the hostname using dns.resolve
     addresses: [
         mongoose.Schema({
@@ -62,7 +63,7 @@ var hostSchema = mongoose.Schema({
         })
     ], 
 
-    toolkit_url: {type: String, default: "auto"},
+    toolkit_url: String, 
     no_agent: {type: Boolean, default: false},
 
     //host info (pshost-toolkitversion, host-hardware-memory, host-os-version, host-hadeware-processorspeed, host-hadware-processorcount)
@@ -76,13 +77,10 @@ var hostSchema = mongoose.Schema({
 
     services: [ serviceSchema ],
 
-    admins: [ String ], //from host-administrators (TODO not used yet - will be auth sub)
+    lsid: String,  //LS instance that this record came from (if this is not set, this record is considered "adhoc")
+    url: String, //source ls url (not set if this record is "simulated")
 
-    //debug 
-    lsid: String,  //source LS instance (mainly to help ui)
-    url: String, //source ls url
-
-    adhoc: {type: Boolean, default: false }, //data from sls is not adhoc unless it's simulated
+    admins: [ String ], //array of user ids (sub string in auth service) (not used if lsid is set)
 
     create_date: {type: Date, default: Date.now},
     update_date: {type: Date, default: Date.now},

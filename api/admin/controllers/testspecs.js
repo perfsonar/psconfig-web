@@ -62,25 +62,23 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
     db.Testspec.findById(req.params.id, function(err, testspec) {
         if(err) return next(err);
         if(!testspec) return next(new Error("can't find a testspec with id:"+req.params.id));
-        //only superadmin or admin of this test spec can update
-        if(canedit(req.user, testspec)) {
-            //do update fields
-            testspec.service_type = req.body.service_type;
-            testspec.name = req.body.name;
-            testspec.desc = req.body.desc;
-            testspec.specs = req.body.specs;
-            testspec.admins = req.body.admins;
-            testspec.update_date = new Date();
-            testspec.save(function(err) {
-                if(err) return next(err);
-                //res.json({status: "ok", _canedit: canedit(req.user, testspec)});
-                testspec = JSON.parse(JSON.stringify(testspec));
-                testspec._canedit = canedit(req.user, testspec);
-                res.json(testspec);
-            }).catch(function(err) {
-                next(err);
-            });
-        } else return res.status(401).end();
+        if(!canedit(req.user, testspec)) return res.status(401).end();
+        
+        //do update fields
+        testspec.service_type = req.body.service_type;
+        testspec.name = req.body.name;
+        testspec.desc = req.body.desc;
+        testspec.specs = req.body.specs;
+        testspec.admins = req.body.admins;
+        testspec.update_date = new Date();
+        testspec.save(function(err) {
+            if(err) return next(err);
+            testspec = JSON.parse(JSON.stringify(testspec));
+            testspec._canedit = canedit(req.user, testspec);
+            res.json(testspec);
+        }).catch(function(err) {
+            next(err);
+        });
     }); 
 });
 

@@ -68,17 +68,17 @@ function create_hostrec(service, uri, cb) {
             info: get_hostinfo(host),
             location: get_location(host),
             communities: host['group-communities']||[],
-
-            url: url,
             services: [],
 
-            //TODO - I need to query the real admin records from the cache (gocdb2sls service already genenrates contact records)
-            //admins: host['host-administrators'], //I just have to store them in our table (lookup service could store empty string for 'host-administrators'..)
-            admins: [],
+            //TODO .. I am not sure what we can do with host-administrators
+            //host['host-administrators'],
+            //I need to query the real admin records from the cache (gocdb2sls service already genenrates contact records)
 
-            adhoc: (host.simulated?true:false), //simulated records are adhoc
             update_date: new Date(),
         };
+
+        if(!host['simulated']) rec.url = url;
+        //else rec.url = null;
 
         //toolkit v<3.5 didn't have client-uuid
         if(host['client-uuid']) rec.uuid = host['client-uuid'][0];
@@ -274,31 +274,30 @@ function run(cb) {
     }, function(err) {
         if(err) logger.error(err); //continue
 
-        //then update if
         async.eachOfSeries(hosts, function(host, id, next) {
             if(!host) return next(); //ignore null host
-            if(host.adhoc) {
-                //adhoc record is only entered if absolutely needed
-                db.Host.findOne({
-                    hostname: host.hostname, 
-                }, function(err, _host) {
-                    if(_host) {
-                        //if existing record exits, only update if it's adhoc
-                        if(_host.adhoc) db.Host.update({hostname: host.hostname}, {$set: host}, next);
-                        else next(null); //non-adhoc record already exists.. ignore this update
-                    } else {
-                        //insert the adhoc record for the first time
-                        var rec = new db.Host(host);
-                        rec.save(next);
-                    }
-                });
-            } else {
-                //upsert existing record
-                if(~host.hostname.indexOf("bu.edu")) logger.debug("upsert:"+host.hostname);
+            if(host.url) {
+                //real record.. update existing record
+                //if(~host.hostname.indexOf("bu.edu")) logger.debug("upsert:"+host.hostname);
                 db.Host.findOneAndUpdate({
                     hostname: host.hostname
                 }, {$set: host}, {upsert: true, setDefaultsOnInsert: true}, function() {
                     next();
+                });
+            } else {
+                //this is simulated record
+                db.Host.findOne({
+                    hostname: host.hostname, 
+                }, function(err, _host) {
+                    if(_host) {
+                        //if existing record exits, only update if it's also simulated
+                        if(!_host.url) db.Host.update({hostname: host.hostname}, {$set: host}, next);
+                        else next(null); //real record already exists.. ignore this update
+                    } else {
+                        //insert new simulated record for the first time
+                        var rec = new db.Host(host);
+                        rec.save(next);
+                    }
                 });
             }
         }, function(err) {

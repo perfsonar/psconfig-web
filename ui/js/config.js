@@ -37,36 +37,9 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     $scope.select = function(config) {
         $scope.selected = config; 
         $scope.closesubbar();
-        //hide subbar if it's hidden optionally for narrow view
         $location.update_path("/configs/"+config._id);
         window.scrollTo(0,0);
-
-        /*
-        //load dynamic hostgroups hosts
-        $scope.selected.tests.forEach(function(test) {
-            load_dynamic(test.agroup);
-            load_dynamic(test.bgroup);
-        });
-        */
     }
-
-    /*
-    function load_dynamic(gid, cb) {
-        if(!gid) return;
-        var group = $scope.gethostgroup(gid);
-        if(group.type == "dynamic") {
-            console.log("dynamic group found");
-            $http.get($scope.appconf.api+'/hostgroups/dynamic', {
-                params: { type: group.service_type, js: group.host_filter, }
-            })
-            .then(function(res) {
-                group.hosts = res.data.recs;
-            }, function(res) {
-                console.log("failed to run dynamic query");
-            });       
-        }
-    }
-    */
 
     $scope.add = function() {
         $scope.selected = configs.add();
@@ -98,8 +71,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
         if(test.bgroup) $scope.gethostgroup(test.bgroup).hosts.forEach(function(id) {
             hostids.push(id);
         });
-        //console.dir(hostids);
-
+        //
         //convert to host objects
         var hosts = [];
         if($scope.hosts) $scope.hosts.forEach(function(host) {

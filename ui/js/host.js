@@ -36,13 +36,8 @@ app.controller('HostsController', function($scope, appconf, toaster, $http, serv
     $scope.selected = null;
     $scope.select = function(host) {
         $scope.selected = host;
+
         hosts.getDetail(host).then(function(_host) {
-            /*
-            //find ma service
-            _host.services.forEach(function(service) {
-                if(service.type == "ma") _host._default_ma = service;
-            });    
-            */
             find_missing_services();    
         });
 
@@ -51,8 +46,14 @@ app.controller('HostsController', function($scope, appconf, toaster, $http, serv
             $(".subbar").removeClass("subbar-shown");
         }
 
+        $scope.closesubbar();
         $location.update_path("/hosts/"+host._id);
         window.scrollTo(0,0);
+    }
+    $scope.add = function() {
+        $scope.selected = hosts.add();
+        $scope.closesubbar();
+        find_missing_services();    
     }
 
     function find_missing_services() {
@@ -79,6 +80,43 @@ app.controller('HostsController', function($scope, appconf, toaster, $http, serv
         });
         find_missing_services();    
         $scope.addservice_item = null;
+    }
+
+    function clean_spec(specs) {
+        for(var k in specs) {
+            if(specs[k] === '') delete specs[k];
+        }
+    }
+
+    $scope.submit = function() {
+        //remove parameter set to empty string
+        clean_spec($scope.selected.info);
+        clean_spec($scope.selected.location);
+
+        if(!$scope.selected._id) {
+            hosts.create($scope.selected).then(function() {
+                toaster.success("Host created successfully!");
+                $scope.form.$setPristine();
+            }).catch(function(res) {
+                toaster.error(res.data.message||res.data.errmsg); 
+            });
+        } else {
+            hosts.update($scope.selected).then(function() {
+                toaster.success("Host updated successfully!");
+                $scope.form.$setPristine();
+            }).catch(function(res) {
+                toaster.error(res.data.message||res.data.errmsg); 
+            });
+        }
+    }
+    $scope.cancel = function() {
+        location.reload();
+    }
+    $scope.remove = function() {
+        hosts.remove($scope.selected).then(function() {
+            toaster.success("Removed successfully");
+            $scope.selected = null;
+        });
     }
 
     /*
@@ -144,10 +182,9 @@ app.controller('HostsController', function($scope, appconf, toaster, $http, serv
     */
 });
 
+/*
 app.controller('HostModalController', function($scope, appconf, toaster, $http, $modalInstance, host, hosts) {
     $scope.host = host;
-    //$scope.title = title;
-    //services.then(function(_services) { $scope.services = _services; }); //for host list
     hosts.getMAs().then(function(hosts) {
         $scope.mas = hosts;
     });
@@ -173,3 +210,4 @@ app.controller('HostModalController', function($scope, appconf, toaster, $http, 
         });   
     }
 });
+*/

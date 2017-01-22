@@ -21,6 +21,7 @@ function canedit(user, host) {
     return false;
 }
 
+//query hosts
 router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
     var find = {};
     if(req.query.find) find = JSON.parse(req.query.find);
@@ -46,19 +47,63 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
     });
 });
 
+//update host info
 router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    //update host info
-    db.Host.findById(req.params.id).then(function(host) {
+    db.Host.findById(req.params.id, function(err, host) {
+        if(err) return next(err);
         if(!host) return res.status(404).end();
         if(!canedit(req.user, host)) return res.status(401).end();
 
-        //things to allow updates
+        //things always allowed to edit
         host.no_agent = req.body.no_agent;
         host.toolkit_url = req.body.toolkit_url;
-        host.services = req.body.services; //should restrict to just MAs?
-        host.save().then(function() {
-            res.json({status: "ok"});
+        host.services = req.body.services; //TODO should restrict to just MAs?
+        host.update_date = new Date();
+
+        if(!host.lsid) {
+            //adhoc records can set more info
+            host.hostname = req.body.hostname;
+            host.sitename = req.body.sitename;
+            host.info = req.body.info;
+            host.location = req.body.location;
+            host.communities = req.body.communities;
+            host.admins =  req.body.admins;
+        }
+
+        host.save(function(err) {
+            if(err) return next(err);
+            host = JSON.parse(JSON.stringify(host));
+            host._canedit = canedit(req.user, host);
+            res.json(host);
+        }).catch(function(err) {
+            next(err);
         });
+    });
+});
+
+//register new adhoc host
+router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
+    if(!req.user.scopes.mca || !~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
+    if(req.body.lsid) delete res.body.lsid;// make sure lsid is not set
+    db.Host.create(req.body, function(err, host) {
+        if(err) return next(err);
+        host = JSON.parse(JSON.stringify(host));
+        host._canedit = canedit(req.user, host);
+        res.json(host);
+    });
+});
+
+router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
+    //var id = parseInt(req.params.id);
+    db.Testspec.findById(req.params.id, function(err, host) {
+        if(err) return next(err);
+        if(!host) return next(new Error("can't find a host with id:"+req.params.id));
+        //only superadmin or admin of this test spec can update
+        if(canedit(req.user, host)) {
+            host.remove().then(function() {
+                res.json({status: "ok"});
+            }); 
+        } else return res.status(401).end();
     });
 });
 

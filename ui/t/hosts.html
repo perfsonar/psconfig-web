@@ -32,13 +32,18 @@
                 ng-class="{'active': selected == host}"
                 ng-click="select(host)">
                 <div class="list-header">
-                    <small><span class="label label-default">{{host.lsid}}</span> {{host.sitename}} 
-                        <!--<span class="text-muted">/</span>-->
+                    <small>
+                        <span class="label label-info pull-right" ng-if="host.lsid && !host.url">Simulated</span> 
+                        <span class="label label-default" ng-if="host.lsid">{{host.lsid}}</span>
+                        <span class="label label-warning" ng-if="!host.lsid">Adhoc</span> 
+                        {{host.hostname}} 
                         <i ng-if="!host._canedit" class="fa fa-lock text-muted" title="readonly"></i>
-                        <span ng-if="host.adhoc" class="label label-warning pull-right">Adhoc</span>
                     </small>
                 </div>
-                <small class="help-block">{{host.hostname}}</small>
+                <small class="help-block">{{host.sitename}}</small>
+            </div>
+            <div class="list-addbutton" ng-click="add()" title="Add new adhoc host">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i> 
             </div>
         </div><!--subbar-list-->
     </div><!--subbar-->
@@ -62,15 +67,12 @@
                 </h2>
                 -->
                 <h2>
-                    <i class="fa fa-trash-o clickable" aria-hidden="true" ng-if="selected._id && selected._canedit"
+                    <i class="fa fa-trash-o clickable" aria-hidden="true" 
+                        ng-if="selected._id && selected._canedit"
                         ng-confirm-click="Are you sure you want to remove this host?"
                         confirmed-click="remove()"></i>&nbsp;&nbsp;&nbsp;
-                    <!--
-                    <i class="fa fa-info-circle" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
-                    <i class="fa fa-star-o" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
-                    <i class="fa fa-share-alt" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
-                    -->
                     <div class="pull-right" style="padding-right: 20px;">
+                         <i class="fa fa-lock" ng-if="!selected._canedit" title="Read Only"></i>
                          <div ng-if="form.$dirty && selected._canedit" class="display: inline-block;">
                             <button type="submit" class="btn btn-primary" ng-if="selected._id">Update</button>
                             <button type="submit" class="btn btn-primary" ng-if="!selected._id">Create</button>
@@ -84,8 +86,7 @@
                         <label for="hostname" class="col-sm-2 control-label"><strong>Hostname *</strong></label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="hostname" ng-model="selected.hostname" 
-                                ng-readonly="!selected.adhoc" 
-                                ng-disabled="!selected._canedit" 
+                                ng-disabled="!selected._canedit || selected.lsid" 
                                 placeholder="some.hostname.edu" required>
                         </div>
                     </div>
@@ -94,25 +95,20 @@
             </div><!--fixed-top-->
 
             <div style="padding-top: 150px" class="margin30">
-                <p class="alert alert-info" ng-if="!selected.adhoc">Information on this host comes from lookup service. You can not edit some information.</p>
+                <p class="bg bg-info" ng-if="selected.lsid" style="padding: 15px;">
+                    You can not modify most information for this host which comes from
+                    <span class="label label-default">{{selected.lsid}}</span> 
+                    <a href="{{selected.url}}" target="_blank" ng-if="selected.url">{{selected.url}}</a>
+                    <span ng-if="!selected.url">as a simulated record</span>
+                </p>
+
                 <h3>Basic Information</h3>
-                <!--
-                <small><span class="label {{services.lss[host.services[0].lsid].label_class}}"> {{services.lss[host.services[0].lsid].label}}</span></small>
-                -->
-                <!--
-                <small>
-                    <a ng-if="selected.toolkit_url != 'auto'" href="{{selected.toolkit_url}}" target="_blank">
-                        <i class="fa fa-external-link"></i>
-                    </a>
-                </small>
-                -->
                 <div class="form-group">
-                    <label for="sitename" class="col-sm-2 control-label"><strong>Site Name *</strong></label>
+                    <label for="sitename" class="col-sm-2 control-label">Site Name *</label>
                     <div class="col-sm-10">
                         <input type="text" class="form-control" id="sitename" 
                             ng-model="selected.sitename" 
-                            ng-readonly="!selected.adhoc"
-                            ng-disabled="!selected._canedit" 
+                            ng-disabled="!selected._canedit || selected.lsid" 
                             placeholder="Like.. AGLT2" required>
                     </div>
                 </div>
@@ -121,8 +117,8 @@
                     <label class="col-sm-2 control-label">toolkit_url</label>
                     <div class="col-sm-10">
                         <input type="text" class="form-control" name="toolkit_url" 
-                            ng-disabled="!selected._canedit" ng-model="selected.toolkit_url" placeholder="http://perfsonar-lt.grid.iu.edu">
-                        <p class="help-block">For graphical displays that wish to provide a link to more information about the host (like MadDash host label). Enter <i>auto</i> if you'd like to generate this from the hostname.</p>
+                            ng-disabled="!selected._canedit" ng-model="selected.toolkit_url" placeholder="Auto generate from hostname">
+                        <p class="help-block">For graphical displays that wish to provide a link to more information about this host (such as MadDash)</p>
                     </div>
                 </div>
 
@@ -140,7 +136,7 @@
                     <label for="admins" class="col-sm-2 control-label">Admins</label>
                     <div class="col-sm-10">
                         <!--<mc-admins admins="selected.admins"></mc-admins>-->
-                        <ui-select multiple ng-model="selected.admins" ng-disabled="!selected._canedit || !selected.adhoc">
+                        <ui-select multiple ng-model="selected.admins" ng-disabled="!selected._canedit || selected.lsid">
                             <ui-select-match placeholder="Select admins who can update this host">
                                 <img gravatar-src="$item.email" gravatar-size="17"/>
                                 <b>{{$item.fullname}}</b> <span class="email">&lt;{{$item.email}}&gt;</span>
@@ -164,9 +160,10 @@
                         <div class="col-md-5">
                             <div class="input-group">
                                 <span class="input-group-addon">Locator</span>
-                                <input type="text" class="form-control" ng-model="service.locator" 
-                                ng-readonly="!selected.adhoc"
-                                placeholder="API URL for this service (leave it blank to auto generate)" ng-disabled="!selected._canedit">
+                                <input type="text" class="form-control" 
+                                    ng-model="service.locator" 
+                                    placeholder="API URL for this service (leave it blank to auto generate)" 
+                                    ng-disabled="!selected._canedit || selected.lsid">
                             </div>
                         </div>
                         <div class="col-md-5" ng-if="service.type != 'ma'">
@@ -188,7 +185,8 @@
                 </div>
 
                 <!--service adder-->
-                <div ng-if="selected._canedit && selected.adhoc && missing_services.length > 0"> 
+                {{missing_services|json}}
+                <div ng-if="selected._canedit && !selected.lsid && missing_services.length > 0"> 
                     <hr>
                     <div class="row">
                         <div class="col-md-2"> </div>
@@ -227,7 +225,7 @@
 
                 <h3>Host Information</h3>
                 <p class="help-block">Host infomation can be used in a dynamic hostgroup query to create groups based on current information. Host detail may change over time.</p>
-                <mc-specs specs="selected.info" form="form" readonly="!selected._canedit || selected.adhoc"></mc-specs>
+                <mc-specs specs="selected.info" form="form" readonly="!selected._canedit || selected.lsid"></mc-specs>
 
                 <h3>Location</h3>
                 <p>Communities that this host is configured to be member of.</p>
@@ -236,7 +234,7 @@
                     href="https://www.google.com/maps/place/{{selected.location.latitude}},{{selected.location.longitude}}">
                     <i class="fa fa-map-marker" aria-hidden="true"></i> Google Map
                 </a>
-                <mc-specs specs="selected.location" form="form" readonly="!selected._canedit || selected.adhoc"></mc-specs>
+                <mc-specs specs="selected.location" form="form" readonly="!selected._canedit || selected.lsid"></mc-specs>
 
                 <h3>Communities</h3>
                 <p class="help-block" ng-if="!selected.communities">No Communities</p>
@@ -244,14 +242,7 @@
                     <li ng-repeat="com in selected.communities">{{com}}</li>
                 </ul>
 
-                <h3>Datasource</h3>
-                <p class="help-block">sLS URL that this host information came from.</p>
-                <!--<span class="label label-default">{{selected.lsid}}</span> <pre>{{selected.url}}</pre>-->
-                <div class="input-group">
-                    <span class="input-group-addon">{{selected.lsid}}</span>
-                    <input type="text" class="form-control" ng-model="selected.url" ng-disabled="!selected._canedit || selected.adhoc">
-                </div>
-
+                <!--
                 <h3>IP Addresses</h3>
                 <p class="help-block">IP addresses <b>{{selected.hostname}}</b> can be reached at.</p>
                 <ul class="list-group">
@@ -261,10 +252,7 @@
                         {{address.address}}
                     </li>
                 </ul>
-
-                <div ng-if="selected.toolkit_url != 'auto'">
-                    Toolkit URL Override: <a href="{{selected.toolkit_url}}" target="_blank">{{selected.toolkit_url}}</a>
-                </div>
+                -->
 
                 <br><br>
                 

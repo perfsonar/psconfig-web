@@ -219,7 +219,7 @@ exports.generate = function(config, opts, cb) {
                 addresses: [ _host.hostname ], 
                 measurement_archives: [ ], 
                 description: _host.sitename,
-                toolkit_url: _host.toolkit_url,
+                toolkit_url: _host.toolkit_url||"auto",
             };
             if(_host.no_agent) host.no_agent = 1;
 

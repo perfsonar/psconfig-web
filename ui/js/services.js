@@ -1,22 +1,4 @@
 
-/* - use users service instead?
-app.factory('profile', function(appconf, $http) {
-    var profile_cache = {};
-    return {
-        get: function(id) {
-            if(profile_cache[id] === undefined) {
-                profile_cache[id] = {};
-                $http.get(appconf.auth_api+"/profile/"+id)
-                .then(function(res) {
-                    for(var key in res.data) profile_cache[id][key] = res.data[key];
-                });
-            }
-            return profile_cache[id];
-        }
-    }
-});
-*/
-
 //just a service to load all users from auth service
 app.factory('serverconf', ['appconf', '$http', function(appconf, $http) {
     return $http.get(appconf.api+'/config')
@@ -25,41 +7,7 @@ app.factory('serverconf', ['appconf', '$http', function(appconf, $http) {
     });
 }]);
 
-/*
-app.factory('services', ['appconf', '$http', 'jwtHelper', function(appconf, $http, jwtHelper) {
-    var label_c = 0;
-    function get_class() {
-        switch(label_c++ % 5) {
-        case 0: return "label-primary"; break;
-        case 1: return "label-success"; break;
-        case 2: return "label-info"; break;
-        case 3: return "label-warning"; break;
-        case 4: return "label-danger"; break;
-        }
-    }
-
-    return $http.get(appconf.api+'/cache/services')
-    .then(function(res) {
-        //assign label_classes
-        for(var lsid in res.data.lss) {
-            res.data.lss[lsid].label_class = get_class();
-        };
-
-        //set old flag on hosts that haven't been updated lately
-        var now = new Date();
-        var old = new Date(now.getTime() - 1000*3600); //1 hour old enough?
-        for(var type in res.data.recs) {
-            res.data.recs[type].forEach(function(service) {
-                if(Date.parse(service.updatedAt) < old) service.old = true;
-            });
-        }
-        //console.dir(res.data);
-        return res.data;
-    });
-}]);
-*/
-
-app.factory('hosts', function(appconf, $http, toaster) {
+app.factory('hosts', function(appconf, $http, jwtHelper) {
     var hosts = [];
     //var all_promise = null;
     var ma_promise = null;
@@ -68,7 +16,7 @@ app.factory('hosts', function(appconf, $http, toaster) {
         //return basic (uuid, sitename, hostname, lsid) host info for all hosts
         getAll: function(opts) { 
             //if(all_promise) return all_promise;
-            var select = "sitename hostname lsid adhoc";
+            var select = "sitename hostname lsid url";
             if(opts && opts.select) select = opts.select;
             return $http.get(appconf.api+'/hosts?select='+select+'&sort=sitename hostname&limit=100000')
             .then(function(res) {
@@ -98,6 +46,48 @@ app.factory('hosts', function(appconf, $http, toaster) {
                 return res.data.hosts;
             });
             return ma_promise;
+        },
+
+        //CRUD
+        add: function() {
+            var host = {
+                //hostname: "",
+                admins: [],
+                services: [],
+                info: {},
+                location: {},
+                communities: {},
+            };
+            
+            //add user to admin
+            var jwt = localStorage.getItem(appconf.jwt_id);
+            if(jwt) {
+                var user = jwtHelper.decodeToken(jwt);
+                host.admins.push(user.sub.toString());
+                host._canedit = true;
+            }
+            hosts.unshift(host);
+            return host;
+        },
+        create: function(host) {
+            return $http.post(appconf.api+'/hosts/', host)
+            .then(function(res) {
+                for(var k in res.data) host[k] = res.data[k];
+                return host;
+            });
+        },
+        update: function(host) {
+            return $http.put(appconf.api+'/hosts/'+host._id, host)
+            .then(function(res) {
+                for(var k in res.data) host[k] = res.data[k];
+                return host;
+            });
+        },
+        remove: function(host) {
+            return $http.delete(appconf.api+'/hosts/'+host._id)
+            .then(function(res) {
+                hosts.splice(hosts.indexOf(host), 1);
+            });
         }
     }
 });
@@ -146,7 +136,7 @@ app.factory('testspecs', function(appconf, $http, jwtHelper) {
                 testspec.admins.push(user.sub.toString());
                 testspec._canedit = true;
             }
-            testspecs.push(testspec);
+            testspecs.unshift(testspec);
             return testspec;
         },
         create: function(testspec) {
@@ -169,15 +159,12 @@ app.factory('testspecs', function(appconf, $http, jwtHelper) {
             return $http.delete(appconf.api+'/testspecs/'+testspec._id)
             .then(function(res) {
                 testspecs.splice(testspecs.indexOf(testspec), 1);
-                //$scope.form.$setPristine();//ignore all changed made
-                //$location.path("/testspecs");
-                //toaster.success("Deleted Successfully!");
             });
         }
     }
 });
 
-app.factory('configs', function(appconf, $http, toaster, jwtHelper) {
+app.factory('configs', function(appconf, $http, jwtHelper) {
     var configs = [];
     //var all_promise = null;
     var ma_promise = null;
@@ -206,7 +193,7 @@ app.factory('configs', function(appconf, $http, toaster, jwtHelper) {
                 config.admins.push(user.sub.toString());
                 config._canedit = true;
             }
-            configs.push(config);
+            configs.unshift(config);
             return config;
         },
         create: function(config) {
@@ -261,7 +248,7 @@ app.factory('hostgroups', function(appconf, $http, jwtHelper) {
                 hostgroup.admins.push(user.sub.toString());
                 hostgroup._canedit = true;
             }
-            hostgroups.push(hostgroup);
+            hostgroups.unshift(hostgroup);
             return hostgroup;
         },
         create: function(hostgroup) {
@@ -292,7 +279,7 @@ app.factory('hostgroups', function(appconf, $http, jwtHelper) {
 
 //TODO - deprecate this?
 //load menu and profile by promise chaining
-app.factory('menu', function(appconf, $http, jwtHelper, $sce, scaMessage, scaMenu, toaster) {
+app.factory('menu', function(appconf, $http, jwtHelper, $sce, scaMessage, scaMenu) {
 
     var jwt = localStorage.getItem(appconf.jwt_id);
     var menu = {

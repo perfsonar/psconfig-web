@@ -23,9 +23,8 @@ app.controller('TestspecsController', function($scope, $route, toaster, $http, j
     $scope.selected = null;
     $scope.select = function(testspec) {
         //TODO - maybe I should catch $dirty flag here.. but what about page nagivation?
-        //console.dir($scope.form.$dirty);
-
         $scope.selected = testspec; 
+
         $scope.closesubbar();
         $location.update_path("/testspecs/"+testspec._id);
         window.scrollTo(0,0);
@@ -52,7 +51,6 @@ app.controller('TestspecsController', function($scope, $route, toaster, $http, j
             delete $scope.selected.specs.ipv4_only;
         }
     });
-
 
     $scope.submit = function() {
         //remove parameter set to empty string
