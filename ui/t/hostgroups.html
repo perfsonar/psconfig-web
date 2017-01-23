@@ -155,7 +155,11 @@
                 </div>
                 <br>
                 <br>
+
                 <!-- don't remove this or ui-select won't be displayed correctly (containing div trims it?)-->
+                <div ng-if="!appconf.debug" style="height: 300px">     
+                </div> 
+
                 <div ng-if="appconf.debug">
                     <h3>Debug</h3>
                     <pre>{{selected|json}}</pre>

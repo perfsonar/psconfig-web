@@ -56,6 +56,12 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
         if(err) return next(err);
         if(!host) return res.status(404).end();
         if(!canedit(req.user, host)) return res.status(401).end();
+        
+        //somehow, mongo doesn't clear ma ref if it's *not set*.. I have to explicity set it to *undefined* 
+        //to force mongo from clearing the ref.
+        req.body.services.forEach(function(service) {
+            if(!service.ma) service.ma = undefined;
+        });
 
         //things always allowed to edit
         host.no_agent = req.body.no_agent;
@@ -75,7 +81,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
 
         host.save(function(err) {
             if(err) return next(err);
-            console.dir(host);
+            //console.log(JSON.stringify(host.services, null, 4));
             host = JSON.parse(JSON.stringify(host));
             host._canedit = canedit(req.user, host);
             res.json(host);

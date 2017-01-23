@@ -88,7 +88,7 @@
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="hostname" ng-model="selected.hostname" 
                                 ng-disabled="!selected._canedit || selected.lsid" 
-                                placeholder="some.hostname.edu" required>
+                                placeholder="Enter hostname" required>
                         </div>
                     </div>
                 </div>
@@ -96,12 +96,26 @@
             </div><!--fixed-top-->
 
             <div style="padding-top: 150px" class="margin30">
+                <!--
                 <p class="bg bg-info" ng-if="selected.lsid" style="padding: 15px;">
                     You can not modify most information for this host which comes from
                     <span class="label label-default">{{selected.lsid}}</span> 
                     <a href="{{selected.url}}" target="_blank" ng-if="selected.url">{{selected.url}}</a>
                     <span ng-if="!selected.url">as a simulated record</span>
                 </p>
+                -->
+
+                <div class="form-group" ng-if="selected.lsid">
+                    <label class="col-sm-2 control-label">Datasource</label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <span class="input-group-addon">{{selected.lsid}}</span>
+                            <input type="text" class="form-control" disabled value="{{selected.url||'(Simulated)'}}"></input>
+                        </div>
+                        <p class="help-block">sLS URL where the host information comes from.</p>
+                        <p class="alert alert-info" ng-if="!selected.url">The information about this host couldn't be discovered by downloading toolkit JSON. We are guessing its content.</p>
+                    </div>
+                </div>
 
                 <h3>Basic Information</h3>
                 <div class="form-group">
@@ -171,7 +185,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon">MA</span>
                                 <ui-select ng-model="service.ma" ng-disabled="!selected._canedit">
-                                    <ui-select-match placeholder="Use local measurement archive">
+                                    <ui-select-match placeholder="Use local measurement archive" allow-clear>
                                         <div style="padding-top: 2px; font-size: 12px">
                                             {{$select.selected.sitename}} <code>{{$select.selected.hostname}}</code>
                                         </div>
@@ -224,11 +238,11 @@
                 -->
 
                 <h3>Host Information</h3>
-                <p class="help-block">Host infomation can be used in a dynamic hostgroup query to create groups based on current information. Host detail may change over time.</p>
+                <p class="help-block">Host infomation can be used in a dynamic hostgroup query.</p>
                 <mc-specs specs="selected.info" form="form" readonly="!selected._canedit || selected.lsid"></mc-specs>
 
                 <h3>Location</h3>
-                <p>Communities that this host is configured to be member of.</p>
+                <!--<p class="help-block">Communities that this host is configured to be member of.</p>-->
                 <a class="pull-right" 
                     target="_blank"
                     href="https://www.google.com/maps/place/{{selected.location.latitude}},{{selected.location.longitude}}">
@@ -237,7 +251,8 @@
                 <mc-specs specs="selected.location" form="form" readonly="!selected._canedit || selected.lsid"></mc-specs>
 
                 <h3>Communities</h3>
-                <p class="help-block" ng-if="!selected.communities">No Communities</p>
+                <!--<p class="help-block">Communities that this host is configured to be member of.</p>-->
+                <p class="help-block" ng-if="selected.communities.length == 0">No Communities</p>
                 <ul class="specs">
                     <li ng-repeat="com in selected.communities">{{com}}</li>
                 </ul>
