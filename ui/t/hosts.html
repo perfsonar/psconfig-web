@@ -170,7 +170,12 @@
                 <div ng-repeat="service in selected.services | orderObjectBy: 'name' ">
                     <div class="row" style="margin-bottom: 10px;">
                         <div class="col-md-2">
-                            <h4 style="margin-top: 0px;">{{service.type}}</h4>
+                            <h4 style="margin-top: 0px;">
+                                {{service.type}} 
+                                <i class="fa fa-trash text-muted clickable" 
+                                    ng-click="removeservice(service)" 
+                                    ng-if="selected._canedit && !selected.lsid"/>
+                            </h4>
                         </div>
                         <div class="col-md-5">
                             <div class="input-group">

@@ -82,6 +82,12 @@ app.controller('HostsController', function($scope, appconf, toaster, $http, serv
         find_missing_services();    
         $scope.addservice_item = null;
     }
+    $scope.removeservice = function(service) {
+        var id = $scope.selected.services.indexOf(service);
+        $scope.selected.services.splice(id, 1);
+        find_missing_services();    
+        $scope.form.$setDirty();
+    }
 
     function clean_spec(specs) {
         for(var k in specs) {
