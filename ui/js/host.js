@@ -71,6 +71,16 @@ app.controller('HostsController', function($scope, appconf, toaster, $http, serv
                 label: $scope.serverconf.service_types[id].label,
             });
         }
+
+        //also inject MA service
+        var found_ma = false;
+        $scope.selected.services.forEach(function(used_service) {
+            if(used_service.type == "ma") found_ma = true;
+        });
+        if(!found_ma) $scope.missing_services.push({
+            id: "ma",
+            label: "Measurement Archive",
+        });
     }
 
     $scope.addservice = function() {

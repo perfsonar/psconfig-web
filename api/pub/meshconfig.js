@@ -228,14 +228,15 @@ exports.generate = function(config, opts, cb) {
                 if(service.type == "mp-bwctl") return;
                 if(service.type == "ma") return;
                 if(service.type == "mp-owamp") return;
-                if(opts.ma_override) service.ma = {
-                    locator: opts.ma_override
-                }
+                if(opts.ma_override) service.ma = { locator: opts.ma_override }
+
                 //service.ma is already resolved.. (local vs. remote)
                 if(service.ma) {
+                    //adhoc host might not have locator specified.. in that, case fake it..
+                    if(!service.ma.locator) service.ma.locator = "http://"+_host.hostname+'/esmond/perfsonar/archive';
                     host.measurement_archives.push(generate_mainfo(service));
                 } else {
-                    logger.error("NO MA service running for ");
+                    logger.error("NO MA service running on ..");
                     logger.debug(service);
                 }
             });
