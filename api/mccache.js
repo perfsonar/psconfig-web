@@ -182,12 +182,15 @@ function cache_ls(hosts, ls, lsid, cb) {
                     if(_service.type == type) exist = true;
                 });
                 if(!exist) {
+                    //pick the last service locator
+                    var len = service['service-locator'].length;
+                    var locator = service['service-locator'][len-1];
                     
                     //construct service record
                     host.services.push({
                         type: type,
                         name: service['service-name'][0],
-                        locator: service['service-locator'][0], //locator is now a critical information needed to generate the config
+                        locator: locator, //locator is now a critical information needed to generate the config
                         //lsid: lsid, //make it easier for ui
                         
                         //TODO - I need to query the real admin records from the cache (gocdb2sls service already genenrates contact records)
