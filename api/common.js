@@ -1,7 +1,9 @@
 
+const fs = require('fs'); //debug
 const request = require('request');
 const winston = require('winston');
 const Sandbox = require('sandbox'); //https://github.com/gf3/sandbox
+const async = require('async');
 
 //mine
 const config = require('./config');
@@ -34,24 +36,46 @@ exports.profile = {
 exports.dynamic = {
     resolve: function(js, type, cb) {
         var services = {};
-        db.Host.find({"services.type": type}, function(err, recs) {
+        db.Host.find({"services.type": type}, function(err, hosts) {
             if(err) return cb(err);
-            logger.debug("running dynamic hostgroup query on "+recs.length);
+            logger.debug("running dynamic hostgroup query on",hosts.length,"hosts");
+
             var sandbox = new Sandbox(/*{timeout: 1000*10}*/);
-            var matches = [];
-            var code = "JSON.stringify("+JSON.stringify(recs)+".filter("+
+
+            //convert recs to json 
+            var json = JSON.stringify(hosts);
+            //(and strip non-ascii chars..)
+            /*
+            fs.writeFile("/tmp/dump.json", json);
+            json = json.replace(/[\u007F-\uFFFF]/g, function(chr) {
+                return "\\u" + ("0000" + chr.charCodeAt(0).toString(16)).substr(-4)
+            })
+            */
+        
+            /*
+            var code = "JSON.stringify("+json+".filter("+
                 "function(host) {"+
-                //"   var host = service.Host||{};\n"+
                 "   try {\n"+
                 js+"\n"+
                 "   } catch(e) {\n"+
                 "   console.log(host.hostname+' - '+e.toString());\n"+
                 "   }\n"+
                 "}))";
+            */
+            var code = `
+                JSON.stringify(`+json+`.filter(
+                function(host) {
+                    try {
+                        `+js+`
+                    } catch(e) {
+                        console.log(host.hostname+' - '+e.toString());
+                    }
+                }))
+            `;
             sandbox.run(code, function(res) {
-                var _recs = res.result.slice(1, -1); //remove first and last double quotes (not sure how I can get rid of it)
                 try {
-                    var hosts = JSON.parse(_recs);
+                    var json = eval(res.result); //Is this safe?
+                    var hosts = JSON.parse(json);
                     var ids = hosts.map(function(host) { return host._id; }); //just pull _id
                     cb(null, {recs: ids, c: res.console});
                 } catch(e) {

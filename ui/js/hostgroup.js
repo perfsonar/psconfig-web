@@ -48,11 +48,16 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
 
     $scope.selected = null;
     $scope.select = function(hostgroup) {
-        switch(hostgroup.type) {
-        case "static": $scope.tabs.static.active = true; break;
-        case "dynamic": $scope.tabs.dynamic.active = true; break;
-        }
         $scope.selected = hostgroup; 
+        switch(hostgroup.type) {
+        case "static":
+            $scope.tabs.static.active = true; 
+            break;
+        case "dynamic": 
+            $scope.tabs.dynamic.active = true; 
+            $scope.run_dynamic();
+            break;
+        }
         $scope.closesubbar();
         $location.update_path("/hostgroups/"+hostgroup._id);
         window.scrollTo(0,0);

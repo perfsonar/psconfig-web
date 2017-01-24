@@ -33,7 +33,8 @@
                 <div class="list-header">
                     <small>
                         <span class="label label-default">{{hostgroup.service_type}}</span> {{hostgroup.name}}
-                        <i ng-if="!hostgroup._canedit" class="fa fa-lock text-muted"></i>
+                        <i ng-if="!hostgroup._canedit" class="fa fa-lock text-muted" title="Readonly"></i>
+                        <i ng-if="hostgroup.type == 'dynamic'" class="fa fa-fire" title="Dynamic Hostgroup"></i>
                     </small>
                 </div>
             </div>

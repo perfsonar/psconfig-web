@@ -232,6 +232,7 @@ app.factory('hostgroups', function(appconf, $http, jwtHelper) {
     return {
         getAll: function() {
             if(all_promise) return all_promise;
+            //all_promise = $http.get(appconf.api+'/hostgroups?select=service_type name type create_date')
             all_promise = $http.get(appconf.api+'/hostgroups')
             .then(function(res) {
                 hostgroups = res.data.hostgroups;
