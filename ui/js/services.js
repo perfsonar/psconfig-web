@@ -53,7 +53,12 @@ app.factory('hosts', function(appconf, $http, jwtHelper) {
             var host = {
                 //hostname: "",
                 admins: [],
-                services: [],
+
+                //let's add ma by default - to prevent user from forget registering it
+                services: [{
+                    "type": "ma", 
+                }],
+
                 info: {},
                 location: {},
                 communities: [],

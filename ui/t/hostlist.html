@@ -1,6 +1,8 @@
 <ul class="hosts" ng-if="hosts">
     <li ng-repeat="id in hostids">
-        <!--<mc-service ls="services.lss[service.lsid]" service="service"></mc-service>-->
-        <b>{{hosts[id].sitename}}</b> <span>{{hosts[id].hostname}}</span> <span class="label label-default">{{hosts[id].lsid}}</span>
+        <span class="label label-default" ng-if="hosts[id].lsid">{{hosts[id].lsid}}</span>
+        <span class="label label-warning" ng-if="!hosts[id].lsid">Adhoc</span>
+        <span>{{hosts[id].hostname||'removed'}}</span> 
+        <!--<span>{{hosts[id].sitename}}</span> -->
     </li>
 </ul>

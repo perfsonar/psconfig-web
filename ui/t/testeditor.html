@@ -105,11 +105,17 @@
     <div class="col-sm-10">
         <ui-select multiple ng-model="test.nahosts" style="margin-top: 5px;">
             <ui-select-match placeholder="Enter Hostnames">
-                <b>{{$item.sitename}}</b> <span>{{$item.hostname|trim_locator}}</span>
+                <span class="label label-default" ng-if="$item.lsid">{{$item.lsid}}</span>
+                <span class="label label-warning" ng-if="!$item.lsid">Adhoc</span>
+                <!--<b>{{$item.sitename}}</b>-->
+                <span>{{$item.hostname|trim_locator}}</span>
             </ui-select-match>
             <!--can't filter by service_type because we aren't loading service_type detail for hosts-->
             <ui-select-choices repeat="host._id as host in hosts | propsFilter: {sitename: $select.search, hostname: $select.search}">
-                <b>{{host.sitename}}</b> <span>{{host.hostname|trim_locator}}</span>
+                <span class="label label-default" ng-if="host.lsid">{{host.lsid}}</span>
+                <span class="label label-warning" ng-if="!host.lsid">Adhoc</span>
+                <b>{{host.sitename}}</b> 
+                <span>{{host.hostname|trim_locator}}</span>
             </ui-select-choices>
         </ui-select>
         <p class="help-block">

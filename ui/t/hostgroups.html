@@ -118,17 +118,19 @@
                                 active="tabs['static'].active">
                                 <ui-select multiple ng-model="selected.hosts" style="margin-top: 5px;" ng-disabled="!selected._canedit">
                                     <ui-select-match placeholder="Enter hostname">
-                                        <!--<mc-service ls="services.lss[$item.lsid]" service="$item"></mc-service>-->
-                                        <b>{{$item.sitename}}</b> <span>{{$item.hostname|trim_locator}}</span>
-                                        <!--<span class="label label-default">{{$item.lsid}}</span>-->
+                                        <span class="label label-default" ng-if="$item.lsid">{{$item.lsid}}</span>
+                                        <span class="label label-warning" ng-if="!$item.lsid">Adhoc</span>
+                                        <!--<b>{{$item.sitename}}</b>-->
+                                        <span>{{$item.hostname|trim_locator}}</span>
                                     </ui-select-match>
                                     <ui-select-choices repeat="host._id as host in hosts[selected.service_type] | propsFilter: {sitename: $select.search, hostname: $select.search}">
-                                        <!--<mc-service ls="services.lss[service.lsid]" service="service"></mc-service>-->
-                                        <b>{{host.sitename}}</b> <span>{{host.hostname|trim_locator}}</span>
-                                        <span class="label label-default">{{host.lsid}}</span>
+                                        <span class="label label-default" ng-if="host.lsid">{{host.lsid}}</span>
+                                        <span class="label label-warning" ng-if="!host.lsid">Adhoc</span>
+                                        <b>{{host.sitename}}</b> 
+                                        <span>{{host.hostname|trim_locator}}</span>
                                     </ui-select-choices>
                                 </ui-select>
-                                <button class="btn btn-xs btn-default pull-right" type="button" ng-click="selected.hosts = []; form.$setDirty();">Clear All</button>
+                                <button class="btn btn-xs btn-default pull-right" type="button" ng-click="selected.hosts = []; form.$setDirty();">Clear All {{selected.hosts.length}} Hosts</button>
                             </tab>
                             <tab heading="Dynamic" 
                                 select="changetype('dynamic')"

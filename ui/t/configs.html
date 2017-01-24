@@ -151,8 +151,10 @@
 
                 <br>
                 <br>
-                <h3>Debug</h3>
-                <pre>{{selected|json}}</pre>
+                <div ng-if="appconf.debug">
+                    <h3>Debug</h3>
+                    <pre>{{selected|json}}</pre>
+                </div>
             </div>
         </form>
         <!--

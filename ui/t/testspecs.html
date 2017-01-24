@@ -109,9 +109,12 @@
                 </div>
                 <ng-include ng-if="selected.service_type" src="'t/testspec-'+selected.service_type+'.html'"></ng-include>
 
-                <!--
-                <pre>{{selected|json}}</pre>
-                -->
+                <br><br>
+
+                <div ng-if="appconf.debug">
+                    <h3>Debug</h3>
+                    <pre>{{selected|json}}</pre>
+                </div>
             </div><!--nonfixed-->
         </form>  
     </div><!--subbar-content-->
