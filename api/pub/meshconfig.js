@@ -83,6 +83,12 @@ function resolve_hostgroup(id, cb) {
     db.Hostgroup.findById(id).exec(function(err, hostgroup) {
         if(err) return cb(err);
         if(!hostgroup) return cb("can't find hostgroup:"+id);
+        //hosts will contain hostid for both static and dynamic (cached by mccache)
+        resolve_hosts(hostgroup.hosts, function(err, hosts) {
+            if(err) return cb(err);
+            cb(null, hosts);
+        }); 
+        /*
         if(hostgroup.type == "static") {
             resolve_hosts(hostgroup.hosts, function(err, hosts) {
                 if(err) return cb(err);
@@ -92,8 +98,15 @@ function resolve_hostgroup(id, cb) {
             logger.debug("resolving dynamic hostgroup");
             logger.debug(hostgroup.host_filter);
             logger.debug(hostgroup.service_type);
-            common.dynamic.resolve(hostgroup.host_filter, hostgroup.service_type, cb);
+            //TODO - I should cache this instead of resolving it every time
+            common.dynamic.resolve(hostgroup.host_filter, hostgroup.service_type, function(err, res) {
+                resolve_hosts(res.ids, function(err, hosts) {
+                    if(err) return cb(err);
+                    cb(null, hosts);
+                }); 
+            });
         }
+        */
     });
 }
 
@@ -140,6 +153,7 @@ exports.generate = function(config, opts, cb) {
                 if(!test.agroup) return next();
                 resolve_hostgroup(test.agroup, function(err, hosts) {
                     if(err) return next(err);
+                    console.dir(hosts);
                     test.agroup = hosts;
                     hosts.forEach(function(host) { host_catalog[host._id] = host; });
                     next();

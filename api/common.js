@@ -77,7 +77,7 @@ exports.dynamic = {
                     var json = eval(res.result); //Is this safe?
                     var hosts = JSON.parse(json);
                     var ids = hosts.map(function(host) { return host._id; }); //just pull _id
-                    cb(null, {recs: ids, c: res.console});
+                    cb(null, {ids: ids, c: res.console});
                 } catch(e) {
                     logger.debug(e);
                     //logger.debug(res.console);

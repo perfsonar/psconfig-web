@@ -239,7 +239,7 @@ function update_dynamic_hostgroup(cb) {
         async.eachSeries(groups, function(group, next) {
             common.dynamic.resolve(group.host_filter, group.service_type, function(err, hosts) {
                 if(err) return next(err);
-                group.hosts = hosts.recs;
+                group.hosts = hosts.ids;
                 group.save().then(function() {
                     logger.debug(group.host_filter);
                     logger.debug("... resolved to ...");

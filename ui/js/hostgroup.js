@@ -117,7 +117,7 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
         })
         .then(function(res) {
             $scope.selected.host_filter_alert = null;
-            $scope.selected._hosts = res.data.recs;
+            $scope.selected._hosts = res.data.ids;
             $scope.selected.host_filter_console = res.data.c;
         }, function(res) {
             //failed..
