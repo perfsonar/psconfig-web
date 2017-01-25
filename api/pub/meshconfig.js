@@ -221,7 +221,7 @@ exports.generate = function(config, opts, cb) {
         //mca currently doesn't handle the concept of organization
         var org = {
             sites: [],
-            administrators: [],
+            //administrators: [], //not required (http://docs.perfsonar.net/config_mesh.html#config-mesh-administrator)
             //description: "",
         };
 
@@ -229,7 +229,7 @@ exports.generate = function(config, opts, cb) {
         for(var id in host_catalog) {
             var _host = host_catalog[id];
             var host = {
-                //administrators: [], //TODO host admins
+                //administrators: [], //maybe I can populate this?
                 addresses: [ _host.hostname ], 
                 measurement_archives: [ ], 
                 description: _host.sitename,
