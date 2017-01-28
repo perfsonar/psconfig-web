@@ -38,11 +38,13 @@ i[onclick] {
     background-color: white;
 }
 */
+/*
 @media (min-width: 992px) {
-  .modal-lg {
-    width: 1100px;
-  }
+    .modal-lg {
+        width: 1100px;
+    }
 }
+*/
 .center-block {
   display: block;
   margin-top: 50px;
@@ -203,4 +205,10 @@ div.well-detail {
   .list-addbutton:hover {
     left: 310px;
   }
+  /*
+    .fixed-top {
+        margin-left: 0px;
+        position: inherit;
+    }
+    */
 }

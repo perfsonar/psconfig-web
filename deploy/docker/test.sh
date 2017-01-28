@@ -13,11 +13,10 @@
 #    --name sca-auth1 \
 #    -v `pwd`/scaconfig/auth:/app/api/config \
 #    -d soichih/sca-auth
-
 #echo "pulling auth.pub and user.jwt from auth service"
 #sleep 3
-cp ./scaconfig/auth/auth.pub config
-cp ./scaconfig/auth/user.jwt config
+#cp ./where_scaauth1_isrunning/auth/auth.pub config
+#cp ./where_scaauth1_isrunning/auth/user.jwt config
 
 #docker rm -f sca-profile1
 #docker run \

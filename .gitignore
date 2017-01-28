@@ -5,3 +5,4 @@ api/debug
 **/*.log
 deploy/docker/config
 ui/config.js
+ui/node_modules

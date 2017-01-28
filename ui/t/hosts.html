@@ -95,7 +95,7 @@
                 <hr style="margin-bottom: 0px;">
             </div><!--fixed-top-->
 
-            <div style="padding-top: 150px" class="margin30">
+            <div class="margin30 fixed-top-under">
                 <!--
                 <p class="bg bg-info" ng-if="selected.lsid" style="padding: 15px;">
                     You can not modify most information for this host which comes from
@@ -105,15 +105,18 @@
                 </p>
                 -->
 
-                <div class="form-group" ng-if="selected.lsid">
+                <div class="form-group">
                     <label class="col-sm-2 control-label">Datasource</label>
-                    <div class="col-sm-10">
-                        <div class="input-group">
+                    <div class="col-sm-10" ng-if="selected.lsid">
+                        <div class="input-group" ng-if="selected.url">
                             <span class="input-group-addon">{{selected.lsid}}</span>
                             <input type="text" class="form-control" disabled value="{{selected.url||'(Simulated)'}}"></input>
                         </div>
-                        <p class="help-block">sLS URL where the host information comes from.</p>
-                        <p class="alert alert-info" ng-if="!selected.url">The information about this host couldn't be discovered by downloading toolkit JSON. We are guessing its content.</p>
+                        <p class="help-block" ng-if="selected.url">sLS URL where the host information comes from.</p>
+                        <p class="alert alert-info" ng-if="!selected.url">The host information came from <code>{{selected.lsid}}</code>, however, we were not able to download its toolkit JSON for host details.. We are guessing its content.</p>
+                    </div>
+                    <div class="col-sm-10" ng-if="!selected.lsid">
+                        <p class="alert alert-warning" ng-if="!selected.lsid">This is an adhoc host. The information about this host was entered manually by MCA administrators. Once real data for this is delivered via sLS, this host will become read-only.</p>
                     </div>
                 </div>
 
@@ -167,40 +170,37 @@
 
                 <h3>Services / MA endpoints</h3>
                 <p class="help-block">You can request each service to send measurements to non-local MA (Measurment Archive)</p>
-                <div ng-repeat="service in selected.services | orderObjectBy: 'name' ">
-                    <div class="row" style="margin-bottom: 10px;">
-                        <div class="col-md-2">
-                            <h4 style="margin-top: 0px;">
-                                {{service.type}} 
-                                <i class="fa fa-trash text-muted clickable" 
-                                    ng-click="removeservice(service)" 
-                                    ng-if="selected._canedit && !selected.lsid"/>
-                            </h4>
+                <div class="form-group" 
+                    ng-repeat="service in selected.services | orderObjectBy: 'name' ">
+                    <label class="col-sm-2 control-label">
+                        {{service.type}}
+                        <i class="fa fa-trash text-muted clickable" 
+                            ng-click="removeservice(service)" 
+                            ng-if="selected._canedit && !selected.lsid"/>
+                    </label>
+                    <div class="col-sm-5">
+                        <div class="input-group">
+                            <span class="input-group-addon">Locator</span>
+                            <input type="text" class="form-control" 
+                                ng-model="service.locator" 
+                                placeholder="API URL for this service (leave it blank to auto generate)" 
+                                ng-disabled="!selected._canedit || selected.lsid">
                         </div>
-                        <div class="col-md-5">
-                            <div class="input-group">
-                                <span class="input-group-addon">Locator</span>
-                                <input type="text" class="form-control" 
-                                    ng-model="service.locator" 
-                                    placeholder="API URL for this service (leave it blank to auto generate)" 
-                                    ng-disabled="!selected._canedit || selected.lsid">
-                            </div>
-                        </div>
-                        <div class="col-md-5" ng-if="service.type != 'ma'">
-                            <div class="input-group">
-                                <span class="input-group-addon">MA</span>
-                                <ui-select ng-model="service.ma" ng-disabled="!selected._canedit">
-                                    <ui-select-match placeholder="Use local measurement archive" allow-clear>
-                                        <div style="padding-top: 2px; font-size: 12px">
-                                            {{$select.selected.sitename}} <code>{{$select.selected.hostname}}</code>
-                                        </div>
-                                    </ui-select-match>
-                                    <ui-select-choices repeat="ma._id as ma in mas | filter: $select.search">
-                                        {{ma.sitename}} <code>{{ma.hostname}}</code>
-                                    </ui-select-choices>
-                                </ui-select>
-                            </div><!--input-group-->
-                        </div><!--ma-->
+                    </div>
+                    <div class="col-sm-5" ng-if="service.type != 'ma'">
+                        <div class="input-group">
+                            <span class="input-group-addon">MA</span>
+                            <ui-select ng-model="service.ma" ng-disabled="!selected._canedit">
+                                <ui-select-match placeholder="Use local measurement archive" allow-clear>
+                                    <div style="padding-top: 2px; font-size: 12px">
+                                        {{$select.selected.sitename}} <code>{{$select.selected.hostname}}</code>
+                                    </div>
+                                </ui-select-match>
+                                <ui-select-choices repeat="ma._id as ma in mas | filter: $select.search">
+                                    {{ma.sitename}} <code>{{ma.hostname}}</code>
+                                </ui-select-choices>
+                            </ui-select>
+                        </div><!--input-group-->
                     </div><!--row-->
                 </div>
 
