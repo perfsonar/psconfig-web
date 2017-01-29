@@ -30,6 +30,7 @@
             <div class="subbar-list-item" 
                 ng-repeat="host in hosts"
                 ng-class="{'active': selected == host}"
+                id="{{host._id}}"
                 ng-click="select(host)">
                 <time class="help-block pull-right">{{testspec.create_date|date}}</time>
                 <div class="list-header">
@@ -150,7 +151,7 @@
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" ng-if="!selected.lsid">
                     <label for="admins" class="col-sm-2 control-label">Admins</label>
                     <div class="col-sm-10">
                         <!--<mc-admins admins="selected.admins"></mc-admins>-->
@@ -164,7 +165,7 @@
                               <b>{{user.fullname}}</b> <small>&lt;{{user.email}}&gt;</small>
                             </ui-select-choices>
                         </ui-select>
-                        <p class="help-block">Users who can update this host. Empty if information came from sLS.</p>
+                        <p class="help-block">Users who can update this host. Only for Adhoc hosts.</p>
                     </div>
                 </div>
 
