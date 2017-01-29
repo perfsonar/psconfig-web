@@ -37,27 +37,34 @@ function resolve_users(uids) {
 function resolve_testspec(id, cb) {
     db.Testspec.findById(id).exec(cb);
 }
+
+//doesn't check if the ma host actually provides ma service
 function resolve_ma(host, next) {
+    /*
     //find local MA
-    //logger.debug("resolving ma");
     var local_ma = null;
     host.services.forEach(function(service) {
-        if(service.type == "ma") local_ma = service;
+        if(service.type == "ma") local_ma = service.ma;
     });
+    */
     
-    //replace ma with the actual ma service
+    //for each service, lookup ma host
     async.eachSeries(host.services, function(service, next_service) {
         if(!service.ma || service.ma == host._id) {
-            service.ma = local_ma; //use local if not set
+            //use host if not set or set to the host itself
+            service.ma = host; 
             next_service();
         } else {
-            //find the host
+            //find the ma host
             resolve_host(service.ma, function(err, _host) {
                 if(err) return next_service(err);
+                /*
                 //find the ma service 
                 _host.services.forEach(function(_service) {
                     if(_service.type == "ma") service.ma = _service;
                 });
+                */
+                service.ma = _host;
                 next_service();
             });
         }
@@ -130,9 +137,10 @@ function get_type(service_type) {
 }
 
 function generate_mainfo(service) {
+    var locator = "http://"+service.ma.hostname+"/esmond/perfsonar/archive";
     return {
-        read_url: service.ma.locator,
-        write_url: service.ma.locator,
+        read_url: locator,
+        write_url: locator,
         type: "perfsonarbuoy/"+service.type, 
     };
 }
@@ -247,7 +255,8 @@ exports.generate = function(config, opts, cb) {
                 //service.ma is already resolved.. (local vs. remote)
                 if(service.ma) {
                     //adhoc host might not have locator specified.. in that, case fake it..
-                    if(!service.ma.locator) service.ma.locator = "http://"+_host.hostname+'/esmond/perfsonar/archive';
+                    //if(!service.ma.locator) service.ma.locator = "http://"+_host.hostname+'/esmond/perfsonar/archive';
+                    //TODO - should this be configurable?
                     host.measurement_archives.push(generate_mainfo(service));
                 } else {
                     logger.error("NO MA service running on ..");

@@ -168,8 +168,8 @@
                     </div>
                 </div>
 
-                <h3>Services / MA endpoints</h3>
-                <p class="help-block">You can request each service to send measurements to non-local MA (Measurment Archive)</p>
+                <h3>Services / Measurement Archive(MA) endpoints</h3>
+                <p class="help-block">You can request each service to send measurements to non-local MA</p>
                 <div class="form-group" 
                     ng-repeat="service in selected.services | orderObjectBy: 'name' ">
                     <label class="col-sm-2 control-label">
@@ -178,6 +178,7 @@
                             ng-click="removeservice(service)" 
                             ng-if="selected._canedit && !selected.lsid"/>
                     </label>
+                    <!--
                     <div class="col-sm-5">
                         <div class="input-group">
                             <span class="input-group-addon">Locator</span>
@@ -187,7 +188,8 @@
                                 ng-disabled="!selected._canedit || selected.lsid">
                         </div>
                     </div>
-                    <div class="col-sm-5" ng-if="service.type != 'ma'">
+                    -->
+                    <div class="col-sm-10" ng-if="service.type != 'ma'">
                         <div class="input-group">
                             <span class="input-group-addon">MA</span>
                             <ui-select ng-model="service.ma" ng-disabled="!selected._canedit">
@@ -202,6 +204,14 @@
                             </ui-select>
                         </div><!--input-group-->
                     </div><!--row-->
+
+                    <div class="col-sm-10" ng-if="service.type == 'ma'">
+                        <div class="input-group">
+                            <span class="input-group-addon">Locator</span>
+                            <input type="text" class="form-control" disabled
+                                value="http://{{selected.hostname}}/esmond/perfsonar/archive/">
+                        </div><!--input-group-->
+                    </div>
                 </div>
 
                 <!--service adder-->

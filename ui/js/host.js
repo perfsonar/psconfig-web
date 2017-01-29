@@ -86,8 +86,8 @@ app.controller('HostsController', function($scope, appconf, toaster, $http, serv
     $scope.addservice = function() {
         $scope.selected.services.push({
             type: $scope.addservice_item.id,
-            name: "tdb..", //TODO is service name used? maybe I should deprecate?
-            locator: "",
+            //name: "tdb..", //TODO is service name used? maybe I should deprecate?
+            //locator: "",
         });
         find_missing_services();    
         $scope.addservice_item = null;
