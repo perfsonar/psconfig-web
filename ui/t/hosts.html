@@ -5,6 +5,7 @@
         <div style="padding-left: 20px; margin-bottom: 10px;">
             <h2>Hosts</h2>
             <p class="help-block">List of all toolkit hosts on configured sLS</p>
+            <!--
             <br>
             <div class="btn-group pull-right" style="left: -20px;top: -5px;">
                 <button class="btn btn-xs btn-default dropdown-toggle" 
@@ -20,15 +21,22 @@
                 <li><a href>Pinger</a></li>
                 </ul>
             </div>
-            <span class="text-muted">{{hosts.length}} hosts</span>
+            -->
+            <span class="text-muted">{{hosts.length}} Hosts</span>
         </div>
-        <hr style="margin: 0px;">
+        <!--<hr style="margin: 0px;">-->
+        <div class="host_filterbox">
+            <input type="text" class="form-control" 
+                ng-class="{active: hosts_filter}"
+                ng-model="hosts_filter" ng-model-options="{debounce: 200}" placeholder="Filter"></input>
+        </div>
 
-        <div class="subbar-list">
+        <div class="subbar-list" style="top: 159px;">
             <p class="alert alert-default" ng-if="loading"><i class="fa fa-circle-o-notch fa-spin"></i> Loading..</p>
             <p class="alert alert-info" ng-if="hosts.length == 0">Please register the first meshconfig.</p>
             <div class="subbar-list-item" 
                 id="{{host._id}}"
+                ng-if="host == selected || check_host_filter(host)"
                 ng-repeat="host in hosts"
                 ng-class="{'active': selected == host}"
                 ng-click="select(host)">

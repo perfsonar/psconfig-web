@@ -1,11 +1,15 @@
 
-app.controller('HostsController', function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hosts, $modal, $routeParams, users) {
+app.controller('HostsController', 
+function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hosts, $modal, $routeParams, users, $cookies) {
+
     scaMessage.show(toaster);
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
     $scope.appconf = appconf;
     $scope.active_menu = "hosts";
 
     $scope.loading = true;
+
+    $scope.hosts_filter = $cookies.get('hosts_filter');
 
     //load users for admin
     users.getAll().then(function(_users) {
@@ -64,6 +68,27 @@ app.controller('HostsController', function($scope, appconf, toaster, $http, serv
         $scope.closesubbar();
         $location.update_path("/hosts");
         find_missing_services();    
+    }
+
+    //apply host filter
+    $scope.check_host_filter = function(host) {
+        $cookies.put('hosts_filter', $scope.hosts_filter);
+        if(!$scope.hosts_filter) return true;
+
+        var hostname = host.hostname.toLowerCase();
+        var sitename = host.sitename.toLowerCase();
+        var lsid = (host.lsid?host.lsid.toLowerCase():"");
+        var tokens = $scope.hosts_filter.toLowerCase().split(" ");
+        //all tokens must match somewhere
+        var accept = true;
+        tokens.forEach(function(token) {
+            var match = false;
+            if(~hostname.indexOf(token)) match = true;
+            if(~sitename.indexOf(token)) match = true;
+            if(lsid && ~lsid.indexOf(token)) match = true;
+            if(!match) accept = false;
+        });
+        return accept;
     }
 
     function find_missing_services() {
