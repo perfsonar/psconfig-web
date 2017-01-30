@@ -28,11 +28,11 @@
             <p class="alert alert-default" ng-if="loading"><i class="fa fa-circle-o-notch fa-spin"></i> Loading..</p>
             <p class="alert alert-info" ng-if="hosts.length == 0">Please register the first meshconfig.</p>
             <div class="subbar-list-item" 
+                id="{{host._id}}"
                 ng-repeat="host in hosts"
                 ng-class="{'active': selected == host}"
-                id="{{host._id}}"
                 ng-click="select(host)">
-                <time class="help-block pull-right">{{testspec.create_date|date}}</time>
+                <!--<time class="help-block pull-right">{{testspec.create_date|date}}</time>-->
                 <div class="list-header">
                     <small>
                         <span class="label label-info pull-right" ng-if="host.lsid && !host.url">Simulated</span> 
