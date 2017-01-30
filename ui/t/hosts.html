@@ -180,7 +180,9 @@
                 <h3>Services / Measurement Archive(MA) endpoints</h3>
                 <p class="help-block">You can request each service to send measurements to non-local MA</p>
                 <div class="form-group" 
-                    ng-repeat="service in selected.services | orderObjectBy: 'name' ">
+                    ng-repeat="service in selected.services | orderObjectBy: 'name'"
+                    ng-class="{'slide-down': !service._id}"
+                    >
                     <label class="col-sm-2 control-label">
                         {{service.type}}
                         <i class="fa fa-trash text-muted clickable" 

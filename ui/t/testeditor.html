@@ -61,7 +61,7 @@
             ng-model="test.agroup" 
             ng-disabled="!selected._canedit" required>
             <option value="">(Select Host Group)</option>
-            <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group._id}}">{{group.name}}</option>
+            <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group._id}}">{{group.name}} ({{group.hosts.length}} Hosts)</option>
         </select>
         <div ng-if="test.agroup">
             <div ng-if="gethostgroup(test.agroup).type == 'static'"
@@ -84,7 +84,7 @@
             ng-model="test.bgroup" 
             ng-disabled="!selected._canedit" required>
             <option value="">(Select Host Group)</option>
-            <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group._id}}">{{group.name}}</option>
+            <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group._id}}">{{group.name}} ({{group.hosts.length}} Hosts)</option>
         </select>
         <div ng-if="test.bgroup">
             <div ng-if="gethostgroup(test.bgroup).type == 'static'"

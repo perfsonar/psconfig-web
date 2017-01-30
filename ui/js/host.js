@@ -77,7 +77,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
 
         var hostname = host.hostname.toLowerCase();
         var sitename = host.sitename.toLowerCase();
-        var lsid = (host.lsid?host.lsid.toLowerCase():"");
+        var lsid = (host.lsid?host.lsid.toLowerCase():"adhoc");
         var tokens = $scope.hosts_filter.toLowerCase().split(" ");
         //all tokens must match somewhere
         var accept = true;

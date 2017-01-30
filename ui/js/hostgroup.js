@@ -79,6 +79,12 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
     }
 
     $scope.submit = function() {
+        if($scope.selected.type == "dynamic") {
+            //update cached host list (.hosts) with current list of hosts (_hosts)
+            //so that it will be up-to-date before next caching takes place
+            $scope.selected.hosts = $scope.selected._hosts;
+        }
+
         if(!$scope.selected._id) {
             hostgroups.create($scope.selected).then(function(hostgroup) {
                 toaster.success("Hostgroup created successfully!");

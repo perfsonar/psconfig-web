@@ -288,7 +288,6 @@ function run(cb) {
             if(!host) return next(); //ignore null host
             if(host.url) {
                 //real record.. update existing record
-                //if(~host.hostname.indexOf("bu.edu")) logger.debug("upsert:"+host.hostname);
                 db.Host.findOneAndUpdate({
                     hostname: host.hostname
                 }, {$set: host}, {upsert: true, setDefaultsOnInsert: true}, function() {
@@ -317,7 +316,6 @@ function run(cb) {
             //lastly, update dynamic host
             update_dynamic_hostgroup(cb);
         });
-        
     });
 }
 
