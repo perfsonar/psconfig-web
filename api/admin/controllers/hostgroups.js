@@ -51,26 +51,45 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
     db.Hostgroup.findById(req.params.id, function(err, hostgroup) {
         if(err) return next(err);
         if(!hostgroup) return next(new Error("can't find the hostgroup with id:"+req.params.id));
-        //only superadmin or admin of this test spec can update
-        if(canedit(req.user, hostgroup)) {
+        
+        async.series([
+            
+            //check access 
+            function(cb) {
+                if(canedit(req.user, hostgroup)) {
+                    cb();
+                } else {
+                    cb("You don't have access to remove this hostgroup");
+                }
+            },
+            
+            //check foreign key dependencies
+            function(cb) {
+                db.Config.find({$or: [
+                        {"tests.agroup": hostgroup._id},
+                        {"tests.bgroup": hostgroup._id},
+                    ]}, function(err, tests) {
+                    if(err) return cb(err);
+                    var names = "";
+                    tests.forEach(function(test) { names+=test.name+", "; });
+                    if(names == "") {
+                        cb();
+                    } else {
+                        cb("You can not remove this hostgroup. It is currently used by "+names);
+                    }
+                }); 
+            }
+
+        ], function(err) {
+            if(err) return next(err);
+            //all good.. remove
             hostgroup.remove().then(function() {
                 res.json({status: "ok"});
             }); 
-        } else return res.status(401).end();
+        });
+
     });
 });
-
-/*
-//remove null items from an array
-function filter_null(a) {
-    var ret = [];
-    a.forEach(function(it) {
-        if(it == null) return;
-        ret.push(it);
-    });
-    return ret;
-}
-*/
 
 router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     db.Hostgroup.findById(req.params.id, function(err, hostgroup) {

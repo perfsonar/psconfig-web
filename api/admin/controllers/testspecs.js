@@ -52,12 +52,40 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
     db.Testspec.findById(req.params.id, function(err, testspec) {
         if(err) return next(err);
         if(!testspec) return next(new Error("can't find a testspec with id:"+req.params.id));
-        //only superadmin or admin of this test spec can update
-        if(canedit(req.user, testspec)) {
+        
+        async.series([
+            //check access 
+            function(cb) {
+                if(canedit(req.user, testspec)) {
+                    cb();
+                } else {
+                    cb("You don't have access to remove this testspec");
+                }
+            },
+            
+            //check foreign key dependencies on test
+            function(cb) {
+                db.Config.find({"tests.testspec": testspec._id}, function(err, tests) {
+                    if(err) return cb(err);
+                    var names = "";
+                    tests.forEach(function(test) {
+                        names+=test.name+", ";
+                    });
+                    if(names == "") {
+                        cb();
+                    } else {
+                        cb("You can not remove this testspec. It is currently used by "+names);
+                    }
+                }); 
+            }
+
+        ], function(err) {
+            if(err) return next(err);
+            //all good.. remove
             testspec.remove().then(function() {
                 res.json({status: "ok"});
             }); 
-        } else return res.status(401).end();
+        });
     });
 });
 

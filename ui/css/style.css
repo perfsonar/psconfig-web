@@ -175,8 +175,8 @@ div.well-detail {
   transition: 0.2s ease all;
 }
 .list-addbutton:hover {
-  font-size: 70px;
   bottom: 0px;
+  font-size: 70px;
   left: 340px;
   color: #008cba;
 }

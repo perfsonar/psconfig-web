@@ -124,13 +124,14 @@
                                         <span class="label label-default" ng-if="$item.lsid">{{$item.lsid}}</span>
                                         <span class="label label-warning" ng-if="!$item.lsid">Adhoc</span>
                                         <!--<b>{{$item.sitename}}</b>-->
-                                        <span>{{$item.hostname|trim_locator}}</span>
+                                        <span>{{$item.hostname||'removed'}}</span>
                                     </ui-select-match>
-                                    <ui-select-choices repeat="host._id as host in hosts[selected.service_type] | propsFilter: {sitename: $select.search, hostname: $select.search}">
+                                    <ui-select-choices 
+                                        group-by="'sitename'"
+                                        repeat="host._id as host in hosts[selected.service_type] | propsFilter: {sitename: $select.search, hostname: $select.search}">
                                         <span class="label label-default" ng-if="host.lsid">{{host.lsid}}</span>
                                         <span class="label label-warning" ng-if="!host.lsid">Adhoc</span>
-                                        <b>{{host.sitename}}</b> 
-                                        <span>{{host.hostname|trim_locator}}</span>
+                                        <span>{{host.hostname||'removed'}}</span>
                                     </ui-select-choices>
                                 </ui-select>
                                 <button class="btn btn-xs btn-default pull-right" type="button" ng-click="selected.hosts = []; form.$setDirty();">Clear All {{selected.hosts.length}} Hosts</button>

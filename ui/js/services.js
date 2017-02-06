@@ -10,7 +10,7 @@ app.factory('serverconf', ['appconf', '$http', function(appconf, $http) {
 app.factory('hosts', function(appconf, $http, jwtHelper) {
     var hosts = [];
     //var all_promise = null;
-    var ma_promise = null;
+    //var ma_promise = null;
 
     return {
         //return basic (uuid, sitename, hostname, lsid) host info for all hosts
@@ -18,7 +18,7 @@ app.factory('hosts', function(appconf, $http, jwtHelper) {
             //if(all_promise) return all_promise;
             var select = "sitename hostname lsid url";
             if(opts && opts.select) select = opts.select;
-            return $http.get(appconf.api+'/hosts?select='+select+'&sort=sitename hostname&limit=100000')
+            return $http.get(appconf.api+'/hosts?select='+select+'&sort=sitename hostname&limit=3000')
             .then(function(res) {
                 hosts = res.data.hosts;
                 return res.data.hosts;
@@ -35,10 +35,11 @@ app.factory('hosts', function(appconf, $http, jwtHelper) {
             });
         },
 
+        /* deprecated
         //list of all hosts with MA service
         getMAs: function() {
             if(ma_promise) return ma_promise;
-            ma_promise = $http.get(appconf.api+'/hosts?select=sitename hostname&sort=sitename hostname&find='+JSON.stringify({
+            ma_promise = $http.get(appconf.api+'/hosts?select=lsid sitename hostname&sort=sitename hostname&limit=3000&find='+JSON.stringify({
                 "services.type": "ma"
             })).then(function(res) {
                 //console.log("mas");
@@ -47,6 +48,7 @@ app.factory('hosts', function(appconf, $http, jwtHelper) {
             });
             return ma_promise;
         },
+        */
 
         //CRUD
         add: function() {

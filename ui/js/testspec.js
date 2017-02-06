@@ -87,7 +87,7 @@ app.controller('TestspecsController', function($scope, $route, toaster, $http, j
         testspecs.remove($scope.selected).then(function() {
             toaster.success("Removed successfully");
             $scope.selected = null;
-        });
+        }).catch($scope.toast_error);
     }
 });
 

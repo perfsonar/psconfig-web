@@ -138,10 +138,19 @@ function get_type(service_type) {
 
 function generate_mainfo(service) {
     var locator = "http://"+service.ma.hostname+"/esmond/perfsonar/archive";
+
+    var type = null;
+    switch(service.type) {
+    case "bwctl": type = "perfsonarbuoy/bwctl"; break;
+    case "owamp": type = "perfsonarbuoy/owamp"; break;
+    default:
+        //pinger, traceroute
+        type = service.type;
+    }
     return {
         read_url: locator,
         write_url: locator,
-        type: "perfsonarbuoy/"+service.type, 
+        type: type,
     };
 }
 

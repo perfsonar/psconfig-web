@@ -46,7 +46,7 @@
                         <span class="label label-info pull-right" ng-if="host.lsid && !host.url">Simulated</span> 
                         <span class="label label-default" ng-if="host.lsid">{{host.lsid}}</span>
                         <span class="label label-warning" ng-if="!host.lsid">Adhoc</span> 
-                        {{host.hostname}} 
+                        {{host.hostname||'removed'}} 
                         <i ng-if="!host._canedit" class="fa fa-lock text-muted" title="readonly"></i>
                     </small>
                 </div>
@@ -206,11 +206,22 @@
                             <ui-select ng-model="service.ma" ng-disabled="!selected._canedit">
                                 <ui-select-match placeholder="Use local measurement archive" allow-clear>
                                     <div style="padding-top: 2px; font-size: 12px">
-                                        {{$select.selected.sitename}} <code>{{$select.selected.hostname}}</code>
+                                        <!--
+                                        <span class="label label-default" style="display: inline;" ng-if="$select.selected.lsid">
+                                            {{$select.selected.lsid}}</span>
+                                        <span class="label label-warning" style="display: inline;" ng-if="!$select.selected.lsid">
+                                            Adhoc</span> 
+                                        -->
+                                        <code>{{$select.selected.hostname||'removed'}}</code>
+                                        {{$select.selected.sitename}} 
                                     </div>
                                 </ui-select-match>
-                                <ui-select-choices repeat="ma._id as ma in mas | filter: $select.search">
-                                    {{ma.sitename}} <code>{{ma.hostname}}</code>
+                                <ui-select-choices 
+                                    group-by="'sitename'"
+                                    repeat="ma._id as ma in hosts | filter: $select.search">
+                                    <span class="label label-default" ng-if="ma.lsid">{{ma.lsid}}</span>
+                                    <span class="label label-warning" ng-if="!ma.lsid">Adhoc</span>
+                                    <code>{{ma.hostname||'removed'}}</code>
                                 </ui-select-choices>
                             </ui-select>
                         </div><!--input-group-->
@@ -264,7 +275,7 @@
                 -->
 
                 <h3>Host Information</h3>
-                <p class="help-block">Host infomation can be used in a dynamic hostgroup query.</p>
+                <p class="help-block">Host infomation can be used in a dynamic hostgroup query (so can location and community info)</p>
                 <mc-specs specs="selected.info" form="form" readonly="!selected._canedit || selected.lsid"></mc-specs>
 
                 <h3>Location</h3>

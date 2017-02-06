@@ -107,11 +107,79 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
     db.Host.findById(req.params.id, function(err, host) {
         if(err) return next(err);
         if(!host) return next(new Error("can't find a host with id:"+req.params.id));
+        
+        async.series([
+            //check access 
+            function(cb) {
+                if(canedit(req.user, host)) {
+                    cb();
+                } else {
+                    cb("You don't have access to remove this host");
+                }
+            },
+            
+            //check foreign key dependencies on host.ma
+            function(cb) {
+                db.Host.find({"services.ma": host._id}, function(err, hosts) {
+                    if(err) return cb(err);
+                    var names = "";
+                    hosts.forEach(function(host) {
+                        names+=host.hostname+" ";
+                    });
+                    if(names == "") {
+                        cb();
+                    } else {
+                        cb("You can not remove this host. It is currently referenced as MA in hosts: "+names);
+                    }
+                }); 
+            },
+
+            //check foreign key dependencies on hostgroup.hosts
+            function(cb) {
+                db.Hostgroup.find({"hosts": host._id}, function(err, hostgroups) {
+                    if(err) return cb(err);
+                    var names = "";
+                    hostgroups.forEach(function(hostgroup) { names+=hostgroup.name+", "; });
+                    if(names == "") {
+                        cb();
+                    } else {
+                        cb("You can not remove this host. It is currently referenced in hostgroups: "+names);
+                    }
+                }); 
+            },
+            
+            //check foreign key dependencies on config test (center / nahosts)
+            function(cb) {
+                db.Config.find({$or: [
+                    {"tests.center": host._id},
+                    {"tests.nahosts": host._id},
+                ]}, function(err, configs) {
+                    if(err) return cb(err);
+                    var names = "";
+                    configs.forEach(function(config) { names+=config.name+", "; });
+                    if(names == "") {
+                        cb();
+                    } else {
+                        cb("You can not remove this host. It is currently referenced in configs: "+names);
+                    }
+                }); 
+            },
+
+        ], function(err) {
+            if(err) return next(err);
+            //all good.. remove
+            host.remove().then(function() {
+                res.json({status: "ok"});
+            }); 
+        });
+
+        /*
         if(canedit(req.user, host)) {
             host.remove().then(function() {
                 res.json({status: "ok"});
             }); 
         } else return res.status(401).end();
+        */
     });
 });
 

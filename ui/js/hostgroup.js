@@ -107,7 +107,7 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
         hostgroups.remove($scope.selected).then(function() {
             toaster.success("Removed successfully");
             $scope.selected = null;
-        });
+        }).catch($scope.toast_error);
     }
     
     //$scope.$watch("selected.host_filter", $scope.run_dynamic);
