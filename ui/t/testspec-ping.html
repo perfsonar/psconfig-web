@@ -1,3 +1,4 @@
+
 <div class="form-group">
     <label for="test_interval" class="col-sm-2 control-label">Test Interval *</label>
     <div class="col-sm-4">
@@ -7,7 +8,7 @@
                 ng-model="selected.specs.test_interval" required>
             <div class="input-group-addon">seconds</div>
         </div>
-        <p class="help-block">Number of seconds between each test</p>
+        <p class="help-block">Number of seconds between each test <code>test_interval</code></p>
     </div>
     <label for="random_start_percentage" class="col-sm-2 control-label">Random Start Percentage</label>
     <div class="col-sm-4">
@@ -17,7 +18,10 @@
                 ng-model="selected.specs.random_start_percentage" placeholder="10">
             <div class="input-group-addon">%</div>
         </div>
-        <p class="help-block">The percentage to randomize the start time of test. Valid values are between 0 and 50 (inclusive). Example: interval of 7200 (2 hours) and random_start_percentage 50 means that a test can start anywhere between 1 hour and 3 hours after the previous test completes.</p>
+        <p class="help-block">
+            The percentage to randomize the start time of test. Valid values are between 0 and 50 (inclusive). Example: interval of 7200 (2 hours) and random_start_percentage 50 means that a test can start anywhere between 1 hour and 3 hours after the previous test completes
+            <code>random_start_percentage</code>
+        </p>
     </div>
 </div>
 <div class="form-group">
@@ -29,7 +33,10 @@
                 ng-model="selected.specs.packet_count">
             <div class="input-group-addon">packets</div>
         </div>
-        <p class="help-block">The number of packets to send per test. This multiplied by packet_interval is the duration of the test.</p>
+        <p class="help-block">
+            The number of packets to send per test. This multiplied by packet_interval is the duration of the test
+            <code>packet_count</code>
+        </p>
     </div>
     <label for="packet_interval" class="col-sm-2 control-label">Packet Interval</label>
     <div class="col-sm-4">
@@ -39,7 +46,10 @@
                 ng-model="selected.specs.packet_interval">
             <div class="input-group-addon">seconds</div>
         </div>
-        <p class="help-block">The average time between packets. A decimal value less than one means to send multiple packets per second (e.g. .1 means 10 packets per second). This multiplied by packet_count is the duration of the test.</p>
+        <p class="help-block">
+            The average time between packets. A decimal value less than one means to send multiple packets per second (e.g. .1 means 10 packets per second). This multiplied by packet_count is the duration of the test
+            <code>packet_interval</code>
+        </p>
     </div>
 </div>
 
@@ -52,7 +62,7 @@
                 ng-model="selected.specs.packet_size">
             <div class="input-group-addon">bytes</div>
         </div>
-        <p class="help-block">The size of packets in bytes.</p>
+        <p class="help-block">The size of packets in bytes <code>packet_size</code></p>
     </div>
     <label for="packet_ttl" class="col-sm-2 control-label">Packet TTL</label>
     <div class="col-sm-4">
@@ -62,9 +72,138 @@
                 ng-model="selected.specs.packet_ttl">
             <div class="input-group-addon">hops</div>
         </div>
-        <p class="help-block">The TTL to set in the IP header of outgoing packets</p>
+        <p class="help-block">The TTL to set in the IP header of outgoing packets <code>packet_ttl</code></p>
     </div>
 </div>
+
+<!--v4-->
+
+<div class="form-group">
+    <label for="tool" class="col-sm-2 control-label">Tool *</label>
+    <div class="col-sm-4">
+        <select class="form-control" name="tool" 
+            ng-disabled="!selected._canedit"
+            ng-model="selected.specs.tool">
+            <option value="ping">ping</option>
+            <option value="ping6">ping6</option>
+        </select>
+        <p class="help-block">
+            The tool to use in performing ping test <code>tool</code>
+            <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+        </p>
+    </div>
+    <!--
+    <div 
+        ng-disabled="!selected._canedit"
+        ng-if="selected.specs.tool == 'bwctl/iperf3' && selected.specs.protocol == 'tcp'">
+        <label for="omit_interval" class="col-sm-2 control-label">Omit Interval</label>
+        <div class="col-sm-4">
+            <div class="input-group">
+                <input type="number" step="1" class="form-control" name="omit_interval" 
+                    ng-disabled="!selected._canedit"
+                    ng-model="selected.specs.omit_interval" placeholder="0">
+                <div class="input-group-addon">seconds</div>
+            </div>
+            <p class="help-block">The time to ignore results at the beginning of a test in seconds. Useful for excluding TCP ramp-up time. Note that this is added to the duration (e.g. omit_interval of 5 and duration 30 leads to a 35 second test) <code>omit_interval</code></p>
+        </div>
+    </div>
+    -->
+</div>
+
+<div class="form-group">
+    <div ng-if="selected.specs.tool == 'ping'">
+        <div class="col-sm-offset-2 col-sm-4">
+            <div class="checkbox">
+                <label> 
+                    <input type="checkbox" name="hostnames" 
+                        ng-disabled="!selected._canedit"
+                        ng-model="selected.specs.hostnames"> Do not try to map IP addresses to host names when displaying them
+                </label>
+                <p class="help-block">
+                    <code>hostnames / ping -n</code>
+                    <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="col-sm-offset-2 col-sm-4">
+            <div class="checkbox">
+                <label> 
+                    <input type="checkbox" name="suppress_loopback" 
+                        ng-disabled="!selected._canedit"
+                        ng-model="selected.specs.suppress_loopback"> Suppress loopback of multicast packets
+                </label>
+                <p class="help-block">
+                    <code>suppress_loopback / ping -L</code>
+                    <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <div ng-if="selected.specs.tool == 'ping'">
+        <label for="deadline" class="col-sm-2 control-label">Deadline</label>
+        <div class="col-sm-4">
+            <div class="input-group">
+                <input type="number" class="form-control" name="deadline" 
+                    ng-disabled="!selected._canedit"
+                    ng-model="selected.specs.deadline">
+                <div class="input-group-addon">seconds</div>
+            </div>
+            <p class="help-block">
+                Specify a timeout, in seconds, before ping exits regardless of how many packets have been sent
+                <code>deadline / ping -w</code>
+                <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+            </p>
+        </div>
+        <label for="timeout" class="col-sm-2 control-label">Timeout</label>
+        <div class="col-sm-4">
+            <div class="input-group">
+                <input type="number" class="form-control" name="timeout" 
+                    ng-disabled="!selected._canedit"
+                    ng-model="selected.specs.timeout">
+                <div class="input-group-addon">seconds</div>
+            </div>
+            <p class="help-block">
+                Time to wait for a response
+                <code>timeout / ping -W</code>
+                <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="tos_bits" class="col-sm-2 control-label">TOS Bits</label>
+    <div class="col-sm-4">
+        <input type="number" step="1" min="0" max="255" class="form-control" name="tos_bits" 
+            ng-disabled="!selected._canedit" 
+            ng-model="selected.specs.tos_bits">
+        <p class="help-block">
+            The type of service to set in the IP header of outgoing packets as an integer from 0-255
+            <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+            <code>tos_bits</code>
+        </p>
+    </div>
+
+    <div ng-if="selected.specs.tool == 'ping6'">
+        <label for="flow_label" class="col-sm-2 control-label">Flow Label</label>
+        <div class="col-sm-4">
+            <input type="number" class="form-control" name="flow_label" 
+                ng-disabled="!selected._canedit"
+                ng-model="selected.specs.flow_label">
+            <p class="help-block">
+                Set the <a href="https://tools.ietf.org/html/rfc6437#page-4">IPv6 flow label</a>
+                <code>flow_label / iperf3 -L</code>
+                <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!--all version-->
 
 <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
@@ -74,18 +213,28 @@
                     ng-disabled="!selected._canedit"
                     ng-model="selected.specs.force_bidirectional"> Do Bidirectional test
             </label>
-            <p class="help-block">Forces each endpoint to initiate the test in both directions. This will lead to redundant tests being run on each side.</p>
+            <p class="help-block">
+                Forces each endpoint to initiate the test in both directions. This will lead to redundant tests being run on each side.
+                <code>force_bidirectional</code>
+            </p>
         </div>
         <div class="checkbox">
             <label> 
-                <input type="checkbox" name="ipv4_only" ng-disabled="!selected._canedit" ng-model="selected.specs.ipv4_only"> IPv4 Only
+                <input type="checkbox" name="ipv4_only" 
+                    ng-disabled="!selected._canedit" 
+                    ng-model="selected.specs.ipv4_only"> IPv4 Only
             </label>
         </div>
         <div class="checkbox">
             <label> 
-                <input type="checkbox" name="ipv6_only" ng-disabled="!selected._canedit" ng-model="selected.specs.ipv6_only"> IPv6 Only
+                <input type="checkbox" name="ipv6_only" 
+                    ng-disabled="!selected._canedit" 
+                    ng-model="selected.specs.ipv6_only"> IPv6 Only
             </label>
-            <p class="help-block">Forces each side to use IPv4/6. Test will fail if no IPv4/6 address can be determined for either endpoint</p>
+            <p class="help-block">
+                Forces each side to use IPv4/6. Test will fail if no IPv4/6 address can be determined for either endpoint
+                <code>ipv4_only / ipv6_only</code>
+            </p>
         </div>
     </div>
 </div>

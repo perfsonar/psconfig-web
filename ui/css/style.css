@@ -196,12 +196,6 @@ div.well-detail {
   .list-addbutton:hover {
     left: 310px;
   }
-  /*
-    .fixed-top {
-        margin-left: 0px;
-        position: inherit;
-    }
-    */
 }
 .host_filterbox {
   background-color: #eee;

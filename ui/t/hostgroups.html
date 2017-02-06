@@ -48,7 +48,7 @@
     
     <div class="subbar-content">
         <p class="alert alert-info" ng-if="!selected">Please select hostgroup</p>
-        <form name="form" class="form-horizontal" ng-submit="submit()" ng-show="selected" confirm-on-exit>
+        <form name="form" class="form-horizontal margin30" ng-submit="submit()" ng-show="selected" confirm-on-exit>
             <div class="fixed-top">
                 <h2>
                     <i class="fa fa-trash-o clickable" aria-hidden="true" ng-if="selected._id && selected._canedit"
@@ -70,19 +70,17 @@
 
                 <br clear="right">
                 <div class="form-group">
-                    <div class="margin30">
-                        <label for="name" class="col-sm-2 control-label"><strong>Name *</strong></label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="name" ng-model="selected.name" 
-                                ng-disabled="!selected._canedit"
-                                placeholder="Name for this hostgroup" required>
-                        </div>
+                    <label for="name" class="col-sm-2 control-label"><strong>Name *</strong></label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="name" ng-model="selected.name" 
+                            ng-disabled="!selected._canedit"
+                            placeholder="Name for this hostgroup" required>
                     </div>
                 </div>
                 <hr style="margin-bottom: 0px;">
             </div><!--fixed-top-->
 
-            <div class="margin30 fixed-top-under">
+            <div class="fixed-top-under">
                 <div class="form-group">
                     <label for="admins" class="col-sm-2 control-label">Admins</label>
                     <div class="col-sm-10">

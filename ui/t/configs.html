@@ -65,7 +65,8 @@
 
     <div class="subbar-content">
         <p class="alert alert-info" ng-if="!selected">Please select config</p>
-        <form name="form" class="form-horizontal" ng-submit="submit()" ng-show="selected" confirm-on-exit>
+        <form name="form" class="form-horizontal margin30" 
+            ng-submit="submit()" ng-show="selected" confirm-on-exit>
             <div class="fixed-top">
                 <h2>
                     <i class="fa fa-trash-o clickable" aria-hidden="true" ng-if="selected._id && selected._canedit"
@@ -82,30 +83,28 @@
                 </h2>
                 <br clear="right">
                 <div class="form-group">
-                    <div class="margin30">
-                        <label class="col-sm-2 control-label">MeshConfig URL</label>
-                        <div class="col-sm-10">
-                            <div class="input-group">
-                                <span class="input-group-addon"><small>{{appconf.pub_url}}</small></span>
-                                <input type="text" name="url" class="form-control" id="url" 
-                                    ng-model="selected.url" 
-                                    placeholder="Enter path to expose this config" 
-                                    ng-disabled="!selected._canedit" required>
-                                <span class="input-group-btn" ng-if="selected._id">
-                                    <button class="btn btn-primary" type="button" 
-                                        ng-disabled="form.$dirty"
-                                        ng-click="relocate(appconf.pub_url+'config/'+selected.url, true)">
-                                        <i class="fa fa-external-link" aria-hidden="true"></i> Open MeshConfig
-                                    </button>
-                                </span>
-                            </div>
+                    <label class="col-sm-2 control-label">MeshConfig URL</label>
+                    <div class="col-sm-10">
+                        <div class="input-group">
+                            <span class="input-group-addon"><small>{{appconf.pub_url}}</small></span>
+                            <input type="text" name="url" class="form-control" id="url" 
+                                ng-model="selected.url" 
+                                placeholder="Enter path to expose this config" 
+                                ng-disabled="!selected._canedit" required>
+                            <span class="input-group-btn" ng-if="selected._id">
+                                <button class="btn btn-primary" type="button" 
+                                    ng-disabled="form.$dirty"
+                                    ng-click="relocate(appconf.pub_url+'config/'+selected.url, true)">
+                                    <i class="fa fa-external-link" aria-hidden="true"></i> Open MeshConfig
+                                </button>
+                            </span>
                         </div>
                     </div>
                 </div>
                 <hr style="margin-bottom: 0px;">
             </div><!--fixed-top-->
 
-            <div class="margin30 fixed-top-under">
+            <div class="fixed-top-under">
                 <div class="form-group">
                     <label for="name" class="col-sm-2 control-label"><strong>Name *</strong></label>
                     <div class="col-sm-10">

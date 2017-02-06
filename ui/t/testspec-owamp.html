@@ -5,7 +5,10 @@
             <input type="number" step="0.0001" class="form-control" name="bucket_width" ng-disabled="!selected._canedit" ng-model="selected.specs.bucket_width" required>
             <div class="input-group-addon">Seconds</div>
         </div>
-        <p class="help-block">The bin size for histogram calculations in terms of seconds. For example a value such as .001 means all histogram bins will be in milliseconds.</p>
+        <p class="help-block">
+            The bin size for histogram calculations in terms of seconds. For example a value such as .001 means all histogram bins will be in milliseconds. 
+            <code>bucket_width</code>
+        </p>
     </div>
     <label for="packet_interval" class="col-sm-2 control-label">Packet Interval *</label>
     <div class="col-sm-4">
@@ -13,9 +16,13 @@
             <input type="number" step="0.01" class="form-control" name="packet_interval" ng-disabled="!selected._canedit" ng-model="selected.specs.packet_interval" required>
             <div class="input-group-addon">Packets Per Second</div>
         </div>
-        <p class="help-block">The mean average time between packets in seconds. For example, .1 means send 10 packets per second.</p>
+        <p class="help-block">
+            The mean average time between packets in seconds. For example, .1 means send 10 packets per second.
+            <code>packet_interval</code>
+        </p>
     </div>
 </div>
+
 <div class="form-group">
     <label for="sample_count" class="col-sm-2 control-label">Sample Count *</label>
     <div class="col-sm-4">
@@ -23,7 +30,10 @@
             <input type="number" step="1" class="form-control" name="sample_count" ng-disabled="!selected._canedit" ng-model="selected.specs.sample_count" required>
             <div class="input-group-addon">tests</div>
         </div>
-        <p class="help-block">The number of packets contained in each summary. This combined with packet_interval determines how often data is stored. For example, a packet_interval of .1 (10 packets per second) and sample_count of 600 stores a result every 60 seconds.</p>
+        <p class="help-block">
+            The number of packets contained in each summary. This combined with packet_interval determines how often data is stored. For example, a packet_interval of .1 (10 packets per second) and sample_count of 600 stores a result every 60 seconds
+            <code>sample_count</code>
+        </p>
     </div>
     <label for="packet_padding" class="col-sm-2 control-label">Packet Padding</label>
     <div class="col-sm-4">
@@ -31,21 +41,61 @@
             <input type="number" step="1" class="form-control" name="packet_padding" ng-disabled="!selected._canedit" ng-model="selected.specs.packet_padding" placeholder="0">
             <div class="input-group-addon">bytes</div>
         </div>
-        <p class="help-block">The size of the padding added to each packet in bytes (not including the IP/UDP headers)</p>
+        <p class="help-block">
+            The size of the padding added to each packet in bytes (not including the IP/UDP headers)
+            <code>packet_padding</code>
+        </p>
     </div>
 </div>
+
+<!-- v4 -->
+<div class="form-group">
+    <label for="tos_bits" class="col-sm-2 control-label">Type of Service</label>
+    <div class="col-sm-4">
+        <input type="number" step="1" min="0" max="255" class="form-control" name="tos_bits" 
+            ng-disabled="!selected._canedit" 
+            ng-model="selected.specs.tos_bits">
+        <p class="help-block">
+            The type of service to set in the IP header of outgoing packets as an integer from 0-255
+            <code>tos_bits</code>
+            <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+        </p>
+    </div>
+
+    <div class="col-sm-offset-2 col-sm-4">
+        <div class="checkbox">
+            <label> <input type="checkbox" name="output_raw" 
+                ng-disabled="!selected._canedit" 
+                ng-model="selected.specs.output_raw"> Output Raw</label>
+            <p class="help-block">
+                This will store the raw owamp results as JSON in the measurement archive
+                <code>output_raw</code>
+                <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- all version-->
+
 <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
         <div class="checkbox">
             <label> <input type="checkbox" name="force_bidirectional" ng-disabled="!selected._canedit" ng-model="selected.specs.force_bidirectional"> Do Bidirectional test</label>
-            <p class="help-block">Forces each endpoint to initiate the test in both directions. This will lead to redundant tests being run on each side.</p>
+            <p class="help-block">
+                Forces each endpoint to initiate the test in both directions. This will lead to redundant tests being run on each side
+                <code>force_bidirectional</code>
+            </p>
         </div>
         <div class="checkbox">
             <label> <input type="checkbox" name="ipv4_only" ng-disabled="!selected._canedit" ng-model="selected.specs.ipv4_only"> IPv4 Only</label>
         </div>
         <div class="checkbox">
             <label> <input type="checkbox" name="ipv6_only" ng-disabled="!selected._canedit" ng-model="selected.specs.ipv6_only"> IPv6 Only</label>
-            <p class="help-block">Forces each side to use IPv4 / IPv6. Test will fail if no IPv4/IPv6 address can be determined for either endpoint</p>
+            <p class="help-block">
+                Forces each side to use IPv4 / IPv6. Test will fail if no IPv4/IPv6 address can be determined for either endpoint
+                <code>ipv4_only / ipv6_only</code>
+            </p>
         </div>
     </div>
 </div>
