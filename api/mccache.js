@@ -16,10 +16,10 @@ const db = require('./models');
 const common = require('./common');
 
 db.init(function(err) {
-    if(err) throw err;
+    if(err) throw err; 
     logger.info("connected to db");
     run(function(err) {
-        if(err) throw err;
+        if(err) logger.error(err);
         logger.info("finished caching .. sleeping for an hour");
         setTimeout(run, 1000*3600);
     });
@@ -311,10 +311,20 @@ function run(cb) {
             }
         }, function(err) {
             if(err) logger.error(err);
-            logger.info("updated "+Object.keys(hosts).length+" hosts");
-            
-            //lastly, update dynamic host
-            update_dynamic_hostgroup(cb);
+            var host_count = Object.keys(hosts).length;
+            logger.info("updated "+host_count+" hosts");
+        
+            //one last thing.. update dynamic host
+            update_dynamic_hostgroup(function(err) {
+                if(err) logger.error(err);
+
+                //report health status to mcadmin
+                var mcadmin = "http://"+(config.admin.host||"localhost")+":"+config.admin.port;
+                request.post({url: mcadmin+"/health/mccache", json: {hosts: host_count}}, function(err, res, body) {
+                    if(err) logger.error(err);
+                    cb();
+                });
+            });
         });
     });
 }
