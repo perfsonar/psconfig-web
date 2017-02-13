@@ -67,10 +67,10 @@ var hostSchema = mongoose.Schema({
     no_agent: {type: Boolean, default: false},
 
     //host info (pshost-toolkitversion, host-hardware-memory, host-os-version, host-hadeware-processorspeed, host-hadware-processorcount)
+    //and location info (location-state, location-city, location-country, etc..)
     info: mongoose.Schema.Types.Mixed,
 
-    //(location-state, location-city, location-country, etc..)
-    location: mongoose.Schema.Types.Mixed,
+    //location: mongoose.Schema.Types.Mixed,
     
     communities: [ String ],
 

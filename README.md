@@ -151,7 +151,7 @@ Now we have all configuration files necessary to start installing MCA servicves.
         -d soichih/mca-admin
     ```
 
-5. Create meshconfig publisher. 
+5. Create meshconfig publishers.
 
     ```bash
     docker run \
@@ -161,6 +161,19 @@ Now we have all configuration files necessary to start installing MCA servicves.
         -v /etc/mca:/app/api/config:ro \
         -d soichih/mca-pub
     ```
+
+You can create as many mca-pub containers as desired (make sure to use unique names `mca-pub1`, `mca-pub2`, etc..) based on available resource (mainly CPU) . 1 or 2 should be fine for most cases.
+
+If you use more than 1 instance, please edit `/etc/mca/nginx/conf.d/mca.conf` to include all instances, like..
+
+```
+upstream mcpub {
+    server mca-pub1:8080;
+    server mca-pub2:8080;
+    server mca-pub3:8080;
+}
+```
+
 
 6. Finally, we install nginx to expose these container via 80/443/9443
 
@@ -190,9 +203,40 @@ aa6471073c01        nginx               "nginx -g 'daemon ..."   11 hours ago   
 10fdf3b63e4f        mongo               "/entrypoint.sh mo..."   12 hours ago        Up 12 hours         27017/tcp                                                          mongo
 ```
 
-### Testing
+### Testing / Monitoring
 
 You should now be able to access MCA by accessing your host on your browser on the host. You should be prompted to the login page. You should signup / confirm your email address, then define host gruops / testspecs, and construct new meshconfig using those test entries.
+
+MCA reports the current health status via following API endpoint (for mcadmin and mccache)
+
+`https://<hostname>/api/meshconfig/health`
+
+```javascript
+{
+    status: "ok",
+    msg: "everything looks good",
+    cache: {
+        hosts: 255,
+        update_time: 1486994021924
+    }
+}
+```
+
+You can configure your monitoring systems (Sensu, Nagious, etc..) to check for `status` and make sure it's set to 'ok'. 
+
+For mca-pub instances, you should run separate test at `http://<hostname>/pub/health` (not https://)
+
+```javascript
+{
+    status: "ok"
+}
+```
+
+> If you are running multiple instances of mca-pub, then /pub/health is from one of the instances (not all)
+
+You can also monitor docker stdout/ere.
+
+### Update
 
 To update MCA containers to the latest version, do `docker pull` the container you are trying to update and rerun the same `docker run ...` command you used to start it.
 

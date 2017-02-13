@@ -1,9 +1,10 @@
 {
-  "name": "perfsonar-meshconfig-admin",
+  "name": "MCA",
   "version": "3.0.0",
   "description": "Tools to generate / publish meshconfig",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "apidoc": "apidoc -i api/ -o ui/apidoc/"
   },
   "author": "",
   "license": "MIT",
@@ -23,7 +24,6 @@
     "promise": "^7.0.4",
     "request": "^2.79.0",
     "sandbox": "^0.8.6",
-    "underscore": "^1.8.3",
     "winston": "^2.3.0"
   },
   "devDependencies": {

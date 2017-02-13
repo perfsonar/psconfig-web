@@ -1,17 +1,16 @@
 'use strict';
 
 //contrib
-var express = require('express');
-var router = express.Router();
-var winston = require('winston');
-var jwt = require('express-jwt');
-var async = require('async');
+const express = require('express');
+const router = express.Router();
+const winston = require('winston');
+const jwt = require('express-jwt');
+const async = require('async');
 
 //mine
-var config = require('../../config');
-var logger = new winston.Logger(config.logger.winston);
-var db = require('../../models');
-var common = require('../../common');
+const config = require('../../config');
+const logger = new winston.Logger(config.logger.winston);
+const db = require('../../models');
 
 function canedit(user, host) {
     if(user) {
@@ -21,8 +20,22 @@ function canedit(user, host) {
     return false;
 }
 
-//query hosts
-router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
+/**
+ * @api {get} /hosts            Query Hosts
+ * @apiGroup                    Hosts
+ * @apiDescription              Query hosts known to MCA
+ *
+ * @apiParam {Object} [find]    Mongo find query JSON.stringify & encodeURIComponent-ed - defaults to {}
+ *                              To pass regex, you need to use {$regex: "...."} format instead of js: /.../ 
+ * @apiParam {Object} [sort]    Mongo sort object - defaults to _id. Enter in string format like "-name%20desc"
+ * @apiParam {String} [select]  Fields to return (admins will always be added). Multiple fields can be entered with %20 as delimiter
+ * @apiParam {Number} [limit]   Maximum number of records to return - defaults to 100
+ * @apiParam {Number} [skip]    Record offset for pagination (default to 0)
+ * @apiHeader {String}          Authorization A valid JWT token "Bearer: xxxxx"
+ *
+ * @apiSuccess {Object}         hosts: List of host objects, count: total number of meshconfig (for paging)
+ */
+router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var find = {};
     if(req.query.find) find = JSON.parse(req.query.find);
 
@@ -50,7 +63,44 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
     });
 });
 
-//update host info
+/**
+ * @api {post} /hosts           New Adhoc Host
+ * @apiGroup                    Hosts
+ * @apiDescription              Register new adhoc host
+ *
+ * @apiParam {String[]} [admins] Array of admin IDs
+ *
+ * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"
+ * @apiSuccess {Object}         Adhoc host registered
+ */
+router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
+    if(!req.user.scopes.mca || !~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
+    if(req.body.lsid) delete res.body.lsid;// make sure lsid is not set
+    db.Host.create(req.body, function(err, host) {
+        if(err) return next(err);
+        host = JSON.parse(JSON.stringify(host));
+        host._canedit = canedit(req.user, host);
+        res.json(host);
+    });
+});
+
+/**
+ * @api {put} /hosts/:id        Update host
+ * @apiGroup                    Hosts
+ * @apiDescription              Update host registration (non-Adhoc host can only update services, no_agent, and toolkit_url)
+ *
+ * @apiParam {Object[]} services List of service objects for this host (TODO - need documentation)
+ * @apiParam {Boolean} [toolkit_url] (default: use hostname) URL to show for MadDash
+ * @apiParam {Boolean} [no_agent] Set to true if this host should not read the meshconfig (passive) (default: false)
+ * @apiParam {String} [hostname] (Adhoc only) hostname
+ * @apiParam {String} [sitename] (Adhoc only) sitename to show to assist hostname lookup inside MCA
+ * @apiParam {Object} [info]    (Adhoc only) host information (key/value pairs of various info - TODO document)
+ * @apiParam {String[]} [communities] (Adhoc only) list of community names that this host is registered in LS
+ * @apiParam {String[]} [admins] Array of admin IDs who can update information on this host
+ *
+ * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"
+ * @apiSuccess {Object}         Host updated
+ */
 router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     db.Host.findById(req.params.id, function(err, host) {
         if(err) return next(err);
@@ -74,7 +124,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             host.hostname = req.body.hostname;
             host.sitename = req.body.sitename;
             host.info = req.body.info;
-            host.location = req.body.location;
+            //host.location = req.body.location;
             host.communities = req.body.communities;
             host.admins =  req.body.admins;
         }
@@ -91,18 +141,19 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
     });
 });
 
-//register new adhoc host
-router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    if(!req.user.scopes.mca || !~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
-    if(req.body.lsid) delete res.body.lsid;// make sure lsid is not set
-    db.Host.create(req.body, function(err, host) {
-        if(err) return next(err);
-        host = JSON.parse(JSON.stringify(host));
-        host._canedit = canedit(req.user, host);
-        res.json(host);
-    });
-});
-
+/**
+ * @api {delete} /configs/:id   Remove hosts
+ * @apiGroup                    Hosts
+ * @apiDescription              Remove host registration - if it's not used by any hostgroup / config. 
+ *                              Also, if it's not adhoc, the host will be reregistered again by cache service.
+ * @apiHeader {String} authorization 
+ *                              A valid JWT token "Bearer: xxxxx"
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *         "status": "ok"
+ *     }
+ */
 router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     db.Host.findById(req.params.id, function(err, host) {
         if(err) return next(err);
@@ -172,14 +223,6 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
                 res.json({status: "ok"});
             }); 
         });
-
-        /*
-        if(canedit(req.user, host)) {
-            host.remove().then(function() {
-                res.json({status: "ok"});
-            }); 
-        } else return res.status(401).end();
-        */
     });
 });
 

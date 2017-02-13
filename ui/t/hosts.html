@@ -272,18 +272,19 @@
                 </ul>
                 -->
 
-                <h3>Host Information</h3>
-                <p class="help-block">Host infomation can be used in a dynamic hostgroup query (so can location and community info)</p>
+                <h3>Host Detail</h3>
+                <p class="help-block">Host details can be used in a dynamic hostgroup query</p>
                 <mc-specs specs="selected.info" form="form" readonly="!selected._canedit || selected.lsid"></mc-specs>
 
+                <!--
                 <h3>Location</h3>
-                <!--<p class="help-block">Communities that this host is configured to be member of.</p>-->
                 <a class="pull-right" 
                     target="_blank"
                     href="https://www.google.com/maps/place/{{selected.location.latitude}},{{selected.location.longitude}}">
                     <i class="fa fa-map-marker" aria-hidden="true"></i> Google Map
                 </a>
                 <mc-specs specs="selected.location" form="form" readonly="!selected._canedit || selected.lsid"></mc-specs>
+                -->
 
                 <h3>Communities</h3>
                 <!--<p class="help-block">Communities that this host is configured to be member of.</p>-->

@@ -66,7 +66,7 @@ function create_hostrec(service, uri, cb) {
         if(res.statusCode != 200) return cb(new Error("failed to cache host from:"+url+" statusCode:"+res.statusCode));
         var rec = {
             info: get_hostinfo(host),
-            location: get_location(host),
+            //location: get_location(host),
             communities: host['group-communities']||[],
             services: [],
 
@@ -104,6 +104,7 @@ function create_hostrec(service, uri, cb) {
     });
 }
 
+/*
 function get_location(service) {
     return {
         longitude: (service['location-longitude']?service['location-longitude'][0]:null),
@@ -114,6 +115,7 @@ function get_location(service) {
         country: (service['location-country']?service['location-country'][0]:null),
     };
 }
+*/
 
 function get_hostinfo(host) {
     var info = {};
@@ -125,8 +127,8 @@ function get_hostinfo(host) {
         if(key == "host-net-interfaces") continue;
         if(key == "host-name") continue;
         
-        //store all (ps)hosts- things
-        ["host-", "pshost-"].forEach(function(prefix) {
+        //store all (ps)hosts-, location things
+        ["host-", "pshost-", "location-"].forEach(function(prefix) {
             var p = key.indexOf(prefix);
             if(p === 0)  info[key] = v[0];
         });

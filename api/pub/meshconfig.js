@@ -1,17 +1,16 @@
 'use strict';
 
 //contrib
-var express = require('express');
-var router = express.Router();
-var _ = require('underscore'); //used?
-var winston = require('winston');
-var async = require('async');
+const express = require('express');
+const router = express.Router();
+const winston = require('winston');
+const async = require('async');
 
 //mine
-var config = require('../config');
-var logger = new winston.Logger(config.logger.winston);
-var db = require('../models');
-var common = require('../common');
+const config = require('../config');
+const logger = new winston.Logger(config.logger.winston);
+const db = require('../models');
+const common = require('../common');
 
 var profile_cache = null;
 function load_profile(cb) {
@@ -40,14 +39,6 @@ function resolve_testspec(id, cb) {
 
 //doesn't check if the ma host actually provides ma service
 function resolve_ma(host, next) {
-    /*
-    //find local MA
-    var local_ma = null;
-    host.services.forEach(function(service) {
-        if(service.type == "ma") local_ma = service.ma;
-    });
-    */
-    
     //for each service, lookup ma host
     async.eachSeries(host.services, function(service, next_service) {
         if(!service.ma || service.ma == host._id) {
@@ -58,12 +49,6 @@ function resolve_ma(host, next) {
             //find the ma host
             resolve_host(service.ma, function(err, _host) {
                 if(err) return next_service(err);
-                /*
-                //find the ma service 
-                _host.services.forEach(function(_service) {
-                    if(_service.type == "ma") service.ma = _service;
-                });
-                */
                 service.ma = _host;
                 next_service();
             });
@@ -95,25 +80,6 @@ function resolve_hostgroup(id, cb) {
             if(err) return cb(err);
             cb(null, hosts);
         }); 
-        /*
-        if(hostgroup.type == "static") {
-            resolve_hosts(hostgroup.hosts, function(err, hosts) {
-                if(err) return cb(err);
-                cb(null, hosts);
-            }); 
-        } else {
-            logger.debug("resolving dynamic hostgroup");
-            logger.debug(hostgroup.host_filter);
-            logger.debug(hostgroup.service_type);
-            //TODO - I should cache this instead of resolving it every time
-            common.dynamic.resolve(hostgroup.host_filter, hostgroup.service_type, function(err, res) {
-                resolve_hosts(res.ids, function(err, hosts) {
-                    if(err) return cb(err);
-                    cb(null, hosts);
-                }); 
-            });
-        }
-        */
     });
 }
 
@@ -170,7 +136,6 @@ exports.generate = function(config, opts, cb) {
                 if(!test.agroup) return next();
                 resolve_hostgroup(test.agroup, function(err, hosts) {
                     if(err) return next(err);
-                    console.dir(hosts);
                     test.agroup = hosts;
                     hosts.forEach(function(host) { host_catalog[host._id] = host; });
                     next();
@@ -275,10 +240,16 @@ exports.generate = function(config, opts, cb) {
 
             var site = {
                 hosts: [ host ],
-                //administrators: [], //TODO site admins (not needed?)
-                location: _host.location,
-                //description: _host.sitename //needed?
+                location: {}
             };
+
+            //set all location- info we know
+            for(var k in _host.info) {
+                if(k.indexOf("location-") == 0) {
+                    var subk = k.substring("location-".length);
+                    site.location[subk] = _host.info[k];
+                }
+            }
             org.sites.push(site);
         }
         mc.organizations.push(org);

@@ -41,7 +41,7 @@ router.get('/health', function(req, res) {
     }
 
     //make sure I can query from db
-    db.Host.findOne({}).exec(function(err, host) {
+    db.Host.findOne().exec(function(err, host) {
         if(err) {
             status = "failed";
             msg = err.toString();
@@ -60,7 +60,7 @@ router.post('/health/mccache', function(req, res) {
     cache_status = req.body;
     cache_status.update_time = Date.now();
     logger.debug(req.body);
-    res.end();
+    res.send('thanks');
 });
 
 router.get('/config', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res) {
@@ -73,7 +73,7 @@ router.get('/config', jwt({secret: config.admin.jwt.pub, credentialsRequired: fa
 
 router.use('/configs', require('./configs'));
 router.use('/testspecs', require('./testspecs'));
-router.use('/services', require('./services'));
+//router.use('/services', require('./services'));
 router.use('/hosts', require('./hosts'));
 router.use('/hostgroups', require('./hostgroups'));
 
