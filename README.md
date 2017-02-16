@@ -52,6 +52,21 @@ $ systemctl enable docker
 $ systemctl start docker
 ```
 
+You should install logrotate for docker container log
+
+/etc/logrotate.d/docker-container
+```
+/docker/containers/*/*.log {
+  rotate 7
+  daily
+  compress
+  size=1M
+  missingok
+  delaycompress
+  copytruncate
+}
+```
+
 ### Configuration
 
 Before we start installing MCA, you should prepare your configuration files first. You can bootstrap it by
@@ -96,12 +111,13 @@ You will need SSL certificates for https access. On /etc/grid-security/host, you
 $ ls /etc/grid-security/host
 cert.pem 
 key.pem
-trusted.pem
 ```
 
-If not, please request for new certificate. If you don't want to store them under /etc/grid-security/host, you have to modify the docker run script below.
+If not, please request for new certificate (at IU, see https://kb.iu.edu/d/bevd). If you don't want to store them under /etc/grid-security/host, then you have to modify the docker run script below.
 
-trusted.pem was created by running `cat /etc/grid-security/certificates/*.pem > /etc/grid-security/host/trusted.pem`. (Unlike Apache, Nginx uses a single CA file for better performance)
+If you are enabling x509 authentication, then you will also need `trusted.pem` inside /etc/grid-security/host. This file contains list of all CAs that you trust and grant access to MCA. For OSG, trusted.pem can be created by running `cat /etc/grid-security/certificates/*.pem > /etc/grid-security/host/trusted.pem`. Please see [osg-ca-cert](https://twiki.grid.iu.edu/bin/view/Documentation/Release3/InstallCertAuth) for more information.
+
+> Unlike Apache, Nginx uses a single CA file for better performance.. so you have to join all .pem into a single .pem file.
 
 ### Container Installation
 
