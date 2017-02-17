@@ -225,7 +225,7 @@ You should now be able to access MCA by accessing your host on your browser on t
 
 MCA reports the current health status via following API endpoint (for mcadmin and mccache)
 
-`https://<hostname>/api/meshconfig/health`
+`https://<hostname>/api/mca/health`
 
 ```javascript
 {
@@ -248,9 +248,20 @@ For mca-pub instances, you should run separate test at `http://<hostname>/pub/he
 }
 ```
 
-> If you are running multiple instances of mca-pub, then /pub/health is from one of the instances (not all)
+> Please note.. if you are running multiple instances of mca-pub, then /pub/health is just from one of the instances (not all)
 
-You can also monitor docker stdout/ere.
+You should also monitor the authentication service status
+
+`https://<hostname>/api/auth/health`
+```javascript
+{
+    status: "ok",
+    headers: {...}
+}
+
+```
+
+You can also monitor docker stdout/stderr log - similar to syslog.
 
 ### Update
 
