@@ -9,6 +9,11 @@ cp -r ../../package.json mca-admin/tmp
 rm -rf mca-admin/tmp/api/config
 
 docker build mca-admin -t soichih/mca-admin
+if [ ! $? -eq 0 ]; then
+    echo "failed to build"
+    exit
+fi
+
 docker tag soichih/mca-admin soichih/mca-admin:3.0
 docker push soichih/mca-admin
 
@@ -20,5 +25,10 @@ cp -r ../../package.json mca-pub/tmp
 rm -rf mca-pub/tmp/api/config
 
 docker build mca-pub -t soichih/mca-pub
+if [ ! $? -eq 0 ]; then
+    echo "failed to build"
+    exit
+fi
+
 docker tag soichih/mca-pub soichih/mca-pub:3.0
 docker push soichih/mca-pub
