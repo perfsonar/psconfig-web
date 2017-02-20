@@ -122,7 +122,6 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     $scope.autoconf = function(host) {
         var address = host.hostname || host.ip;
         window.open(appconf.pub_url+"auto/"+address, '_blank');
-        //document.location = appconf.pub_url+"auto/"+address;
     }
 });
 

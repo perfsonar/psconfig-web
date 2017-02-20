@@ -33,7 +33,7 @@ function canedit(user, host) {
  * @apiParam {Number} [skip]    Record offset for pagination (default to 0)
  * @apiHeader {String}          Authorization A valid JWT token "Bearer: xxxxx"
  *
- * @apiSuccess {Object}         hosts: List of host objects, count: total number of meshconfig (for paging)
+ * @apiSuccess {Object}         hosts: List of host objects(hosts:), count: total number of hosts (for paging)
  */
 router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var find = {};
@@ -64,11 +64,18 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
 });
 
 /**
- * @api {post} /hosts           New Adhoc Host
- * @apiGroup                    Hosts
- * @apiDescription              Register new adhoc host
+ * @api {post} /hosts               New Adhoc Host
+ * @apiGroup                        Hosts
+ * @apiDescription                  Register new adhoc host
  *
- * @apiParam {String[]} [admins] Array of admin IDs
+ * @apiParam {Object[]} services    List of service objects for this host (TODO - need documentation)
+ * @apiParam {Boolean} [toolkit_url] (default: use hostname) URL to show for MadDash
+ * @apiParam {Boolean} [no_agent]   Set to true if this host should not read the meshconfig (passive) (default: false)
+ * @apiParam {String} [hostname]    (Adhoc only) hostname
+ * @apiParam {String} [sitename]    (Adhoc only) sitename to show to assist hostname lookup inside MCA
+ * @apiParam {Object} [info]        (Adhoc only) host information (key/value pairs of various info - TODO document)
+ * @apiParam {String[]} [communities] (Adhoc only) list of community names that this host is registered in LS
+ * @apiParam {String[]} [admins]    Array of admin IDs who can update information on this host
  *
  * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"
  * @apiSuccess {Object}         Adhoc host registered
@@ -113,7 +120,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             if(!service.ma) service.ma = undefined;
         });
 
-        //things always allowed to edit
+        //things always allowed to edit (TODO - shouldn't I have to mask fields not set?)
         host.no_agent = req.body.no_agent;
         host.toolkit_url = req.body.toolkit_url;
         host.services = req.body.services; //TODO should restrict to just MAs?

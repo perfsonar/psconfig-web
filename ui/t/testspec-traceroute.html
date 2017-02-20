@@ -124,7 +124,7 @@
         <p class="help-block">
             Sets the algorithm used by paris-traceroute
             <code>algorithm / paris-traceroute -a</code>
-            <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+            <minver min="minver.tool"></minver>
         </p>
     </div>
 
@@ -138,7 +138,7 @@
             <p class="help-block">
                 Perform Autonomous System(AS) path lookups in routing registries and print results directly after the corresponding addresses.
                 <code>as / traceroute -A</code>
-                <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+                <minver min="minver.as"></minver>
             </p>
         </div>
     </div>
@@ -157,7 +157,7 @@
         <p class="help-block">
             Protocol to use to send probes
             <code>probe_type</code>
-            <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+            <minver min="minver.probe_type"></minver>
         </p>
     </div>
 </div>
@@ -171,7 +171,7 @@
             </label>
             <p class="help-block">
                 <code>fragment / traceroute -F</code>
-                <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+                <minver min="minver.fragment"></minver>
             </p>
         </div>
     </div>
@@ -185,7 +185,7 @@
             </label>
             <p class="help-block">
                 <code>hostnames / traceroute -n</code>
-                <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+                <minver min="minver.hostnames"></minver>
             </p>
         </div>
     </div>
@@ -199,8 +199,8 @@
             ng-model="selected.specs.tos_bits">
         <p class="help-block">
             The type of service to set in the IP header of outgoing packets as an integer from 0-255
-            <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
             <code>tos_bits</code>
+            <minver min="minver.tos_bits"></minver>
         </p>
     </div>
 
@@ -214,7 +214,7 @@
         <p class="help-block">
             Set the number of probe packets to send per hop
             <code>queries / traceroute -p</code>
-            <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+            <minver min="minver.queries"></minver>
         </p>
     </div>
 </div>
@@ -229,8 +229,8 @@
         </div>
         <p class="help-block">
             Minimal time interval between probes
-            <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
             <code>sendwait / traceroute -z</code>
+            <minver min="minver.sendwait"></minver>
         </p>
     </div>
 
@@ -244,7 +244,7 @@
         <p class="help-block">
             Time to wait for a response to a probe
             <code>wait / traceroute -w</code>
-            <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+            <minver min="minver.wait"></minver>
         </p>
     </div>
 </div>

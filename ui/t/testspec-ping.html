@@ -89,7 +89,7 @@
         </select>
         <p class="help-block">
             The tool to use in performing ping test <code>tool</code>
-            <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+            <minver min="minver.tool"></minver>
         </p>
     </div>
     <!--
@@ -121,7 +121,7 @@
                 </label>
                 <p class="help-block">
                     <code>hostnames / ping -n</code>
-                    <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+                    <minver min="minver.hostnames"></minver>
                 </p>
             </div>
         </div>
@@ -135,7 +135,7 @@
                 </label>
                 <p class="help-block">
                     <code>suppress_loopback / ping -L</code>
-                    <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+                    <minver min="minver.suppress_loopback"></minver>
                 </p>
             </div>
         </div>
@@ -155,7 +155,7 @@
             <p class="help-block">
                 Specify a timeout, in seconds, before ping exits regardless of how many packets have been sent
                 <code>deadline / ping -w</code>
-                <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+                <minver min="minver.deadline"></minver>
             </p>
         </div>
         <label for="timeout" class="col-sm-2 control-label">Timeout</label>
@@ -169,7 +169,7 @@
             <p class="help-block">
                 Time to wait for a response
                 <code>timeout / ping -W</code>
-                <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+                <minver min="minver.timeout"></minver>
             </p>
         </div>
     </div>
@@ -183,8 +183,8 @@
             ng-model="selected.specs.tos_bits">
         <p class="help-block">
             The type of service to set in the IP header of outgoing packets as an integer from 0-255
-            <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
             <code>tos_bits</code>
+            <minver min="minver.tos_bits"></minver>
         </p>
     </div>
 
@@ -197,7 +197,7 @@
             <p class="help-block">
                 Set the <a href="https://tools.ietf.org/html/rfc6437#page-4">IPv6 flow label</a>
                 <code>flow_label / iperf3 -L</code>
-                <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+                <minver min="minver.flow_label"></minver>
             </p>
         </div>
     </div>

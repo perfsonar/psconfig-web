@@ -155,7 +155,7 @@
         </div>
         <p class="help-block">
             The rate at which the tool will attempt to send TCP packets. Can specify as bits per second or with suffix K, M, or G to indicated Kbps, Mbps or Gbps respectively <code>tcp_bandwidth</code> 
-            <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+            <minver min="minver.tcp_bandwidth"></minver>
         </p>
     </div>
 
@@ -166,7 +166,7 @@
                 ng-model="selected.specs.no_delay"> No Delay</label>
             <p class="help-block">
                 Set TCP_NODELAY option for the tests <code>no_delay</code>
-                <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+                <minver min="minver.no_delay"></minver>
             </p>
         </div>
     </div>
@@ -187,7 +187,7 @@
             <p class="help-block">
                 Use this TCP <a href="https://en.wikipedia.org/wiki/TCP_congestion_control" target="_blank">congestion control algorithm</a> 
                 <code>congestion</code>
-                <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+                <minver min="minver.congestion"></minver>
             </p>
         </div>
     </div>
@@ -201,7 +201,7 @@
             <p class="help-block">
                 Set the <a href="https://tools.ietf.org/html/rfc6437#page-4">IPv6 flow label</a>
                 <code>flow_label / iperf3 -L</code>
-                <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+                <minver min="minver.flow_label"></minver>
             </p>
         </div>
     </div>
@@ -220,7 +220,7 @@
             <p class="help-block">
                 The <a href="https://en.wikipedia.org/wiki/Differentiated_services">Defferentiated Services</a> code point value to set in the IP header of outgoing packets
                 <code>dscp</code> 
-                <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+                <minver min="minver.dscp"></minver>
             </p>
         </div>
     </div>
@@ -236,7 +236,7 @@
             </div>
             <p class="help-block">
                 Tell the tool to use a <a target="_blank" href="https://en.wikipedia.org/wiki/Maximum_segment_size">Maximum TCP segment Size</a> of N bytes <code>mss</code>
-                <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+                <minver min="minver.mss"></minver>
             </p>
         </div>
     </div>
@@ -251,7 +251,7 @@
         <p class="help-block">
             Specify which CPU socket ID to use for the server tool (useful for 40/100G NUMA hosts)
             <code>server_cpu_affinity / numactl -N ID</code> 
-            <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+            <minver min="minver.server_cpu_affinity"></minver>
         </p>
     </div>
 
@@ -263,7 +263,7 @@
         <p class="help-block">
             Specify which CPU socket ID to use for the client tool (useful for 40/100G NUMA hosts)
             <code>client_cpu_affinity / numactl -N ID</code> 
-            <span class="label label-warning" title="Only Supported by perfSONAR >v4.0">v4</span>
+            <minver min="minver.client_cpu_affinity"></minver>
         </p>
     </div>
 </div>

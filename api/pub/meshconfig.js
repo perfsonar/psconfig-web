@@ -121,14 +121,13 @@ function generate_mainfo(service) {
 }
 
 //synchronous function to construct meshconfig from admin config
-exports.generate = function(config, opts, cb) {
-
+exports.generate = function(_config, opts, cb) {
     //catalog of all hosts referenced in member groups keyed by _id
     var host_catalog = {}; 
 
     //resolve all db entries first
-    config.admins = resolve_users(config.admins);
-    async.eachSeries(config.tests, function(test, next_test) {
+    _config.admins = resolve_users(_config.admins);
+    async.eachSeries(_config.tests, function(test, next_test) {
         if(!test.enabled) return next_test();
         async.parallel([
             function(next) {
@@ -178,9 +177,20 @@ exports.generate = function(config, opts, cb) {
                 resolve_testspec(test.testspec, function(err, testspec) {
                     if(err) return next(err);
                     test.testspec = testspec;
+
+                    //suppress testspecs that does't meet min host version
+                    if(!_config._host_version) return next();
+                    var hostv = parseInt(_config._host_version[0]);
+                    var minver = config.meshconfig.minver[test.service_type];
+                    for(var k in test.testspec.specs) {
+                        //if minver is set for this testspec, make sure host version meets it
+                        if(minver[k]) {
+                            if(hostv < minver[k]) delete test.testspec.specs[k]; 
+                        }
+                    }
                     next();
                 });
-            }
+            },
         ], next_test);
     }, function(err) {
         if(err) return logger.error(err);
@@ -190,12 +200,14 @@ exports.generate = function(config, opts, cb) {
             organizations: [],
             tests: [],
             administrators: [],
-            description: config.name + " / " + config.desc,
+            description: _config.name,
             //_debug: config //debug
         };
-    
+        if(_config.desc) mc.description += " / " + _config.desc;
+        if(_config._host_version) mc.description += " (v"+_config._host_version+")";
+     
         //set meshconfig admins
-        if(config.admins) config.admins.forEach(function(admin) {
+        if(_config.admins) _config.admins.forEach(function(admin) {
             mc.administrators.push({name: admin.fullname, email: admin.email});
         });
     
@@ -243,19 +255,28 @@ exports.generate = function(config, opts, cb) {
                 location: {}
             };
 
+            /*
             //set all location- info we know
+            //-- this includes location-sitename which breaks generate_configuration
             for(var k in _host.info) {
                 if(k.indexOf("location-") == 0) {
                     var subk = k.substring("location-".length);
                     site.location[subk] = _host.info[k];
                 }
             }
+            */
+            //pull location info (some location- info that comes with sLS isn't allowed for meshconfig
+            //so I have to list all that's allowed (v4 host may be ok?)
+            ['country', 'street_address', 'city', 'state', 'latitude', 'longitude'].forEach((k)=>{
+                site.location[k] = _host.info['location-'+k];
+            });
+            if(_host.info['location-code']) site.location['postal_code'] = _host.info['location-code'];//odd one
             org.sites.push(site);
         }
         mc.organizations.push(org);
 
         //now the most interesting part..
-        config.tests.forEach(function(test) {
+        _config.tests.forEach(function(test) {
             if(!test.enabled) return;
             var members = {
                 type: test.mesh_type
@@ -292,7 +313,5 @@ exports.generate = function(config, opts, cb) {
         //all done
         cb(null, mc);
     });
-
-    //mc.debug = config;
 }
 

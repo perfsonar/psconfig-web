@@ -5,22 +5,6 @@
             <h2>Test specs</h2>
             <p class="help-block">List of defined test specifications</p>
             <br>
-            <!--
-            <div class="btn-group pull-right" style="left: -20px;top: -5px;">
-                <button class="btn btn-xs btn-default dropdown-toggle" 
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Type <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                <li><a href>All</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href>Latency</a></li>
-                <li><a href>Bandwidth</a></li>
-                <li><a href>Traceroute</a></li>
-                <li><a href>Pinger</a></li>
-                </ul>
-            </div>
-            -->
             <span class="text-muted">{{testspecs.length}} testspecs</span>
         </div>
         <hr style="margin: 0px;">
@@ -107,7 +91,8 @@
                         </select>
                     </div>
                 </div>
-                <ng-include ng-if="selected.service_type" src="'t/testspec-'+selected.service_type+'.html'"></ng-include>
+                <ng-include ng-if="selected.service_type" 
+                    src="'t/testspec-'+selected.service_type+'.html'"></ng-include>
                 <p class="help-block pull-right">For more information on testspecs, please see <a target="_blank" href="http://docs.perfsonar.net/config_mesh.html">MeshConfig Documentation</a></p>
 
                 <br><br>

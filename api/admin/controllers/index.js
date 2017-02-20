@@ -13,10 +13,9 @@ const db = require('../../models');
 var cache_status = null;
 
 /**
- * @apiGroup System
- * @api {get} /health Get API status
- * @apiDescription Get current API status
- * @apiName GetHealth
+ * @api {get} /health   Get API status
+ * @apiGroup            Administrator
+ * @apiDescription      Get current API status
  *
  * @apiSuccess {String} status 'ok' or 'failed'
  */
@@ -68,6 +67,7 @@ router.get('/config', jwt({secret: config.admin.jwt.pub, credentialsRequired: fa
         service_types: config.meshconfig.service_types,
         mesh_types: config.meshconfig.mesh_types,
         defaults: config.meshconfig.defaults,
+        minver: config.meshconfig.minver,
     });
 });
 

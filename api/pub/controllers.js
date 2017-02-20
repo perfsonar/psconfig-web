@@ -11,10 +11,24 @@ const logger = new winston.Logger(config.logger.winston);
 const db = require('../models');
 const meshconfig = require('./meshconfig');
 
+/**
+ * @apiGroup            Publisher
+ * @api {get} /health   Get API status for publisher
+ * @apiDescription      Get current API status for MCA publisher
+ *
+ * @apiSuccess {String} status 'ok' or 'failed'
+ */
 router.get('/health', function(req, res) {
     res.json({status: 'ok'});
 });
 
+/**
+ * @apiGroup                Publisher
+ * @api {get} /config/:url  Download meshconfig
+ * @apiDescription          generate meshconfig that can be consumed by 3rd party tools (like meshconfig_generator for toolkit)
+ *
+ * @apiParam {string} url   url for registered meshconfig 
+ */
 router.get('/config/:url', function(req, res, next) {
     db.Config.findOne({url: req.params.url}).lean().exec(function(err, config) {
         if(err) return next(err);
@@ -26,15 +40,25 @@ router.get('/config/:url', function(req, res, next) {
     });
 });
 
-//construct config on-the-fly by aggregating all tests that includes the host specified
+/**
+ * @apiGroup                 Publisher
+ * @api {get} /auto/:address Download auto-meshconfig 
+ * @apiDescription           Construct meshconfig on-the-fly by aggregating all tests that includes the host specified
+ *
+ * @apiParam {string} address Hostname of the toolkit instance to generate auto-meshconfig for.
+ * @apiParam {string} [ma_override] Override all MA endpoints in this meshconfig with this hostname
+ * @apiParam {string} [host_version] Override the host version provided via sLS (like.. to suppress v4 options)
+ */
 router.get('/auto/:address', function(req, res, next) {
     var address = req.params.address;
+    logger.debug(req.query.host_version);
     //find host from hostname or ip
-    db.Host.findOne({ hostname: address }, '_id', function(err, host) {
+    db.Host.findOne({ hostname: address }, '_id  info.pshost-toolkitversion', function(err, host) {
         if(err) return next(err);
         if(!host) return res.status(404).json({message: "no such hostname registered: "+address});
         var config = {
-            desc: "Auto-MeshConfig for "+address,
+            name: "Auto-MeshConfig for "+address,
+            //desc: "",
             admins: [],  //TODO - find out how I populated this for OSG version..
             tests: [], 
         };
@@ -68,7 +92,13 @@ router.get('/auto/:address', function(req, res, next) {
                         if(found) config.tests.push(test);
                     });
                 });
-                console.dir(JSON.stringify(config));
+
+                //figure out version
+                config._host_version = 
+                    req.query.host_version || 
+                    host.info['pshost-toolkitversion'] || 
+                    host.info['pshost-bundle-version'] || 
+                    null;
                 
                 meshconfig.generate(config, req.query, function(err, m) {
                     if(err) return next(err);

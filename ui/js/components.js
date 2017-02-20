@@ -94,3 +94,9 @@ app.directive('mcSpecs', function() {
     } 
 });
 
+app.directive('minver', function() {
+    return {
+        scope: {min: '<'},
+        template: '<span ng-if="min" class="label label-warning" title="Only Supported by perfSONAR >v{{min}}">v{{min}}</span>',
+    } 
+});

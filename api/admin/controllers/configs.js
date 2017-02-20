@@ -20,7 +20,6 @@ function canedit(user, config) {
     return false;
 }
 
-//router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
 /**
  * @api {get} /configs          Query Configs
  * @apiGroup                    Configs

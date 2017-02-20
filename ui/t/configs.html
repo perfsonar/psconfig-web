@@ -47,8 +47,7 @@
         <div class="autoconfig">
             <h3 style="margin-top: 15px;">Auto Mesh Config</h3>
             <p class="help-block">Enter hostname of perfSONAR toolkit instance to generate a mesh config URL containing tests for that instance as test endpoints.</p>
-            <ui-select 
-                ng-model="autoconf_select" on-select="autoconf($item)">
+            <ui-select ng-model="autoconf_select" on-select="autoconf($item)">
                 <ui-select-match placeholder="Enter hostname">
                     <div style="padding-top: 2px; font-size: 12px">
                         <b>{{$select.selected.sitename}}</b> ({{$select.selected.hostname}})

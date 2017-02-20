@@ -28,6 +28,8 @@ app.controller('TestspecsController', function($scope, $route, toaster, $http, j
         $scope.closesubbar();
         $location.update_path("/testspecs/"+testspec._id);
         window.scrollTo(0,0);
+
+        $scope.minver = $scope.serverconf.minver[testspec.service_type];
     }
 
     $scope.add = function() {
@@ -54,9 +56,9 @@ app.controller('TestspecsController', function($scope, $route, toaster, $http, j
     });
 
     $scope.submit = function() {
-        //remove parameter set to empty string
+        //remove parameter set to empty, null, or false
         for(var k in $scope.selected.specs) {
-            if($scope.selected.specs[k] === '') delete $scope.selected.specs[k];
+            if(!$scope.selected.specs[k]) delete $scope.selected.specs[k];
         }
 
         //remove parameters that aren't shown on the UI
