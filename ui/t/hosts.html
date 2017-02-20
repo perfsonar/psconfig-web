@@ -273,6 +273,12 @@
                 -->
 
                 <h3>Host Detail</h3>
+                <a class="pull-right" 
+                    target="_blank"
+                    ng-if="selected.info['location-latitude'] && selected.info['location-longitude']"
+                    href="https://www.google.com/maps/place/{{selected.info['location-latitude']}},{{selected.info['location-longitude']}}">
+                    <i class="fa fa-map-marker" aria-hidden="true"></i> Location
+                </a>
                 <p class="help-block">Host details can be used in a dynamic hostgroup query</p>
                 <mc-specs specs="selected.info" form="form" readonly="!selected._canedit || selected.lsid"></mc-specs>
 
