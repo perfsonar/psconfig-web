@@ -19,12 +19,40 @@ const meshconfig = require('./meshconfig');
  * @apiSuccess {String} status 'ok' or 'failed'
  */
 router.get('/health', function(req, res) {
-    res.json({status: 'ok'});
+    var status = "ok";
+    var msg = null;
+
+    //check meshconfig health
+    var mc_status = meshconfig.health();
+    if(mc_status.status != "ok") {
+        status = mc_status.status;
+        msg= mc_status.msg;
+    }
+
+    //check db health
+    db.Config.findOne().exec(function(err, config) {
+        if(err) {
+            status = "failed";
+            msg = err.toString();
+        }
+        if(!config) {
+            status = "failed";
+            msg = "no config (yet?)";
+        } else {
+            msg = "db status ok";
+        }
+        res.json({status: status, msg: msg});
+    });
 });
 
 /**
  * @apiGroup                Publisher
  * @api {get} /config/:url  Download meshconfig
+ *
+ * @apiParam {string} [ma_override] 
+ *                          Override all MA endpoints in this meshconfig with this hostname
+ * @apiParam {string} [host_version] 
+ *                          Override the host version provided via sLS (like.. to suppress v4 options)
  * @apiDescription          generate meshconfig that can be consumed by 3rd party tools (like meshconfig_generator for toolkit)
  *
  * @apiParam {string} url   url for registered meshconfig 
@@ -33,6 +61,7 @@ router.get('/config/:url', function(req, res, next) {
     db.Config.findOne({url: req.params.url}).lean().exec(function(err, config) {
         if(err) return next(err);
         if(!config) return res.status(404).text("Couldn't find config with URL:"+req.params.url);
+        config._host_version = req.query.host_version;
         meshconfig.generate(config, req.query, function(err, m) {
             if(err) return next(err);
             res.json(m);
@@ -51,7 +80,7 @@ router.get('/config/:url', function(req, res, next) {
  */
 router.get('/auto/:address', function(req, res, next) {
     var address = req.params.address;
-    logger.debug(req.query.host_version);
+    //logger.debug(req.query.host_version);
     //find host from hostname or ip
     db.Host.findOne({ hostname: address }, '_id  info.pshost-toolkitversion', function(err, host) {
         if(err) return next(err);

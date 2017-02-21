@@ -296,8 +296,8 @@ $ exit
 
 Copy the output from auth.js which is your access token. Store this on your server somewhere and make sure only you can access it (like chmod 600 `~/.mca.token.jwt`)
 
-You can now use most of the MCA REST APIs as documented here..
-> https://soichi7.ppa.iu.edu/mca/apidoc/
+You can now use most of the MCA REST APIs as documented here.. (test instance)
+> https://meshconfig-itb.grid.iu.edu/apidoc/
 
 For example, to query for the hostgroups, you can do something like
 

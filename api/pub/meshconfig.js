@@ -13,19 +13,42 @@ const db = require('../models');
 const common = require('../common');
 
 var profile_cache = null;
+var profile_cache_date = null;
 function load_profile(cb) {
     logger.info("reloading profiles");
     common.profile.getall(function(err, profiles) {
-        if(err) logger.error(err);
-        else profile_cache = profiles;
+        if(err) return logger.error(err);
+        profile_cache = profiles;
+        profile_cache_date = Date.now();
+
     });
 }
 //load profile for the first time
 load_profile();
 setInterval(load_profile, 10*60*1000); //reload every 10 minutes
 
+exports.health = function() {
+    var status = "ok";
+    var msg = null;
+    if(!profile_cache) {
+        status = "failed";
+        msg = "profile cache not loaded yet?";
+    } else {
+        if(Date.now() - profile_cache_date > 3600*60*1000) {
+            status = "failed";
+            msg = "profile cache not loaded for more than an hour";
+        }
+        if(profile_cache.length == 0) {
+            status = "failed";
+            msg = "profile cache is empty";
+        }
+    }
+    return {msg: msg, status: status};
+}
+
 //convert list of UIDs to list of profile objects
 function resolve_users(uids) {
+    if(!profile_cache) return null; //auth profile not loaded yet?
     var users = [];
     uids.forEach(function(uid) {
         users.push(profile_cache[uid]);  
@@ -236,7 +259,7 @@ exports.generate = function(_config, opts, cb) {
                 if(service.type == "mp-bwctl") return;
                 if(service.type == "ma") return;
                 if(service.type == "mp-owamp") return;
-                if(opts.ma_override) service.ma = { locator: opts.ma_override }
+                if(opts.ma_override) service.ma = { hostname: opts.ma_override }
 
                 //service.ma is already resolved.. (local vs. remote)
                 if(service.ma) {
