@@ -48,14 +48,14 @@ router.get('/health', function(req, res) {
 /**
  * @apiGroup                Publisher
  * @api {get} /config/:url  Download meshconfig
+ * @apiDescription          generate meshconfig that can be consumed by 3rd party tools (like meshconfig_generator for toolkit)
  *
+ * @apiParam {string} url   url for registered meshconfig 
  * @apiParam {string} [ma_override] 
  *                          Override all MA endpoints in this meshconfig with this hostname
  * @apiParam {string} [host_version] 
  *                          Override the host version provided via sLS (like.. to suppress v4 options)
- * @apiDescription          generate meshconfig that can be consumed by 3rd party tools (like meshconfig_generator for toolkit)
  *
- * @apiParam {string} url   url for registered meshconfig 
  */
 router.get('/config/:url', function(req, res, next) {
     db.Config.findOne({url: req.params.url}).lean().exec(function(err, config) {

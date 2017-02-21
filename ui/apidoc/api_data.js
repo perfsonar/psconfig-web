@@ -947,6 +947,20 @@ define({ "api": [
             "optional": false,
             "field": "url",
             "description": "<p>url for registered meshconfig</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": true,
+            "field": "ma_override",
+            "description": "<p>Override all MA endpoints in this meshconfig with this hostname</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": true,
+            "field": "host_version",
+            "description": "<p>Override the host version provided via sLS (like.. to suppress v4 options)</p>"
           }
         ]
       }
