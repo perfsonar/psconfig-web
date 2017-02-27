@@ -5,26 +5,8 @@
         <div style="padding-left: 20px; margin-bottom: 10px;">
             <h2>Hosts</h2>
             <p class="help-block">List of all toolkit hosts on configured sLS</p>
-            <!--
-            <br>
-            <div class="btn-group pull-right" style="left: -20px;top: -5px;">
-                <button class="btn btn-xs btn-default dropdown-toggle" 
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Datasource <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                <li><a href>All</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href>Latency</a></li>
-                <li><a href>Bandwidth</a></li>
-                <li><a href>Traceroute</a></li>
-                <li><a href>Pinger</a></li>
-                </ul>
-            </div>
-            -->
             <span class="text-muted">{{hosts.length}} Hosts</span>
         </div>
-        <!--<hr style="margin: 0px;">-->
         <div class="host_filterbox">
             <input type="text" class="form-control" 
                 ng-class="{active: hosts_filter}"
@@ -40,12 +22,12 @@
                 ng-repeat="host in hosts"
                 ng-class="{'active': selected == host}"
                 ng-click="select(host)">
-                <!--<time class="help-block pull-right">{{testspec.create_date|date}}</time>-->
                 <div class="list-header">
                     <small>
                         <span class="label label-info pull-right" ng-if="host.lsid && !host.url">Simulated</span> 
                         <span class="label label-default" ng-if="host.lsid">{{host.lsid}}</span>
                         <span class="label label-warning" ng-if="!host.lsid">Adhoc</span> 
+                        <span class="label label-danger" ng-if="host.url && host._stale">Stale</span> 
                         {{host.hostname||'removed'}} 
                         <i ng-if="!host._canedit" class="fa fa-lock text-muted" title="readonly"></i>
                     </small>
@@ -62,20 +44,6 @@
         <p class="alert alert-info" ng-if="!selected">Please select a host</p>
         <form name="form" class="form-horizontal margin30" ng-submit="submit()" ng-show="selected" confirm-on-exit>
             <div class="fixed-top">
-                <!--
-                <h2 class="page-heading">
-                    <button type="button" class="btn btn-primary pull-right"
-                        ng-disabled="!selected._canedit" 
-                        ng-click="edit(selected)">
-                        <i class="fa fa-pencil-square-o"></i> Edit
-                    </button>
-                    {{selected.sitename}}<br>
-                    <small class="text-muted">
-                        {{selected.hostname}}
-                        <span class="label label-danger" ng-if="selected.no_agent">No Agent</span>
-                    </small>
-                </h2>
-                -->
                 <h2>
                     <i class="fa fa-trash-o clickable" aria-hidden="true" 
                         ng-if="selected._id && selected._canedit"
@@ -103,15 +71,6 @@
             </div><!--fixed-top-->
 
             <div class="fixed-top-under">
-                <!--
-                <p class="bg bg-info" ng-if="selected.lsid" style="padding: 15px;">
-                    You can not modify most information for this host which comes from
-                    <span class="label label-default">{{selected.lsid}}</span> 
-                    <a href="{{selected.url}}" target="_blank" ng-if="selected.url">{{selected.url}}</a>
-                    <span ng-if="!selected.url">as a simulated record</span>
-                </p>
-                -->
-
                 <div class="form-group">
                     <label class="col-sm-2 control-label">Datasource</label>
                     <div class="col-sm-10" ng-if="selected.lsid">
@@ -119,14 +78,14 @@
                             <span class="input-group-addon">{{selected.lsid}}</span>
                             <input type="text" class="form-control" disabled value="{{selected.url||'(Simulated)'}}"></input>
                         </div>
-                        <p class="help-block" ng-if="selected.url">sLS URL where the host information comes from.</p>
+                        <p class="help-block" ng-if="selected.url">Information about this host came from above sLS URL</p>
                         <p class="alert alert-info" ng-if="!selected.url">The host information came from <code>{{selected.lsid}}</code>, however, we were not able to download its toolkit JSON for host details.. We are guessing its content.</p>
+                        <p class="alert alert-danger" ng-if="selected.url && selected._stale">The host information has not been received for more than 7 days. Last update was {{selected.update_date | timeAgo}}</p>
                     </div>
                     <div class="col-sm-10" ng-if="!selected.lsid">
                         <p class="alert alert-warning" ng-if="!selected.lsid">This is an adhoc host. The information about this host was entered manually by MCA administrators. Once real data for this is delivered via sLS, this host will become read-only.</p>
                     </div>
                 </div>
-
                 <h3>Basic Information</h3>
                 <div class="form-group">
                     <label for="sitename" class="col-sm-2 control-label">Site Name *</label>
@@ -187,29 +146,12 @@
                             ng-click="removeservice(service)" 
                             ng-if="selected._canedit && !selected.lsid"/>
                     </label>
-                    <!--
-                    <div class="col-sm-5">
-                        <div class="input-group">
-                            <span class="input-group-addon">Locator</span>
-                            <input type="text" class="form-control" 
-                                ng-model="service.locator" 
-                                placeholder="API URL for this service (leave it blank to auto generate)" 
-                                ng-disabled="!selected._canedit || selected.lsid">
-                        </div>
-                    </div>
-                    -->
                     <div class="col-sm-10" ng-if="service.type != 'ma'">
                         <div class="input-group">
                             <span class="input-group-addon">MA</span>
                             <ui-select ng-model="service.ma" ng-disabled="!selected._canedit">
                                 <ui-select-match placeholder="Use local measurement archive" allow-clear>
                                     <div style="padding-top: 2px; font-size: 12px">
-                                        <!--
-                                        <span class="label label-default" style="display: inline;" ng-if="$select.selected.lsid">
-                                            {{$select.selected.lsid}}</span>
-                                        <span class="label label-warning" style="display: inline;" ng-if="!$select.selected.lsid">
-                                            Adhoc</span> 
-                                        -->
                                         <code>{{$select.selected.hostname||'removed'}}</code>
                                         {{$select.selected.sitename}} 
                                     </div>
@@ -249,29 +191,6 @@
                     </div>
                 </div>
 
-                <!--
-                <p class="help-block">All services running under this host and which measurement archive the data should be sent to</p>
-                <ul class="list-group">
-                    <li class="list-group-item" ng-repeat="service in selected.services">
-                        <div class="host">
-                            {{service.type}}
-                            <small class="text-muted">{{service.locator}}</small>
-                            <span ng-if="service.old" class="label label-warning">Stale</span>
-                        </div>
-                        <div style="display: inline-block; opacity: 0.5" ng-if="service.type != 'ma' && !service.ma && selected._default_ma"> 
-                            <i class="fa fa-arrow-right"></i> 
-                            <div class="host">local ma</div>
-                        </div>
-                        <div style="display: inline-block;" ng-if="service.type != 'ma' && service.ma"> 
-                            <i class="fa fa-arrow-right"></i> 
-                            <div class="host">
-                                {{hosts_o[service.ma].sitename}} <code>{{hosts_o[service.ma].hostname}}</code>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-                -->
-
                 <h3>Host Detail</h3>
                 <a class="pull-right" 
                     target="_blank"
@@ -282,34 +201,12 @@
                 <p class="help-block">Host details can be used in a dynamic hostgroup query</p>
                 <mc-specs specs="selected.info" form="form" readonly="!selected._canedit || selected.lsid"></mc-specs>
 
-                <!--
-                <h3>Location</h3>
-                <a class="pull-right" 
-                    target="_blank"
-                    href="https://www.google.com/maps/place/{{selected.location.latitude}},{{selected.location.longitude}}">
-                    <i class="fa fa-map-marker" aria-hidden="true"></i> Google Map
-                </a>
-                <mc-specs specs="selected.location" form="form" readonly="!selected._canedit || selected.lsid"></mc-specs>
-                -->
-
                 <h3>Communities</h3>
                 <!--<p class="help-block">Communities that this host is configured to be member of.</p>-->
                 <p class="help-block" ng-if="selected.communities.length == 0">No Communities</p>
                 <ul class="specs">
                     <li ng-repeat="com in selected.communities">{{com}}</li>
                 </ul>
-
-                <!--
-                <h3>IP Addresses</h3>
-                <p class="help-block">IP addresses <b>{{selected.hostname}}</b> can be reached at.</p>
-                <ul class="list-group">
-                    <li class="list-group-item" ng-repeat="address in selected.addresses">
-                        <span class="label label-primary" ng-if="address.family == 4">IPv4</span>
-                        <span class="label label-danger" ng-if="address.family == 6">IPv6</span>
-                        {{address.address}}
-                    </li>
-                </ul>
-                -->
 
                 <br><br>
                 

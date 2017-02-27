@@ -13,7 +13,8 @@ var app = angular.module('app', [
     'sca-shared',
     'ui.gravatar',
     'ui.ace',
-    'ngLocationUpdate'
+    'ngLocationUpdate',
+    'yaru22.angular-timeago'
 ]);
 
 //can't quite do the slidedown animation through pure angular/css.. borrowing slideDown from jQuery..

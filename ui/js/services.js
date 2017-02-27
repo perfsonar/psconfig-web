@@ -16,11 +16,18 @@ app.factory('hosts', function(appconf, $http, jwtHelper) {
         //return basic (uuid, sitename, hostname, lsid) host info for all hosts
         getAll: function(opts) { 
             //if(all_promise) return all_promise;
-            var select = "sitename hostname lsid url";
+            var select = "sitename hostname lsid url update_date";
             if(opts && opts.select) select = opts.select;
             return $http.get(appconf.api+'/hosts?select='+select+'&sort=sitename hostname&limit=3000')
             .then(function(res) {
                 hosts = res.data.hosts;
+                hosts.forEach(function(host) {
+                    var d = new Date();
+                    d.setHours(-24*7);
+                    if(new Date(host.update_date) < d) { 
+                        host._stale = true;
+                    }
+                });
                 return res.data.hosts;
             });
         },
@@ -29,8 +36,7 @@ app.factory('hosts', function(appconf, $http, jwtHelper) {
         getDetail: function(host) {
             return $http.get(appconf.api+'/hosts?find='+JSON.stringify({_id: host._id})).then(function(res) {
                 var _host = res.data.hosts[0];
-                //console.dir(_host);
-                for(var k in _host) host[k] = _host[k];
+                for(var k in _host) host[k] = _host[k]; //append info to host
                 return host;
             });
         },

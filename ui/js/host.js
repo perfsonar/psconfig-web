@@ -6,9 +6,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
     $scope.appconf = appconf;
     $scope.active_menu = "hosts";
-
     $scope.loading = true;
-
     $scope.hosts_filter = $cookies.get('hosts_filter');
 
     //load users for admin
@@ -17,8 +15,6 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         $scope.users = _users;
         hosts.getAll().then(function(_hosts) {
             $scope.hosts = _hosts;
-
-            //create _id>host mapping
             $scope.hosts_o = {};
             _hosts.forEach(function(host) {
                 $scope.hosts_o[host._id] = host;
@@ -39,22 +35,8 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
                     if(item) item.scrollIntoView(true);
                 },0);
             } else $scope.select(_hosts[0]); //select first one then
-
-            /*
-            //find hosts that provides MAs
-            $scope.mas = [];
-            _hosts.forEach(function(host) {
-                console.dir(host);
-                if(host.services) host.services.forEach(function(service) {
-                    if(service.type == "ma") $scope.mas.push(host);
-                });
-            });
-            //hosts.getMAs().then(function(hosts) { $scope.mas = hosts; });
-            */
         });
-
     });
-
 
     $scope.selected = null;
     $scope.select = function(host) {
@@ -72,8 +54,6 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         $scope.closesubbar();
         $location.update_path("/hosts/"+host._id);
         window.scrollTo(0,0);
-
-
     }
     $scope.add = function() {
         $scope.selected = hosts.add();
