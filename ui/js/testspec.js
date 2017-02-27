@@ -38,6 +38,17 @@ app.controller('TestspecsController', function($scope, $route, toaster, $http, j
         $location.update_path("/testspecs");
     }
 
+    //for "combo-boxing" congestion field
+    //http://stackoverflow.com/questions/29489821/allow-manually-entered-text-in-ui-select
+    $scope.congestion_algs = ['cubic', 'htcp', 'bbr'];
+    $scope.getcongestion = function(search) {
+        var newalgs = $scope.congestion_algs.slice();
+        if (search && newalgs.indexOf(search) === -1) {
+            newalgs.unshift(search);
+        }
+        return newalgs;
+    }
+
     $scope.setdefault = function(type) {
         var def = $scope.serverconf.defaults.testspecs[type];
         $scope.selected.specs = angular.copy(def);

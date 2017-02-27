@@ -78,6 +78,7 @@
 
 <!--v4-->
 
+<!--
 <div class="form-group">
     <label for="tool" class="col-sm-2 control-label">Tool *</label>
     <div class="col-sm-4">
@@ -92,86 +93,67 @@
             <minver min="minver.tool"></minver>
         </p>
     </div>
-    <!--
-    <div 
-        ng-disabled="!selected._canedit"
-        ng-if="selected.specs.tool == 'bwctl/iperf3' && selected.specs.protocol == 'tcp'">
-        <label for="omit_interval" class="col-sm-2 control-label">Omit Interval</label>
-        <div class="col-sm-4">
-            <div class="input-group">
-                <input type="number" step="1" class="form-control" name="omit_interval" 
-                    ng-disabled="!selected._canedit"
-                    ng-model="selected.specs.omit_interval" placeholder="0">
-                <div class="input-group-addon">seconds</div>
-            </div>
-            <p class="help-block">The time to ignore results at the beginning of a test in seconds. Useful for excluding TCP ramp-up time. Note that this is added to the duration (e.g. omit_interval of 5 and duration 30 leads to a 35 second test) <code>omit_interval</code></p>
-        </div>
-    </div>
-    -->
 </div>
+-->
 
 <div class="form-group">
-    <div ng-if="selected.specs.tool == 'ping'">
-        <div class="col-sm-offset-2 col-sm-4">
-            <div class="checkbox">
-                <label> 
-                    <input type="checkbox" name="hostnames" 
-                        ng-disabled="!selected._canedit"
-                        ng-model="selected.specs.hostnames"> Do not try to map IP addresses to host names when displaying them
-                </label>
-                <p class="help-block">
-                    <code>hostnames / ping -n</code>
-                    <minver min="minver.hostnames"></minver>
-                </p>
-            </div>
+    <div class="col-sm-offset-2 col-sm-4">
+        <div class="checkbox">
+            <label> 
+                <input type="checkbox" name="hostnames" 
+                    ng-disabled="!selected._canedit"
+                    ng-model="selected.specs.hostnames"> Do not try to map IP addresses to host names when displaying them
+            </label>
+            <p class="help-block">
+                <code>hostnames / ping -n</code>
+                <minver min="minver.hostnames"></minver>
+            </p>
         </div>
+    </div>
 
-        <div class="col-sm-offset-2 col-sm-4">
-            <div class="checkbox">
-                <label> 
-                    <input type="checkbox" name="suppress_loopback" 
-                        ng-disabled="!selected._canedit"
-                        ng-model="selected.specs.suppress_loopback"> Suppress loopback of multicast packets
-                </label>
-                <p class="help-block">
-                    <code>suppress_loopback / ping -L</code>
-                    <minver min="minver.suppress_loopback"></minver>
-                </p>
-            </div>
+    <div class="col-sm-offset-2 col-sm-4">
+        <div class="checkbox">
+            <label> 
+                <input type="checkbox" name="suppress_loopback" 
+                    ng-disabled="!selected._canedit"
+                    ng-model="selected.specs.suppress_loopback"> Suppress loopback of multicast packets
+            </label>
+            <p class="help-block">
+                <code>suppress_loopback / ping -L</code>
+                <minver min="minver.suppress_loopback"></minver>
+            </p>
         </div>
     </div>
 </div>
 
 <div class="form-group">
-    <div ng-if="selected.specs.tool == 'ping'">
-        <label for="deadline" class="col-sm-2 control-label">Deadline</label>
-        <div class="col-sm-4">
-            <div class="input-group">
-                <input type="number" class="form-control" name="deadline" 
-                    ng-disabled="!selected._canedit"
-                    ng-model="selected.specs.deadline">
-                <div class="input-group-addon">seconds</div>
-            </div>
-            <p class="help-block">
-                Specify a timeout, in seconds, before ping exits regardless of how many packets have been sent
-                <code>deadline / ping -w</code>
-                <minver min="minver.deadline"></minver>
-            </p>
+    <label for="deadline" class="col-sm-2 control-label">Deadline</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="number" class="form-control" name="deadline" 
+                ng-disabled="!selected._canedit"
+                ng-model="selected.specs.deadline">
+            <div class="input-group-addon">seconds</div>
         </div>
-        <label for="timeout" class="col-sm-2 control-label">Timeout</label>
-        <div class="col-sm-4">
-            <div class="input-group">
-                <input type="number" class="form-control" name="timeout" 
-                    ng-disabled="!selected._canedit"
-                    ng-model="selected.specs.timeout">
-                <div class="input-group-addon">seconds</div>
-            </div>
-            <p class="help-block">
-                Time to wait for a response
-                <code>timeout / ping -W</code>
-                <minver min="minver.timeout"></minver>
-            </p>
+        <p class="help-block">
+            Specify a timeout, in seconds, before ping exits regardless of how many packets have been sent
+            <code>deadline / ping -w</code>
+            <minver min="minver.deadline"></minver>
+        </p>
+    </div>
+    <label for="timeout" class="col-sm-2 control-label">Timeout</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="number" class="form-control" name="timeout" 
+                ng-disabled="!selected._canedit"
+                ng-model="selected.specs.timeout">
+            <div class="input-group-addon">seconds</div>
         </div>
+        <p class="help-block">
+            Time to wait for a response
+            <code>timeout / ping -W</code>
+            <minver min="minver.timeout"></minver>
+        </p>
     </div>
 </div>
 
@@ -188,6 +170,7 @@
         </p>
     </div>
 
+    <!--
     <div ng-if="selected.specs.tool == 'ping6'">
         <label for="flow_label" class="col-sm-2 control-label">Flow Label</label>
         <div class="col-sm-4">
@@ -201,6 +184,7 @@
             </p>
         </div>
     </div>
+    -->
 </div>
 
 <!--all version-->

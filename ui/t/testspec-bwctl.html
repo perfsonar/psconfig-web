@@ -176,6 +176,13 @@
     <div ng-if="selected.specs.tool == 'bwctl/iperf3' && selected.specs.protocol == 'tcp'">
         <label for="congestion" class="col-sm-2 control-label">Congestion Algorithm</label>
         <div class="col-sm-4">
+            <ui-select ng-model="selected.specs.congestion">
+                <ui-select-match placeholder="(Use default algorithm)" allow-clear="true">{{$select.selected}}</ui-select-match> 
+                <ui-select-choices repeat="item in getcongestion($select.search)">
+                    {{item}}
+                </ui-select-choices>
+            </ui-select>
+            <!--
             <select class="form-control" name="congestion"
                 ng-disabled="!selected._canedit"
                 ng-model="selected.specs.congestion">
@@ -184,6 +191,7 @@
                 <option value="htcp">htcp</option>
                 <option value="bbr">bbr</option>
             </select>
+            -->
             <p class="help-block">
                 Use this TCP <a href="https://en.wikipedia.org/wiki/TCP_congestion_control" target="_blank">congestion control algorithm</a> 
                 <code>congestion</code>

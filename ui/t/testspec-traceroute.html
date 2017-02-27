@@ -109,8 +109,7 @@
 
 <!--v4-->
 
-<div class="form-group" 
-    ng-if="selected.specs.tool == 'paris-traceroute'">
+<div class="form-group" ng-if="selected.specs.tool == 'paris-traceroute'">
     <label for="algorithm" class="col-sm-2 control-label">Algorithm</label>
     <div class="col-sm-4">
         <select class="form-control" ng-disabled="!selected._canedit" ng-model="selected.specs.algorithm" name="tool">
@@ -127,7 +126,9 @@
             <minver min="minver.tool"></minver>
         </p>
     </div>
+</div>
 
+<div class="form-group" ng-if="selected.specs.tool == 'traceroute'">
     <div class="col-sm-offset-2 col-sm-4">
         <div class="checkbox">
             <label> 
@@ -141,6 +142,41 @@
                 <minver min="minver.as"></minver>
             </p>
         </div>
+        <div class="checkbox">
+            <label> 
+                <input type="checkbox" name="fragment" 
+                    ng-disabled="!selected._canedit" ng-model="selected.specs.fragment"> Do not fragment
+            </label>
+            <p class="help-block">
+                <code>fragment / traceroute -F</code>
+                <minver min="minver.fragment"></minver>
+            </p>
+        </div>
+        <div class="checkbox">
+            <label> 
+                <input type="checkbox" name="hostnames" 
+                    ng-disabled="!selected._canedit"
+                    ng-model="selected.specs.hostnames"> Do not try to map IP addresses to host names when displaying them
+            </label>
+            <p class="help-block">
+                <code>hostnames / traceroute -n</code>
+                <minver min="minver.hostnames"></minver>
+            </p>
+        </div>
+    </div>
+
+    <label for="queries" class="col-sm-2 control-label">Queries</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="number" class="form-control" name="queries" 
+                ng-disabled="!selected._canedit" ng-model="selected.specs.queries">
+            <div class="input-group-addon">Packets/Hop</div>
+        </div>
+        <p class="help-block">
+            Set the number of probe packets to send per hop
+            <code>queries / traceroute -p</code>
+            <minver min="minver.queries"></minver>
+        </p>
     </div>
 </div>
 
@@ -160,38 +196,7 @@
             <minver min="minver.probe_type"></minver>
         </p>
     </div>
-</div>
 
-<div class="form-group">
-    <div class="col-sm-offset-2 col-sm-4">
-        <div class="checkbox">
-            <label> 
-                <input type="checkbox" name="fragment" 
-                    ng-disabled="!selected._canedit" ng-model="selected.specs.fragment"> Do not fragment
-            </label>
-            <p class="help-block">
-                <code>fragment / traceroute -F</code>
-                <minver min="minver.fragment"></minver>
-            </p>
-        </div>
-    </div>
-
-    <div class="col-sm-offset-2 col-sm-4">
-        <div class="checkbox">
-            <label> 
-                <input type="checkbox" name="hostnames" 
-                    ng-disabled="!selected._canedit"
-                    ng-model="selected.specs.hostnames"> Do not try to map IP addresses to host names when displaying them
-            </label>
-            <p class="help-block">
-                <code>hostnames / traceroute -n</code>
-                <minver min="minver.hostnames"></minver>
-            </p>
-        </div>
-    </div>
-</div>
-
-<div class="form-group">
     <label for="tos_bits" class="col-sm-2 control-label">TOS Bits</label>
     <div class="col-sm-4">
         <input type="number" step="1" min="0" max="255" class="form-control" name="tos_bits" 
@@ -204,22 +209,9 @@
         </p>
     </div>
 
-    <label for="queries" class="col-sm-2 control-label">Queries</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="number" class="form-control" name="queries" 
-                ng-disabled="!selected._canedit" ng-model="selected.specs.queries">
-            <div class="input-group-addon">Packets/Hop</div>
-        </div>
-        <p class="help-block">
-            Set the number of probe packets to send per hop
-            <code>queries / traceroute -p</code>
-            <minver min="minver.queries"></minver>
-        </p>
-    </div>
 </div>
 
-<div class="form-group">
+<div class="form-group" ng-if="selected.specs.tool == 'traceroute'">
     <label for="sendwait" class="col-sm-2 control-label">Send Wait Time</label>
     <div class="col-sm-4">
         <div class="input-group">

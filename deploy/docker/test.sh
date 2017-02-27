@@ -1,31 +1,5 @@
 #docker network create mca
 
-#docker run \
-#    --restart=always \
-#    --net mca \
-#    --name mca-mongo1 \
-#    -d mongo
-
-#docker rm -f sca-auth1
-#docker run \
-#    --restart=always \
-#    --net mca \
-#    --name sca-auth1 \
-#    -v `pwd`/scaconfig/auth:/app/api/config \
-#    -d soichih/sca-auth
-#echo "pulling auth.pub and user.jwt from auth service"
-#sleep 3
-#cp ./where_scaauth1_isrunning/auth/auth.pub config
-#cp ./where_scaauth1_isrunning/auth/user.jwt config
-
-#docker rm -f sca-profile1
-#docker run \
-#    --restart=always \
-#    --net mca \
-#    --name sca-profile1 \
-#    -v `pwd`/scaconfig/auth:/app/api/config \
-#    -d soichih/sca-auth
-
 docker rm -f mca-admin1
 docker run \
     --restart=always \
