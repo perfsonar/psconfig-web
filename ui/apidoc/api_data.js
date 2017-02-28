@@ -935,9 +935,73 @@ define({ "api": [
   {
     "group": "Publisher",
     "type": "get",
+    "url": "/config",
+    "title": "Enumerate meshconfig URLs",
+    "description": "<p>Query registered meshconfigs URLs and its basic details</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": true,
+            "field": "find",
+            "description": "<p>Mongo find query JSON.stringify &amp; encodeURIComponent-ed - defaults to {} To pass regex, you need to use {$regex: &quot;....&quot;} format instead of js: /.../</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": true,
+            "field": "ma_override",
+            "description": "<p>Override all MA endpoints in this meshconfig with this hostname</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": true,
+            "field": "host_version",
+            "description": "<p>Override the host version provided via sLS (like.. to suppress v4 options)</p>"
+          }
+        ]
+      }
+    },
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>A valid JWT token &quot;Bearer: xxxxx&quot;</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "configs:",
+            "description": "<p>List of meshconfig registrations, count: total number of meshconfig (for paging)</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "api/pub/controllers.js",
+    "groupTitle": "Publisher",
+    "name": "GetConfig"
+  },
+  {
+    "group": "Publisher",
+    "type": "get",
     "url": "/config/:url",
     "title": "Download meshconfig",
-    "description": "<p>generate meshconfig that can be consumed by 3rd party tools (like meshconfig_generator for toolkit)</p>",
+    "description": "<p>Generate meshconfig that can be consumed by 3rd party tools (like meshconfig_generator for toolkit)</p>",
     "parameter": {
       "fields": {
         "Parameter": [

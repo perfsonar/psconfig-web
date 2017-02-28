@@ -46,15 +46,53 @@ router.get('/health', function(req, res) {
 });
 
 /**
- * @apiGroup                Publisher
- * @api {get} /config/:url  Download meshconfig
- * @apiDescription          generate meshconfig that can be consumed by 3rd party tools (like meshconfig_generator for toolkit)
+ * @apiGroup                    Publisher
+ * @api {get} /config           Enumerate meshconfig URLs
+ * @apiDescription              Query registered meshconfigs URLs and its basic details
  *
- * @apiParam {string} url   url for registered meshconfig 
+ * @apiParam {Object} [find]    Mongo find query JSON.stringify & encodeURIComponent-ed - defaults to {}
+ *                              To pass regex, you need to use {$regex: "...."} format instead of js: /.../ 
  * @apiParam {string} [ma_override] 
- *                          Override all MA endpoints in this meshconfig with this hostname
+ *                              Override all MA endpoints in this meshconfig with this hostname
  * @apiParam {string} [host_version] 
- *                          Override the host version provided via sLS (like.. to suppress v4 options)
+ *                              Override the host version provided via sLS (like.. to suppress v4 options)
+ *
+ * @apiHeader {String}          Authorization A valid JWT token "Bearer: xxxxx"
+ *
+ * @apiSuccess {Object}         configs: List of meshconfig registrations, count: total number of meshconfig (for paging)
+ */
+router.get('/config', function(req, res, next) {
+    var find = {};
+    if(req.query.find) find = JSON.parse(req.query.find);
+    db.Config.find(find)
+    .exec(function(err, configs) {
+        if(err) return next(err);
+        var q = "";
+        if(req.query.ma_override) {
+            q += "ma_override="+req.query.ma_override;
+        }
+        if(req.query.host_version) {
+            if(q!="") q+="&";
+            q += "host_version="+req.query.host_version;
+        }
+        if(q!="") q="?"+q;
+        var urls = configs.map((_config)=>{
+            return {include: [ config.pub.url+_config.url+q ]};
+        });
+        res.json(urls);
+    }); 
+});
+
+/**
+ * @apiGroup                    Publisher
+ * @api {get} /config/:url      Download meshconfig
+ * @apiDescription              Generate meshconfig that can be consumed by 3rd party tools (like meshconfig_generator for toolkit)
+ *
+ * @apiParam {string} url       url for registered meshconfig 
+ * @apiParam {string} [ma_override] 
+ *                              Override all MA endpoints in this meshconfig with this hostname
+ * @apiParam {string} [host_version] 
+ *                              Override the host version provided via sLS (like.. to suppress v4 options)
  *
  */
 router.get('/config/:url', function(req, res, next) {

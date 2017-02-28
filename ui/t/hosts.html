@@ -80,7 +80,7 @@
                         </div>
                         <p class="help-block" ng-if="selected.url">Information about this host came from above sLS URL</p>
                         <p class="alert alert-info" ng-if="!selected.url">The host information came from <code>{{selected.lsid}}</code>, however, we were not able to download its toolkit JSON for host details.. We are guessing its content.</p>
-                        <p class="alert alert-danger" ng-if="selected.url && selected._stale">The host information has not been received for more than 7 days. Last update was {{selected.update_date | timeAgo}}</p>
+                        <p class="alert alert-danger" ng-if="selected.url && selected._stale">The host information has not been received for more than 7 days. Last update was <time title="{{selected.update_date}}">{{selected.update_date | timeAgo}}</time></p>
                     </div>
                     <div class="col-sm-10" ng-if="!selected.lsid">
                         <p class="alert alert-warning" ng-if="!selected.lsid">This is an adhoc host. The information about this host was entered manually by MCA administrators. Once real data for this is delivered via sLS, this host will become read-only.</p>
