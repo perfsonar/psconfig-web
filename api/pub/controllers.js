@@ -59,7 +59,7 @@ router.get('/health', function(req, res) {
  *
  * @apiHeader {String}          Authorization A valid JWT token "Bearer: xxxxx"
  *
- * @apiSuccess {Object}         configs: List of meshconfig registrations, count: total number of meshconfig (for paging)
+ * @apiSuccess {Object[]}       List of object containing "include" parameter with meshconfig URL (format adhears to meshconfig_agent
  */
 router.get('/config', function(req, res, next) {
     var find = {};
