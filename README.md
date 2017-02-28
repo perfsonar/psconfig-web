@@ -82,6 +82,7 @@ tar -xzf mca.sample.tar.gz -C /etc
 
     * Edit defaults `testspecs` if necessary (`meshconfig.defaults.testspecs`)
     * Edit datasource section which determines which host you'd like to load from sLS to construct your host config.
+    * Update pub.url with the hostname that your MCA instance will be exposed as.
 
 2. For Authentication Service
 
