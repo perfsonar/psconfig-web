@@ -77,7 +77,7 @@ router.get('/config', function(req, res, next) {
         }
         if(q!="") q="?"+q;
         var urls = configs.map((_config)=>{
-            return {include: [ config.pub.url+_config.url+q ]};
+            return {include: [ config.pub.url+'config/'+_config.url+q ]};
         });
         res.json(urls);
     }); 

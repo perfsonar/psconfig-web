@@ -85,7 +85,7 @@
                     <label class="col-sm-2 control-label">MeshConfig URL</label>
                     <div class="col-sm-10">
                         <div class="input-group">
-                            <span class="input-group-addon"><small>{{appconf.pub_url}}</small></span>
+                            <span class="input-group-addon"><small>{{appconf.pub_url+'config/'}}</small></span>
                             <input type="text" name="url" class="form-control" id="url" 
                                 ng-model="selected.url" 
                                 placeholder="Enter path to expose this config" 
@@ -93,7 +93,7 @@
                             <span class="input-group-btn" ng-if="selected._id">
                                 <button class="btn btn-primary" type="button" 
                                     ng-disabled="form.$dirty"
-                                    ng-click="relocate(appconf.pub_url+selected.url, true)">
+                                    ng-click="relocate(appconf.pub_url+'config/'+selected.url, true)">
                                     <i class="fa fa-external-link" aria-hidden="true"></i> Open MeshConfig
                                 </button>
                             </span>
@@ -155,37 +155,6 @@
                 </div>
             </div>
         </form>
-        <!--
-        <ul class="list-group">
-        <li class="list-group-item" style="background-color: #fafafa">
-            <br>
-            <br>
-        </li>
-        <li class="list-group-item" ng-repeat="config in configs | orderBy:'id' ">
-            <div class="row">
-                <div class="col-lg-8">
-                    <h4>
-                        <small>{{config.id}}</small> 
-                        {{config.desc}}
-                        <small><a href="{{appconf.pub_url}}/config/{{config.url}}" target="_blank">/{{config.url}}</a></small>
-                    </h4>
-                    <mc-tests tests="config.Tests" servicetypes="serverconf.service_types"></mc-tests>
-                </div>
-                <div class="col-md-4">
-                    <h5>Admins<small> (who can edit)</small></h5>
-                    <mc-admins admins="config.admins"></mc-admins>
-                </div>
-            </div>
-            <div class="pull-right edit_button" ng-if="config.canedit">
-                <button type="button" ng-click="edit(config)" class="btn btn-xs pull-right"><i class="fa fa-pencil-square-o"></i></button>
-            </div>
-            <div class="pull-right edit_button" ng-if="!config.canedit">
-                <button type="button" ng-click="edit(config)" class="btn btn-xs pull-right"><i class="fa fa-eye"></i></button>
-            </div>
-        </li>
-        </ul>
-        <button type="button" ng-click="addconfig()" ng-if="cancreate" class="btn btn-sm">Add New</button>
-        -->
     </div><!--subbar-content-->
 </div><!--sca-sidebar-page-->
 
