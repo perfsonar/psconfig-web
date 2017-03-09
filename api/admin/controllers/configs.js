@@ -119,7 +119,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             }).catch(function(err) {
                 next(err);
             });
-        } else return res.status(401).end();
+        } else return res.status(401).end("you are not administartor");
     }); 
 });
 
