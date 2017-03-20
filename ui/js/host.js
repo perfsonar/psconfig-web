@@ -1,5 +1,5 @@
 
-app.controller('HostsController', 
+app.controller('HostsController',
 function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hosts, $modal, $routeParams, users, $cookies) {
 
     scaMessage.show(toaster);
@@ -9,16 +9,31 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
     $scope.loading = true;
     $scope.hosts_filter = $cookies.get('hosts_filter');
 
+    $scope.ma_hosts = {}
+    $scope.refreshHosts = function(query, hostname) {
+        var select = "sitename hostname lsid url update_date";
+        var find = JSON.stringify({hostname: {$regex: query}});
+        return $http.get(appconf.api+'/hosts?select='+select+
+            '&sort=sitename hostname&limit=3000&find='+find)
+        .then(function(res) {
+            $scope.ma_hosts[hostname] = res.data.hosts;
+            console.log("search results");
+            console.dir(res.data);
+        });
+    };
+
     //load users for admin
     users.getAll().then(function(_users) {
 
         $scope.users = _users;
         hosts.getAll().then(function(_hosts) {
             $scope.hosts = _hosts;
+            /*
             $scope.hosts_o = {};
             _hosts.forEach(function(host) {
                 $scope.hosts_o[host._id] = host;
             });
+            */
 
             $scope.loading = false;
 
@@ -43,7 +58,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         $scope.selected = host;
 
         hosts.getDetail(host).then(function(_host) {
-            find_missing_services();    
+            find_missing_services();
         });
 
         //hide subbar if shown
@@ -59,13 +74,19 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         $scope.selected = hosts.add();
         $scope.closesubbar();
         $location.update_path("/hosts");
-        find_missing_services();    
+        find_missing_services();
     }
 
     //apply host filter
     $scope.check_host_filter = function(host) {
         $cookies.put('hosts_filter', $scope.hosts_filter);
         if(!$scope.hosts_filter) return true;
+
+        if(!host.hostname) {
+            console.log("host with invalid hostname")
+            console.dir(host);
+        }
+
 
         var hostname = host.hostname.toLowerCase();
         var sitename = host.sitename.toLowerCase();
@@ -91,9 +112,9 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
             var missing = true;
             $scope.selected.services.forEach(function(used_service) {
                 if(used_service.type == id) missing = false;
-            }); 
+            });
             if(missing) $scope.missing_services.push({
-                id: id, 
+                id: id,
                 label: $scope.serverconf.service_types[id].label,
             });
         }
@@ -115,13 +136,13 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
             //name: "tdb..", //TODO is service name used? maybe I should deprecate?
             //locator: "",
         });
-        find_missing_services();    
+        find_missing_services();
         $scope.addservice_item = null;
     }
     $scope.removeservice = function(service) {
         var id = $scope.selected.services.indexOf(service);
         $scope.selected.services.splice(id, 1);
-        find_missing_services();    
+        find_missing_services();
         $scope.form.$setDirty();
     }
 

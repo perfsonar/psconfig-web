@@ -50,7 +50,7 @@
             <!--can't filter by host.service_type == test.service_type because we aren't loading services-->
             <ui-select-choices 
                 group-by="'sitename'"
-                repeat="host._id as host in hosts | propsFilter: {sitename: $select.search, hostname: $select.search}">
+                repeat="host._id as host in hosts | filter: $select.search | limitTo: 100">
                 <span class="label label-default" ng-if="host.lsid">{{host.lsid}}</span>
                 <span class="label label-warning" ng-if="!host.lsid">Adhoc</span>
                 <code>{{host.hostname|trim_locator}}</code>
@@ -118,7 +118,7 @@
             <!--can't filter by service_type because we aren't loading service_type detail for hosts-->
             <ui-select-choices 
                 group-by="'sitename'"
-                repeat="host._id as host in hosts | propsFilter: {sitename: $select.search, hostname: $select.search}">
+                repeat="host._id as host in getselectedhosts(test)">
                 <span class="label label-default" ng-if="host.lsid">{{host.lsid}}</span>
                 <span class="label label-warning" ng-if="!host.lsid">Adhoc</span>
                 <code>{{host.hostname|trim_locator}}</code>

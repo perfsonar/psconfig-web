@@ -10,7 +10,7 @@ const logger = new winston.Logger(config.logger.winston);
 
 //use native promise for mongoose
 //without this, I will get Mongoose: mpromise (mongoose's default promise library) is deprecated
-mongoose.Promise = global.Promise; 
+mongoose.Promise = global.Promise;
 
 exports.init = function(cb) {
     mongoose.connect(config.mongodb, {
@@ -21,7 +21,7 @@ exports.init = function(cb) {
             logger.error("mongodb might not be started yet.. going to retry in 5 seconds");
             setTimeout(function() {
                 exports.init(cb);
-            }, 5000); 
+            }, 5000);
             return;
         }
         logger.info("connected to mongo");
@@ -34,7 +34,7 @@ exports.disconnect = function(cb) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-//service is now part of host 
+//service is now part of host
 var serviceSchema = mongoose.Schema({
     type: String, //like "owamp", "bwctl", etc.
     //name: String, //from service-name
@@ -46,14 +46,14 @@ var serviceSchema = mongoose.Schema({
 
 //workflow instance
 var hostSchema = mongoose.Schema({
-   
+
     /////////////////////////////////////////////////////////////////////////////////////////..
     //key
-    hostname: {type: String, index: { unique: true } }, 
+    hostname: {type: String, index: { unique: true }, required: true },
 
     uuid: String, //this is now much less important..(maybe I should deprecate?)
     sitename: String,
-    
+
     //TODO - right now I don't know what I can use this information for..
     //stores ip address resolved from the hostname using dns.resolve
     addresses: [
@@ -61,9 +61,9 @@ var hostSchema = mongoose.Schema({
             family: Number, //4 or 6
             address: String, //ip address
         })
-    ], 
+    ],
 
-    toolkit_url: String, 
+    toolkit_url: String,
     no_agent: {type: Boolean, default: false},
 
     //host info (pshost-toolkitversion, host-hardware-memory, host-os-version, host-hadeware-processorspeed, host-hadware-processorcount)
@@ -71,7 +71,7 @@ var hostSchema = mongoose.Schema({
     info: mongoose.Schema.Types.Mixed,
 
     //location: mongoose.Schema.Types.Mixed,
-    
+
     communities: [ String ],
 
     services: [ serviceSchema ],
@@ -87,7 +87,7 @@ var hostSchema = mongoose.Schema({
 
 /*
 //mongoose's pre/post are just too fragile.. it gets call on some and not on others.. (like findOneAndUpdate)
-//I prefer doing this manually anyway, because it will be more visible 
+//I prefer doing this manually anyway, because it will be more visible
 instanceSchema.pre('update', function(next) {
     this.update_date = new Date();
     next();
@@ -138,13 +138,13 @@ var testSchema = mongoose.Schema({
     desc: String,
 
     mesh_type: String,
-    agroup: {type: mongoose.Schema.Types.ObjectId, ref: 'Hostgroup'}, 
-    bgroup: {type: mongoose.Schema.Types.ObjectId, ref: 'Hostgroup'}, 
+    agroup: {type: mongoose.Schema.Types.ObjectId, ref: 'Hostgroup'},
+    bgroup: {type: mongoose.Schema.Types.ObjectId, ref: 'Hostgroup'},
 
     center: {type: mongoose.Schema.Types.ObjectId, ref: 'Host'}, //only used for mesh_type == star
     nahosts: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Host'} ], //let's not use hostgroup for this..
 
-    testspec: {type: mongoose.Schema.Types.ObjectId, ref: 'Testspec'}, 
+    testspec: {type: mongoose.Schema.Types.ObjectId, ref: 'Testspec'},
 
     enabled: {type: Boolean, default: true }, //should I keep this?
 });

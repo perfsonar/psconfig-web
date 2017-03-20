@@ -1,5 +1,5 @@
 
-app.controller('ConfigsController', 
+app.controller('ConfigsController',
 function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, hostgroups, configs, $routeParams, testspecs) {
     scaMessage.show(toaster);
     $scope.active_menu = "configs";
@@ -8,17 +8,17 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     users.getAll().then(function(_users) {
         $scope.users = _users;
 
-        testspecs.getAll().then(function(_testspecs) { 
-            $scope.testspecs = _testspecs; 
+        testspecs.getAll().then(function(_testspecs) {
+            $scope.testspecs = _testspecs;
 
             hosts.getAll().then(function(_hosts) {
                 $scope.hosts = _hosts;
 
-                hostgroups.getAll().then(function(_hostgroups) { 
+                hostgroups.getAll().then(function(_hostgroups) {
                     $scope.hostgroups = _hostgroups;
 
-                    configs.getAll().then(function(_configs) { 
-                        $scope.configs = _configs; 
+                    configs.getAll().then(function(_configs) {
+                        $scope.configs = _configs;
                         if($routeParams.id) {
                             $scope.configs.forEach(function(config) {
                                 if(config._id == $routeParams.id) $scope.select(config);
@@ -32,10 +32,10 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
             });
         });
     });
-    
+
     $scope.selected = null;
     $scope.select = function(config) {
-        $scope.selected = config; 
+        $scope.selected = config;
         $scope.closesubbar();
         $location.update_path("/configs/"+config._id);
         window.scrollTo(0,0);
@@ -59,7 +59,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     $scope.gethostgroup = function(id) {
         var it = null;
         $scope.hostgroups.forEach(function(hostgroup) {
-            if(hostgroup._id == id) it = hostgroup; 
+            if(hostgroup._id == id) it = hostgroup;
         });
         return it;
     }
@@ -72,6 +72,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
         if(test.bgroup) $scope.gethostgroup(test.bgroup).hosts.forEach(function(id) {
             hostids.push(id);
         });
+        if(test.center) hostids.push(test.center);
         //
         //convert to host objects
         var hosts = [];

@@ -16,7 +16,7 @@ const db = require('./models');
 const common = require('./common');
 
 db.init(function(err) {
-    if(err) throw err; 
+    if(err) throw err;
     logger.info("connected to db");
     run(function(err) {
         if(err) logger.error(err);
@@ -34,16 +34,16 @@ function lookup_addresses(address, cb) {
         dns.reverse(ip, function(err, _hostnames) {
             if(err) {
                 return cb("couldn't reverse lookup ip: "+ip);
-            } 
+            }
             if(_hostnames.length > 1) logger.warn("reverse lookup of "+ip+" resulted in multiple hostname - picking first one:"+JSON.stringify(_hostnames));
-            hostname = _hostnames[0]; 
-           
+            hostname = _hostnames[0];
+
             //then do lookup all IP addresses
             dns.lookup(hostname, {all: true}, function(err, addresses) {
                 if(err) return cb("couldn't lookup "+address);
                 cb(null, hostname, addresses);
             });
-        }); 
+        });
     } else {
         hostname = address;
         dns.lookup(hostname, {all: true}, function(err, addresses) {
@@ -91,12 +91,12 @@ function create_hostrec(service, uri, cb) {
             rec.sitename = "("+mockname+")";
             logger.error("location-sitename not set!! using mockup name."+mockname);
         }
-        
+
         var ip = host['host-name'][0]; //usually ip address
         var hostname = host['host-name'][1]; //often undefined. if set, it's hostname (always?)
         if(hostname !== undefined) rec.hostname = hostname;
         lookup_addresses(ip, function(err, hostname, addresses) {
-            if(err) return cb(err); 
+            if(err) return cb(err);
             if(hostname) rec.hostname = hostname;
             rec.addresses = addresses;
             cb(null, rec);
@@ -108,7 +108,7 @@ function create_hostrec(service, uri, cb) {
 function get_location(service) {
     return {
         longitude: (service['location-longitude']?service['location-longitude'][0]:null),
-        latitude: (service['location-latitude']?service['location-latitude'][0]:null), 
+        latitude: (service['location-latitude']?service['location-latitude'][0]:null),
         city: (service['location-city']?service['location-city'][0]:null),
         state: (service['location-state']?service['location-state'][0]:null),
         postal_code: (service['location-code']?service['location-code'][0]:null),
@@ -126,7 +126,7 @@ function get_hostinfo(host) {
         if(key == "host-administrators") continue;
         if(key == "host-net-interfaces") continue;
         if(key == "host-name") continue;
-        
+
         //store all (ps)hosts-, location things
         ["host-", "pshost-", "location-"].forEach(function(prefix) {
             var p = key.indexOf(prefix);
@@ -143,7 +143,7 @@ function cache_ls(hosts, ls, lsid, cb) {
         if(res.statusCode != 200) return cb(new Error("failed to cahce service from:"+ls.url+" statusCode:"+res.statusCode));
 
         function get_host(uri, service, _cb) {
-            if(hosts[uri] !== undefined) return _cb(null, hosts[uri]);              
+            if(hosts[uri] !== undefined) return _cb(null, hosts[uri]);
             create_hostrec(service, res.request.uri, function(err, host) {
                 if(err) {
                     logger.error("failed to create hostrecord from following service");
@@ -168,7 +168,7 @@ function cache_ls(hosts, ls, lsid, cb) {
                     logger.error(JSON.stringify(service, null, 4));
                     return next();
                 } else id = service['service-host'][0];
-            } else id = service['client-uuid'][0]; 
+            } else id = service['client-uuid'][0];
             get_host(id, service, function(err, host) {
                 if(err) {
                     logger.error(err);
@@ -194,14 +194,14 @@ function cache_ls(hosts, ls, lsid, cb) {
                     //],
                     var len = service['service-locator'].length;
                     //var locator = service['service-locator'][len-1];
-                    
+
                     //construct service record
                     host.services.push({
                         type: type,
                         //name: service['service-name'][0],
                         //locator: locator, //locator is now a critical information needed to generate the config
                         //lsid: lsid, //make it easier for ui
-                        
+
                         //TODO - I need to query the real admin records from the cache (gocdb2sls service already genenrates contact records)
                         //I just have to store them in our table
                         //admins: service['service-administrators'],
@@ -233,12 +233,12 @@ function cache_global_ls(hosts, service, id, cb) {
                     if(err) logger.error(err); //continue
                     next();
                 });
-            }, cb); 
+            }, cb);
         } catch (e) {
             //couldn't parse activehosts json..
             return cb(e);
         }
-    }); 
+    });
 }
 
 function update_dynamic_hostgroup(cb) {
@@ -268,7 +268,7 @@ function run(cb) {
     //mca host records keyed by uri (hostname could duplicate)
     //hostname found first will take precedence
     //host.simulated will have less precedence
-    var hosts = {}; 
+    var hosts = {};
 
     //go through each LS
     async.eachOfSeries(config.datasource.lses, function(service, id, next) {
@@ -292,14 +292,16 @@ function run(cb) {
                 //real record.. update existing record
                 db.Host.findOneAndUpdate({
                     hostname: host.hostname
-                }, {$set: host}, {upsert: true, setDefaultsOnInsert: true}, function() {
+                }, {$set: host}, {upsert: true, setDefaultsOnInsert: true}, function(err) {
+                    if(err) logger.error(err); //continue
                     next();
                 });
             } else {
                 //this is simulated record
                 db.Host.findOne({
-                    hostname: host.hostname, 
+                    hostname: host.hostname,
                 }, function(err, _host) {
+                    if(err) logger.error(err); //continue
                     if(_host) {
                         //if existing record exits, only update if it's also simulated
                         if(!_host.url) db.Host.update({hostname: host.hostname}, {$set: host}, next);
@@ -315,7 +317,7 @@ function run(cb) {
             if(err) logger.error(err);
             var host_count = Object.keys(hosts).length;
             logger.info("updated "+host_count+" hosts");
-        
+
             //one last thing.. update dynamic host
             update_dynamic_hostgroup(function(err) {
                 if(err) logger.error(err);
