@@ -144,6 +144,22 @@
                             </li>
                         </ul>
                         <button type="button" ng-click="addtest()" ng-show="selected._canedit" class="btn btn-sm">Add New Test</button>
+                        <span ng-if="!showimporter">or <a href="" ng-click="$parent.showimporter = true">Import from existing meshconfig</a></span>
+                        <br><br>
+                        <div class="panel panel-default" ng-if="showimporter">
+                            <div class="panel-heading">Meshconfig Importer</div>
+                            <div class="panel-body">
+                                <p>Enter Meshconfig URL to Import. This tool will add all missing hosts as adhoc hosts and setup hostgroup, testspecs, and meshconfig tests</p>
+                                <div class="input-group">
+                                    <span class="input-group-addon" id="sizing-addon2">URL</span>
+                                    <input type="text" class="form-control" ng-model="$parent.importer_url" 
+                                        placeholder="http://somewhere.com/meshconfig"></input>
+                                     <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button" ng-click="import()">Go!</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

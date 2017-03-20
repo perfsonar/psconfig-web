@@ -6,6 +6,7 @@ const router = express.Router();
 const winston = require('winston');
 const jwt = require('express-jwt');
 const async = require('async');
+const request = require('request');
 
 //mine
 const config = require('../../config');
@@ -103,7 +104,6 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
     db.Config.findById(req.params.id, function(err, config) {
         if(err) return next(err);
         if(!config) return next(new Error("can't find a config with id:"+req.params.id));
-        //only superadmin or admin of this test spec can update
         if(canedit(req.user, config)) {
             config.url = req.body.url;            
             config.name = req.body.name;            
@@ -139,7 +139,6 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
     db.Config.findById(req.params.id, function(err, config) {
         if(err) return next(err);
         if(!config) return next(new Error("can't find the config with id:"+req.params.id));
-        //only superadmin or admin of this test spec can update
         if(canedit(req.user, config)) {
             config.remove().then(function() {
                 res.json({status: "ok"});

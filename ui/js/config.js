@@ -4,6 +4,8 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     scaMessage.show(toaster);
     $scope.active_menu = "configs";
 
+    $scope.importer_url = "http://myosg.grid.iu.edu/psmesh/json/name/us-cms"; //default
+
     //start loading things (should I parallelize)
     users.getAll().then(function(_users) {
         $scope.users = _users;
@@ -123,6 +125,15 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     $scope.autoconf = function(host) {
         var address = host.hostname || host.ip;
         window.open(appconf.pub_url+"auto/"+address, '_blank');
+    }
+
+    $scope.import = function() {
+        console.log("importing", $scope.importer_url);
+        $http.post(appconf.api+'/importer', {url: $scope.importer_url})
+        .then(function(res) {
+            console.dir(res.data);
+            toaster.success(res.data.msg);
+        });
     }
 });
 

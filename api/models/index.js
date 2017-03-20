@@ -112,7 +112,6 @@ var hostgroupSchema = mongoose.Schema({
     create_date: {type: Date, default: Date.now},
     update_date: {type: Date, default: Date.now},
 });
-//hostgroupSchema.index({name: 'text', desc: 'text'});
 exports.Hostgroup = mongoose.model('Hostgroup', hostgroupSchema);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

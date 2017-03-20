@@ -23,14 +23,9 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
             _hosts.forEach(function(host) {
                 if(host.services) host.services.forEach(function(service) {
                     if(!$scope.hosts[service.type]) $scope.hosts[service.type] = [];
-                    //console.log(service.type+" "+host._id);
                     $scope.hosts[service.type].push(host);
                 });
             });
-
-            //console.dir($scope.hosts["bwctl"]);
-            //check for duplicates
-            //$scope.hosts["bwctl"].forEach(function(host) {
 
             hostgroups.getAll().then(function(_hostgroups) {
                 $scope.hostgroups = _hostgroups;

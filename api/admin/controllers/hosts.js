@@ -69,13 +69,13 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
  * @apiDescription                  Register new adhoc host
  *
  * @apiParam {Object[]} services    List of service objects for this host (TODO - need documentation)
- * @apiParam {Boolean} [toolkit_url] (default: use hostname) URL to show for MadDash
+ * @apiParam {String} [toolkit_url] (default: use hostname) URL to show for MadDash (leave it not set for "auto")
  * @apiParam {Boolean} [no_agent]   Set to true if this host should not read the meshconfig (passive) (default: false)
  * @apiParam {String} [hostname]    (Adhoc only) hostname
  * @apiParam {String} [sitename]    (Adhoc only) sitename to show to assist hostname lookup inside MCA
  * @apiParam {Object} [info]        (Adhoc only) host information (key/value pairs of various info - TODO document)
  * @apiParam {String[]} [communities] (Adhoc only) list of community names that this host is registered in LS
- * @apiParam {String[]} [admins]    Array of admin IDs who can update information on this host
+ * @apiParam {String[]} [admins]    Array of admin IDs who can update information on this host (default to submitter)
  *
  * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"
  * @apiSuccess {Object}         Adhoc host registered
@@ -83,6 +83,10 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
 router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     if(!req.user.scopes.mca || !~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
     if(req.body.lsid) delete res.body.lsid;// make sure lsid is not set
+
+    //default admins to submitter
+    if(!req.body.admins) req.body.admins = [req.user.sub.toString()];
+
     db.Host.create(req.body, function(err, host) {
         if(err) return next(err);
         host = JSON.parse(JSON.stringify(host));
