@@ -17,9 +17,9 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
     users.getAll().then(function(_users) {
         $scope.users = _users;
         hosts.getAll({select: 'hostname sitename services lsid'}).then(function(_hosts) {
-        
+
             //organize by service provided
-            $scope.hosts = {}; 
+            $scope.hosts = {};
             _hosts.forEach(function(host) {
                 if(host.services) host.services.forEach(function(service) {
                     if(!$scope.hosts[service.type]) $scope.hosts[service.type] = [];
@@ -32,8 +32,8 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
             //check for duplicates
             //$scope.hosts["bwctl"].forEach(function(host) {
 
-            hostgroups.getAll().then(function(_hostgroups) { 
-                $scope.hostgroups = _hostgroups; 
+            hostgroups.getAll().then(function(_hostgroups) {
+                $scope.hostgroups = _hostgroups;
                 if($routeParams.id) {
                     $scope.hostgroups.forEach(function(hostgroup) {
                         if(hostgroup._id == $routeParams.id) $scope.select(hostgroup);
@@ -48,13 +48,13 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
 
     $scope.selected = null;
     $scope.select = function(hostgroup) {
-        $scope.selected = hostgroup; 
+        $scope.selected = hostgroup;
         switch(hostgroup.type) {
         case "static":
-            $scope.tabs.static.active = true; 
+            $scope.tabs.static.active = true;
             break;
-        case "dynamic": 
-            $scope.tabs.dynamic.active = true; 
+        case "dynamic":
+            $scope.tabs.dynamic.active = true;
             $scope.run_dynamic();
             break;
         }
@@ -85,6 +85,8 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
             $scope.selected.hosts = $scope.selected._hosts;
         }
 
+        delete $scope.selected.host_filter_console; //could cause "payload too large"
+
         if(!$scope.selected._id) {
             hostgroups.create($scope.selected).then(function(hostgroup) {
                 toaster.success("Hostgroup created successfully!");
@@ -109,7 +111,7 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
             $scope.selected = null;
         }).catch($scope.toast_error);
     }
-    
+
     //$scope.$watch("selected.host_filter", $scope.run_dynamic);
     //$scope.$watch("selected.service_type", $scope.run_dynamic);
 
@@ -131,7 +133,7 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
             $scope.selected.host_filter_alert = null;
             $scope.selected.host_filter_console = null;
             if(res.data.message) $scope.selected.host_filter_alert = res.data.message;
-        });       
+        });
     }
 });
 

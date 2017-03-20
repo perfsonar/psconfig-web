@@ -126,7 +126,7 @@
                                     </ui-select-match>
                                     <ui-select-choices 
                                         group-by="'sitename'"
-                                        repeat="host._id as host in hosts[selected.service_type] | propsFilter: {sitename: $select.search, hostname: $select.search}">
+                                        repeat="host._id as host in hosts[selected.service_type] | filter: $select.search | limitTo: 100">
                                         <span class="label label-default" ng-if="host.lsid">{{host.lsid}}</span>
                                         <span class="label label-warning" ng-if="!host.lsid">Adhoc</span>
                                         <span>{{host.hostname||'removed'}}</span>
