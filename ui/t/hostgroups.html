@@ -117,7 +117,7 @@
                             <tab heading="Static" 
                                 select="changetype('static')"
                                 active="tabs['static'].active">
-                                <ui-select multiple ng-model="selected.hosts" style="margin-top: 5px;" ng-disabled="!selected._canedit">
+                                <ui-select ng-cloak multiple ng-model="selected.hosts" style="margin-top: 5px;" ng-disabled="!selected._canedit">
                                     <ui-select-match placeholder="Enter hostname">
                                         <span class="label label-default" ng-if="$item.lsid">{{$item.lsid}}</span>
                                         <span class="label label-warning" ng-if="!$item.lsid">Adhoc</span>
@@ -126,8 +126,9 @@
                                     </ui-select-match>
                                     <ui-select-choices 
                                         group-by="'sitename'"
-                                        minimum-input-length="3"
-                                        repeat="host._id as host in hosts[selected.service_type] | filter: $select.search">
+                                        refresh-delay="200"
+                                        refresh="refreshHosts($select.search)"
+                                        repeat="host._id as host in hosts">
                                         <span class="label label-default" ng-if="host.lsid">{{host.lsid}}</span>
                                         <span class="label label-warning" ng-if="!host.lsid">Adhoc</span>
                                         <span>{{host.hostname||'removed'}}</span>

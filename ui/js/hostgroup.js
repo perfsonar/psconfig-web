@@ -16,6 +16,7 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
 
     users.getAll().then(function(_users) {
         $scope.users = _users;
+        /*
         hosts.getAll({select: 'hostname sitename services lsid'}).then(function(_hosts) {
 
             //organize by service provided
@@ -26,20 +27,41 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
                     $scope.hosts[service.type].push(host);
                 });
             });
+        */
 
-            hostgroups.getAll().then(function(_hostgroups) {
-                $scope.hostgroups = _hostgroups;
-                if($routeParams.id) {
-                    $scope.hostgroups.forEach(function(hostgroup) {
-                        if(hostgroup._id == $routeParams.id) $scope.select(hostgroup);
-                    });
-                } else {
-                    //select first one
-                    if($scope.hostgroups.length > 0) $scope.select($scope.hostgroups[0]);
-                }
-            });
+        hostgroups.getAll().then(function(_hostgroups) {
+            $scope.hostgroups = _hostgroups;
+            if($routeParams.id) {
+                $scope.hostgroups.forEach(function(hostgroup) {
+                    if(hostgroup._id == $routeParams.id) $scope.select(hostgroup);
+                });
+            } else {
+                //select first one
+                if($scope.hostgroups.length > 0) $scope.select($scope.hostgroups[0]);
+            }
         });
     });
+
+    $scope.refreshHosts = function(query) {
+        var find = {
+            "services.type": $scope.selected.service_type,
+        };
+        if(query) { 
+            find.$or = [
+                {hostname: {$regex: query}},
+                {sitename: {$regex: query}},
+                {lsid: {$regex: query}},
+            ];
+        } else {
+            //only search for what's selected
+            find._id = {$in: $scope.selected.hosts};
+        }
+        return $http.get($scope.appconf.api+'/hosts'+
+            '?select='+encodeURIComponent('sitename hostname lsid')+
+            '&find='+encodeURIComponent(JSON.stringify(find))).then(function(res) {
+            $scope.hosts = res.data.hosts;
+        });
+    };
 
     $scope.selected = null;
     $scope.select = function(hostgroup) {
@@ -53,6 +75,7 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
             $scope.run_dynamic();
             break;
         }
+        $scope.refreshHosts();
         $scope.closesubbar();
         $location.update_path("/hostgroups/"+hostgroup._id);
         window.scrollTo(0,0);
@@ -93,6 +116,11 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
                 toaster.success("Hostgroup updated successfully!");
                 $scope.form.$setPristine();
             }).catch($scope.toast_error);
+            /*
+            }).catch(function(err) {
+                console.dir(err);
+            });
+            */
         }
     }
 

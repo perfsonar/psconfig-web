@@ -13,23 +13,19 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
         testspecs.getAll().then(function(_testspecs) {
             $scope.testspecs = _testspecs;
 
-            hosts.getAll().then(function(_hosts) {
-                $scope.hosts = _hosts;
+            hostgroups.getAll().then(function(_hostgroups) {
+                $scope.hostgroups = _hostgroups;
 
-                hostgroups.getAll().then(function(_hostgroups) {
-                    $scope.hostgroups = _hostgroups;
-
-                    configs.getAll().then(function(_configs) {
-                        $scope.configs = _configs;
-                        if($routeParams.id) {
-                            $scope.configs.forEach(function(config) {
-                                if(config._id == $routeParams.id) $scope.select(config);
-                            });
-                        } else {
-                            //select first one
-                            if($scope.configs.length > 0) $scope.select($scope.configs[0]);
-                        }
-                    });
+                configs.getAll().then(function(_configs) {
+                    $scope.configs = _configs;
+                    if($routeParams.id) {
+                        $scope.configs.forEach(function(config) {
+                            if(config._id == $routeParams.id) $scope.select(config);
+                        });
+                    } else {
+                        //select first one
+                        if($scope.configs.length > 0) $scope.select($scope.configs[0]);
+                    }
                 });
             });
         });
@@ -66,7 +62,39 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
         return it;
     }
 
-    $scope.getselectedhosts = function(test) {
+    $scope.serviceChange = function(test) {
+        test.agroup = null;
+        test.bgroup = null;
+        test.center = null;
+        test.nahosts = [];
+    }
+
+    $scope.refreshHosts = function(query, test) {
+        console.log("refreshing hosts");
+        var select = "sitename hostname lsid";
+        var find = {
+            "services.type": test.service_type,
+        }
+        if(query) {
+            find.$or = [
+                {hostname: {$regex: query}},
+                {sitename: {$regex: query}},
+                {lsid: {$regex: query}},
+            ];
+        } else {
+            if(test && test.center) find._id = test.center;
+            else return;
+        }
+        console.dir(find);
+        return $http.get(appconf.api+'/hosts?select='+encodeURIComponent(select)+
+            '&sort=sitename hostname&find='+encodeURIComponent(JSON.stringify(find)))
+        .then(function(res) {
+            $scope.hosts = res.data.hosts;
+        });
+    };
+
+    $scope.refreshNAHosts = function(test) {
+        console.log("refreshing na hosts");
         var hostids = [];
         if(test.agroup) $scope.gethostgroup(test.agroup).hosts.forEach(function(id) {
             hostids.push(id);
@@ -75,13 +103,21 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
             hostids.push(id);
         });
         if(test.center) hostids.push(test.center);
-        //
-        //convert to host objects
-        var hosts = [];
+    
+        //load hosts from hostids
+        var select = "sitename hostname lsid";
+        var find = {_id: {$in: hostids}};
+        return $http.get(appconf.api+'/hosts?select='+encodeURIComponent(select)+
+            '&find='+encodeURIComponent(JSON.stringify(find)))
+        .then(function(res) {
+            $scope.na_hosts = res.data.hosts;
+        });
+        /*
         if($scope.hosts) $scope.hosts.forEach(function(host) {
             if(~hostids.indexOf(host._id)) hosts.push(host);
         });
         return hosts;
+        */
     }
     $scope.getselectedtestspec = function(test) {
         var it = null;

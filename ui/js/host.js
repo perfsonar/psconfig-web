@@ -9,16 +9,35 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
     $scope.loading = true;
     $scope.hosts_filter = $cookies.get('hosts_filter');
 
-    $scope.ma_hosts = {}
-    $scope.refreshHosts = function(query, hostname) {
-        var select = "sitename hostname lsid url update_date";
-        var find = JSON.stringify({hostname: {$regex: query}});
-        return $http.get(appconf.api+'/hosts?select='+select+
-            '&sort=sitename hostname&limit=3000&find='+find)
+    $scope.refreshHosts = function(query, service) {
+        var select = "sitename hostname lsid";
+        var find = {}
+        if(query) {
+            find.$or = [
+                {hostname: {$regex: query}},
+                {sitename: {$regex: query}},
+                {lsid: {$regex: query}},
+            ];
+        } else {
+            /*
+            //only search for what's already selected
+            var host_ids = [];
+            $scope.selected.services.forEach(service=>{
+                if(service.ma) host_ids.push(service.ma);
+            });
+            if(host_ids.length == 0) return [];
+            find._id = {$in: host_ids};
+            */
+            if(service && service.ma) find._id = service.ma;
+            else return;
+        }
+        //console.dir(find);
+        return $http.get(appconf.api+'/hosts?select='+encodeURIComponent(select)+
+            '&sort=sitename hostname&find='+encodeURIComponent(JSON.stringify(find)))
         .then(function(res) {
-            $scope.ma_hosts[hostname] = res.data.hosts;
-            console.log("search results");
-            console.dir(res.data);
+            //console.log("search results");
+            //console.dir(res.data.hosts);
+            $scope.ma_hosts = res.data.hosts;
         });
     };
 
@@ -59,6 +78,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
 
         hosts.getDetail(host).then(function(_host) {
             find_missing_services();
+            $scope.refreshHosts();
         });
 
         //hide subbar if shown
@@ -79,6 +99,8 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
 
     //apply host filter
     $scope.check_host_filter = function(host) {
+        if(!host.hostname) return false; //shouldn't happen but it does..
+
         $cookies.put('hosts_filter', $scope.hosts_filter);
         if(!$scope.hosts_filter) return true;
 
@@ -86,7 +108,6 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
             console.log("host with invalid hostname")
             console.dir(host);
         }
-
 
         var hostname = host.hostname.toLowerCase();
         var sitename = host.sitename.toLowerCase();

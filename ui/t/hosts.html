@@ -158,10 +158,12 @@
                                 </ui-select-match>
                                 <ui-select-choices 
                                     group-by="'sitename'"
-                                    repeat="ma._id as ma in ::hosts | filter: $select.search | limitTo:100">
-                                    <span class="label label-default" ng-if="ma.lsid">{{::ma.lsid}}</span>
+                                    refresh-delay="200"
+                                    refresh="refreshHosts($select.search, service)"
+                                    repeat="ma._id as ma in ma_hosts">
+                                    <span class="label label-default" ng-if="ma.lsid">{{ma.lsid}}</span>
                                     <span class="label label-warning" ng-if="!ma.lsid">Adhoc</span>
-                                    <code>{{::ma.hostname||'removed'}}</code>
+                                    <code>{{ma.hostname||'removed'}}</code>
                                 </ui-select-choices>
                             </ui-select>
                         </div><!--input-group-->
