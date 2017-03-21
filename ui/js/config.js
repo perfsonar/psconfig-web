@@ -85,7 +85,6 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
             if(test && test.center) find._id = test.center;
             else return;
         }
-        console.dir(find);
         return $http.get(appconf.api+'/hosts?select='+encodeURIComponent(select)+
             '&sort=sitename hostname&find='+encodeURIComponent(JSON.stringify(find)))
         .then(function(res) {
@@ -165,11 +164,26 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
 
     $scope.import = function() {
         console.log("importing", $scope.importer_url);
-        $http.put(appconf.api+'/configs/import/'+$scope.selected._id, {url: $scope.importer_url})
+        $http.put(appconf.api+'/configs/import', {url: $scope.importer_url})
         .then(function(res) {
             console.dir(res.data.tests);
-            $scope.selected.tests = $scope.selected.tests.concat(res.data.tests);
-            toaster.success(res.data.msg);
+            testspecs.clear();
+            testspecs.getAll().then(function(_testspecs) {
+                $scope.testspecs = _testspecs;
+                hostgroups.clear();
+                hostgroups.getAll().then(function(_hostgroups) {
+                    $scope.hostgroups = _hostgroups;
+
+                    //now show tests
+                    res.data.tests.forEach(function(test) {
+                        $scope.refreshNAHosts(test);
+                        $scope.refreshHosts(null, test);
+                        $scope.selected.tests.push(test);
+                    });
+                    $scope.form.$setDirty();
+                    toaster.success(res.data.msg);
+                })
+            });
         });
     }
 });

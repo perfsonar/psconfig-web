@@ -87,6 +87,14 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     });
 });
 
+router.put('/import', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
+    if(!req.user.scopes.mca || !~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
+    importer.import(req.body.url, req.user.sub, function(err, tests) {
+        if(err) return next(err);
+        res.json({msg: "Created testspecs / host / hostgroups records", tests: tests});
+    });
+});
+
 /**
  * @api {put} /configs/:id      Update Config
  * @apiGroup                    Configs
@@ -124,24 +132,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
     }); 
 });
 
-router.put('/import/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    if(!req.user.scopes.mca || !~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
-    db.Config.findById(req.params.id, function(err, config) {
-        if(err) return next(err);
-        if(!config) return next(new Error("can't find a config with id:"+req.params.meshconfig_id));
-        if(canedit(req.user, config)) {
-            importer.import(req.body.url, req.user.sub, function(err, tests) {
-                if(err) return next(err);
-                //console.log(JSON.stringify(config, null, 4));
-                config.tests = config.tests.concat(tests);
-                config.save(function(err) {
-                    if(err) return next(err);
-                    res.json({msg: "Successfully registered", tests: tests});
-                });
-            });
-        } else res.status(404);
-    }); 
-});
+
 
 
 /**

@@ -138,6 +138,10 @@ app.factory('testspecs', function(appconf, $http, jwtHelper) {
             });
             return all_promise; 
         },
+        clear: function() {
+            //invalidate
+            all_promise = null;
+        },
         add: function() {
             var testspec = {
                 desc: "New Testspec",
@@ -240,13 +244,16 @@ app.factory('hostgroups', function(appconf, $http, jwtHelper) {
     return {
         getAll: function() {
             if(all_promise) return all_promise;
-            //all_promise = $http.get(appconf.api+'/hostgroups?select=service_type name type create_date')
             all_promise = $http.get(appconf.api+'/hostgroups')
             .then(function(res) {
                 hostgroups = res.data.hostgroups;
                 return res.data.hostgroups;
             });
             return all_promise; 
+        },
+        clear: function() {
+            //invalidate
+            all_promise = null;
         },
         add: function() {
             var hostgroup = {
