@@ -134,7 +134,7 @@ exports.Testspec = mongoose.model('Testspec', testspecSchema);
 var testSchema = mongoose.Schema({
     service_type: String,
     name: String,
-    desc: String,
+    //desc: String, //deprecated?
 
     mesh_type: String,
     agroup: {type: mongoose.Schema.Types.ObjectId, ref: 'Hostgroup'},

@@ -165,9 +165,10 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
 
     $scope.import = function() {
         console.log("importing", $scope.importer_url);
-        $http.post(appconf.api+'/importer', {url: $scope.importer_url})
+        $http.put(appconf.api+'/configs/import/'+$scope.selected._id, {url: $scope.importer_url})
         .then(function(res) {
-            console.dir(res.data);
+            console.dir(res.data.tests);
+            $scope.selected.tests = $scope.selected.tests.concat(res.data.tests);
             toaster.success(res.data.msg);
         });
     }

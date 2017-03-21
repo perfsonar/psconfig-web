@@ -75,7 +75,6 @@ router.use('/configs', require('./configs'));
 router.use('/testspecs', require('./testspecs'));
 router.use('/hosts', require('./hosts'));
 router.use('/hostgroups', require('./hostgroups'));
-router.use('/importer', require('./importer'));
 
 module.exports = router;
 

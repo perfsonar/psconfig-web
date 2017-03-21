@@ -124,11 +124,11 @@ function ensure_testspecs(testspecs, cb) {
     }, cb);
 }
 
-router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    if(!req.user.scopes.mca || !~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
-
+exports.import = function(url, sub, cb) {
+    logger.debug("config importer");
+    
     //load requested json
-    request.get({url:req.body.url, json:true}, function(err, r, meshconfig) {
+    request.get({url:url, json:true}, function(err, r, meshconfig) {
         if(err) return next(err);
 
         var meshconfig_desc = meshconfig.description;
@@ -151,7 +151,7 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
                         sitename: host.description,
                         info: {},
                         communities: [],
-                        admins: [req.user.sub.toString()],
+                        admins: [sub.toString()],
                     };
                     if(host.toolkit_url && host.toolkit_url != "auto") host_info.toolkit_url = host.toolkit_url;
                     hosts_info.push(host_info);
@@ -162,39 +162,58 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
         //process hostgroups / testspecs
         var hostgroups = [];
         var testspecs = [];
+        var tests = [];
         meshconfig.tests.forEach(function(test) {
-            var test_desc = test.description;
             var member_type = test.members.type;
             if(member_type != "mesh") return next("only mesh type is supported currently");
 
             var type = get_service_type(test.parameters.type);
-            hostgroups.push({
+            var hostgroup = {
                 name: test.description+" Group",
                 desc: "Imported by MCA importer",
                 type: "static",
                 service_type: type,
-                admins: [req.user.sub.toString()],
+                admins: [sub.toString()],
                 _hosts: test.members.members, //hostnames that needs to be converted to host id
-            });
+            };
+            hostgroups.push(hostgroup);
 
-            testspecs.push({
+            var testspec = {
                 name: test.description+" Testspecs",
                 desc: "Imported by MCA importer",
-                sevice_type: type,
-                admins: [req.user.sub.toString()],
+                service_type: type,
+                admins: [sub.toString()],
                 specs: test.parameters,
+            };
+            testspecs.push(testspec);
+
+            tests.push({
+                name: test.description,
+                //desc: "imported", //I don't think this is used anymore
+                service_type: get_service_type(test.parameters.type),
+                mesh_type: "mesh", 
+                enabled: true,
+                nahosts: [],
+                _agroup: hostgroup, //
+                _testspec: testspec //tmp
             });
         });
 
+
+        //now do update (TODO - should I let caller handle this?)
         ensure_hosts(hosts_info, function(err) {
             ensure_hostgroups(hostgroups, function(err) {
                 ensure_testspecs(testspecs, function(err) {
-                    if(err) return next(err);
-                    res.json({msg: "Successfully registered", id: "123", debug: meshconfig});
+                    //add correct db references
+                    tests.forEach(function(test) {
+                        test.agroup = test._agroup._id;
+                        test.testspec = test._testspec._id;
+                    });
+                    cb(null, tests);
                 });
             });
         });
-    });
-});
-module.exports = router;
+
+    }); //loading meshconfig json
+}
 
