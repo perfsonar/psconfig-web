@@ -55,8 +55,14 @@
                 </ui-select-match>
                 <ui-select-choices 
                     position="auto"
-                    repeat="host.uuid as host in hosts | filter: $select.search">
-                    <b>{{host.sitename}}</b> (<span ng-if="host.hostname">{{host.hostname}}</span><span ng-if="!host.hostname && host.ip">{{host.ip}}</span>)
+                    group-by="'sitename'"
+                    refresh-delay="200"
+                    refresh="refreshAutoHosts($select.search)"
+                    repeat="host._id as host in hosts">
+                    <span class="label label-default" ng-if="host.lsid">{{host.lsid}}</span>
+                    <span class="label label-warning" ng-if="!host.lsid">Adhoc</span>
+                    <code>{{host.hostname|trim_locator}}</code>
+                    <!--<b>{{host.sitename}}</b> (<span ng-if="host.hostname">{{host.hostname}}</span><span ng-if="!host.hostname && host.ip">{{host.ip}}</span>)-->
                 </ui-select-choices>
             </ui-select>
         </div>

@@ -118,6 +118,27 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
         return hosts;
         */
     }
+
+    $scope.refreshAutoHosts = function(query) {
+        console.log("refreshing auto hosts");
+        var select = "sitename hostname lsid";
+        var find = {
+            //"services.type": test.service_type,
+        }
+        if(query) {
+            find.$or = [
+                {hostname: {$regex: query}},
+                {sitename: {$regex: query}},
+                {lsid: {$regex: query}},
+            ];
+        } else return;
+        return $http.get(appconf.api+'/hosts?select='+encodeURIComponent(select)+
+            '&sort=sitename hostname&find='+encodeURIComponent(JSON.stringify(find)))
+        .then(function(res) {
+            $scope.hosts = res.data.hosts;
+        });
+    };
+
     $scope.getselectedtestspec = function(test) {
         var it = null;
         if($scope.testspecs) $scope.testspecs.forEach(function(testspec) {
