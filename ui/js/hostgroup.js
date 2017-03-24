@@ -8,27 +8,8 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
         dynamic: {},
     };
 
-    //serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
-    //$scope.appconf = appconf;
-
-    //var jwt = localStorage.getItem(appconf.jwt_id);
-    //var user = jwtHelper.decodeToken(jwt);
-
     users.getAll().then(function(_users) {
         $scope.users = _users;
-        /*
-        hosts.getAll({select: 'hostname sitename services lsid'}).then(function(_hosts) {
-
-            //organize by service provided
-            $scope.hosts = {};
-            _hosts.forEach(function(host) {
-                if(host.services) host.services.forEach(function(service) {
-                    if(!$scope.hosts[service.type]) $scope.hosts[service.type] = [];
-                    $scope.hosts[service.type].push(host);
-                });
-            });
-        */
-
         hostgroups.getAll().then(function(_hostgroups) {
             $scope.hostgroups = _hostgroups;
             if($routeParams.id) {
@@ -43,10 +24,9 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
     });
 
     $scope.refreshHosts = function(query) {
-        var find = {
-            "services.type": $scope.selected.service_type,
-        };
+        var find = {};
         if(query) { 
+            find["services.type"] = $scope.selected.service_type,
             find.$or = [
                 {hostname: {$regex: query}},
                 {sitename: {$regex: query}},

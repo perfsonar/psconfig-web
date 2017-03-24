@@ -72,10 +72,9 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     $scope.refreshHosts = function(query, test) {
         console.log("refreshing hosts");
         var select = "sitename hostname lsid";
-        var find = {
-            "services.type": test.service_type,
-        }
+        var find = {};
         if(query) {
+            find["services.type"] = test.service_type,
             find.$or = [
                 {hostname: {$regex: query}},
                 {sitename: {$regex: query}},
@@ -122,9 +121,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     $scope.refreshAutoHosts = function(query) {
         console.log("refreshing auto hosts");
         var select = "sitename hostname lsid";
-        var find = {
-            //"services.type": test.service_type,
-        }
+        var find = {};
         if(query) {
             find.$or = [
                 {hostname: {$regex: query}},
