@@ -270,12 +270,14 @@ exports.generate = function(_config, opts, cb) {
                 host.measurement_archives.push(generate_mainfo(service));
             });
 
+            /*
             //don't add entry with empty measurement_archives - breaks maddash?
             //this could happen if a site stops running service that used to
             if(host.measurement_archives.length == 0) {
                 logger.warn("no service registrered for ", _host.hostname);
                 continue;
             }
+            */
                 
             var site = {
                 hosts: [ host ],
