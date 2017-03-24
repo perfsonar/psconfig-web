@@ -80,12 +80,14 @@ function resolve_ma(host, next) {
         next(err, host);
     });
 }
+
 function resolve_host(id, cb) {
     db.Host.findById(id).exec(function(err, host) {
         if(err) return cb(err);
         resolve_ma(host, cb);
     });
 }
+
 function resolve_hosts(ids, cb) {
     db.Host.find({_id: {$in: ids}}).lean().exec(function(err, hosts) {
         if(err) return cb(err);
@@ -94,6 +96,7 @@ function resolve_hosts(ids, cb) {
         });
     });
 }
+
 function resolve_hostgroup(id, cb) {
     db.Hostgroup.findById(id).exec(function(err, hostgroup) {
         if(err) return cb(err);
@@ -109,6 +112,7 @@ function resolve_hostgroup(id, cb) {
 function generate_members(hosts) {
     var members = [];
     hosts.forEach(function(host) {
+        //console.dir(host);
         members.push(host.hostname);
     });
     return members;
@@ -147,6 +151,7 @@ function generate_mainfo(service) {
 exports.generate = function(_config, opts, cb) {
     //catalog of all hosts referenced in member groups keyed by _id
     var host_catalog = {}; 
+
 
     //resolve all db entries first
     _config.admins = resolve_users(_config.admins);
@@ -189,7 +194,7 @@ exports.generate = function(_config, opts, cb) {
                 if(!test.center) return next();
                 resolve_host(test.center, function(err, host) {
                     if(err) return next(err);
-                    test.ceneter = host;
+                    test.center = host;
                     host_catalog[host._id] = host;
                     next();
                 });
@@ -224,7 +229,6 @@ exports.generate = function(_config, opts, cb) {
             tests: [],
             administrators: [],
             description: _config.name,
-            //_debug: config //debug
         };
         if(_config.desc) mc.description += " / " + _config.desc;
         if(_config._host_version) mc.description += " (v"+_config._host_version+")";
@@ -238,21 +242,19 @@ exports.generate = function(_config, opts, cb) {
         //mca currently doesn't handle the concept of organization
         var org = {
             sites: [],
-            //administrators: [], //not required (http://docs.perfsonar.net/config_mesh.html#config-mesh-administrator)
-            //description: "",
         };
 
         //register sites(hosts)
         for(var id in host_catalog) {
             var _host = host_catalog[id];
             var host = {
-                //administrators: [], //maybe I can populate this?
                 addresses: [ _host.hostname ], 
                 measurement_archives: [ ], 
                 description: _host.sitename,
                 toolkit_url: _host.toolkit_url||"auto",
-            };
+            }
             if(_host.no_agent) host.no_agent = 1;
+            //logger.warn(_host.hostname, _host.services.length);
 
             //create ma entry for each service
             _host.services.forEach(function(service) {
@@ -260,34 +262,26 @@ exports.generate = function(_config, opts, cb) {
                 if(service.type == "ma") return;
                 if(service.type == "mp-owamp") return;
                 if(opts.ma_override) service.ma = { hostname: opts.ma_override }
-
-                //service.ma is already resolved.. (local vs. remote)
-                if(service.ma) {
-                    //adhoc host might not have locator specified.. in that, case fake it..
-                    //if(!service.ma.locator) service.ma.locator = "http://"+_host.hostname+'/esmond/perfsonar/archive';
-                    //TODO - should this be configurable?
-                    host.measurement_archives.push(generate_mainfo(service));
-                } else {
+                if(!service.ma) {
                     logger.error("NO MA service running on ..");
                     logger.debug(service);
+                    return;
                 }
+                host.measurement_archives.push(generate_mainfo(service));
             });
 
+            //don't add entry with empty measurement_archives - breaks maddash?
+            //this could happen if a site stops running service that used to
+            if(host.measurement_archives.length == 0) {
+                logger.warn("no service registrered for ", _host.hostname);
+                continue;
+            }
+                
             var site = {
                 hosts: [ host ],
                 location: {}
             };
 
-            /*
-            //set all location- info we know
-            //-- this includes location-sitename which breaks generate_configuration
-            for(var k in _host.info) {
-                if(k.indexOf("location-") == 0) {
-                    var subk = k.substring("location-".length);
-                    site.location[subk] = _host.info[k];
-                }
-            }
-            */
             //pull location info (some location- info that comes with sLS isn't allowed for meshconfig
             //so I have to list all that's allowed (v4 host may be ok?)
             ['country', 'street_address', 'city', 'state', 'latitude', 'longitude'].forEach((k)=>{
@@ -300,28 +294,38 @@ exports.generate = function(_config, opts, cb) {
 
         //now the most interesting part..
         _config.tests.forEach(function(test) {
+
+            function has_service(host_id) {
+                var host = host_catalog[host_id];
+                var found = false;
+                host.services.forEach(function(service) {
+                    if(service.type == test.service_type) found = true;
+                });
+                return found;
+            }
+
             if(!test.enabled) return;
             var members = {
                 type: test.mesh_type
             };
             switch(test.mesh_type) { 
             case "disjoint":
-                members.a_members = generate_members(test.agroup);
-                members.b_members = generate_members(test.bgroup);
+                members.a_members = generate_members(test.agroup.filter(host=>has_service(host._id)));
+                members.b_members = generate_members(test.bgroup.filter(host=>has_service(host._id)));
                 break;
             case "mesh":
-                members.members = generate_members(test.agroup);
+                members.members = generate_members(test.agroup.filter(host=>has_service(host._id)));
                 break;
             case "star":
-                members.members = generate_members(test.agroup);
-                if(test.center) members.center_address = test.center.hostname; // || test.center.ip;
+                members.members = generate_members(test.agroup.filter(host=>has_service(host._id)));
+                if(has_service(test.center.id)) members.center_address = test.center.hostname; 
                 break;
             case "ordered_mesh": 
-                members.members = generate_members(test.agroup);
+                members.members = generate_members(test.agroup.filter(host=>has_service(host._id)));
                 break;
             }
             if(test.nahosts && test.nahosts.length > 0) {
-                members.no_agents = generate_members(test.nahosts);
+                members.no_agents = generate_members(test.nahosts.filter(host=>has_service(host._id)));
             }
 
             var parameters = test.testspec.specs;

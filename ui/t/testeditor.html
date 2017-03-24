@@ -25,7 +25,6 @@
         <select class="form-control" ng-model="test.service_type" 
             ng-disabled="!selected._canedit" 
             ng-change="serviceChange(test)" required>
-            <!--<option value="">(Select Service Type)</option>-->
             <option ng-repeat="(id, type) in serverconf.service_types" value="{{id}}">{{type.label}} ({{id}})</option>
         </select>
     </div>
@@ -33,7 +32,6 @@
     <div class="col-sm-4">
         <select class="form-control" ng-model="test.mesh_type" 
             ng-disabled="!selected._canedit" required>
-            <!--<option value="">(Select Mesh Type)</option>-->
             <option ng-repeat="(id, type) in serverconf.mesh_types" value="{{id}}">{{type.label}}</option>
         </select>
     </div>
@@ -42,15 +40,17 @@
 <div class="form-group" ng-if="test.service_type && test.mesh_type == 'star'">
     <label for="center_address" class="col-sm-2 control-label">Star Center</label>
     <div class="col-sm-10">
+        <!-- can't get ng-required to work !------------------------->
         <ui-select 
             ng-model="test.center" 
             ng-change="refreshNAHosts(test)"
-            ng-disabled="!selected._canedit" required>
-            <ui-select-match placeholder="Pick a center host">
+            ng-disabled="!selected._canedit">
+            <ui-select-match 
+                placeholder="Pick a center host" 
+                allow-clear="true">
                 <code>{{$select.selected.hostname}}</code>
                 {{$select.selected.sitename}}
             </ui-select-match>
-            <!--can't filter by host.service_type == test.service_type because we aren't loading services-->
             <ui-select-choices 
                 group-by="'sitename'"
                 refresh-delay="200"

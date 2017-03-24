@@ -129,7 +129,7 @@ function cache_ls(hosts, ls, lsid, cb) {
     logger.debug("caching ls:"+lsid+" from "+ls.url);
     request({url: ls.url, timeout: 1000*10, json: true}, function(err, res, services) {
         if(err) return cb(err);
-        if(res.statusCode != 200) return cb(new Error("failed to cahce service from:"+ls.url+" statusCode:"+res.statusCode));
+        if(res.statusCode != 200) return cb(new Error("failed to cache service from:"+ls.url+" statusCode:"+res.statusCode));
 
         function get_host(uri, service, _cb) {
             if(hosts[uri] !== undefined) return _cb(null, hosts[uri]);
@@ -187,14 +187,6 @@ function cache_ls(hosts, ls, lsid, cb) {
                     //construct service record
                     host.services.push({
                         type: type,
-                        //name: service['service-name'][0],
-                        //locator: locator, //locator is now a critical information needed to generate the config
-                        //lsid: lsid, //make it easier for ui
-
-                        //TODO - I need to query the real admin records from the cache (gocdb2sls service already genenrates contact records)
-                        //I just have to store them in our table
-                        //admins: service['service-administrators'],
-                        //$inc: { count: 1 }, //number of times updated (exists to allow updateTime update)
                     });
                 }
                 next();
@@ -241,7 +233,7 @@ function update_dynamic_hostgroup(cb) {
                 group.save().then(function() {
                     logger.debug(group.host_filter);
                     logger.debug("... resolved to ...");
-                    logger.debug(hosts);
+                    logger.debug(hosts.ids);
                     next();
                 });
             });
@@ -253,7 +245,6 @@ function update_dynamic_hostgroup(cb) {
 }
 
 function run(cb) {
-
     //mca host records keyed by uri (hostname could duplicate)
     //hostname found first will take precedence
     //host.simulated will have less precedence
@@ -274,9 +265,12 @@ function run(cb) {
         }
     }, function(err) {
         if(err) logger.error(err); //continue
-
         async.eachOfSeries(hosts, function(host, id, next) {
             if(!host) return next(); //ignore null host
+            if(host.services.length == 0) { 
+                logger.error("ignoring with host with empty services", host.hostname);
+                return next(); //ignore host with empty services
+            }
             if(host.url) {
                 //real record.. update existing record
                 db.Host.findOneAndUpdate({
