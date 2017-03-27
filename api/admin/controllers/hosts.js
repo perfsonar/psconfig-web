@@ -70,6 +70,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
  *
  * @apiParam {Object[]} services    List of service objects for this host (TODO - need documentation)
  * @apiParam {String} [toolkit_url] (default: use hostname) URL to show for MadDash (leave it not set for "auto")
+ * @apiParam {String} [desc]        host description used in meshconfig - sitename will be used if missing
  * @apiParam {Boolean} [no_agent]   Set to true if this host should not read the meshconfig (passive) (default: false)
  * @apiParam {String} [hostname]    (Adhoc only) hostname
  * @apiParam {String} [sitename]    (Adhoc only) sitename to show to assist hostname lookup inside MCA
@@ -98,10 +99,11 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
 /**
  * @api {put} /hosts/:id        Update host
  * @apiGroup                    Hosts
- * @apiDescription              Update host registration (non-Adhoc host can only update services, no_agent, and toolkit_url)
+ * @apiDescription              Update host registration (non-Adhoc host can only update services, no_agent, desc, and toolkit_url)
  *
  * @apiParam {Object[]} services List of service objects for this host (TODO - need documentation)
  * @apiParam {Boolean} [toolkit_url] (default: use hostname) URL to show for MadDash
+ * @apiParam {String} [desc]        host description used in meshconfig - sitename will be used if missing
  * @apiParam {Boolean} [no_agent] Set to true if this host should not read the meshconfig (passive) (default: false)
  * @apiParam {String} [hostname] (Adhoc only) hostname
  * @apiParam {String} [sitename] (Adhoc only) sitename to show to assist hostname lookup inside MCA
@@ -127,6 +129,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
         //things always allowed to edit (TODO - shouldn't I have to mask fields not set?)
         host.no_agent = req.body.no_agent;
         host.toolkit_url = req.body.toolkit_url;
+        host.desc = req.body.desc;
         host.services = req.body.services; //TODO should restrict to just MAs?
         host.update_date = new Date();
 

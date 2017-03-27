@@ -53,6 +53,7 @@ var hostSchema = mongoose.Schema({
 
     uuid: String, //this is now much less important..(maybe I should deprecate?)
     sitename: String,
+    desc: String, //if not set, sitename will be used for host "description" in meshconfig
 
     //TODO - right now I don't know what I can use this information for..
     //stores ip address resolved from the hostname using dns.resolve
