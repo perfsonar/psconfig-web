@@ -1,8 +1,9 @@
 
-//show all testspecs
-app.controller('TestspecsController', function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMessage, users, testspecs, $modal, $routeParams) {
+app.controller('TestspecsController', 
+function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMessage, users, testspecs, $modal, $routeParams, $cookies) {
     scaMessage.show(toaster);
     $scope.active_menu = "testspecs";
+    $scope.filter = $cookies.get('testspecs_filter');
 
     users.getAll().then(function(_users) {
         $scope.users = _users;
@@ -93,14 +94,40 @@ app.controller('TestspecsController', function($scope, $route, toaster, $http, j
             }).catch($scope.toast_error);
         }
     }
+
     $scope.cancel = function() {
         location.reload();
     }
+
     $scope.remove = function() {
         testspecs.remove($scope.selected).then(function() {
             toaster.success("Removed successfully");
             $scope.selected = null;
         }).catch($scope.toast_error);
+    }
+
+    $scope.filter_testspecs = function(testspecs) {
+        if(!testspecs) return; //no loaded yet?
+        $cookies.put('testspecs_filter', $scope.filter);
+
+        return testspecs.filter(function(testspec) {
+            if($scope.selected == testspec) return true; //always show selected one
+            if(!$scope.filter) return true; //show all
+
+            var name = testspec.name.toLowerCase();
+            var type = testspec.service_type.toLowerCase();
+
+            //all tokens must match somewhere
+            var tokens = $scope.filter.toLowerCase().split(" ");
+            var accept = true;
+            tokens.forEach(function(token) {
+                var match = false;
+                if(~name.indexOf(token)) match = true;
+                if(~type.indexOf(token)) match = true;
+                if(!match) accept = false;
+            });
+            return accept;
+        });
     }
 });
 

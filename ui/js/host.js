@@ -97,32 +97,36 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         find_missing_services();
     }
 
-    //apply host filter
-    $scope.check_host_filter = function(host) {
-        if(!host.hostname) return false; //shouldn't happen but it does..
-
+    $scope.filter_hosts = function(hosts) {
+        if(!hosts) return; //not loaded yet?
         $cookies.put('hosts_filter', $scope.hosts_filter);
-        if(!$scope.hosts_filter) return true;
 
-        if(!host.hostname) {
-            console.log("host with invalid hostname")
-            console.dir(host);
-        }
+        return hosts.filter(function(host) {
+            if($scope.selected == host) return true; //always show selected one
+            if(!$scope.hosts_filter) return true; //show all 
 
-        var hostname = host.hostname.toLowerCase();
-        var sitename = host.sitename.toLowerCase();
-        var lsid = (host.lsid?host.lsid.toLowerCase():"adhoc");
-        var tokens = $scope.hosts_filter.toLowerCase().split(" ");
-        //all tokens must match somewhere
-        var accept = true;
-        tokens.forEach(function(token) {
-            var match = false;
-            if(~hostname.indexOf(token)) match = true;
-            if(~sitename.indexOf(token)) match = true;
-            if(lsid && ~lsid.indexOf(token)) match = true;
-            if(!match) accept = false;
+            if(!host.hostname) {
+                console.log("host with invalid hostname")
+                console.dir(host);
+                return false; //shouldn't happen but it does..
+            }
+
+            var hostname = host.hostname.toLowerCase();
+            var sitename = host.sitename.toLowerCase();
+            var lsid = (host.lsid?host.lsid.toLowerCase():"adhoc");
+            
+            //all tokens must match somewhere
+            var tokens = $scope.hosts_filter.toLowerCase().split(" ");
+            var accept = true;
+            tokens.forEach(function(token) {
+                var match = false;
+                if(~hostname.indexOf(token)) match = true;
+                if(~sitename.indexOf(token)) match = true;
+                if(lsid && ~lsid.indexOf(token)) match = true;
+                if(!match) accept = false;
+            });
+            return accept;
         });
-        return accept;
     }
 
     function find_missing_services() {

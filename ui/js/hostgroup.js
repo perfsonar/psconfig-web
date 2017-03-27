@@ -1,7 +1,9 @@
 
-app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelper, serverconf, users, $modal, scaMessage, $routeParams, $location, hostgroups, hosts) {
+app.controller('HostgroupsController', 
+function($scope, toaster, $http, jwtHelper, serverconf, users, $modal, scaMessage, $routeParams, $location, hostgroups, hosts, $cookies) {
     scaMessage.show(toaster);
     $scope.active_menu = "hostgroups";
+    $scope.filter = $cookies.get('hostgroups_filter');
 
     $scope.tabs = {
         static: {},
@@ -115,9 +117,6 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
         }).catch($scope.toast_error);
     }
 
-    //$scope.$watch("selected.host_filter", $scope.run_dynamic);
-    //$scope.$watch("selected.service_type", $scope.run_dynamic);
-
     $scope.run_dynamic = function() {
         console.log("pre");
         if(!$scope.tabs.dynamic.active) return;
@@ -136,6 +135,30 @@ app.controller('HostgroupsController', function($scope, toaster, $http, jwtHelpe
             $scope.selected.host_filter_alert = null;
             $scope.selected.host_filter_console = null;
             if(res.data.message) $scope.selected.host_filter_alert = res.data.message;
+        });
+    }
+
+    $scope.filter_hostgroups = function(hostgroups) {
+        if(!hostgroups) return; //no loaded yet?
+        $cookies.put('hostgroups_filter', $scope.filter);
+
+        return hostgroups.filter(function(hostgroup) {
+            if($scope.selected == hostgroup) return true; //always show selected one
+            if(!$scope.filter) return true; //show all
+
+            var name = hostgroup.name.toLowerCase();
+            var type = hostgroup.service_type.toLowerCase();
+
+            //all tokens must match somewhere
+            var tokens = $scope.filter.toLowerCase().split(" ");
+            var accept = true;
+            tokens.forEach(function(token) {
+                var match = false;
+                if(~name.indexOf(token)) match = true;
+                if(~type.indexOf(token)) match = true;
+                if(!match) accept = false;
+            });
+            return accept;
         });
     }
 });

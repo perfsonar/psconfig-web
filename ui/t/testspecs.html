@@ -4,15 +4,19 @@
         <div style="padding-left: 20px; margin-bottom: 10px;">
             <h2>Test specs</h2>
             <p class="help-block">List of defined test specifications</p>
-            <br>
-            <span class="text-muted">{{testspecs.length}} testspecs</span>
+            <span class="text-muted">{{testspecs.length}} Testspecs</span>
         </div>
-        <hr style="margin: 0px;">
+        <div class="filterbox" ng-class="{active: filter}">
+            <i class="fa fa-times pull-right remove" ng-click="filter = ''"></i>
+            <input type="text" class="form-control"
+                ng-model="filter" ng-model-options="{debounce: 200}" placeholder="Filter"></input>
+        </div>
 
-        <div class="subbar-list">
+        <div class="subbar-list" style="top: 159px">
             <p class="alert alert-info" ng-if="testspecs.length == 0">Please register a testspec.</p>
             <div class="subbar-list-item" 
-                ng-repeat="testspec in testspecs" 
+                id="{{testspec._id}}"
+                ng-repeat="testspec in filter_testspecs(testspecs)" 
                 ng-class="{active: selected == testspec}"
                 ng-click="select(testspec)">
                 <time class="help-block pull-right">{{testspec.create_date|date}}</time>

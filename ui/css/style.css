@@ -197,22 +197,24 @@ div.well-detail {
     left: 310px;
   }
 }
-.host_filterbox {
+.filterbox {
   background-color: #eee;
   padding: 5px;
   height: 49px;
-  /*box-shadow: inset 0px 0px 2px #ddd;*/
+  position: relative;
 }
-.host_filterbox input.active {
+.filterbox .remove {
+  position: absolute;
+  right: 15px;
+  top: 13px;
+  color: #008cba;
+  font-size: 150%;
+  cursor: pointer;
+  display: none;
+}
+.filterbox.active input {
   background-color: #d5eff7;
 }
-/*
-.hosts_filter {
-    display: inline-block;
-    width: 220px;
-    padding: 3px 6px;
-    margin: 0px 6px;
-    border: none;
-    border-bottom: 1px solid #ddd;
+.filterbox.active .remove {
+  display: block;
 }
-*/
