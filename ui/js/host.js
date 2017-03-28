@@ -82,11 +82,12 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
             
             //then load tests that these hostgroups are used in
             var hostgroup_ids = $scope.hostgroups.map(function(hostgroup) { return hostgroup._id});
+            console.dir(hostgroup_ids);
             $http.get(appconf.api+'/configs?populate='+encodeURIComponent("tests.testspec")+
                 '&select='+encodeURIComponent('name desc url tests')+
                 '&find='+encodeURIComponent(JSON.stringify({$or: [
-                    {"tests.agroup": {$in: [hostgroup_ids]}},
-                    {"tests.bgroup": {$in: [hostgroup_ids]}},
+                    {"tests.agroup": {$in: hostgroup_ids}},
+                    {"tests.bgroup": {$in: hostgroup_ids}},
                     {"tests.center": host._id},
                 ]})))
             .then(function(res) {
