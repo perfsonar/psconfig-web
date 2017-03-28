@@ -155,13 +155,16 @@
                         <div class="panel panel-default" ng-if="showimporter">
                             <div class="panel-heading">Meshconfig Importer</div>
                             <div class="panel-body">
-                                <p>Enter Meshconfig URL to Import. This tool will add all missing hosts as adhoc hosts and setup hostgroup, testspecs, and meshconfig tests</p>
+                                <p>Enter Meshconfig URL to Import. </p>
+                                <p>This tool will register all missing hosts as adhoc hosts and register hostgroup, testspecs (if the same name doesn't exist already). Finally, it will create new meshconfig tests and populate here.</p>
+                                <p>Meshconfig tests themselves won't be registered automatically - until you click Update on this pageIIf you import the same meshconfig twice, already imported test won't be overriden - you need to remove old tests manually</p>
                                 <div class="input-group">
                                     <span class="input-group-addon" id="sizing-addon2">URL</span>
                                     <input type="text" class="form-control" ng-model="$parent.importer_url" 
-                                        placeholder="http://somewhere.com/meshconfig"></input>
+                                        placeholder="http://myosg.grid.iu.edu/psmesh/json/name/us-cms"></input>
                                      <span class="input-group-btn">
-                                        <button class="btn btn-default" type="button" ng-click="import()">Go!</button>
+                                        <button class="btn btn-default" type="button" 
+                                            ng-disabled="!$parent.importer_url" ng-click="import()">Go!</button>
                                     </span>
                                 </div>
                             </div>
@@ -172,8 +175,10 @@
                 <br>
                 <br>
                 <div ng-if="appconf.debug">
-                    <h3>Debug</h3>
+                    <h3>Selected</h3>
                     <pre>{{selected|json}}</pre>
+                    <h3>HostGroups</h3>
+                    <pre>{{hostgroups|json}}</pre>
                 </div>
             </div>
         </form>

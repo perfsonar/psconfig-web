@@ -219,6 +219,54 @@
                     <li ng-repeat="com in selected.communities">{{com}}</li>
                 </ul>
 
+
+                <h3>Membership</h3>
+                <!--
+                <h4>MeshConfig Information</h4>
+                <table class="table">
+                <thead>
+                    <tr>
+                        <th>Service Type</th>
+                        <th>Name</th>
+                        <td>Description</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="clickable" ng-repeat="hostgroup in hostgroups" ng-click="click_hostgroup(hostgroup)">
+                        <td>{{hostgroup.service_type}}</td>
+                        <td>{{hostgroup.name}}</td>
+                        <td>{{hostgroup.desc}}</td>
+                    </tr>
+                </tbody>
+                </table>
+                -->
+                <p ng-if="hostgroups.length > 0" class="help-block">This host is member of following hostgroups</p>
+                <p ng-if="hostgroups.length == 0" class="help-block">This host does not belong to any hostgroup</p>
+                <div class="well well-sm clickable" style="margin-bottom: 5px;" ng-repeat="hostgroup in hostgroups" ng-click="click_hostgroup(hostgroup)">
+                    <span class="label label-default">{{hostgroup.service_type}}</span>
+                    <b><!--<i class="fa fa-server"></i>-->{{hostgroup.name}}</b>
+                    <small>{{hostgroup.desc}}</small>
+                </div>
+
+                <br>
+                <p ng-if="configs.length > 0" class="help-block">Which is used in following meshconfig</p>
+                <p ng-if="configs.length == 0" class="help-block">Which is not used in any meshconfig</p>
+                <div class="well well-sm clickable" style="margin-bottom: 5px;" ng-repeat="config in configs" ng-click="click_config(config)">
+                    <span class="label label-default">/{{config.url}}</span>
+                    <b>{{config.name}}</b>
+                    <small>{{config.desc}}</small>
+                    <!--
+                    <ul class="list-group">
+                        <li class="list-group-item" ng-repeat="test in config.tests">
+                            <span class="label label-default">{{test.service_type}}</span>
+                            <b>{{test.name}}</b>
+                            {{test.mesh_type}}
+                            <mc-specs readonly="true" specs="test.testspec.specs"></mc-specs>
+                        </li>
+                    </ul>
+                    -->
+                </div>
+
                 <br><br>
                 
                 <div ng-if="appconf.debug">

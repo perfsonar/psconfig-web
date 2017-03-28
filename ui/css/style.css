@@ -218,3 +218,6 @@ div.well-detail {
 .filterbox.active .remove {
   display: block;
 }
+.angular-google-map-container {
+  height: 325px;
+}

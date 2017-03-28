@@ -170,21 +170,17 @@
         </p>
     </div>
 
-    <!--
-    <div ng-if="selected.specs.tool == 'ping6'">
-        <label for="flow_label" class="col-sm-2 control-label">Flow Label</label>
-        <div class="col-sm-4">
-            <input type="number" class="form-control" name="flow_label" 
-                ng-disabled="!selected._canedit"
-                ng-model="selected.specs.flow_label">
-            <p class="help-block">
-                Set the <a href="https://tools.ietf.org/html/rfc6437#page-4">IPv6 flow label</a>
-                <code>flow_label / iperf3 -L</code>
-                <minver min="minver.flow_label"></minver>
-            </p>
-        </div>
+    <label for="flow_label" class="col-sm-2 control-label">Flow Label</label>
+    <div class="col-sm-4">
+        <input type="number" class="form-control" name="flow_label" 
+            ng-disabled="!selected._canedit"
+            ng-model="selected.specs.flow_label">
+        <p class="help-block">
+        <!--Set the <a href="https://tools.ietf.org/html/rfc6437#page-4">IPv6 flow label</a>-->
+            <code>flow_label / iperf3 -L</code>
+            <minver min="minver.flow_label"></minver>
+        </p>
     </div>
-    -->
 </div>
 
 <!--all version-->

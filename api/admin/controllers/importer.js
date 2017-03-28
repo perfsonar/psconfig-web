@@ -125,11 +125,12 @@ function ensure_testspecs(testspecs, cb) {
 }
 
 exports.import = function(url, sub, cb) {
-    logger.debug("config importer");
+    logger.debug("config importer", url);
     
     //load requested json
-    request.get({url:url, json:true}, function(err, r, meshconfig) {
-        if(err) return next(err);
+    request.get({url:url, json:true, timeout: 3000}, function(err, r, meshconfig) {
+        if(err) return cb(err);
+        if(r.statusCode != 200) return cb("non-200 response from "+url);
 
         var meshconfig_desc = meshconfig.description;
 
@@ -165,7 +166,7 @@ exports.import = function(url, sub, cb) {
         var tests = [];
         meshconfig.tests.forEach(function(test) {
             var member_type = test.members.type;
-            if(member_type != "mesh") return next("only mesh type is supported currently");
+            if(member_type != "mesh") return cb("only mesh type is supported currently");
 
             var type = get_service_type(test.parameters.type);
             var hostgroup = {

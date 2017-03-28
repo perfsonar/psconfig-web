@@ -21,6 +21,8 @@ angular.module('app.config', []).constant('appconf', {
     //authentication service URL to jump if user needs to login
     auth_url: '../auth',
 
+    google_map_api: 'AIzaSyBhCVWYLcFh8NSpy4bRSuJpdE962x4KUpE',
+
     jwt_id: 'jwt',
 
     debug: true,

@@ -1,10 +1,9 @@
 
 app.controller('ConfigsController',
-function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, hostgroups, configs, $routeParams, testspecs) {
+function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, hostgroups, configs, $routeParams, testspecs, uiGmapGoogleMapApi) {
     scaMessage.show(toaster);
     $scope.active_menu = "configs";
-
-    $scope.importer_url = "http://myosg.grid.iu.edu/psmesh/json/name/us-cms"; //default
+    //$scope.importer_url = "";
 
     //start loading things (should I parallelize)
     users.getAll().then(function(_users) {
@@ -35,8 +34,51 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     $scope.select = function(config) {
         $scope.selected = config;
         $scope.closesubbar();
+
+        config.tests.forEach(function(test) {
+            reset_map(test);
+        });
+
         $location.update_path("/configs/"+config._id);
         window.scrollTo(0,0);
+    }
+
+    /*
+    $scope.$watchCollection('selected.config', function() {
+        console.log("config changed");
+    });
+    */
+
+    function reset_map(test) {
+        console.dir("resetting map", test);
+        test.map = {
+            center: { latitude: 0, longitude: 0 }, zoom: 1, //world
+            options: {
+                scrollwheel: false,
+            },
+            markers: [],
+        }
+        load_hosts(test, function(hosts) {
+            var bounds = new google.maps.LatLngBounds(null);
+            hosts.forEach(function(host) {
+                var lat = host.info['location-latitude'];
+                var lng = host.info['location-longitude'];
+                if(lat && lng) {
+                    console.log("updating bounds");
+                    bounds.extend(new google.maps.LatLng(lat, lng));
+                    test.map.markers.push({
+                        id: host._id,
+                        latitude: lat,
+                        longitude: lng,
+                    });
+                }
+            });
+            //bounds = bounds.toJSON();
+            //console.log("setting test.map");
+            //test.map.bounds.northeast = {latitude: bounds.north, longitude: bounds.east};
+            //test.map.bounds.southwest = {latitude: bounds.south, longitude: bounds.west};
+            //console.dir(test.map.bounds);
+        });
     }
 
     $scope.add = function() {
@@ -45,13 +87,15 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
         $location.update_path("/configs");
     }
     $scope.addtest = function() {
-        $scope.selected.tests.push({
+        var test = {
             name: "",
             desc: "",
             enabled: true,
             service_type: "owamp",
             mesh_type: "mesh",
-        });
+        }
+        reset_map(test);
+        $scope.selected.tests.push(test);
         $scope.form.$setDirty();
     }
     $scope.gethostgroup = function(id) {
@@ -91,8 +135,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
         });
     };
 
-    $scope.refreshNAHosts = function(test) {
-        console.log("refreshing na hosts");
+    function load_hosts(test, cb) {
         var hostids = [];
         if(test.agroup) $scope.gethostgroup(test.agroup).hosts.forEach(function(id) {
             hostids.push(id);
@@ -103,23 +146,23 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
         if(test.center) hostids.push(test.center);
     
         //load hosts from hostids
-        var select = "sitename hostname lsid";
+        var select = "sitename hostname lsid info.location-latitude info.location-longitude";
         var find = {_id: {$in: hostids}};
         return $http.get(appconf.api+'/hosts?select='+encodeURIComponent(select)+
             '&find='+encodeURIComponent(JSON.stringify(find)))
         .then(function(res) {
-            $scope.na_hosts = res.data.hosts;
+            cb(res.data.hosts);
         });
-        /*
-        if($scope.hosts) $scope.hosts.forEach(function(host) {
-            if(~hostids.indexOf(host._id)) hosts.push(host);
+    }
+
+    $scope.refreshNAHosts = function(test) {
+        reset_map(test);
+        load_hosts(test, function(hosts) {
+            $scope.na_hosts = hosts;
         });
-        return hosts;
-        */
     }
 
     $scope.refreshAutoHosts = function(query) {
-        console.log("refreshing auto hosts");
         var select = "sitename hostname lsid";
         var find = {};
         if(query) {
@@ -196,12 +239,16 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
                     res.data.tests.forEach(function(test) {
                         $scope.refreshNAHosts(test);
                         $scope.refreshHosts(null, test);
+                        reset_map(test);
                         $scope.selected.tests.push(test);
                     });
                     $scope.form.$setDirty();
                     toaster.success(res.data.msg);
                 })
             });
+        }).catch(function(res) {
+            console.error(res);
+            toaster.error("Oops. Failed to import specified URL.");
         });
     }
 });

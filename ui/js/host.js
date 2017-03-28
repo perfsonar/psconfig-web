@@ -47,13 +47,6 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         $scope.users = _users;
         hosts.getAll().then(function(_hosts) {
             $scope.hosts = _hosts;
-            /*
-            $scope.hosts_o = {};
-            _hosts.forEach(function(host) {
-                $scope.hosts_o[host._id] = host;
-            });
-            */
-
             $scope.loading = false;
 
             //select specified host
@@ -79,6 +72,26 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         hosts.getDetail(host).then(function(_host) {
             find_missing_services();
             $scope.refreshHosts();
+        });
+
+        //load hostgroups that this host is member of
+        $http.get(appconf.api+'/hostgroups?select='+encodeURIComponent("name desc service_type")+
+            '&find='+encodeURIComponent(JSON.stringify({"hosts":host._id})))
+        .then(function(res) {
+            $scope.hostgroups = res.data.hostgroups;
+            
+            //then load tests that these hostgroups are used in
+            var hostgroup_ids = $scope.hostgroups.map(function(hostgroup) { return hostgroup._id});
+            $http.get(appconf.api+'/configs?populate='+encodeURIComponent("tests.testspec")+
+                '&select='+encodeURIComponent('name desc url tests')+
+                '&find='+encodeURIComponent(JSON.stringify({$or: [
+                    {"tests.agroup": {$in: [hostgroup_ids]}},
+                    {"tests.bgroup": {$in: [hostgroup_ids]}},
+                    {"tests.center": host._id},
+                ]})))
+            .then(function(res) {
+                $scope.configs = res.data.configs;
+            });
         });
 
         //hide subbar if shown
@@ -203,6 +216,12 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
             toaster.success("Removed successfully");
             $scope.selected = null;
         }).catch($scope.toast_error);
+    }
+    $scope.click_hostgroup = function(hostgroup) {
+        $location.path("/hostgroups/"+hostgroup._id);
+    }
+    $scope.click_config = function(config) {
+        $location.path("/configs/"+config._id);
     }
 });
 

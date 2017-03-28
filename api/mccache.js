@@ -93,6 +93,7 @@ function create_hostrec(service, uri, cb) {
 
         var ip = host['host-name'][0]; //usually ip address
         var hostname = host['host-name'][1]; //often undefined. if set, it's hostname (always?)
+        if(!ip) return cb("host-name not set in LS");
         if(hostname !== undefined) rec.hostname = hostname;
         lookup_addresses(ip, function(err, hostname, addresses) {
             if(err) return cb(err);

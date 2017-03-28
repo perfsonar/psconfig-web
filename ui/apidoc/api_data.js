@@ -714,10 +714,17 @@ define({ "api": [
           },
           {
             "group": "Parameter",
-            "type": "Boolean",
+            "type": "String",
             "optional": true,
             "field": "toolkit_url",
-            "description": "<p>(default: use hostname) URL to show for MadDash</p>"
+            "description": "<p>(default: use hostname) URL to show for MadDash (leave it not set for &quot;auto&quot;)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "desc",
+            "description": "<p>host description used in meshconfig - sitename will be used if missing</p>"
           },
           {
             "group": "Parameter",
@@ -759,7 +766,7 @@ define({ "api": [
             "type": "String[]",
             "optional": true,
             "field": "admins",
-            "description": "<p>Array of admin IDs who can update information on this host</p>"
+            "description": "<p>Array of admin IDs who can update information on this host (default to submitter)</p>"
           }
         ]
       }
@@ -800,7 +807,7 @@ define({ "api": [
     "url": "/hosts/:id",
     "title": "Update host",
     "group": "Hosts",
-    "description": "<p>Update host registration (non-Adhoc host can only update services, no_agent, and toolkit_url)</p>",
+    "description": "<p>Update host registration (non-Adhoc host can only update services, no_agent, desc, and toolkit_url)</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -817,6 +824,13 @@ define({ "api": [
             "optional": true,
             "field": "toolkit_url",
             "description": "<p>(default: use hostname) URL to show for MadDash</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "desc",
+            "description": "<p>host description used in meshconfig - sitename will be used if missing</p>"
           },
           {
             "group": "Parameter",
@@ -983,10 +997,10 @@ define({ "api": [
         "Success 200": [
           {
             "group": "Success 200",
-            "type": "Object",
+            "type": "Object[]",
             "optional": false,
-            "field": "configs:",
-            "description": "<p>List of meshconfig registrations, count: total number of meshconfig (for paging)</p>"
+            "field": "List",
+            "description": "<p>of object containing &quot;include&quot; parameter with meshconfig URL (format adhears to meshconfig_agent</p>"
           }
         ]
       }

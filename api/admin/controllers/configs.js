@@ -31,6 +31,7 @@ function canedit(user, config) {
  *                              To pass regex, you need to use {$regex: "...."} format instead of js: /.../ 
  * @apiParam {Object} [sort]    Mongo sort object - defaults to _id. Enter in string format like "-name%20desc"
  * @apiParam {String} [select]  Fields to return (admins will always be added). Multiple fields can be entered with %20 as delimiter
+ * @apiParam {String} [populate]  Fields to populate
  * @apiParam {Number} [limit]   Maximum number of records to return - defaults to 100
  * @apiParam {Number} [skip]    Record offset for pagination (default to 0)
  * @apiHeader {String}          Authorization A valid JWT token "Bearer: xxxxx"
@@ -47,6 +48,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
 
     db.Config.find(find)
     .select(select)
+    .populate(req.query.populate||'')
     .limit(parseInt(req.query.limit) || 100)
     .skip(parseInt(req.query.skip) || 0)
     .sort(req.query.sort || '_id')
