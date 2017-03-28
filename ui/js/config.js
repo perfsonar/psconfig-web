@@ -50,7 +50,6 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     */
 
     function reset_map(test) {
-        console.dir("resetting map", test);
         test.map = {
             center: { latitude: 0, longitude: 0 }, zoom: 1, //world
             options: {
@@ -59,13 +58,10 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
             markers: [],
         }
         load_hosts(test, function(hosts) {
-            var bounds = new google.maps.LatLngBounds(null);
             hosts.forEach(function(host) {
                 var lat = host.info['location-latitude'];
                 var lng = host.info['location-longitude'];
                 if(lat && lng) {
-                    console.log("updating bounds");
-                    bounds.extend(new google.maps.LatLng(lat, lng));
                     test.map.markers.push({
                         id: host._id,
                         latitude: lat,
