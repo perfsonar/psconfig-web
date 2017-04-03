@@ -125,8 +125,6 @@ router.get('/auto/:address', function(req, res, next) {
         if(!host) return res.status(404).json({message: "no such hostname registered: "+address});
         var config = {
             name: "Auto-MeshConfig for "+address,
-            //desc: "",
-            admins: [],  //TODO - find out how I populated this for OSG version..
             tests: [], 
         };
 

@@ -152,9 +152,8 @@ exports.generate = function(_config, opts, cb) {
     //catalog of all hosts referenced in member groups keyed by _id
     var host_catalog = {}; 
 
-
     //resolve all db entries first
-    _config.admins = resolve_users(_config.admins);
+    if(_config.admins) _config.admins = resolve_users(_config.admins);
     async.eachSeries(_config.tests, function(test, next_test) {
         if(!test.enabled) return next_test();
         async.parallel([
@@ -227,16 +226,18 @@ exports.generate = function(_config, opts, cb) {
         var mc = {
             organizations: [],
             tests: [],
-            administrators: [],
             description: _config.name,
         };
         if(_config.desc) mc.description += " / " + _config.desc;
         if(_config._host_version) mc.description += " (v"+_config._host_version+")";
      
         //set meshconfig admins
-        if(_config.admins) _config.admins.forEach(function(admin) {
-            mc.administrators.push({name: admin.fullname, email: admin.email});
-        });
+        if(_config.admins) {
+            mc.administrators = [];
+            _config.admins.forEach(function(admin) {
+                mc.administrators.push({name: admin.fullname, email: admin.email});
+            });
+        }
     
         //convert services to sites/hosts entries
         //mca currently doesn't handle the concept of organization
