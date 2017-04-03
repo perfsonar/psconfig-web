@@ -2,6 +2,8 @@
 
 MeshConfig Administrator GUI and tools to publish generated meshconfig
 
+![Alt text](/readme/mca.png?raw=true "MCA screenshot")
+
 ## Installation
 
 ### VM Host
