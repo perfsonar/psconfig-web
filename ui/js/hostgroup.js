@@ -39,11 +39,47 @@ function($scope, toaster, $http, jwtHelper, serverconf, users, $modal, scaMessag
             find._id = {$in: $scope.selected.hosts};
         }
         return $http.get($scope.appconf.api+'/hosts'+
-            '?select='+encodeURIComponent('sitename hostname lsid')+
+            '?select='+encodeURIComponent('sitename hostname lsid info')+
+            '&limit=1000'+
             '&find='+encodeURIComponent(JSON.stringify(find))).then(function(res) {
             $scope.hosts = res.data.hosts;
+            update_map();
         });
     };
+
+    $scope.map = {
+        center: { latitude: 0, longitude: 0 }, zoom: 1, //world
+        options: {
+            scrollwheel: false,
+        },
+        markers: [],
+    }
+
+    $scope.$watch('selected.hosts', function() {
+        update_map();
+    });
+
+    function update_map() {
+        $scope.map.markers = [];
+        if(!$scope.selected) return;
+        if(!$scope.hosts) return;
+        $scope.selected.hosts.forEach(function(host_id) {
+            //find host info
+            $scope.hosts.forEach(function(host) {
+                if(host._id == host_id) {
+                    var lat = host.info['location-latitude'];
+                    var lng = host.info['location-longitude'];
+                    if(lat && lng) {
+                        $scope.map.markers.push({
+                            id: host._id,
+                            latitude: lat,
+                            longitude: lng,
+                        });
+                    }
+                }
+            });
+        });
+    }
 
     $scope.selected = null;
     $scope.select = function(hostgroup) {
@@ -54,7 +90,7 @@ function($scope, toaster, $http, jwtHelper, serverconf, users, $modal, scaMessag
             break;
         case "dynamic":
             $scope.tabs.dynamic.active = true;
-            $scope.run_dynamic();
+            //$scope.run_dynamic();
             break;
         }
         $scope.refreshHosts();
@@ -79,11 +115,13 @@ function($scope, toaster, $http, jwtHelper, serverconf, users, $modal, scaMessag
     }
 
     $scope.submit = function() {
+        /*
         if($scope.selected.type == "dynamic") {
             //update cached host list (.hosts) with current list of hosts (_hosts)
             //so that it will be up-to-date before next caching takes place
             $scope.selected.hosts = $scope.selected._hosts;
         }
+        */
 
         delete $scope.selected.host_filter_console; //could cause "payload too large"
 
@@ -118,20 +156,25 @@ function($scope, toaster, $http, jwtHelper, serverconf, users, $modal, scaMessag
     }
 
     $scope.run_dynamic = function() {
-        console.log("pre");
         if(!$scope.tabs.dynamic.active) return;
 
-        console.log("running dynamic query");
+        //console.log("running dynamic query");
         $http.get($scope.appconf.api+'/hostgroups/dynamic', {
             params: { type: $scope.selected.service_type, js: $scope.selected.host_filter, }
         })
         .then(function(res) {
             $scope.selected.host_filter_alert = null;
-            $scope.selected._hosts = res.data.ids;
+            //$scope.selected._hosts = res.data.ids;
             $scope.selected.host_filter_console = res.data.c;
+
+            //update cached host list (.hosts) with current list of hosts (_hosts)
+            //so that it will be up-to-date before next caching takes place
+            $scope.selected.hosts = res.data.ids;
+            $scope.refreshHosts();
         }, function(res) {
             //failed..
-            $scope.selected._hosts = null;
+            //$scope.selected._hosts = null;
+            $scope.selected.hosts = null; //should I set to []?
             $scope.selected.host_filter_alert = null;
             $scope.selected.host_filter_console = null;
             if(res.data.message) $scope.selected.host_filter_alert = res.data.message;

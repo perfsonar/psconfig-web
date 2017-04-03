@@ -29,7 +29,7 @@
                     </small>
                 </div>
             </div>
-            <div class="list-addbutton" ng-click="add()" title="Add New Hostgroup">
+            <div class="list-addbutton animated" ng-class="{bounceInLeft: hostgroups.length == 0}" ng-click="add()" title="Add New Hostgroup">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> 
             </div>
         </div>
@@ -43,9 +43,11 @@
                     <i class="fa fa-trash-o clickable" aria-hidden="true" ng-if="selected._id && selected._canedit"
                         ng-confirm-click="Are you sure you want to remove this hostgroup?"
                         confirmed-click="remove()"></i>&nbsp;&nbsp;&nbsp;
+                    <!--
                     <i class="fa fa-info-circle" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
                     <i class="fa fa-star-o" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
                     <i class="fa fa-share-alt" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
+                    -->
 
                     <div class="pull-right" style="padding-right: 20px;">
                         <i class="fa fa-lock" ng-if="!selected._canedit" title="Read Only"></i>
@@ -123,7 +125,13 @@
                                         <span>{{host.hostname||'removed'}}</span>
                                     </ui-select-choices>
                                 </ui-select>
-                                <button class="btn btn-xs btn-default pull-right" type="button" ng-click="selected.hosts = []; form.$setDirty();">Clear All {{selected.hosts.length}} Hosts</button>
+                                <button class="btn btn-xs pull-right" type="button"
+                                    ng-if="selected.hosts.length > 0"
+                                    ng-click="selected.hosts = []; form.$setDirty();">
+                                    Clear All {{selected.hosts.length}} Hosts</button>
+
+                                <p class="help-block">Map only shows sites that has locaiton information published.</p>
+
                             </tab>
                             <tab heading="Dynamic" 
                                 select="changetype('dynamic')"
@@ -138,14 +146,25 @@
                                         style="margin-bottom: 5px;" required></div>
                                     <alert type="danger" ng-if="selected.host_filter_alert" style="margin-bottom: 0px;">{{selected.host_filter_alert}}</alert>
                                     <alert type="warning" ng-if="selected.host_filter_console[0]" style="margin-bottom: 0px;">{{selected.host_filter_console[0]}}</alert>
-                                    <div ng-if="selected._hosts" style="max-height: 150px; overflow: auto; margin-bottom: 0px; opacity:0.85;" class="well well-sm">
-                                        <p class="help-block">{{selected._hosts.length}} hosts match above query</p>
-                                        <mc-hostlist hostids="selected._hosts"></mc-hostlist>
+                                    <div ng-if="selected.hosts" style="max-height: 150px; overflow: auto; margin-bottom: 0px; opacity:0.85;" class="well well-sm">
+                                        <p class="help-block">{{selected.hosts.length}} hosts match above query</p>
+                                        <mc-hostlist hostids="selected.hosts"></mc-hostlist>
                                     </div>
                                 </div>
                                 <p class="help-block">Please see <a target="_target" href="http://docs.perfsonar.net/mca_userguide_hostgroup.html#dynamic-host-groups">Dynamic Host Groups</a> for more detail.</p>
                             </tab>
                         </tabset>
+
+                        <ui-gmap-google-map 
+                            center="map.center" 
+                            zoom="map.zoom" 
+                            options="map.options">
+                            <ui-gmap-markers fit="true" 
+                                models="map.markers" 
+                                coords="'self'" 
+                                icon="'icon'"></ui-gmap-markers>
+                        </ui-gmap-google-map>
+
                     </div>
                 </div>
                 <br>

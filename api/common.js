@@ -36,14 +36,21 @@ exports.profile = {
 exports.dynamic = {
     resolve: function(js, type, cb) {
         var services = {};
-        db.Host.find({"services.type": type}, function(err, hosts) {
+        db.Host.find({"services.type": type}).lean().exec(function(err, hosts) {
             if(err) return cb(err);
             logger.debug("running dynamic hostgroup query on",hosts.length,"hosts");
             var sandbox = new Sandbox(/*{timeout: 1000*10}*/);
 
             //convert recs to json 
-            var json = JSON.stringify(hosts);
-            //(and strip non-ascii chars..)
+            var sand_hosts = hosts.map(host=>{
+                var sand_host = {};
+                Object.assign(sand_host, host);
+                //simplify list of services
+                sand_host.services = host.services.map(s=>s.type);
+                return sand_host;
+            });
+            var json = JSON.stringify(sand_hosts);
+            //console.log(JSON.stringify(sand_hosts, null, 4));
             var code = `
                 JSON.stringify(`+json+`.filter(
                 function(host) {
@@ -54,14 +61,22 @@ exports.dynamic = {
                     }
                 }))
             `;
+            logger.debug("running sandbox");
             sandbox.run(code, function(res) {
+                //make sure output looks like an array - sandbox injects random error messages to res.result..
+                if(res.result[0] != "'") {
+                    return cb(res.result);
+                } 
                 try {
+                    logger.debug("done running - parsing");
+                    //console.dir(res);
                     var json = eval(res.result); //Is this safe?
                     var hosts = JSON.parse(json);
                     var ids = hosts.map(function(host) { return host._id; }); //just pull _id
+                    logger.debug("done parsing");
                     cb(null, {ids: ids, c: res.console});
                 } catch(e) {
-                    //logger.debug(e);
+                    logger.error(e);
                     cb("couldn't parse sanbox output or cb error");
                 }
             });

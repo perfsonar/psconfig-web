@@ -27,7 +27,7 @@
                     </small>
                 </div>
             </div>
-            <div class="list-addbutton" ng-click="add()" title="Add new testspec">
+            <div class="list-addbutton animated" ng-class="{bounceInLeft: testspecs.length == 0}" ng-click="add()" title="Add new testspec">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> 
             </div>
         </div>
@@ -41,9 +41,11 @@
                     <i class="fa fa-trash-o clickable" aria-hidden="true" ng-if="selected._id && selected._canedit"
                         ng-confirm-click="Are you sure you want to remove this test spec?"
                         confirmed-click="remove()"></i>&nbsp;&nbsp;&nbsp;
+                    <!--
                     <i class="fa fa-info-circle" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
                     <i class="fa fa-star-o" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
                     <i class="fa fa-share-alt" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
+                    -->
 
                     <div class="pull-right" style="padding-right: 20px;">
                         <i class="fa fa-lock" ng-if="!selected._canedit" title="Read Only"></i>

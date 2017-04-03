@@ -64,6 +64,25 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
             } else $scope.select(_hosts[0]); //select first one then
         });
     });
+    
+    function reset_mapinfo() {
+        delete $scope.selected.map;
+        if( !$scope.selected.info["location-latitude"] ||
+            !$scope.selected.info["location-latitude"]) return;
+        //reset map info
+        var marker = {
+            id: $scope.selected._id,
+            latitude: $scope.selected.info["location-latitude"],
+            longitude: $scope.selected.info["location-longitude"],
+        }
+        $scope.selected.map = {
+            center: marker, zoom: 5,
+            options: {
+                scrollwheel: false,
+            },
+            markers: [ marker ],
+        }
+    }
 
     $scope.selected = null;
     $scope.select = function(host) {
@@ -71,6 +90,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
 
         hosts.getDetail(host).then(function(_host) {
             find_missing_services();
+            reset_mapinfo(); 
             $scope.refreshHosts();
         });
 
@@ -82,7 +102,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
             
             //then load tests that these hostgroups are used in
             var hostgroup_ids = $scope.hostgroups.map(function(hostgroup) { return hostgroup._id});
-            console.dir(hostgroup_ids);
+            //console.dir(hostgroup_ids);
             $http.get(appconf.api+'/configs?populate='+encodeURIComponent("tests.testspec")+
                 '&select='+encodeURIComponent('name desc url tests')+
                 '&find='+encodeURIComponent(JSON.stringify({$or: [
@@ -99,6 +119,8 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         if($(".subbar").hasClass("subbar-shown")) {
             $(".subbar").removeClass("subbar-shown");
         }
+
+
 
         $scope.closesubbar();
         $location.update_path("/hosts/"+host._id);

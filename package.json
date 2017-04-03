@@ -13,16 +13,16 @@
     "url": "https://github.com/soichih/meshconfig-admin"
   },
   "dependencies": {
-    "async": "^2.1.4",
-    "body-parser": "^1.13.3",
+    "async": "^2.3.0",
+    "body-parser": "^1.17.1",
     "compression": "^1.6.1",
-    "express": "^4.13.3",
+    "express": "^4.15.2",
     "express-jwt": "^5.1.0",
-    "express-winston": "^2.1.2",
+    "express-winston": "^2.3.0",
     "jsonwebtoken": "^7.2.1",
-    "mongoose": "^4.7.6",
+    "mongoose": "^4.9.3",
     "promise": "^7.0.4",
-    "request": "^2.79.0",
+    "request": "^2.81.0",
     "sandbox": "^0.8.6",
     "winston": "^2.3.0"
   },

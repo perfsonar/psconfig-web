@@ -33,7 +33,7 @@
                 </div>
                 <small class="help-block">{{host.sitename}}</small>
             </div>
-            <div class="list-addbutton" ng-click="add()" title="Add new adhoc host">
+            <div class="list-addbutton animated" ng-class="{bounceInLeft: hosts.length == 0}" ng-click="add()" title="Add new adhoc host">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> 
             </div>
         </div><!--subbar-list-->
@@ -203,13 +203,27 @@
                 </div>
 
                 <h3>Host Detail</h3>
+                <p class="help-block">Host details can be used in a dynamic hostgroup query</p>
+                <div ng-if="selected.map">
+                    <ui-gmap-google-map 
+                        center="selected.map.center" 
+                        zoom="selected.map.zoom" 
+                        options="selected.map.options">
+                        <ui-gmap-markers 
+                            models="selected.map.markers" 
+                            coords="'self'" icon="'icon'">
+                        </ui-gmap-markers>
+                    </ul-gmap-google-map>
+                </div>
+
+                <!--
                 <a class="pull-right" 
                     target="_blank"
                     ng-if="selected.info['location-latitude'] && selected.info['location-longitude']"
                     href="https://www.google.com/maps/place/{{selected.info['location-latitude']}},{{selected.info['location-longitude']}}">
                     <i class="fa fa-map-marker" aria-hidden="true"></i> Location
                 </a>
-                <p class="help-block">Host details can be used in a dynamic hostgroup query</p>
+                -->
                 <mc-specs specs="selected.info" form="form" readonly="!selected._canedit || selected.lsid"></mc-specs>
 
                 <h3>Communities</h3>
