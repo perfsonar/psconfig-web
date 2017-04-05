@@ -310,7 +310,7 @@ function run(cb) {
                 var mcadmin = "http://"+(config.admin.host||"localhost")+":"+config.admin.port;
                 request.post({url: mcadmin+"/health/mccache", json: {hosts: host_count}}, function(err, res, body) {
                     if(err) logger.error(err);
-                    cb();
+                    if(cb) cb();
                 });
             });
         });
