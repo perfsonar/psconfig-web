@@ -136,8 +136,7 @@ function cache_ls(hosts, ls, lsid, cb) {
             if(hosts[uri] !== undefined) return _cb(null, hosts[uri]);
             create_hostrec(service, res.request.uri, function(err, host) {
                 if(err) {
-                    logger.error("failed to create hostrecord from following service");
-                    logger.error(service);
+                    logger.error("failed to create hostrecord for ",ls.url, service.uri, service['service-locator']);
                     hosts[uri] = null; //make it null to signal we failed to create hostrec for this
                     return _cb(err);
                 }
