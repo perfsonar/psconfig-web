@@ -267,7 +267,10 @@ function run(cb) {
         if(err) logger.error(err); //continue
         async.eachOfSeries(hosts, function(host, id, next) {
             if(!host) return next(); //ignore null host
-            console.log(JSON.stringify(host, null, 4));
+
+            //dump everything
+            //console.log(JSON.stringify(host, null, 4));
+
             if(host.services.length == 0) { 
                 logger.error("ignoring with host with empty services", host.hostname);
                 return next(); //ignore host with empty services
