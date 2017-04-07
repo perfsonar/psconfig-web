@@ -136,7 +136,7 @@ function cache_ls(hosts, ls, lsid, cb) {
             if(hosts[uri] !== undefined) return _cb(null, hosts[uri]);
             create_hostrec(service, res.request.uri, function(err, host) {
                 if(err) {
-                    logger.error("failed to create hostrecord for ",ls.url, service.uri, service['service-locator']);
+                    logger.error("failed to create hostrecord for ",ls.url, service.uri, service['service-locator'], uri);
                     hosts[uri] = null; //make it null to signal we failed to create hostrec for this
                     return _cb(err);
                 }
@@ -267,6 +267,7 @@ function run(cb) {
         if(err) logger.error(err); //continue
         async.eachOfSeries(hosts, function(host, id, next) {
             if(!host) return next(); //ignore null host
+            console.log(JSON.stringify(host, null, 4));
             if(host.services.length == 0) { 
                 logger.error("ignoring with host with empty services", host.hostname);
                 return next(); //ignore host with empty services

@@ -25,6 +25,8 @@ function($scope, toaster, $http, jwtHelper, serverconf, users, $modal, scaMessag
         });
     });
 
+    $scope.host_catalog = {}; //keyed by id
+
     $scope.refreshHosts = function(query) {
         var find = {};
         if(query) { 
@@ -43,6 +45,9 @@ function($scope, toaster, $http, jwtHelper, serverconf, users, $modal, scaMessag
             '&limit=1000'+
             '&find='+encodeURIComponent(JSON.stringify(find))).then(function(res) {
             $scope.hosts = res.data.hosts;
+            $scope.hosts.forEach(function(host) {
+                $scope.host_catalog[host._id] = host;
+            });
             update_map();
         });
     };
@@ -65,6 +70,7 @@ function($scope, toaster, $http, jwtHelper, serverconf, users, $modal, scaMessag
         if(!$scope.hosts) return;
         $scope.selected.hosts.forEach(function(host_id) {
             //find host info
+            /*
             $scope.hosts.forEach(function(host) {
                 if(host._id == host_id) {
                     var lat = host.info['location-latitude'];
@@ -78,6 +84,18 @@ function($scope, toaster, $http, jwtHelper, serverconf, users, $modal, scaMessag
                     }
                 }
             });
+            */
+            var host = $scope.host_catalog[host_id];
+            if(!host) return;
+            var lat = host.info['location-latitude'];
+            var lng = host.info['location-longitude'];
+            if(lat && lng) {
+                $scope.map.markers.push({
+                    id: host._id,
+                    latitude: lat,
+                    longitude: lng,
+                });
+            }
         });
     }
 
