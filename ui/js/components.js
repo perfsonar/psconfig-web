@@ -100,3 +100,21 @@ app.directive('minver', function() {
         template: '<span ng-if="min" class="label label-warning" title="Only Supported by perfSONAR >v{{min}}">v{{min}}</span>',
     } 
 });
+
+//used to convert string to number for input type="number"
+//https://docs.angularjs.org/error/ngModel/numfmt
+app.directive('stringToNumber', function() {
+    return {
+        require: 'ngModel',
+        link: function(scope, element, attrs, ngModel) {
+            /*
+            ngModel.$parsers.push(function(value) {
+                return '' + value;
+            });
+            */
+            ngModel.$formatters.push(function(value) {
+                return parseFloat(value);
+            });
+        }
+    };
+});

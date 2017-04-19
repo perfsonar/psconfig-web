@@ -2,7 +2,7 @@
     <label for="bucket_width" class="col-sm-2 control-label">Bucket Width *</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="number" step="0.0001" class="form-control" name="bucket_width" ng-disabled="!selected._canedit" ng-model="selected.specs.bucket_width" required>
+            <input type="number" string-to-number step="0.0001" class="form-control" name="bucket_width" ng-disabled="!selected._canedit" ng-model="selected.specs.bucket_width" required>
             <div class="input-group-addon">Seconds</div>
         </div>
         <p class="help-block">
@@ -13,7 +13,7 @@
     <label for="packet_interval" class="col-sm-2 control-label">Packet Interval *</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="number" step="0.01" class="form-control" name="packet_interval" ng-disabled="!selected._canedit" ng-model="selected.specs.packet_interval" required>
+            <input type="number" string-to-number step="0.01" class="form-control" name="packet_interval" ng-disabled="!selected._canedit" ng-model="selected.specs.packet_interval" required>
             <div class="input-group-addon">Packets Per Second</div>
         </div>
         <p class="help-block">
@@ -27,7 +27,7 @@
     <label for="sample_count" class="col-sm-2 control-label">Sample Count *</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="number" step="1" class="form-control" name="sample_count" ng-disabled="!selected._canedit" ng-model="selected.specs.sample_count" required>
+            <input type="number" string-to-number step="1" class="form-control" name="sample_count" ng-disabled="!selected._canedit" ng-model="selected.specs.sample_count" required>
             <div class="input-group-addon">tests</div>
         </div>
         <p class="help-block">
@@ -38,7 +38,7 @@
     <label for="packet_padding" class="col-sm-2 control-label">Packet Padding</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="number" step="1" class="form-control" name="packet_padding" ng-disabled="!selected._canedit" ng-model="selected.specs.packet_padding" placeholder="0">
+            <input type="number" string-to-number step="1" class="form-control" name="packet_padding" ng-disabled="!selected._canedit" ng-model="selected.specs.packet_padding" placeholder="0">
             <div class="input-group-addon">bytes</div>
         </div>
         <p class="help-block">
@@ -52,7 +52,7 @@
 <div class="form-group">
     <label for="tos_bits" class="col-sm-2 control-label">Type of Service</label>
     <div class="col-sm-4">
-        <input type="number" step="1" min="0" max="255" class="form-control" name="tos_bits" 
+        <input type="number" string-to-number step="1" min="0" max="255" class="form-control" name="tos_bits" 
             ng-disabled="!selected._canedit" 
             ng-model="selected.specs.tos_bits">
         <p class="help-block">

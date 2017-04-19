@@ -2,7 +2,7 @@
     <label for="test_interval" class="col-sm-2 control-label">Test Interval *</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="number" class="form-control" name="test_interval" ng-disabled="!selected._canedit" ng-model="selected.specs.test_interval" required>
+            <input type="number" string-to-number class="form-control" name="test_interval" ng-disabled="!selected._canedit" ng-model="selected.specs.test_interval" required>
             <div class="input-group-addon">seconds</div>
         </div>
         <p class="help-block">
@@ -13,7 +13,7 @@
     <label for="random_start_percentage" class="col-sm-2 control-label">Random Start Percentage</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="number" class="form-control" name="random_start_percentage" ng-disabled="!selected._canedit" ng-model="selected.specs.random_start_percentage" placeholder="10">
+            <input type="number" string-to-number class="form-control" name="random_start_percentage" ng-disabled="!selected._canedit" ng-model="selected.specs.random_start_percentage" placeholder="10">
             <div class="input-group-addon">%</div>
         </div>
         <p class="help-block">
@@ -45,7 +45,7 @@
     <label for="timeout" class="col-sm-2 control-label">Timeout</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="number" class="form-control" name="timeout" 
+            <input type="number" string-to-number class="form-control" name="timeout" 
                 ng-disabled="!selected._canedit" 
                 ng-model="selected.specs.timeout">
             <div class="input-group-addon">Seconds</div>
@@ -61,7 +61,7 @@
     <label for="first_ttl" class="col-sm-2 control-label">First TTL</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="number" class="form-control" name="first_ttl" ng-disabled="!selected._canedit" ng-model="selected.specs.first_ttl" placeholder="1">
+            <input type="number" string-to-number class="form-control" name="first_ttl" ng-disabled="!selected._canedit" ng-model="selected.specs.first_ttl" placeholder="1">
             <div class="input-group-addon">hops</div>
         </div>
         <p class="help-block">
@@ -72,7 +72,7 @@
     <label for="max_ttl" class="col-sm-2 control-label">Max TTL</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="number" class="form-control" name="max_ttl" ng-disabled="!selected._canedit" ng-model="selected.specs.max_ttl" placeholder="30">
+            <input type="number" string-to-number class="form-control" name="max_ttl" ng-disabled="!selected._canedit" ng-model="selected.specs.max_ttl" placeholder="30">
             <div class="input-group-addon">hops</div>
         </div>
         <p class="help-block">
@@ -97,7 +97,7 @@
     <label for="packet_size" class="col-sm-2 control-label">Packet Size</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="number" class="form-control" name="packet_size" ng-disabled="!selected._canedit" ng-model="selected.specs.packet_size" placeholder="(Tool Default)">
+            <input type="number" string-to-number class="form-control" name="packet_size" ng-disabled="!selected._canedit" ng-model="selected.specs.packet_size" placeholder="(Tool Default)">
             <div class="input-group-addon">bytes</div>
         </div>
         <p class="help-block">
@@ -168,7 +168,7 @@
     <label for="queries" class="col-sm-2 control-label">Queries</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="number" class="form-control" name="queries" 
+            <input type="number" string-to-number class="form-control" name="queries" 
                 ng-disabled="!selected._canedit" ng-model="selected.specs.queries">
             <div class="input-group-addon">Packets/Hop</div>
         </div>
@@ -199,7 +199,7 @@
 
     <label for="tos_bits" class="col-sm-2 control-label">TOS Bits</label>
     <div class="col-sm-4">
-        <input type="number" step="1" min="0" max="255" class="form-control" name="tos_bits" 
+        <input type="number" string-to-number step="1" min="0" max="255" class="form-control" name="tos_bits" 
             ng-disabled="!selected._canedit" 
             ng-model="selected.specs.tos_bits">
         <p class="help-block">
@@ -215,7 +215,7 @@
     <label for="sendwait" class="col-sm-2 control-label">Send Wait Time</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="number" class="form-control" name="sendwait" 
+            <input type="number" string-to-number class="form-control" name="sendwait" 
                 ng-disabled="!selected._canedit" ng-model="selected.specs.sendwait">
             <div class="input-group-addon">Seconds</div>
         </div>
@@ -229,7 +229,7 @@
     <label for="wait" class="col-sm-2 control-label">Wait Time</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="number" class="form-control" name="wait" 
+            <input type="number" string-to-number class="form-control" name="wait" 
                 ng-disabled="!selected._canedit" ng-model="selected.specs.wait">
             <div class="input-group-addon">Seconds</div>
         </div>

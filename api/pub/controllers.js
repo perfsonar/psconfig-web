@@ -37,7 +37,7 @@ router.get('/health', function(req, res) {
         }
         if(!config) {
             status = "failed";
-            msg = "no config (yet?)";
+            msg = "no meshconfig seems to have been registered by user yet.";
         } else {
             msg = "db status ok";
         }
