@@ -18,11 +18,7 @@ const common = require('./common');
 db.init(function(err) {
     if(err) throw err;
     logger.info("connected to db");
-    run(function(err) {
-        if(err) logger.error(err);
-        logger.info("finished caching .. sleeping for an hour");
-        setTimeout(run, 1000*3600);
-    });
+    run(); //this start loop
 });
 
 //resolve ip or hostname into cb(err, hostname, addresses)
@@ -244,7 +240,7 @@ function update_dynamic_hostgroup(cb) {
     });
 }
 
-function run(cb) {
+function run() {
     //mca host records keyed by uri (hostname could duplicate)
     //hostname found first will take precedence
     //host.simulated will have less precedence
@@ -313,7 +309,8 @@ function run(cb) {
                 var mcadmin = "http://"+(config.admin.host||"localhost")+":"+config.admin.port;
                 request.post({url: mcadmin+"/health/mccache", json: {hosts: host_count}}, function(err, res, body) {
                     if(err) logger.error(err);
-                    if(cb) cb();
+                    logger.info("finished caching .. sleeping for "+config.datasource.delay +" msec");
+                    setTimeout(run, config.datasource.delay);
                 });
             });
         });
