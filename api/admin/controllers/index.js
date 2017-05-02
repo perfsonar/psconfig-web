@@ -29,9 +29,9 @@ router.get('/health', function(req, res) {
         status = "failed";
         msg = "no status report from mccache service (yet?)";
     } else {
-        if(Date.now() - cache_status.update_time > 1000*60*60) {
+        if(Date.now() - cache_status.update_time > config.datasource.delay) {
             status = "failed";
-            msg = "mccache hasn't reported back for more than an hour..";
+            msg = "mccache hasn't reported back for more than "+config.datasource.delay + " msec";
         }
         if(cache_status.hosts < 10) {
             status = "failed";
