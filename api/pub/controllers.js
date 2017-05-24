@@ -76,8 +76,11 @@ router.get('/config', function(req, res, next) {
             q += "host_version="+req.query.host_version;
         }
         if(q!="") q="?"+q;
+        console.dir(req.headers);
+        var proto = "http";
+        if(req.headers['x-forwarded-proto']) proto = req.headers['x-forwarded-proto'];
         var urls = configs.map((_config)=>{
-            return {include: [ config.pub.url+'config/'+_config.url+q ]};
+            return {include: [ proto+"://"+config.pub.url+'config/'+_config.url+q ]};
         });
         res.json(urls);
     }); 
