@@ -1,6 +1,6 @@
 FROM node:6
 
-MAINTAINER Soichi Hayashi <hayashis@iu.edu>
+MAINTAINER Michael Johnson <mj82@globalnoc.iu.edu>
 
 EXPOSE 80 
 EXPOSE 8080
