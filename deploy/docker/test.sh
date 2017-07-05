@@ -8,7 +8,7 @@ docker run \
     -v `pwd`/config:/app/api/config \
     -p 10080:80 \
     -p 18080:8080 \
-    -d soichih/mca-admin
+    -d perfsonar/mca-admin
 
 docker rm -f mca-pub1
 docker run \
@@ -17,7 +17,7 @@ docker run \
     --name mca-pub1 \
     -v `pwd`/config:/app/api/config \
     -p 18081:8080 \
-    -d soichih/mca-pub
+    -d perfsonar/mca-pub
 
 #docker exec -it mca-admin1 bash
 

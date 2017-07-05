@@ -75,7 +75,7 @@ Before we start installing MCA, you should prepare your configuration files firs
 downloading and deploying MCA's default configuration files from git repo.
 
 ```bash
-wget https://github.com/soichih/meshconfig-admin/raw/master/deploy/docker/mca.sample.tar.gz
+wget https://github.com/perfsonar/meshconfig-admin/raw/master/deploy/docker/mca.sample.tar.gz
 tar -xzf mca.sample.tar.gz -C /etc
 ```
 1. For MCA
@@ -153,7 +153,7 @@ Now we have all configuration files necessary to start installing MCA servicves.
         --name sca-auth \
         -v /etc/mca/auth:/app/api/config \
         -v /usr/local/data/auth:/db \
-        -d soichih/sca-auth
+        -d perfsonar/sca-auth
     ```
 
     > sca-auth container will generate a few files under /config directory when it's first started, so don't mount it with `ro`.
@@ -167,7 +167,7 @@ Now we have all configuration files necessary to start installing MCA servicves.
         --net mca \
         --name mca-admin1 \
         -v /etc/mca:/app/api/config:ro \
-        -d soichih/mca-admin
+        -d perfsonar/mca-admin
     ```
 
 5. Create meshconfig publishers.
@@ -178,7 +178,7 @@ Now we have all configuration files necessary to start installing MCA servicves.
         --net mca \
         --name mca-pub1 \
         -v /etc/mca:/app/api/config:ro \
-        -d soichih/mca-pub
+        -d perfsonar/mca-pub
     ```
 
 You can create as many mca-pub containers as desired (make sure to use unique names `mca-pub1`, `mca-pub2`, etc..) based on available resource (mainly CPU) . 1 or 2 should be fine for most cases.
@@ -215,9 +215,9 @@ Now you should see all 5 containers running.
 ```bash
 docker container list
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                                              NAMES
-42efd21ff7f1        soichih/mca-pub     "node /app/api/mcp..."   18 seconds ago      Up 17 seconds       8080/tcp                                                           mca-pub1
-ab3936c7ab8c        soichih/mca-admin   "/start.sh"              19 seconds ago      Up 18 seconds       80/tcp, 8080/tcp                                                   mca-admin1
-90cfbb8ba096        soichih/sca-auth    "/app/docker/start.sh"   24 seconds ago      Up 24 seconds       80/tcp, 8080/tcp                                                   sca-auth
+42efd21ff7f1        perfsonar/mca-pub     "node /app/api/mcp..."   18 seconds ago      Up 17 seconds       8080/tcp                                                           mca-pub1
+ab3936c7ab8c        perfsonar/mca-admin   "/start.sh"              19 seconds ago      Up 18 seconds       80/tcp, 8080/tcp                                                   mca-admin1
+90cfbb8ba096        perfsonar/sca-auth    "/app/docker/start.sh"   24 seconds ago      Up 24 seconds       80/tcp, 8080/tcp                                                   sca-auth
 aa6471073c01        nginx               "nginx -g 'daemon ..."   11 hours ago        Up 11 hours         0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:9443->9443/tcp   nginx
 10fdf3b63e4f        mongo               "/entrypoint.sh mo..."   12 hours ago        Up 12 hours         27017/tcp                                                          mongo
 ```
