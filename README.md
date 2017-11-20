@@ -1,4 +1,4 @@
-# perfSONAR Meshconfig Administartor
+# perfSONAR Meshconfig Administrator
 
 MeshConfig Administrator GUI and tools to publish generated meshconfig
 
@@ -15,10 +15,6 @@ Minimum resource requirements are..
 * 4-6 CPUs
 * 4G memory
 * 16G disk
-
-Creation of VM is out of scope for this document, but at GOC, you can run something like..
-
-`mkvm -c 4 -m 4G -p -r c7 -s 16G meshconfig-itb.4`
 
 ### Docker Engine
 
@@ -95,7 +91,7 @@ tar -xzf mca.sample.tar.gz -C /etc
     ```javascript
     exports.email_confirmation = {
         subject: 'Meshconfign Account Confirmation',
-        from: 'hayashis@iu.edu',  //most mail server will reject if this is not eplyable address
+        from: 'user@domain.tld',  //most mail server will reject if this is not replyable address
     };
 
     ```
@@ -132,7 +128,7 @@ Now we have all configuration files necessary to start installing MCA servicves.
     docker network create mca
     ```
 
-2. Create mongoDB container. Use -v to persist data on host directory (/usr/local/data/mongo) 
+2. Create mongoDB container. Use -v to persist data on host directory (/usr/local/data/mongo)
 
     ```bash
     mkdir -p /usr/local/data
@@ -299,8 +295,8 @@ $ exit
 
 Copy the output from auth.js which is your access token. Store this on your server somewhere and make sure only you can access it (like chmod 600 `~/.mca.token.jwt`)
 
-You can now use most of the MCA REST APIs as documented here.. (test instance)
-> https://meshconfig-itb.grid.iu.edu/apidoc/
+You can now use most of the MCA REST APIs as documented here.
+> https://<hostname>/apidoc/
 
 For example, to query for the hostgroups, you can do something like
 
@@ -325,16 +321,14 @@ http://docs.perfsonar.net/config_mesh.html
 
 Remove service records that are really old (1 week?)
 
-when a user login for the first time, I should forward user to install ui that does following
+When a user login for the first time, I should forward user to install UI that does following
 1) make the first user login as super admin
 2) create sample testspec / hostgroups / config to show user how to get started
-
-Disallow user from used testspecs / hostgroups (and show which config/test uses them)
-
-when config is removed, test records will be orphaned - should be cascaded?
+* Disallow user from used testspecs / hostgroups (and show which config/test uses them)
+* When config is removed, test records will be orphaned - should be cascaded?
 
 * Prevent user from removing hostgroups / testspecs currently used by a config
 * Prevent user from orphaning config / testspecs / hostsgroups by removing all admins
 
-* profile service needs to announce any updates made by user to all other services caching profile info
+* Profile service needs to announce any updates made by user to all other services caching profile info
 * Display which config/test users each hostgroup / testspecs
