@@ -228,7 +228,7 @@ exports.generate = function(_config, opts, cb) {
             tests: [],
             description: _config.name,
         };
-        if(_config.desc) mc.description += " / " + _config.desc;
+        if(_config.desc) mc.description += ": " + _config.desc;
         if(_config._host_version) mc.description += " (v"+_config._host_version+")";
      
         //set meshconfig admins
