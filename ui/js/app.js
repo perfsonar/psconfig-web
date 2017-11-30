@@ -15,7 +15,7 @@ var app = angular.module('app', [
     'ui.ace',
     'ngLocationUpdate',
     'yaru22.angular-timeago',
-    'uiGmapgoogle-maps',
+    'uiGmapgoogle-maps'
 ]);
 
 //can't quite do the slidedown animation through pure angular/css.. borrowing slideDown from jQuery..
@@ -86,6 +86,7 @@ app.directive('stopEvent', function () {
         }
     };
 });
+
 
 app.config(function(uiSelectConfig) {
   uiSelectConfig.dropdownPosition = 'down';
@@ -239,6 +240,24 @@ app.filter('trim_locator', function() {
     }
 });
 
+app.directive('meshName', function ( ) {
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function (scope, elm, attrs, ctrl) {
+            ctrl.$parsers.unshift(function (viewValue) {
+                if (viewValue.indexOf("/") !== -1) {
+                    ctrl.$setValidity('name', false);
+                    return undefined;
+                } else {
+                    ctrl.$setValidity('name', true);
+                    return viewValue;
+                }
+            });
+        }
+    };
+});
+
 //http://stackoverflow.com/questions/21311401/angularjs-get-element-in-controller
 app.directive('hostmap', function (uiGmapGoogleMapApi) {
     return {
@@ -255,4 +274,3 @@ app.directive('hostmap', function (uiGmapGoogleMapApi) {
         }
     };
 })
-

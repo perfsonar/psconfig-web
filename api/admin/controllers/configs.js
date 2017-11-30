@@ -116,11 +116,13 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
         if(err) return next(err);
         if(!config) return next(new Error("can't find a config with id:"+req.params.id));
         if(canedit(req.user, config)) {
-            config.url = req.body.url;            
-            config.name = req.body.name;            
-            config.desc = req.body.desc;            
-            config.tests = req.body.tests;            
-            config.admins = req.body.admins;            
+            config.url = req.body.url;
+            if ( req.body.name ) {
+                config.name = req.body.name.replace('/', '-');
+            }
+            config.desc = req.body.desc;
+            config.tests = req.body.tests;
+            config.admins = req.body.admins;
             config.update_date = new Date();
             config.save(function(err) {
                 if(err) return next(err);

@@ -71,7 +71,7 @@
     <div class="subbar-content">
         <p class="alert alert-info" ng-if="!selected">Please select config</p>
         <form name="form" class="form-horizontal margin30" 
-            ng-submit="submit()" ng-show="selected" confirm-on-exit>
+            ng-submit="form.$valid && submit()" ng-show="selected" confirm-on-exit>
             <div class="fixed-top">
                 <h2>
                     <i class="fa fa-trash-o clickable" aria-hidden="true" ng-if="selected._id && selected._canedit"
@@ -113,9 +113,10 @@
                 <div class="form-group">
                     <label for="name" class="col-sm-2 control-label"><strong>Name *</strong></label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="name" ng-model="selected.name" 
+                        <input type="text" class="form-control" id="name" name="name" ng-model="selected.name" 
                             ng-disabled="!selected._canedit"
-                            placeholder="Name for this config" required>
+                            placeholder="Name for this config" required mesh-name="">
+                        <span ng-show="form.name.$error.name" style="color:red">Name cannot include a '/'.</span>
                     </div>
                 </div>
                 <div class="form-group">
