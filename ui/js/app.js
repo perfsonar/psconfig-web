@@ -246,17 +246,20 @@ app.directive('meshName', function ( ) {
         require: 'ngModel',
         link: function (scope, elm, attrs, ctrl) {
             ctrl.$parsers.unshift(function (viewValue) {
+                var field = attrs.name;
+                scope.field = field;
                 if (viewValue.indexOf("/") !== -1) {
-                    ctrl.$setValidity('name', false);
+                    ctrl.$setValidity(scope.field, false);
                     return undefined;
                 } else {
-                    ctrl.$setValidity('name', true);
+                    ctrl.$setValidity(scope.field, true);
                     return viewValue;
                 }
             });
         }
     };
 });
+
 
 //http://stackoverflow.com/questions/21311401/angularjs-get-element-in-controller
 app.directive('hostmap', function (uiGmapGoogleMapApi) {

@@ -120,7 +120,9 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             if ( req.body.name ) {
                 config.name = req.body.name.replace('/', '-');
             }
-            config.desc = req.body.desc;
+            if ( req.body.desc ) {
+                config.desc = req.body.desc.replace('/', '-');
+            }
             config.tests = req.body.tests;
             config.admins = req.body.admins;
             config.update_date = new Date();
