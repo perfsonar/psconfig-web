@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Soichi Hayashi <hayashis@iu.edu> (http://soichi.us)",
+  "author": "Michael Johnson <mj82@globalnoc.iu.edu> (http://globalnoc.iu.edu)",
   "license": "ISC",
   "dependencies": {
     "ace-builds": "^1.2.5",
