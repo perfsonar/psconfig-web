@@ -96,7 +96,7 @@
                             ng-disabled="!selected._canedit"
                             ng-change="run_dynamic()"
                             ng-model="selected.service_type" required>
-                            <option ng-repeat="(sid, item) in serverconf.service_types" value="{{sid}}">{{item.label}} ({{sid}})</option>
+                            <option ng-repeat="(sid, item) in serverconf.service_types" value="{{sid}}">{{item.label}}</option>
                         </select>
                     </div>
                 </div>

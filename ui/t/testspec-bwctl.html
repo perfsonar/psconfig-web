@@ -4,9 +4,9 @@
         <select class="form-control" name="tool" 
             ng-disabled="!selected._canedit"
             ng-model="selected.specs.tool" required>
-            <option value="bwctl/iperf3">bwctl/iperf3</option>
-            <option value="bwctl/iperf">bwctl/iperf</option>
-            <option value="bwctl/nuttcp">bwctl/nuttcp (>v4)</option>
+            <option value="bwctl/iperf3">iperf3</option>
+            <option value="bwctl/iperf">iperf</option>
+            <option value="bwctl/nuttcp">nuttcp (>v4)</option>
         </select>
         <p class="help-block">The tool to use in performing the throughput test <code>tool</code></p>
     </div>
@@ -65,7 +65,7 @@
                 <input type="text" class="form-control" name="udp_bandwidth" ng-disabled="!selected._canedit" ng-model="selected.specs.udp_bandwidth" placeholder="1000000">
                 <div class="input-group-addon">Bits Per Secs</div>
             </div>
-            <p class="help-block">The rate at which the tool will attempt to send UDP packets. Can specify as bits per second or with suffix K, M, or G to indicated Kbps, Mbps or Gbps respectively <code>udp_bandwidth</code></p>
+            <p class="help-block">The rate at which the tool will attempt to send UDP packets, in bits per second <code>udp_bandwidth</code></p>
         </div>
     </div>
     <div ng-if="selected.specs.protocol == 'tcp'">
@@ -154,7 +154,7 @@
             <div class="input-group-addon">bps</div>
         </div>
         <p class="help-block">
-            The rate at which the tool will attempt to send TCP packets. Can specify as bits per second or with suffix K, M, or G to indicated Kbps, Mbps or Gbps respectively <code>tcp_bandwidth</code> 
+            The rate at which the tool will attempt to send TCP packets, in bits per second <code>tcp_bandwidth</code> 
             <minver min="minver.tcp_bandwidth"></minver>
         </p>
     </div>
