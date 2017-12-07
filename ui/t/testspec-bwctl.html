@@ -251,6 +251,58 @@
 </div>
 
 <div class="form-group">
+    <label for="mss" class="col-sm-2 control-label">Max Segment Size (MSS)</label>
+    <div class="col-sm-4">
+        <input type="number" string-to-number class="form-control" name="mss"
+        ng-disabled="!selected._canedit"
+        ng-model="selected.specs.mss">
+        <p class="help-block">
+            Tell the tool the Max Segment Size (MSS) to use, in bytes
+            <code>mss</code>
+            <minver min="minver.mss"></minver>
+        </p>
+    </div>
+
+    <label for="dscp" class="col-sm-2 control-label">DSCP</label>
+    <div class="col-sm-4">
+        <input type="number" string-to-number class="form-control" name="dscp"
+        ng-disabled="!selected._canedit"
+        ng-model="selected.specs.dscp">
+        <p class="help-block">
+            The differentiated services code point (DSCP) value to set in the IP header of outgoing packets
+            <code>dscp</code>
+            <minver min="minver.dscp"></minver>
+        </p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="congestion" class="col-sm-2 control-label">Congestion Control</label>
+    <div class="col-sm-4">
+        <input type="text"  class="form-control" name="congestion"
+        ng-disabled="!selected._canedit"
+        ng-model="selected.specs.congestion">
+        <p class="help-block">
+            Use this TCP congestion control algorithm (cubic, htcp, bbr, etc)
+            <code>congestion</code>
+            <minver min="minver.congestion"></minver>
+        </p>
+    </div>
+
+    <label for="flow_label" class="col-sm-2 control-label">Flow Label</label>
+    <div class="col-sm-4">
+        <input type="number" string-to-number class="form-control" name="flow_label"
+        ng-disabled="!selected._canedit"
+        ng-model="selected.specs.flow_label">
+        <p class="help-block">
+            Set the ipv6 flow label (integer)
+            <code>flow_label</code>
+            <minver min="minver.flow_label"></minver>
+        </p>
+    </div>
+</div>
+
+<div class="form-group">
     <label for="server_cpu_affinity" class="col-sm-2 control-label">Server CPU Affinity</label>
     <div class="col-sm-4">
         <input type="number" string-to-number class="form-control" name="server_cpu_affinity" 
@@ -289,7 +341,7 @@
         </div>
         <div class="checkbox">
             <label> <input type="checkbox" name="ipv6_only" ng-disabled="!selected._canedit" ng-model="selected.specs.ipv6_only"> IPv6 Only</label>
-            <p class="help-block">Forces each side to use IPv4/IPv6. Test will fail if no IPv4/IPv6 address can be determined for either endpoint <code>ipv4_onnly/ipv6_only</code></p>
+            <p class="help-block">Forces each side to use IPv4/IPv6. Test will fail if no IPv4/IPv6 address can be determined for either endpoint <code>ipv4_only/ipv6_only</code></p>
         </div>    
     </div>
 </div>
