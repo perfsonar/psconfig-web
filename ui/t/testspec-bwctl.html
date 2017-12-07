@@ -81,24 +81,9 @@
 </div>
 
 
-<div class="form-group">
-    <!--all/common-->
-    <div class="col-sm-offset-2 col-sm-4">
-        <div class="checkbox">
-            <label> <input type="checkbox" name="ipv4_only" ng-disabled="!selected._canedit" ng-model="selected.specs.ipv4_only"> IPv4 Only</label>
-        </div>
-        <div class="checkbox">
-            <label> <input type="checkbox" name="ipv6_only" ng-disabled="!selected._canedit" ng-model="selected.specs.ipv6_only"> IPv6 Only</label>
-            <p class="help-block">Forces each side to use IPv4/IPv6. Test will fail if no IPv4/IPv6 address can be determined for either endpoint <code>ipv4_only/ipv6_only</code></p>
-        </div>
-    </div>
-    <div class="col-sm-offset-2 col-sm-4">
-        <div class="checkbox">
-            <label> <input type="checkbox" name="force_bidirectional" ng-disabled="!selected._canedit" ng-model="selected.specs.force_bidirectional"> Do Bidirectional test</label>
-            <p class="help-block">Forces each endpoint to initiate the test in both directions. This will lead to redundant tests being run on each side <code>force_bidirectional</code></p>
-        </div>
-    </div>
-</div>
+<!-- Common parameters -->
+<ng-include src="'t/testspec-common.html'"></ng-include>
+
 <div class="form-group">
     <label for="random_start_percentage" class="col-sm-2 control-label">Random Start Percentage</label>
     <div class="col-sm-4">
