@@ -88,7 +88,7 @@ tar -xzf mca.sample.tar.gz -C /etc
 
     ```javascript
     exports.email_confirmation = {
-        subject: 'Meshconfign Account Confirmation',
+        subject: 'Meshconfig Account Confirmation',
         from: 'user@domain.tld',  //most mail server will reject if this is not replyable address
     };
 
