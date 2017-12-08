@@ -18,17 +18,15 @@ Minimum resource requirements are..
 
 ### Docker Engine
 
-Follow the official [docker installation doc](https://docs.docker.com/engine/installation/) (not from the RHEL repo) to install docker engine.
+Read the official [docker installation doc](https://docs.docker.com/engine/installation/) for more information. For CentOS 7, the Docker version from the CentOS Extras repo will work. For CentOS 6, the CentOS version might work, or you might need to try the version from the Docker repo.
 
-For CentOS7 as root
+For CentOS7 as root:
 
 ```bash
-yum-config-manager \
-    --add-repo https://docs.docker.com/engine/installation/linux/repo_files/centos/docker.repo
-yum install -y docker-engine
+yum install -y docker
 ```
 
-Before you start the docker engine, you might want to add any VM specific configuration. For example, your VM might be using /usr/local as a primary partition for your VM (like at GOC). If so, you should have something like following..
+Before you start the docker engine, you might want to add any VM specific configuration. For example, your VM might be using /usr/local as a primary partition for your VM. If so, you should have something like following..
 
 ```bash
 mkdir /etc/docker
