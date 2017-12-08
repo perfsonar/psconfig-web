@@ -218,6 +218,8 @@ aa6471073c01        nginx               "nginx -g 'daemon ..."   11 hours ago   
 
 ### Testing / Monitoring
 
+Note: sometimes, docker containers will initially not have connectivity to the outside world. Usually this can be resolved by running `systemctl restart docker`
+
 You should now be able to access MCA by accessing your host on your browser on the host. You should be prompted to the login page. You should signup / confirm your email address, then define host gruops / testspecs, and construct new meshconfig using those test entries.
 
 MCA reports the current health status via following API endpoint (for mcadmin and mccache)
