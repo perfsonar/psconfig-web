@@ -6,3 +6,5 @@ api/debug
 deploy/docker/config
 ui/config.js
 ui/node_modules
+.*.swo
+.*.swp
