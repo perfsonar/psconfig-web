@@ -276,4 +276,16 @@ app.directive('hostmap', function (uiGmapGoogleMapApi) {
             });
         }
     };
-})
+});
+
+app.controller('paramsAccordion', function ($scope) {
+    $scope.oneAtATime = true;
+
+    $scope.status = {
+        isCustomHeaderOpen: false,
+        isFirstOpen: true,
+        isFirstDisabled: false,
+        advancedOpen: false,
+        basicOpen: true
+    };
+});

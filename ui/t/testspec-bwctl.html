@@ -1,350 +1,375 @@
-<div class="form-group">
-    <h3>Basic Test Parameters</h3>
-</div>
+<div ng-controller="paramsAccordion">
 
-<div class="form-section">
+    <accordion close-others="false">
 
-<div class="form-group">
-    <label for="tool" class="col-sm-2 control-label">Tool *</label>
-    <div class="col-sm-4">
-        <select class="form-control" name="tool" 
-            ng-disabled="!selected._canedit"
-            ng-model="selected.specs.tool" required>
-            <option value="bwctl/iperf3">iperf3</option>
-            <option value="bwctl/iperf">iperf</option>
-            <option value="bwctl/nuttcp">nuttcp (>v4)</option>
-        </select>
-        <p class="help-block">The tool to use in performing the throughput test <code>tool</code></p>
-    </div>
-    <div 
-        ng-disabled="!selected._canedit"
-        ng-if="selected.specs.tool == 'bwctl/iperf3' && selected.specs.protocol == 'tcp'">
-        <label for="omit_interval" class="col-sm-2 control-label">Omit Interval</label>
-        <div class="col-sm-4">
-            <div class="input-group">
-                <input type="number" string-to-number step="1" class="form-control" name="omit_interval" 
+        <accordion-group is-open="status.basicOpen">
+            <accordion-heading>
+                <h3>Basic Test Parameters
+                <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.basicOpen, 'glyphicon-chevron-right': !status.basicOpen}"></i>
+            </h3>
+            </accordion-heading>
+
+
+            <div class="form-section">
+
+                <div class="form-group">
+                    <label for="tool" class="col-sm-2 control-label">Tool *</label>
+                    <div class="col-sm-4">
+                        <select class="form-control" name="tool" 
+                            ng-disabled="!selected._canedit"
+                            ng-model="selected.specs.tool" required>
+                            <option value="bwctl/iperf3">iperf3</option>
+                            <option value="bwctl/iperf">iperf</option>
+                            <option value="bwctl/nuttcp">nuttcp (>v4)</option>
+                        </select>
+                        <p class="help-block">The tool to use in performing the throughput test <code>tool</code></p>
+                    </div>
+                    <div 
+                        ng-disabled="!selected._canedit"
+                        ng-if="selected.specs.tool == 'bwctl/iperf3' && selected.specs.protocol == 'tcp'">
+                        <label for="omit_interval" class="col-sm-2 control-label">Omit Interval</label>
+                        <div class="col-sm-4">
+                            <div class="input-group">
+                                <input type="number" string-to-number step="1" class="form-control" name="omit_interval" 
+                                    ng-disabled="!selected._canedit"
+                                    ng-model="selected.specs.omit_interval" placeholder="0">
+                                <div class="input-group-addon">seconds</div>
+                            </div>
+                            <p class="help-block">The time to ignore results at the beginning of a test in seconds. Useful for excluding TCP ramp-up time. Note that this is added to the duration (e.g. omit_interval of 5 and duration 30 leads to a 35 second test) <code>omit_interval</code></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="interval" class="col-sm-2 control-label">Interval *</label>
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input type="number" string-to-number step="1" class="form-control" name="interval" 
+                                ng-disabled="!selected._canedit"
+                                ng-model="selected.specs.interval" required>
+                            <div class="input-group-addon">seconds</div>
+                        </div>
+                        <p class="help-block">The time in between throughput tests in seconds <code>interval</code></p>
+                    </div>
+                    <label for="duration" class="col-sm-2 control-label">Duration *</label>
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input type="number" string-to-number step="1" class="form-control" name="duration" 
+                                ng-disabled="!selected._canedit"
+                                ng-model="selected.specs.duration" required>
+                            <div class="input-group-addon">seconds</div>
+                        </div>
+                        <p class="help-block">The length to run each throughput test in seconds <code>duration</code></p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="protocol" class="col-sm-2 control-label">Protocol</label>
+                    <div class="col-sm-4">
+                        <select class="form-control" name="protocol" ng-disabled="!selected._canedit" ng-model="selected.specs.protocol">
+                            <option value="tcp">TCP</option>
+                            <option value="udp">UDP</option>
+                        </select>
+                        <p class="help-block">The transport protocol to use for the test. (Default: tcp) <code>protocol</code></p>
+                    </div>
+                    <div ng-if="selected.specs.protocol == 'udp'">
+                        <label for="udp_bandwidth" class="col-sm-2 control-label">UDP Bandwidth</label>
+                        <div class="col-sm-4">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="udp_bandwidth" ng-disabled="!selected._canedit" ng-model="selected.specs.udp_bandwidth" placeholder="1000000">
+                                <div class="input-group-addon">Bits Per Secs</div>
+                            </div>
+                            <p class="help-block">The rate at which the tool will attempt to send UDP packets, in bits per second <code>udp_bandwidth</code></p>
+                        </div>
+                    </div>
+                    <div ng-if="selected.specs.protocol == 'tcp'">
+                        <label for="window_size" class="col-sm-2 control-label">Window Size</label>
+                        <div class="col-sm-4">
+                            <div class="input-group">
+                                <input type="number" string-to-number step="1" class="form-control" name="window_size" ng-disabled="!selected._canedit" ng-model="selected.specs.window_size" placeholder="0">
+                                <div class="input-group-addon">Bytes</div>
+                            </div>
+                            <p class="help-block">TCP window size (bytes). Set it to 0 to use endpoint host default <code>window_size</code></p>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Common parameters -->
+                <ng-include src="'t/testspec-common.html'"></ng-include>
+
+                </div> <!-- end form-section -->
+                <!--
+                <div class="form-group">
+                    <h3>Advanced Test Parameters</h3>
+                </div>
+                -->
+
+
+        </accordion-group>
+
+
+        <accordion-group is-open="status.open">
+            <accordion-heading>
+                <h3>Advanced Test Parameters
+                    <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                </h3>
+            </accordion-heading>
+
+
+            <div class="form-section">
+
+            <div class="form-group">
+                <label for="random_start_percentage" class="col-sm-2 control-label">Random Start Percentage</label>
+                <div class="col-sm-4">
+                    <div class="input-group">
+                        <input type="number" string-to-number class="form-control" name="random_start_percentage" ng-disabled="!selected._canedit" ng-model="selected.specs.random_start_percentage" placeholder="10">
+                        <div class="input-group-addon">%</div>
+                    </div>
+                    <p class="help-block">The percentage to randomize the start time of requests. Valid values are between 0 and 50 (inclusive). Example: interval of 7200 (2 hours) and random_start_percentage 50 means that a test can start anywhere between 1 hour and 3 hours after the previous test completes <code>random_start_percentage</code></p>
+                </div>
+                <label for="tos_bits" class="col-sm-2 control-label">TOS Bits</label>
+                <div class="col-sm-4">
+                    <input type="number" string-to-number step="1" min="0" max="255" class="form-control" name="tos_bits" 
+                        ng-disabled="!selected._canedit" 
+                        ng-model="selected.specs.tos_bits">
+                    <p class="help-block">The type of service to set in the IP header of outgoing packets as an integer from 0-255
+                        <code>tos_bits</code>
+                    </p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="buffer_length" class="col-sm-2 control-label">Buffer Length</label>
+                <div class="col-sm-4">
+                    <div class="input-group">
+                        <input type="number" string-to-number step="1" class="form-control" name="buffer_length" ng-disabled="!selected._canedit" ng-model="selected.specs.buffer_length" placeholder="(system default)">
+                        <div class="input-group-addon">Bytes</div>
+                    </div>
+                    <p class="help-block">Length of read and write buffers <code>buffer_length</code></p>
+                </div>
+                <label for="Latest Time" class="col-sm-2 control-label">Latest Time</label>
+                <div class="col-sm-4">
+                    <div class="input-group">
+                        <input type="number" string-to-number step="1" class="form-control" name="latest_time" ng-disabled="!selected._canedit" ng-model="selected.specs.latest_time">
+                        <div class="input-group-addon">Seconds</div>
+                    </div>
+                    <p class="help-block">
+                        The delay in seconds after the test is requested that it is allowed to start. This may be useful on busy hosts where a test cannot be scheduled until further in the future than the default allows. Default: 50% of the interval OR the difference between the interval and duration (whichever is smaller) 
+                        <code>latest_time</code>
+                    </p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="report_interval" class="col-sm-2 control-label">Report Interval</label>
+                <div class="col-sm-4">
+                    <div class="input-group">
+                        <input type="number" string-to-number step="1" class="form-control" name="report_interval" ng-disabled="!selected._canedit" ng-model="selected.specs.report_interval" placeholder="1">
+                        <div class="input-group-addon">Seconds</div>
+                    </div>
+                    <p class="help-block">The sub-interval at which to report results in seconds <code>report_interval</code></p>
+                </div>
+
+                <label for="streams" class="col-sm-2 control-label">Streams</label>
+                <div class="col-sm-4">
+                    <div class="input-group">
+                        <input type="number" string-to-number step="1" class="form-control" name="streams" ng-disabled="!selected._canedit" ng-model="selected.specs.streams" placeholder="1">
+                        <div class="input-group-addon">Streams</div>
+                    </div>
+                    <p class="help-block">The number of parallel streams to use in the test <code>streams</code></p>
+                </div>
+            </div>
+
+            <!--v4-->
+
+            <div class="form-group">
+                <label for="tcp_bandwidth" class="col-sm-2 control-label">TCP Bandwidth</label>
+                <div class="col-sm-4">
+                    <div class="input-group">
+                        <input type="string" class="form-control" name="tcp_bandwidth" 
+                        ng-disabled="!selected._canedit" 
+                        ng-model="selected.specs.tcp_bandwidth">
+                        <div class="input-group-addon">bps</div>
+                    </div>
+                    <p class="help-block">
+                        The rate at which the tool will attempt to send TCP packets, in bits per second <code>tcp_bandwidth</code> 
+                        <minver min="minver.tcp_bandwidth"></minver>
+                    </p>
+                </div>
+
+                <div class="col-sm-offset-2 col-sm-4" ng-if="selected.specs.protocol == 'tcp'">
+                    <div class="checkbox">
+                        <label> <input type="checkbox" name="no_delay" 
+                            ng-disabled="!selected._canedit" 
+                            ng-model="selected.specs.no_delay"> No Delay</label>
+                        <p class="help-block">
+                            Set TCP_NODELAY option for the tests <code>no_delay</code>
+                            <minver min="minver.no_delay"></minver>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div ng-if="selected.specs.tool == 'bwctl/iperf3' && selected.specs.protocol == 'tcp'">
+                    <label for="congestion" class="col-sm-2 control-label">Congestion Algorithm</label>
+                    <div class="col-sm-4">
+                        <ui-select ng-model="selected.specs.congestion">
+                            <ui-select-match placeholder="(Use default algorithm)" allow-clear="true">{{$select.selected}}</ui-select-match> 
+                            <ui-select-choices repeat="item in getcongestion($select.search)">
+                                {{item}}
+                            </ui-select-choices>
+                        </ui-select>
+                        <!--
+                        <select class="form-control" name="congestion"
+                            ng-disabled="!selected._canedit"
+                            ng-model="selected.specs.congestion">
+                            <option value="">(Use Default)</option>
+                            <option value="cubic">cubic</option>
+                            <option value="htcp">htcp</option>
+                            <option value="bbr">bbr</option>
+                        </select>
+                        -->
+                        <p class="help-block">
+                            Use this TCP <a href="https://en.wikipedia.org/wiki/TCP_congestion_control" target="_blank">congestion control algorithm</a> 
+                            <code>congestion</code>
+                            <minver min="minver.congestion"></minver>
+                        </p>
+                    </div>
+                </div>
+
+                <div ng-if="selected.specs.tool == 'bwctl/iperf3'">
+                    <label for="flow_label" class="col-sm-2 control-label">Flow Label</label>
+                    <div class="col-sm-4">
+                        <input type="number" string-to-number class="form-control" name="flow_label" 
+                            ng-disabled="!selected._canedit"
+                            ng-model="selected.specs.flow_label">
+                        <p class="help-block">
+                            Set the <a href="https://tools.ietf.org/html/rfc6437#page-4">IPv6 flow label</a>
+                            <code>flow_label / iperf3 -L</code>
+                            <minver min="minver.flow_label"></minver>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div ng-if="selected.specs.tool == 'bwctl/nuttcp'">
+                    <label for="dscp" class="col-sm-2 control-label">DSCP</label>
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input type="number" string-to-number class="form-control" name="dscp" 
+                            ng-disabled="!selected._canedit" 
+                            ng-model="selected.specs.dscp">
+                            <div class="input-group-addon">bps</div>
+                        </div>
+                        <p class="help-block">
+                            The <a href="https://en.wikipedia.org/wiki/Differentiated_services">Defferentiated Services</a> code point value to set in the IP header of outgoing packets
+                            <code>dscp</code> 
+                            <minver min="minver.dscp"></minver>
+                        </p>
+                    </div>
+                </div>
+
+                <div ng-if="selected.specs.tool == 'bwctl/nuttcp'">
+                    <label for="mss" class="col-sm-2 control-label">Maxium Segment Size</label>
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input type="number" string-to-number step="1" class="form-control" name="mss" 
+                            ng-disabled="!selected._canedit" 
+                            ng-model="selected.specs.mss">
+                            <div class="input-group-addon">Bytes</div>
+                        </div>
+                        <p class="help-block">
+                            Tell the tool to use a <a target="_blank" href="https://en.wikipedia.org/wiki/Maximum_segment_size">Maximum TCP segment Size</a> of N bytes <code>mss</code>
+                            <minver min="minver.mss"></minver>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="mss" class="col-sm-2 control-label">Max Segment Size (MSS)</label>
+                <div class="col-sm-4">
+                    <input type="number" string-to-number class="form-control" name="mss"
                     ng-disabled="!selected._canedit"
-                    ng-model="selected.specs.omit_interval" placeholder="0">
-                <div class="input-group-addon">seconds</div>
+                    ng-model="selected.specs.mss">
+                    <p class="help-block">
+                        Tell the tool the Max Segment Size (MSS) to use, in bytes
+                        <code>mss</code>
+                        <minver min="minver.mss"></minver>
+                    </p>
+                </div>
+
+                <label for="dscp" class="col-sm-2 control-label">DSCP</label>
+                <div class="col-sm-4">
+                    <input type="number" string-to-number class="form-control" name="dscp"
+                    ng-disabled="!selected._canedit"
+                    ng-model="selected.specs.dscp">
+                    <p class="help-block">
+                        The differentiated services code point (DSCP) value to set in the IP header of outgoing packets
+                        <code>dscp</code>
+                        <minver min="minver.dscp"></minver>
+                    </p>
+                </div>
             </div>
-            <p class="help-block">The time to ignore results at the beginning of a test in seconds. Useful for excluding TCP ramp-up time. Note that this is added to the duration (e.g. omit_interval of 5 and duration 30 leads to a 35 second test) <code>omit_interval</code></p>
-        </div>
-    </div>
-</div>
 
-<div class="form-group">
-    <label for="interval" class="col-sm-2 control-label">Interval *</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="number" string-to-number step="1" class="form-control" name="interval" 
-                ng-disabled="!selected._canedit"
-                ng-model="selected.specs.interval" required>
-            <div class="input-group-addon">seconds</div>
-        </div>
-        <p class="help-block">The time in between throughput tests in seconds <code>interval</code></p>
-    </div>
-    <label for="duration" class="col-sm-2 control-label">Duration *</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="number" string-to-number step="1" class="form-control" name="duration" 
-                ng-disabled="!selected._canedit"
-                ng-model="selected.specs.duration" required>
-            <div class="input-group-addon">seconds</div>
-        </div>
-        <p class="help-block">The length to run each throughput test in seconds <code>duration</code></p>
-    </div>
-</div>
+            <div class="form-group">
+                <label for="congestion" class="col-sm-2 control-label">Congestion Control</label>
+                <div class="col-sm-4">
+                    <input type="text"  class="form-control" name="congestion"
+                    ng-disabled="!selected._canedit"
+                    ng-model="selected.specs.congestion">
+                    <p class="help-block">
+                        Use this TCP congestion control algorithm (cubic, htcp, bbr, etc)
+                        <code>congestion</code>
+                        <minver min="minver.congestion"></minver>
+                    </p>
+                </div>
 
-<div class="form-group">
-    <label for="protocol" class="col-sm-2 control-label">Protocol</label>
-    <div class="col-sm-4">
-        <select class="form-control" name="protocol" ng-disabled="!selected._canedit" ng-model="selected.specs.protocol">
-            <option value="tcp">TCP</option>
-            <option value="udp">UDP</option>
-        </select>
-        <p class="help-block">The transport protocol to use for the test. (Default: tcp) <code>protocol</code></p>
-    </div>
-    <div ng-if="selected.specs.protocol == 'udp'">
-        <label for="udp_bandwidth" class="col-sm-2 control-label">UDP Bandwidth</label>
-        <div class="col-sm-4">
-            <div class="input-group">
-                <input type="text" class="form-control" name="udp_bandwidth" ng-disabled="!selected._canedit" ng-model="selected.specs.udp_bandwidth" placeholder="1000000">
-                <div class="input-group-addon">Bits Per Secs</div>
+                <label for="flow_label" class="col-sm-2 control-label">Flow Label</label>
+                <div class="col-sm-4">
+                    <input type="number" string-to-number class="form-control" name="flow_label"
+                    ng-disabled="!selected._canedit"
+                    ng-model="selected.specs.flow_label">
+                    <p class="help-block">
+                        Set the ipv6 flow label (integer)
+                        <code>flow_label</code>
+                        <minver min="minver.flow_label"></minver>
+                    </p>
+                </div>
             </div>
-            <p class="help-block">The rate at which the tool will attempt to send UDP packets, in bits per second <code>udp_bandwidth</code></p>
-        </div>
-    </div>
-    <div ng-if="selected.specs.protocol == 'tcp'">
-        <label for="window_size" class="col-sm-2 control-label">Window Size</label>
-        <div class="col-sm-4">
-            <div class="input-group">
-                <input type="number" string-to-number step="1" class="form-control" name="window_size" ng-disabled="!selected._canedit" ng-model="selected.specs.window_size" placeholder="0">
-                <div class="input-group-addon">Bytes</div>
+
+            <div class="form-group">
+                <label for="server_cpu_affinity" class="col-sm-2 control-label">Server CPU Affinity</label>
+                <div class="col-sm-4">
+                    <input type="number" string-to-number class="form-control" name="server_cpu_affinity" 
+                    ng-disabled="!selected._canedit" 
+                    ng-model="selected.specs.server_cpu_affinity">
+                    <p class="help-block">
+                        Specify which CPU socket ID to use for the server tool (useful for 40/100G NUMA hosts)
+                        <code>server_cpu_affinity / numactl -N ID</code> 
+                        <minver min="minver.server_cpu_affinity"></minver>
+                    </p>
+                </div>
+
+                <label for="client_cpu_affinity" class="col-sm-2 control-label">Client CPU Affinity</label>
+                <div class="col-sm-4">
+                    <input type="number" string-to-number class="form-control" name="client_cpu_affinity" 
+                    ng-disabled="!selected._canedit" 
+                    ng-model="selected.specs.client_cpu_affinity">
+                    <p class="help-block">
+                        Specify which CPU socket ID to use for the client tool (useful for 40/100G NUMA hosts)
+                        <code>client_cpu_affinity / numactl -N ID</code> 
+                        <minver min="minver.client_cpu_affinity"></minver>
+                    </p>
+                </div>
             </div>
-            <p class="help-block">TCP window size (bytes). Set it to 0 to use endpoint host default <code>window_size</code></p>
-        </div>
-    </div>
-</div>
+
+        </accordion-group>
 
 
-<!-- Common parameters -->
-<ng-include src="'t/testspec-common.html'"></ng-include>
-
-</div> <!-- end form-section -->
-
-<div class="form-group">
-    <h3>Advanced Test Parameters</h3>
-</div>
-
-<div class="form-section">
-
-<div class="form-group">
-    <label for="random_start_percentage" class="col-sm-2 control-label">Random Start Percentage</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="number" string-to-number class="form-control" name="random_start_percentage" ng-disabled="!selected._canedit" ng-model="selected.specs.random_start_percentage" placeholder="10">
-            <div class="input-group-addon">%</div>
-        </div>
-        <p class="help-block">The percentage to randomize the start time of requests. Valid values are between 0 and 50 (inclusive). Example: interval of 7200 (2 hours) and random_start_percentage 50 means that a test can start anywhere between 1 hour and 3 hours after the previous test completes <code>random_start_percentage</code></p>
-    </div>
-    <label for="tos_bits" class="col-sm-2 control-label">TOS Bits</label>
-    <div class="col-sm-4">
-        <input type="number" string-to-number step="1" min="0" max="255" class="form-control" name="tos_bits" 
-            ng-disabled="!selected._canedit" 
-            ng-model="selected.specs.tos_bits">
-        <p class="help-block">The type of service to set in the IP header of outgoing packets as an integer from 0-255
-            <code>tos_bits</code>
-        </p>
-    </div>
-</div>
-
-<div class="form-group">
-    <label for="buffer_length" class="col-sm-2 control-label">Buffer Length</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="number" string-to-number step="1" class="form-control" name="buffer_length" ng-disabled="!selected._canedit" ng-model="selected.specs.buffer_length" placeholder="(system default)">
-            <div class="input-group-addon">Bytes</div>
-        </div>
-        <p class="help-block">Length of read and write buffers <code>buffer_length</code></p>
-    </div>
-    <label for="Latest Time" class="col-sm-2 control-label">Latest Time</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="number" string-to-number step="1" class="form-control" name="latest_time" ng-disabled="!selected._canedit" ng-model="selected.specs.latest_time">
-            <div class="input-group-addon">Seconds</div>
-        </div>
-        <p class="help-block">
-            The delay in seconds after the test is requested that it is allowed to start. This may be useful on busy hosts where a test cannot be scheduled until further in the future than the default allows. Default: 50% of the interval OR the difference between the interval and duration (whichever is smaller) 
-            <code>latest_time</code>
-        </p>
-    </div>
-</div>
-
-<div class="form-group">
-    <label for="report_interval" class="col-sm-2 control-label">Report Interval</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="number" string-to-number step="1" class="form-control" name="report_interval" ng-disabled="!selected._canedit" ng-model="selected.specs.report_interval" placeholder="1">
-            <div class="input-group-addon">Seconds</div>
-        </div>
-        <p class="help-block">The sub-interval at which to report results in seconds <code>report_interval</code></p>
-    </div>
-
-    <label for="streams" class="col-sm-2 control-label">Streams</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="number" string-to-number step="1" class="form-control" name="streams" ng-disabled="!selected._canedit" ng-model="selected.specs.streams" placeholder="1">
-            <div class="input-group-addon">Streams</div>
-        </div>
-        <p class="help-block">The number of parallel streams to use in the test <code>streams</code></p>
-    </div>
-</div>
-
-<!--v4-->
-
-<div class="form-group">
-    <label for="tcp_bandwidth" class="col-sm-2 control-label">TCP Bandwidth</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="string" class="form-control" name="tcp_bandwidth" 
-            ng-disabled="!selected._canedit" 
-            ng-model="selected.specs.tcp_bandwidth">
-            <div class="input-group-addon">bps</div>
-        </div>
-        <p class="help-block">
-            The rate at which the tool will attempt to send TCP packets, in bits per second <code>tcp_bandwidth</code> 
-            <minver min="minver.tcp_bandwidth"></minver>
-        </p>
-    </div>
-
-    <div class="col-sm-offset-2 col-sm-4" ng-if="selected.specs.protocol == 'tcp'">
-        <div class="checkbox">
-            <label> <input type="checkbox" name="no_delay" 
-                ng-disabled="!selected._canedit" 
-                ng-model="selected.specs.no_delay"> No Delay</label>
-            <p class="help-block">
-                Set TCP_NODELAY option for the tests <code>no_delay</code>
-                <minver min="minver.no_delay"></minver>
-            </p>
-        </div>
-    </div>
-</div>
-
-<div class="form-group">
-    <div ng-if="selected.specs.tool == 'bwctl/iperf3' && selected.specs.protocol == 'tcp'">
-        <label for="congestion" class="col-sm-2 control-label">Congestion Algorithm</label>
-        <div class="col-sm-4">
-            <ui-select ng-model="selected.specs.congestion">
-                <ui-select-match placeholder="(Use default algorithm)" allow-clear="true">{{$select.selected}}</ui-select-match> 
-                <ui-select-choices repeat="item in getcongestion($select.search)">
-                    {{item}}
-                </ui-select-choices>
-            </ui-select>
-            <!--
-            <select class="form-control" name="congestion"
-                ng-disabled="!selected._canedit"
-                ng-model="selected.specs.congestion">
-                <option value="">(Use Default)</option>
-                <option value="cubic">cubic</option>
-                <option value="htcp">htcp</option>
-                <option value="bbr">bbr</option>
-            </select>
-            -->
-            <p class="help-block">
-                Use this TCP <a href="https://en.wikipedia.org/wiki/TCP_congestion_control" target="_blank">congestion control algorithm</a> 
-                <code>congestion</code>
-                <minver min="minver.congestion"></minver>
-            </p>
-        </div>
-    </div>
-
-    <div ng-if="selected.specs.tool == 'bwctl/iperf3'">
-        <label for="flow_label" class="col-sm-2 control-label">Flow Label</label>
-        <div class="col-sm-4">
-            <input type="number" string-to-number class="form-control" name="flow_label" 
-                ng-disabled="!selected._canedit"
-                ng-model="selected.specs.flow_label">
-            <p class="help-block">
-                Set the <a href="https://tools.ietf.org/html/rfc6437#page-4">IPv6 flow label</a>
-                <code>flow_label / iperf3 -L</code>
-                <minver min="minver.flow_label"></minver>
-            </p>
-        </div>
-    </div>
-</div>
-
-<div class="form-group">
-    <div ng-if="selected.specs.tool == 'bwctl/nuttcp'">
-        <label for="dscp" class="col-sm-2 control-label">DSCP</label>
-        <div class="col-sm-4">
-            <div class="input-group">
-                <input type="number" string-to-number class="form-control" name="dscp" 
-                ng-disabled="!selected._canedit" 
-                ng-model="selected.specs.dscp">
-                <div class="input-group-addon">bps</div>
-            </div>
-            <p class="help-block">
-                The <a href="https://en.wikipedia.org/wiki/Differentiated_services">Defferentiated Services</a> code point value to set in the IP header of outgoing packets
-                <code>dscp</code> 
-                <minver min="minver.dscp"></minver>
-            </p>
-        </div>
-    </div>
-
-    <div ng-if="selected.specs.tool == 'bwctl/nuttcp'">
-        <label for="mss" class="col-sm-2 control-label">Maxium Segment Size</label>
-        <div class="col-sm-4">
-            <div class="input-group">
-                <input type="number" string-to-number step="1" class="form-control" name="mss" 
-                ng-disabled="!selected._canedit" 
-                ng-model="selected.specs.mss">
-                <div class="input-group-addon">Bytes</div>
-            </div>
-            <p class="help-block">
-                Tell the tool to use a <a target="_blank" href="https://en.wikipedia.org/wiki/Maximum_segment_size">Maximum TCP segment Size</a> of N bytes <code>mss</code>
-                <minver min="minver.mss"></minver>
-            </p>
-        </div>
-    </div>
-</div>
-
-<div class="form-group">
-    <label for="mss" class="col-sm-2 control-label">Max Segment Size (MSS)</label>
-    <div class="col-sm-4">
-        <input type="number" string-to-number class="form-control" name="mss"
-        ng-disabled="!selected._canedit"
-        ng-model="selected.specs.mss">
-        <p class="help-block">
-            Tell the tool the Max Segment Size (MSS) to use, in bytes
-            <code>mss</code>
-            <minver min="minver.mss"></minver>
-        </p>
-    </div>
-
-    <label for="dscp" class="col-sm-2 control-label">DSCP</label>
-    <div class="col-sm-4">
-        <input type="number" string-to-number class="form-control" name="dscp"
-        ng-disabled="!selected._canedit"
-        ng-model="selected.specs.dscp">
-        <p class="help-block">
-            The differentiated services code point (DSCP) value to set in the IP header of outgoing packets
-            <code>dscp</code>
-            <minver min="minver.dscp"></minver>
-        </p>
-    </div>
-</div>
-
-<div class="form-group">
-    <label for="congestion" class="col-sm-2 control-label">Congestion Control</label>
-    <div class="col-sm-4">
-        <input type="text"  class="form-control" name="congestion"
-        ng-disabled="!selected._canedit"
-        ng-model="selected.specs.congestion">
-        <p class="help-block">
-            Use this TCP congestion control algorithm (cubic, htcp, bbr, etc)
-            <code>congestion</code>
-            <minver min="minver.congestion"></minver>
-        </p>
-    </div>
-
-    <label for="flow_label" class="col-sm-2 control-label">Flow Label</label>
-    <div class="col-sm-4">
-        <input type="number" string-to-number class="form-control" name="flow_label"
-        ng-disabled="!selected._canedit"
-        ng-model="selected.specs.flow_label">
-        <p class="help-block">
-            Set the ipv6 flow label (integer)
-            <code>flow_label</code>
-            <minver min="minver.flow_label"></minver>
-        </p>
-    </div>
-</div>
-
-<div class="form-group">
-    <label for="server_cpu_affinity" class="col-sm-2 control-label">Server CPU Affinity</label>
-    <div class="col-sm-4">
-        <input type="number" string-to-number class="form-control" name="server_cpu_affinity" 
-        ng-disabled="!selected._canedit" 
-        ng-model="selected.specs.server_cpu_affinity">
-        <p class="help-block">
-            Specify which CPU socket ID to use for the server tool (useful for 40/100G NUMA hosts)
-            <code>server_cpu_affinity / numactl -N ID</code> 
-            <minver min="minver.server_cpu_affinity"></minver>
-        </p>
-    </div>
-
-    <label for="client_cpu_affinity" class="col-sm-2 control-label">Client CPU Affinity</label>
-    <div class="col-sm-4">
-        <input type="number" string-to-number class="form-control" name="client_cpu_affinity" 
-        ng-disabled="!selected._canedit" 
-        ng-model="selected.specs.client_cpu_affinity">
-        <p class="help-block">
-            Specify which CPU socket ID to use for the client tool (useful for 40/100G NUMA hosts)
-            <code>client_cpu_affinity / numactl -N ID</code> 
-            <minver min="minver.client_cpu_affinity"></minver>
-        </p>
-    </div>
-</div>
-
-
+        </accordion>
+    </div><!-- end paramsAccordion -->
 </div> <!-- end form-section -->

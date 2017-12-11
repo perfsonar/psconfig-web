@@ -57,6 +57,7 @@ app.controller('HeaderController', function($scope, appconf, $route, serverconf,
             toaster.error(res);
         } 
     }
+
 });
 
 /*
