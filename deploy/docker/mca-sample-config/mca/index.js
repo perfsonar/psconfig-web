@@ -98,7 +98,7 @@ exports.meshconfig = {
         ping: {
             tool: 4,
             tos_bits: 4,
-            flowlabel: 4,
+            flow_label: 4,
             hostnames: 4,
             suppress_loopback: 4,
             deadline: 4,
@@ -143,13 +143,16 @@ exports.datasource = {
             query: '?type=service&group-communities=pS-Testbed&group-communities-operator=any',
         },
 
-        //sLS instance
+        // Private sLS instance
+        // only uncomment this if you are running a private sLS instance
+        /*
         "gocdb-oim": {
             label: 'GOCDB-OIM', 
             type: 'sls',
             url: 'http://sls:8090/lookup/records/?type=service', 
             //exclude: [], //TODO - allow user to remove certain service from appearing in the UI
         },
+        */
     }
 }
 
@@ -171,7 +174,7 @@ exports.pub = {
     host: "0.0.0.0",
     port: 8080,
 
-    url: 'http://meshconfig-itb.grid.iu.edu/pub/', 
+    url: 'http://host.domain.tld/pub/',
 };
 
 exports.common = {

@@ -13,7 +13,7 @@ exports.auth = {
     },
 
     //isser to use for generated jwt token
-    iss: "https://sca.iu.edu/auth",
+    iss: "https://host.domain.tld/auth",
     //ttl for jwt
     ttl: 24*3600*1000, //1 day
 
@@ -28,23 +28,23 @@ exports.auth = {
 
 //comment this out if you don't want to confirm email
 exports.email_confirmation = {
-    subject: 'Meshconfign Account Confirmation',
-    from: 'hayashis@iu.edu',  //most mail server will reject if this is not eplyable address
+    subject: 'Meshconfig Account Confirmation',
+    from: 'user@domain.tld',  //most mail server will reject if this is not replyable address
 };
 
 //for local user/pass login (you should use either local, or ldap - but not both)
 exports.local = {
     //url base for callbacks only used if req.header.referer is not set (like via cli)
-    //url: 'https://soichi7.ppa.iu.edu/auth',
+    //url: 'https://host.domain.tld/auth',
 
     //comment this out if you don't want to confirm email
     email_confirmation: {
-	    subject: 'Meshconfign Account Confirmation',
-	    from: 'hayashis@iu.edu',  //most mail server will reject if this is not eplyable address
+	    subject: 'Meshconfig Account Confirmation',
+	    from: 'user@domain.tld',  //most mail server will reject if this is not replyable address
     },
     email_passreset: {
-	    subject: 'Meshconfign Password Reset',
-	    from: 'hayashis@iu.edu',  //most mail server will reject if this is not eplyable address
+	    subject: 'Meshconfig Password Reset',
+	    from: 'user@domain.tld',  //most mail server will reject if this is not replyable address
     }
 };
 
@@ -60,7 +60,7 @@ exports.oidc = {
     token_url: "https://cilogon.org/oauth2/token",
     userinfo_url: "https://cilogon.org/oauth2/userinfo", //specific to openid connect
 
-    callback_url: "https://meshconfig-itb.grid.iu.edu/api/auth/oidc/callback",
+    callback_url: "https://host.domain.tld/api/auth/oidc/callback",
     scope: "openid profile email org.cilogon.userinfo",
 
     client_id: "myproxy:oa4mp,2012:/client_id/234dba466fc3dd2dd30e3414087e3c1b",
