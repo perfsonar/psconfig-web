@@ -1,3 +1,18 @@
+<div ng-controller="paramsAccordion">
+
+    <accordion close-others="false">
+
+        <accordion-group is-open="status.basicOpen">
+            <accordion-heading>
+                <h3>Basic Test Parameters
+                <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.basicOpen, 'glyphicon-chevron-right': !status.basicOpen}"></i>
+            </h3>
+            </accordion-heading>
+
+
+            <div class="form-section">
+
+
 <div class="form-group">
     <label for="test_interval" class="col-sm-2 control-label">Test Interval *</label>
     <div class="col-sm-4">
@@ -132,6 +147,22 @@
 <!-- Common parameters -->
 <ng-include src="'t/testspec-common.html'"></ng-include>
 
+                </div> <!-- end form-section -->             
+
+
+        </accordion-group>
+
+
+        <accordion-group is-open="status.open">
+            <accordion-heading>
+                <h3>Advanced Test Parameters
+                    <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                </h3>
+            </accordion-heading>
+            
+            
+            <div class="form-section">
+
 <div class="form-group" ng-if="selected.specs.tool == 'traceroute'">
     <div class="col-sm-offset-2 col-sm-4">
         <div class="checkbox">
@@ -244,3 +275,14 @@
         </p>
     </div>
 </div>
+
+        </div> <!-- end form-section -->
+
+
+    </accordion-group>
+
+
+    </accordion>
+</div><!-- end paramsAccordion -->
+
+
