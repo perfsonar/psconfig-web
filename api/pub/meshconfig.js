@@ -152,6 +152,11 @@ exports.generate = function(_config, opts, cb) {
     //catalog of all hosts referenced in member groups keyed by _id
     var host_catalog = {}; 
 
+    var format = opts.format;
+    console.log("generate format", format);
+    console.log("config", _config);
+    console.log("opts", opts);
+
     //resolve all db entries first
     if(_config.admins) _config.admins = resolve_users(_config.admins);
     async.eachSeries(_config.tests, function(test, next_test) {
@@ -228,6 +233,22 @@ exports.generate = function(_config, opts, cb) {
             tests: [],
             description: _config.name,
         };
+
+        //psconfig root template
+        var psconfig = {
+            archives: {},
+            addresses: {},
+            groups: {},
+            tests: {},
+            schedules: {},
+            tasks: {},
+            description: _config.name,
+            // TODO: find out if there's 'description' or a replacement for it
+            // for psconfig
+            //
+
+        }
+
         if(_config.desc) mc.description += ": " + _config.desc;
         if(_config._host_version) mc.description += " (v"+_config._host_version+")";
      
@@ -341,7 +362,11 @@ exports.generate = function(_config, opts, cb) {
         });
 
         //all done
-        cb(null, mc);
+        if ( format == "psconfig" ) {
+            cb(null, psconfig);
+        } else {
+            cb(null, mc);
+        }
     });
 }
 
