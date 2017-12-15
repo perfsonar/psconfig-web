@@ -129,7 +129,8 @@ function get_type(service_type) {
     return service_type; //no change
 }
 
-function generate_mainfo(service) {
+function generate_mainfo(service, format) {
+    console.log("generate_mainfo format", format);
     var locator = "http://"+service.ma.hostname+"/esmond/perfsonar/archive";
 
     var type = null;
@@ -140,11 +141,22 @@ function generate_mainfo(service) {
         //pinger, traceroute
         type = service.type;
     }
-    return {
-        read_url: locator,
-        write_url: locator,
-        type: type,
-    };
+    if ( format != "psconfig" ) {
+        return {
+            read_url: locator,
+            write_url: locator,
+            type: type,
+        };
+    } else {
+        return {
+            archiver: "esmond",
+            data: {
+                url: locator,
+                "measurement_agent": "{% scheduled_by_address %}",
+            }
+        };
+
+    }
 }
 
 //synchronous function to construct meshconfig from admin config
@@ -242,12 +254,14 @@ exports.generate = function(_config, opts, cb) {
             tests: {},
             schedules: {},
             tasks: {},
-            description: _config.name,
-            // TODO: find out if there's 'description' or a replacement for it
-            // for psconfig
-            //
+            _meta: {
+                description: _config.name
+            },
 
         }
+
+        // make a list of the psconfig archives
+        var psc_archives = {};
 
         if(_config.desc) mc.description += ": " + _config.desc;
         if(_config._host_version) mc.description += " (v"+_config._host_version+")";
@@ -266,17 +280,33 @@ exports.generate = function(_config, opts, cb) {
             sites: [],
         };
 
+        var last_ma_number = 0;
+        var maHash = {};
+        var psc_addresses = {};
         //register sites(hosts)
         for(var id in host_catalog) {
             var _host = host_catalog[id];
             var host = {
-                addresses: [ _host.hostname ], 
-                measurement_archives: [ ], 
+                addresses: [ _host.hostname ],
+                measurement_archives: [ ],
                 description: _host.desc||_host.sitename,
                 toolkit_url: _host.toolkit_url||"auto",
             }
             if(_host.no_agent) host.no_agent = 1;
             //logger.warn(_host.hostname, _host.services.length);
+
+            console.log("host", host);
+            //console.log("_host", _host);
+            var address = {};
+            psc_addresses[ _host.hostname ] = {
+                "address":  _host.hostname,
+                "_meta": {
+                    "display-name": _host.desc||_host.sitename
+                    // TODO: add org?
+                    //"organization": _host.org
+
+                }
+            };
 
             //create ma entry for each service
             _host.services.forEach(function(service) {
@@ -290,6 +320,18 @@ exports.generate = function(_config, opts, cb) {
                     return;
                 }
                 host.measurement_archives.push(generate_mainfo(service));
+
+                var maInfo = generate_mainfo(service, format);
+                var maName = "archive" + last_ma_number;
+                var url = maInfo.data.url;
+                if ( ! ( url in maHash ) ) {
+                    psc_archives[ maName ] = maInfo;
+                    last_ma_number++;
+                    maHash[url] = 1;
+                } else {
+
+                }
+
             });
 
             /*
@@ -314,6 +356,8 @@ exports.generate = function(_config, opts, cb) {
             if(_host.info['location-code']) site.location['postal_code'] = _host.info['location-code'];//odd one
             org.sites.push(site);
         }
+        psconfig.archives = psc_archives;
+        psconfig.addresses = psc_addresses;
         mc.organizations.push(org);
 
         //now the most interesting part..
