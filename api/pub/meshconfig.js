@@ -166,7 +166,7 @@ exports.generate = function(_config, opts, cb) {
 
     var format = opts.format;
     console.log("generate format", format);
-    console.log("config", _config);
+    console.log("_config", _config);
     console.log("opts", opts);
 
     //resolve all db entries first
@@ -260,8 +260,6 @@ exports.generate = function(_config, opts, cb) {
 
         }
 
-        // make a list of the psconfig archives
-        var psc_archives = {};
 
         if(_config.desc) mc.description += ": " + _config.desc;
         if(_config._host_version) mc.description += " (v"+_config._host_version+")";
@@ -283,6 +281,9 @@ exports.generate = function(_config, opts, cb) {
         var last_ma_number = 0;
         var maHash = {};
         var psc_addresses = {};
+        var psc_groups = {};
+        // make a list of the psconfig archives
+        var psc_archives = {};
         //register sites(hosts)
         for(var id in host_catalog) {
             var _host = host_catalog[id];
@@ -297,7 +298,6 @@ exports.generate = function(_config, opts, cb) {
 
             console.log("host", host);
             //console.log("_host", _host);
-            var address = {};
             psc_addresses[ _host.hostname ] = {
                 "address":  _host.hostname,
                 "_meta": {
@@ -334,6 +334,17 @@ exports.generate = function(_config, opts, cb) {
 
             });
 
+            _config.tests.forEach(function(test) {
+                //console.log("test", test);
+                var type = test.service_type;
+                var enabled = test.enabled;
+                var name = type + "_host";
+                psc_groups[ name ] = {
+                    "type": test.mesh_type,
+                    "addresses": [] // TODO ADD addresses to groups
+                };
+            });
+
             /*
             //don't add entry with empty measurement_archives - breaks maddash?
             //this could happen if a site stops running service that used to
@@ -358,6 +369,7 @@ exports.generate = function(_config, opts, cb) {
         }
         psconfig.archives = psc_archives;
         psconfig.addresses = psc_addresses;
+        psconfig.groups = psc_groups;
         mc.organizations.push(org);
 
         //now the most interesting part..
