@@ -130,7 +130,7 @@ function get_type(service_type) {
 }
 
 function generate_mainfo(service, format) {
-    console.log("generate_mainfo format", format);
+    //console.log("generate_mainfo format", format);
     var locator = "http://"+service.ma.hostname+"/esmond/perfsonar/archive";
 
     var type = null;
@@ -159,6 +159,52 @@ function generate_mainfo(service, format) {
     }
 }
 
+function generate_group_members( test, group, type, host_groups, host_catalog, next, addr_prefix ) {
+    console.log("TYPE", type);
+    if ( ( typeof addr_prefix == "undefined" ) || ( type == "mesh" ) ) {
+        addr_prefix = "";
+    }
+    var group_prefix = addr_prefix.replace("-", "");
+    if ( group_prefix == "" ) group_prefix = "a";
+    var group_field = group_prefix + "group";
+    console.log("group_field", group_field);
+    resolve_hostgroup(group, function(err, hosts) {
+        var addr = addr_prefix + "addresses";
+        if ( ! ( test.name in host_groups ) ) {
+            host_groups[ test.name ] = { 
+                "type": type
+            };
+        }
+        if ( ! ( addr in host_groups[ test.name ] ) ) {
+            host_groups[ test.name ][ addr ] = [];
+        }
+        if(err) return next(err);
+        test[ group_field ] = hosts;
+        console.log("prefix " + addr_prefix + " group hosts", hosts);
+        hosts.forEach(function(host) {
+            host_catalog[host._id] = host;
+            console.log("host", host);
+            //console.log("host.hostname", host.hostname);
+            //console.log("host ADDRESSES", host.addresses);
+            if ( host.hostname ) {
+                host_groups[ test.name ][ addr ].push( 
+                    { "name": host.hostname }
+                    );
+            } else {
+                host.addresses.forEach( function( address ) {
+                    host_groups[ test.name ][ addr ].push( 
+                        { "name": address.address }
+                        );
+                });
+            }
+
+
+        });
+        next();
+    });
+
+}
+
 //synchronous function to construct meshconfig from admin config
 exports.generate = function(_config, opts, cb) {
     //catalog of all hosts referenced in member groups keyed by _id
@@ -181,44 +227,14 @@ exports.generate = function(_config, opts, cb) {
             function(next) {
                 //a group
                 if(!test.agroup) return next();
-                resolve_hostgroup(test.agroup, function(err, hosts) {
-                    if ( ! ( test.name in host_groups ) ) {
-                        host_groups[ test.name ] = { 
-                            "type": type
-                        };
-                    }
-                    if ( ! ( "addresses" in host_groups[ test.name ] ) ) {
-                        host_groups[ test.name ].addresses = [];
-                    }
-                    if(err) return next(err);
-                    test.agroup = hosts;
-                    console.log("a group hosts", hosts);
-                    hosts.forEach(function(host) {
-                        host_catalog[host._id] = host;
-                        console.log("host", host);
-                        //console.log("host.hostname", host.hostname);
-                        //console.log("host ADDRESSES", host.addresses);
-                        if ( host.hostname ) {
-                            host_groups[ test.name ].addresses.push( 
-                                { "name": host.hostname }
-                            );
-                        } else {
-                            host.addresses.forEach( function( address ) {
-                                host_groups[ test.name ].addresses.push( 
-                                    { "name": address.address }
-                                );
-                            });
-                        }
-
-
-                    });
-                    next();
-                });
+                generate_group_members( test, test.agroup, type, host_groups, host_catalog, next, "a-" );
             },
             function(next) {
                 //b group
                 // TODO: add host addresses similar to how A group is currently working
                 if(!test.bgroup) return next();
+                generate_group_members( test, test.bgroup, type, host_groups, host_catalog, next, "b-" );
+                /*
                 resolve_hostgroup(test.bgroup, function(err, res) {
                     if(err) return next(err);
                     resolve_hosts(res.recs, function(err, hosts) {
@@ -227,6 +243,7 @@ exports.generate = function(_config, opts, cb) {
                         next();
                     });
                 });
+                */
             },
             function(next) {
                 if(!test.nahosts) return next();
