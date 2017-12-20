@@ -17,9 +17,7 @@ exports.meshconfig = {
     //mesh types
     mesh_types: {
         "mesh": {label: "Mesh"},
-        "disjoint": {label: "Disjoint"},
-        "star": {label: "Star"},
-        "ordered_mesh": {label: "Ordered Mesh"},
+        "disjoint": {label: "Disjoint"}
     },
 
 
