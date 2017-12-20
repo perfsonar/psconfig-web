@@ -447,6 +447,9 @@ exports.generate = function(_config, opts, cb) {
             }
             if(test.nahosts && test.nahosts.length > 0) {
                 members.no_agents = generate_members(test.nahosts.filter(host=>has_service(host._id)));
+                members.no_agents.forEach( function( host ) {
+                    psconfig.addresses[ host ][ "no-agent" ] = true;
+                });
             }
 
             var parameters = test.testspec.specs;
