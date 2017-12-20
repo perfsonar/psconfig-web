@@ -163,6 +163,7 @@ function generate_mainfo(service, format) {
 exports.generate = function(_config, opts, cb) {
     //catalog of all hosts referenced in member groups keyed by _id
     var host_catalog = {}; 
+    var host_groups = {};
 
     var format = opts.format;
     console.log("generate format", format);
@@ -172,20 +173,51 @@ exports.generate = function(_config, opts, cb) {
     //resolve all db entries first
     if(_config.admins) _config.admins = resolve_users(_config.admins);
     async.eachSeries(_config.tests, function(test, next_test) {
+        console.log("test", test);
+        var type = test.mesh_type;
+
         if(!test.enabled) return next_test();
         async.parallel([
             function(next) {
                 //a group
                 if(!test.agroup) return next();
                 resolve_hostgroup(test.agroup, function(err, hosts) {
+                    if ( ! ( test.name in host_groups ) ) {
+                        host_groups[ test.name ] = { 
+                            "type": type
+                        };
+                    }
+                    if ( ! ( "addresses" in host_groups[ test.name ] ) ) {
+                        host_groups[ test.name ].addresses = [];
+                    }
                     if(err) return next(err);
                     test.agroup = hosts;
-                    hosts.forEach(function(host) { host_catalog[host._id] = host; });
+                    console.log("a group hosts", hosts);
+                    hosts.forEach(function(host) {
+                        host_catalog[host._id] = host;
+                        console.log("host", host);
+                        //console.log("host.hostname", host.hostname);
+                        //console.log("host ADDRESSES", host.addresses);
+                        if ( host.hostname ) {
+                            host_groups[ test.name ].addresses.push( 
+                                { "name": host.hostname }
+                            );
+                        } else {
+                            host.addresses.forEach( function( address ) {
+                                host_groups[ test.name ].addresses.push( 
+                                    { "name": address.address }
+                                );
+                            });
+                        }
+
+
+                    });
                     next();
                 });
             },
             function(next) {
                 //b group
+                // TODO: add host addresses similar to how A group is currently working
                 if(!test.bgroup) return next();
                 resolve_hostgroup(test.bgroup, function(err, res) {
                     if(err) return next(err);
@@ -319,7 +351,6 @@ exports.generate = function(_config, opts, cb) {
                     logger.debug(service);
                     return;
                 }
-                host.measurement_archives.push(generate_mainfo(service));
 
                 if ( format == "psconfig" ) {
                     var maInfo = generate_mainfo(service, format);
@@ -332,20 +363,27 @@ exports.generate = function(_config, opts, cb) {
                     } else {
 
                     }
+                } else {
+                    host.measurement_archives.push(generate_mainfo(service));
                 }
 
             });
 
+            /*
             _config.tests.forEach(function(test) {
-                //console.log("test", test);
+                console.log("testNOW", test);
                 var type = test.service_type;
                 var enabled = test.enabled;
-                var name = type + "_host";
+                var hgName = test.name;
+                var name = hgName + "_hosts";
                 psc_groups[ name ] = {
                     "type": test.mesh_type,
                     "addresses": [] // TODO ADD addresses to groups
                 };
+                // TODO figure out how to have multiple tests of same type
+                // (need unique hostgroup names)
             });
+            */
 
             /*
             //don't add entry with empty measurement_archives - breaks maddash?
@@ -355,7 +393,7 @@ exports.generate = function(_config, opts, cb) {
                 continue;
             }
             */
-                
+
             var site = {
                 hosts: [ host ],
                 location: {}
@@ -371,7 +409,8 @@ exports.generate = function(_config, opts, cb) {
         }
         psconfig.archives = psc_archives;
         psconfig.addresses = psc_addresses;
-        psconfig.groups = psc_groups;
+        psconfig.groups = host_groups;
+        //psconfig.groups = psc_groups;
         mc.organizations.push(org);
 
         //now the most interesting part..
