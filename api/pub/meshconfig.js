@@ -171,7 +171,7 @@ function generate_group_members( test, group, type, host_groups, host_catalog, n
     resolve_hostgroup(group, function(err, hosts) {
         var addr = addr_prefix + "addresses";
         if ( ! ( test.name in host_groups ) ) {
-            host_groups[ test.name ] = { 
+            host_groups[ test.name ] = {
                 "type": type
             };
         }
@@ -251,16 +251,6 @@ exports.generate = function(_config, opts, cb) {
                     if(err) return next(err);
                     test.nahosts = hosts;
                     hosts.forEach(function(host) { host_catalog[host._id] = host; });
-                    next();
-                });
-            },
-            function(next) {
-                //star center
-                if(!test.center) return next();
-                resolve_host(test.center, function(err, host) {
-                    if(err) return next(err);
-                    test.center = host;
-                    host_catalog[host._id] = host;
                     next();
                 });
             },
@@ -452,13 +442,6 @@ exports.generate = function(_config, opts, cb) {
                 members.b_members = generate_members(test.bgroup.filter(host=>has_service(host._id)));
                 break;
             case "mesh":
-                members.members = generate_members(test.agroup.filter(host=>has_service(host._id)));
-                break;
-            case "star":
-                members.members = generate_members(test.agroup.filter(host=>has_service(host._id)));
-                if(has_service(test.center.id)) members.center_address = test.center.hostname; 
-                break;
-            case "ordered_mesh": 
                 members.members = generate_members(test.agroup.filter(host=>has_service(host._id)));
                 break;
             }
