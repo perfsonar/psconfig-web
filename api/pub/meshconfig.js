@@ -321,15 +321,17 @@ exports.generate = function(_config, opts, cb) {
                 }
                 host.measurement_archives.push(generate_mainfo(service));
 
-                var maInfo = generate_mainfo(service, format);
-                var maName = "archive" + last_ma_number;
-                var url = maInfo.data.url;
-                if ( ! ( url in maHash ) ) {
-                    psc_archives[ maName ] = maInfo;
-                    last_ma_number++;
-                    maHash[url] = 1;
-                } else {
+                if ( format == "psconfig" ) {
+                    var maInfo = generate_mainfo(service, format);
+                    var maName = "archive" + last_ma_number;
+                    var url = maInfo.data.url;
+                    if ( ! ( url in maHash ) ) {
+                        psc_archives[ maName ] = maInfo;
+                        last_ma_number++;
+                        maHash[url] = 1;
+                    } else {
 
+                    }
                 }
 
             });
