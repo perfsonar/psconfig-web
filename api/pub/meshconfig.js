@@ -57,9 +57,47 @@ function resolve_users(uids) {
     return users;
 }
 
+function meshconfig_testspec_to_psconfig( testspec, name, psc_tests ) {
+    console.log("NAME", name);
+    var spec = testspec.specs;
+    var test = psc_tests[ name ];
+    var service_types = {
+        "bwctl": "throughput",
+        "owamp": "latencybg",
+        "ping": "rtt",
+        "traceroute": "trace"
+
+    };
+
+    if ( test.type in service_types ) {
+        test.type = service_types[ test.type ];
+
+    }
+
+    console.log("TESTSPEC", testspec);
+
+    if ( psc_tests[ name ]["spec"].duration ) {
+        psc_tests[ name ]["spec"].duration = seconds_to_iso8601(spec.duration );
+    }
+    rename_field( spec, "force_bidirectional", "force-bidirectional" );
+
+    delete spec.type;
+
+}
+
+function rename_field( obj, oldname, newname ) {
+    if ( oldname in obj ) {
+        obj[ newname ] = obj[ oldname ];
+        delete obj[ oldname ];
+    }
+    return obj;
+
+}
+
 function seconds_to_iso8601( seconds ) {
     return moment.duration(seconds, 'seconds').toISOString();
 }
+
 
 function resolve_testspec(id, cb) {
     db.Testspec.findById(id).exec(cb);
@@ -474,13 +512,16 @@ exports.generate = function(_config, opts, cb) {
 
             console.log("testspec", test.testspec);
 
-            if ( psc_tests[ name ]["spec"].duration ) {
-                psc_tests[ name ]["spec"].duration = seconds_to_iso8601( psc_tests[ name ]["spec"].duration );
+            var spec = testspec.specs;
+
+            if ( format == "psconfig" ) {
+                meshconfig_testspec_to_psconfig( testspec, name, psc_tests );
             }
 
 
+
             var parameters = test.testspec.specs;
-            parameters.type = get_type(test.service_type);
+            if ( format != "psconfig" ) parameters.type = get_type(test.service_type);
             mc.tests.push({
                 members: members,
                 parameters: parameters,
