@@ -76,12 +76,58 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests ) {
 
     console.log("TESTSPEC", testspec);
 
-    if ( psc_tests[ name ]["spec"].duration ) {
-        psc_tests[ name ]["spec"].duration = seconds_to_iso8601(spec.duration );
+    // change underscores to dashes in all field names in the "spec" stanza
+    rename_underscores_to_dashes( spec );
+
+    // this array is a list of fields we will convert from seconds to iso8601
+    var iso_fields = [
+        "duration",
+        "interval",
+        "test-interval",
+        "packet-interval",
+        "bucket-width"
+    ];
+
+    for(var i in iso_fields) {
+        var field = iso_fields[i];
+        if ( psc_tests[ name ]["spec"][ field ] ) {
+            psc_tests[ name ]["spec"][ field ] = seconds_to_iso8601(spec[ field ] );
+        }
+
     }
-    rename_field( spec, "force_bidirectional", "force-bidirectional" );
+
+    rename_field( spec, "test-interval", "interval" );
+    rename_field( spec, "sample-count", "packet-count" );
+
+    // rename protocol: udp to udp: true
+    if ( ( "protocol" in  psc_tests[ name ]["spec"] ) &&  psc_tests[ name ]["spec"].protocol == "udp" ) {
+        psc_tests[ name ]["spec"].udp = true;
+        delete psc_tests[ name ]["spec"].protocol;
+    }
+
+    // handle newer "ipversion" format
+    // old: ipv4-only, ipv6-only
+    // new: ip-version: 4, 6
+    if ("ipv4-only" in psc_tests[ name ]["spec"] ) {
+        psc_tests[ name ]["spec"]["ip-version"] = 4;
+        delete psc_tests[ name ]["spec"]["ipv4-only"];
+    }
+    if ("ipv6-only" in psc_tests[ name ]["spec"] ) {
+        psc_tests[ name ]["spec"]["ip-version"] = 6;
+        delete psc_tests[ name ]["spec"]["ipv6-only"];
+    }
 
     delete spec.type;
+
+}
+
+function rename_underscores_to_dashes( obj ) {
+    for(var key in obj ) {
+        var newkey = key.replace("_", "-");
+        obj[ newkey ] = obj[ key ];
+        if (key.match(/_/) ) delete obj[ key ];
+
+    }
 
 }
 
