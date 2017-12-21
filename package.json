@@ -20,6 +20,7 @@
     "express-jwt": "^5.1.0",
     "express-winston": "^2.3.0",
     "jsonwebtoken": "^7.2.1",
+    "moment-duration": "0.0.6",
     "mongoose": "^4.9.3",
     "promise": "^7.0.4",
     "request": "^2.81.0",

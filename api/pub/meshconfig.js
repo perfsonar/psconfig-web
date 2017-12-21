@@ -5,6 +5,7 @@ const express = require('express');
 const router = express.Router();
 const winston = require('winston');
 const async = require('async');
+const moment = require('moment');
 
 //mine
 const config = require('../config');
@@ -54,6 +55,10 @@ function resolve_users(uids) {
         users.push(profile_cache[uid]);  
     });
     return users;
+}
+
+function seconds_to_iso8601( seconds ) {
+    return moment.duration(seconds, 'seconds').toISOString();
 }
 
 function resolve_testspec(id, cb) {
@@ -323,6 +328,7 @@ exports.generate = function(_config, opts, cb) {
         var psc_groups = {};
         // make a list of the psconfig archives
         var psc_archives = {};
+        var psc_tests = {};
         //register sites(hosts)
         for(var id in host_catalog) {
             var _host = host_catalog[id];
@@ -436,14 +442,14 @@ exports.generate = function(_config, opts, cb) {
             var members = {
                 type: test.mesh_type
             };
-            switch(test.mesh_type) { 
-            case "disjoint":
-                members.a_members = generate_members(test.agroup.filter(host=>has_service(host._id)));
-                members.b_members = generate_members(test.bgroup.filter(host=>has_service(host._id)));
-                break;
-            case "mesh":
-                members.members = generate_members(test.agroup.filter(host=>has_service(host._id)));
-                break;
+            switch(test.mesh_type) {
+                case "disjoint":
+                    members.a_members = generate_members(test.agroup.filter(host=>has_service(host._id)));
+                    members.b_members = generate_members(test.bgroup.filter(host=>has_service(host._id)));
+                    break;
+                case "mesh":
+                    members.members = generate_members(test.agroup.filter(host=>has_service(host._id)));
+                    break;
             }
             if(test.nahosts && test.nahosts.length > 0) {
                 members.no_agents = generate_members(test.nahosts.filter(host=>has_service(host._id)));
@@ -451,6 +457,27 @@ exports.generate = function(_config, opts, cb) {
                     psconfig.addresses[ host ][ "no-agent" ] = true;
                 });
             }
+
+            var name = test.name;
+            var testspec = test.testspec;
+
+            psc_tests[ name ] = {
+                "type": test.service_type,
+                "spec": {
+                    "source": "{% address[0] %}",
+                    "dest": "{% address[1] %}"
+
+                }
+            };
+
+            psc_tests[ name ].spec = testspec.specs;
+
+            console.log("testspec", test.testspec);
+
+            if ( psc_tests[ name ]["spec"].duration ) {
+                psc_tests[ name ]["spec"].duration = seconds_to_iso8601( psc_tests[ name ]["spec"].duration );
+            }
+
 
             var parameters = test.testspec.specs;
             parameters.type = get_type(test.service_type);
@@ -460,6 +487,8 @@ exports.generate = function(_config, opts, cb) {
                 description: test.name,
             });
         });
+
+        psconfig.tests = psc_tests;
 
         //all done
         if ( format == "psconfig" ) {
