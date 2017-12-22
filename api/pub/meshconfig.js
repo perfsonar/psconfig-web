@@ -102,13 +102,10 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
     rename_field( spec, "test-interval", "interval" );
     rename_field( spec, "sample-count", "packet-count" );
 
-    console.log("INTERVAL", testspec[ "interval" ] );
-    console.log("TEST INTERVAL", testspec[ "test-interval" ] );
 
     if ( testspec[ "interval" ] ) {
         var interval = testspec[ "interval" ];
         var interval_name = "repeat-" + interval;
-        console.log("interval_name", interval_name);
         psc_schedules[ interval_name ] = {
             "repeat": interval,
             "sliprand": true
@@ -120,17 +117,12 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
         if ( testspec["random-start-percentage"] && testspec.interval) {
             var slip = testspec["random-start-percentage"] * interval_seconds / 100;
             slip = seconds_to_iso8601( slip );
-            console.log("SLIP", slip);
             psc_schedules[ interval_name ].slip = slip;
 
         }
 
-        console.log("psc_schedules", psc_schedules);
-
-
+        //console.log("psc_schedules", psc_schedules);
         //delete testspec[ "test-interval" ];
-
-
     }
 
     // rename protocol: udp to udp: true
@@ -282,6 +274,12 @@ function generate_mainfo(service, format) {
     }
 }
 
+function set_test_meta( test, key, value ) {
+    if ( ! test._meta ) test._meta = {};
+    test._meta[key] = value;
+
+}
+
 function generate_group_members( test, group, type, host_groups, host_catalog, next, addr_prefix ) {
     console.log("TYPE", type);
     if ( ( typeof addr_prefix == "undefined" ) || ( type == "mesh" ) ) {
@@ -301,12 +299,16 @@ function generate_group_members( test, group, type, host_groups, host_catalog, n
         if ( ! ( addr in host_groups[ test.name ] ) ) {
             host_groups[ test.name ][ addr ] = [];
         }
+        set_test_meta( test, "_hostgroup", test.name ); 
+
+        console.log("TEST", test);
+
         if(err) return next(err);
         test[ group_field ] = hosts;
         console.log("prefix " + addr_prefix + " group hosts", hosts);
         hosts.forEach(function(host) {
             host_catalog[host._id] = host;
-            console.log("host", host);
+            //console.log("host", host);
             //console.log("host.hostname", host.hostname);
             //console.log("host ADDRESSES", host.addresses);
             if ( host.hostname ) {
@@ -315,7 +317,7 @@ function generate_group_members( test, group, type, host_groups, host_catalog, n
                     );
             } else {
                 host.addresses.forEach( function( address ) {
-                    host_groups[ test.name ][ addr ].push( 
+                    host_groups[ test.name ][ addr ].push(
                         { "name": address.address }
                         );
                 });
@@ -354,19 +356,8 @@ exports.generate = function(_config, opts, cb) {
             },
             function(next) {
                 //b group
-                // TODO: add host addresses similar to how A group is currently working
                 if(!test.bgroup) return next();
                 generate_group_members( test, test.bgroup, type, host_groups, host_catalog, next, "b-" );
-                /*
-                resolve_hostgroup(test.bgroup, function(err, res) {
-                    if(err) return next(err);
-                    resolve_hosts(res.recs, function(err, hosts) {
-                        test.bgroup = hosts;
-                        hosts.forEach(function(host) { host_catalog[host._id] = host; });
-                        next();
-                    });
-                });
-                */
             },
             function(next) {
                 if(!test.nahosts) return next();
@@ -425,7 +416,7 @@ exports.generate = function(_config, opts, cb) {
 
         if(_config.desc) mc.description += ": " + _config.desc;
         if(_config._host_version) mc.description += " (v"+_config._host_version+")";
-     
+
         //set meshconfig admins
         if(_config.admins) {
             mc.administrators = [];
@@ -433,7 +424,7 @@ exports.generate = function(_config, opts, cb) {
                 mc.administrators.push({name: admin.fullname, email: admin.email});
             });
         }
-    
+
         //convert services to sites/hosts entries
         //mca currently doesn't handle the concept of organization
         var org = {
@@ -448,6 +439,8 @@ exports.generate = function(_config, opts, cb) {
         var psc_archives = {};
         var psc_tests = {};
         var psc_schedules = {};
+        var psc_tasks = {};
+
         //register sites(hosts)
         for(var id in host_catalog) {
             var _host = host_catalog[id];
@@ -460,7 +453,7 @@ exports.generate = function(_config, opts, cb) {
             if(_host.no_agent) host.no_agent = 1;
             //logger.warn(_host.hostname, _host.services.length);
 
-            console.log("host", host);
+            //console.log("host", host);
             //console.log("_host", _host);
             psc_addresses[ _host.hostname ] = {
                 "address":  _host.hostname,
@@ -501,30 +494,8 @@ exports.generate = function(_config, opts, cb) {
 
             });
 
-            /*
-            _config.tests.forEach(function(test) {
-                console.log("testNOW", test);
-                var type = test.service_type;
-                var enabled = test.enabled;
-                var hgName = test.name;
-                var name = hgName + "_hosts";
-                psc_groups[ name ] = {
-                    "type": test.mesh_type,
-                    "addresses": [] // TODO ADD addresses to groups
-                };
                 // TODO figure out how to have multiple tests of same type
                 // (need unique hostgroup names)
-            });
-            */
-
-            /*
-            //don't add entry with empty measurement_archives - breaks maddash?
-            //this could happen if a site stops running service that used to
-            if(host.measurement_archives.length == 0) {
-                logger.warn("no service registrered for ", _host.hostname);
-                continue;
-            }
-            */
 
             var site = {
                 hosts: [ host ],
@@ -589,6 +560,7 @@ exports.generate = function(_config, opts, cb) {
                 }
             };
 
+
             psc_tests[ name ].spec = testspec.specs;
 
             console.log("testspec", test.testspec);
@@ -601,6 +573,15 @@ exports.generate = function(_config, opts, cb) {
             }
 
 
+            var interval = psc_tests[ name ].spec.interval;
+            console.log("INTERVAL", interval);
+
+            psc_tasks[ name ] = {
+                "schedule": "repeat-" + interval,
+                "group": test._meta._hostgroup
+
+
+            };
 
             var parameters = test.testspec.specs;
             if ( format != "psconfig" ) parameters.type = get_type(test.service_type);
@@ -613,6 +594,7 @@ exports.generate = function(_config, opts, cb) {
 
         psconfig.tests = psc_tests;
         psconfig.schedules = psc_schedules;
+        psconfig.tasks = psc_tasks;
 
         //all done
         if ( format == "psconfig" ) {
