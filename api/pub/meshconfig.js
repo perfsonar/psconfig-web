@@ -57,10 +57,11 @@ function resolve_users(uids) {
     return users;
 }
 
-function meshconfig_testspec_to_psconfig( testspec, name, psc_tests ) {
+function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules ) {
     console.log("NAME", name);
     var spec = testspec.specs;
     var test = psc_tests[ name ];
+    var testspec = psc_tests[ name ].spec;
     var service_types = {
         "bwctl": "throughput",
         "owamp": "latencybg",
@@ -79,6 +80,8 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests ) {
     // change underscores to dashes in all field names in the "spec" stanza
     rename_underscores_to_dashes( spec );
 
+    var interval_seconds = testspec.interval || testspec.test_interval; 
+
     // this array is a list of fields we will convert from seconds to iso8601
     var iso_fields = [
         "duration",
@@ -90,8 +93,8 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests ) {
 
     for(var i in iso_fields) {
         var field = iso_fields[i];
-        if ( psc_tests[ name ]["spec"][ field ] ) {
-            psc_tests[ name ]["spec"][ field ] = seconds_to_iso8601(spec[ field ] );
+        if ( testspec[ field ] ) {
+            testspec[ field ] = seconds_to_iso8601(spec[ field ] );
         }
 
     }
@@ -99,22 +102,53 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests ) {
     rename_field( spec, "test-interval", "interval" );
     rename_field( spec, "sample-count", "packet-count" );
 
+    console.log("INTERVAL", testspec[ "interval" ] );
+    console.log("TEST INTERVAL", testspec[ "test-interval" ] );
+
+    if ( testspec[ "interval" ] ) {
+        var interval = testspec[ "interval" ];
+        var interval_name = "repeat-" + interval;
+        console.log("interval_name", interval_name);
+        psc_schedules[ interval_name ] = {
+            "repeat": interval,
+            "sliprand": true
+
+        };
+
+        // "slip"
+        // convert slip from random_start_percentage
+        if ( testspec["random-start-percentage"] && testspec.interval) {
+            var slip = testspec["random-start-percentage"] * interval_seconds / 100;
+            slip = seconds_to_iso8601( slip );
+            console.log("SLIP", slip);
+            psc_schedules[ interval_name ].slip = slip;
+
+        }
+
+        console.log("psc_schedules", psc_schedules);
+
+
+        //delete testspec[ "test-interval" ];
+
+
+    }
+
     // rename protocol: udp to udp: true
-    if ( ( "protocol" in  psc_tests[ name ]["spec"] ) &&  psc_tests[ name ]["spec"].protocol == "udp" ) {
-        psc_tests[ name ]["spec"].udp = true;
-        delete psc_tests[ name ]["spec"].protocol;
+    if ( ( "protocol" in  testspec ) &&  testspec.protocol == "udp" ) {
+        testspec.udp = true;
+        delete testspec.protocol;
     }
 
     // handle newer "ipversion" format
     // old: ipv4-only, ipv6-only
     // new: ip-version: 4, 6
-    if ("ipv4-only" in psc_tests[ name ]["spec"] ) {
-        psc_tests[ name ]["spec"]["ip-version"] = 4;
-        delete psc_tests[ name ]["spec"]["ipv4-only"];
+    if ("ipv4-only" in testspec ) {
+        testspec["ip-version"] = 4;
+        delete testspec["ipv4-only"];
     }
-    if ("ipv6-only" in psc_tests[ name ]["spec"] ) {
-        psc_tests[ name ]["spec"]["ip-version"] = 6;
-        delete psc_tests[ name ]["spec"]["ipv6-only"];
+    if ("ipv6-only" in testspec ) {
+        testspec["ip-version"] = 6;
+        delete testspec["ipv6-only"];
     }
 
     delete spec.type;
@@ -123,7 +157,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests ) {
 
 function rename_underscores_to_dashes( obj ) {
     for(var key in obj ) {
-        var newkey = key.replace("_", "-");
+        var newkey = key.replace(/_/g, "-");
         obj[ newkey ] = obj[ key ];
         if (key.match(/_/) ) delete obj[ key ];
 
@@ -413,6 +447,7 @@ exports.generate = function(_config, opts, cb) {
         // make a list of the psconfig archives
         var psc_archives = {};
         var psc_tests = {};
+        var psc_schedules = {};
         //register sites(hosts)
         for(var id in host_catalog) {
             var _host = host_catalog[id];
@@ -560,8 +595,9 @@ exports.generate = function(_config, opts, cb) {
 
             var spec = testspec.specs;
 
+
             if ( format == "psconfig" ) {
-                meshconfig_testspec_to_psconfig( testspec, name, psc_tests );
+                meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules );
             }
 
 
@@ -576,6 +612,7 @@ exports.generate = function(_config, opts, cb) {
         });
 
         psconfig.tests = psc_tests;
+        psconfig.schedules = psc_schedules;
 
         //all done
         if ( format == "psconfig" ) {
