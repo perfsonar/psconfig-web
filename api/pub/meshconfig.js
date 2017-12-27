@@ -57,6 +57,24 @@ function resolve_users(uids) {
     return users;
 }
 
+function convert_tool( tool ) {
+    var tool_conversions = {
+        "bwctl/nuttcp": "nuttcp",
+        "bwctl/iperf": "iperf",
+        "bwctl/iperf3": "iperf3"
+
+    };
+    // update tool names
+    console.log("TOOL", tool);
+    console.log("tool_conversions", tool_conversions);
+    if ( tool in tool_conversions ) {
+        tool = tool_conversions[ tool ];
+        console.log("newTOOL", tool);
+    }
+    return tool;
+
+}
+
 function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules ) {
     console.log("NAME", name);
     var spec = testspec.specs;
@@ -70,6 +88,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
     };
 
+
     if ( test.type in service_types ) {
         test.type = service_types[ test.type ];
 
@@ -80,7 +99,12 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
     // change underscores to dashes in all field names in the "spec" stanza
     rename_underscores_to_dashes( spec );
 
-    var interval_seconds = testspec.interval || testspec.test_interval; 
+    var interval_seconds = testspec.interval;
+    if ( "test-interval" in testspec ) {
+        interval_seconds = testspec["test-interval"];
+    }
+
+    console.log("interval_seconds", interval_seconds);
 
     // this array is a list of fields we will convert from seconds to iso8601
     var iso_fields = [
@@ -114,9 +138,11 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
         // "slip"
         // convert slip from random_start_percentage
-        if ( testspec["random-start-percentage"] && testspec.interval) {
+        if ( "random-start-percentage" in testspec && interval_seconds) {
             var slip = testspec["random-start-percentage"] * interval_seconds / 100;
+            console.log("SLIP", slip);
             slip = seconds_to_iso8601( slip );
+            console.log("SLIP ISO", slip);
             psc_schedules[ interval_name ].slip = slip;
 
         }
@@ -124,6 +150,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
         //console.log("psc_schedules", psc_schedules);
         //delete testspec[ "test-interval" ];
     }
+
 
     // rename protocol: udp to udp: true
     if ( ( "protocol" in  testspec ) &&  testspec.protocol == "udp" ) {
@@ -299,7 +326,9 @@ function generate_group_members( test, group, type, host_groups, host_catalog, n
         if ( ! ( addr in host_groups[ test.name ] ) ) {
             host_groups[ test.name ][ addr ] = [];
         }
-        set_test_meta( test, "_hostgroup", test.name ); 
+        set_test_meta( test, "_hostgroup", test.name );
+        set_test_meta( test, "_test", test.name );
+        set_test_meta( test, "_tool", convert_tool( test.testspec.specs.tool ) );
 
         console.log("TEST", test);
 
@@ -578,7 +607,9 @@ exports.generate = function(_config, opts, cb) {
 
             psc_tasks[ name ] = {
                 "schedule": "repeat-" + interval,
-                "group": test._meta._hostgroup
+                "group": test._meta._hostgroup,
+                "test": test._meta._test,
+                "tool": test._meta._tool
 
 
             };
