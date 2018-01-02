@@ -104,8 +104,6 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
         interval_seconds = testspec["test-interval"];
     }
 
-    console.log("interval_seconds", interval_seconds);
-
     // this array is a list of fields we will convert from seconds to iso8601
     var iso_fields = [
         "duration",
@@ -140,9 +138,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
         // convert slip from random_start_percentage
         if ( "random-start-percentage" in testspec && interval_seconds) {
             var slip = testspec["random-start-percentage"] * interval_seconds / 100;
-            console.log("SLIP", slip);
             slip = seconds_to_iso8601( slip );
-            console.log("SLIP ISO", slip);
             psc_schedules[ interval_name ].slip = slip;
 
         }
@@ -469,6 +465,7 @@ exports.generate = function(_config, opts, cb) {
         var psc_tests = {};
         var psc_schedules = {};
         var psc_tasks = {};
+        var psc_hosts = {};
 
         //register sites(hosts)
         for(var id in host_catalog) {
@@ -505,13 +502,25 @@ exports.generate = function(_config, opts, cb) {
                     logger.debug(service);
                     return;
                 }
+                console.log("SERVICE", service);
+            console.log("_HOST", _host);
+
+                //console.log("SERVICE", service);
+                //TODO: add HOSTS section
 
                 if ( format == "psconfig" ) {
                     var maInfo = generate_mainfo(service, format);
+                    console.log("maInfo", maInfo);
                     var maName = "archive" + last_ma_number;
                     var url = maInfo.data.url;
                     if ( ! ( url in maHash ) ) {
                         psc_archives[ maName ] = maInfo;
+                        if ( ! ( "_archive" in _host ) ) _host._archive = [];
+                        _host._archive.push(maName);
+                        if ( ! ( _host.hostname in psc_hosts) ) psc_hosts[ _host.hostname ]  = {};
+                        if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
+                        psc_hosts[ _host.hostname ].archives.push( maName );
+                        console.log( "HOST MAs",  psc_hosts );
                         last_ma_number++;
                         maHash[url] = 1;
                     } else {
@@ -603,7 +612,6 @@ exports.generate = function(_config, opts, cb) {
 
 
             var interval = psc_tests[ name ].spec.interval;
-            console.log("INTERVAL", interval);
 
             psc_tasks[ name ] = {
                 "schedule": "repeat-" + interval,
@@ -626,6 +634,9 @@ exports.generate = function(_config, opts, cb) {
         psconfig.tests = psc_tests;
         psconfig.schedules = psc_schedules;
         psconfig.tasks = psc_tasks;
+        psconfig.hosts = psc_hosts;
+
+        console.log("HOSTS", psc_hosts);
 
         //all done
         if ( format == "psconfig" ) {
