@@ -65,18 +65,14 @@ function convert_tool( tool ) {
 
     };
     // update tool names
-    console.log("TOOL", tool);
-    console.log("tool_conversions", tool_conversions);
     if ( tool in tool_conversions ) {
         tool = tool_conversions[ tool ];
-        console.log("newTOOL", tool);
     }
     return tool;
 
 }
 
 function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules ) {
-    console.log("NAME", name);
     var spec = testspec.specs;
     var test = psc_tests[ name ];
     var testspec = psc_tests[ name ].spec;
@@ -93,8 +89,6 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
         test.type = service_types[ test.type ];
 
     }
-
-    console.log("TESTSPEC", testspec);
 
     // change underscores to dashes in all field names in the "spec" stanza
     rename_underscores_to_dashes( spec );
@@ -123,6 +117,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
     rename_field( spec, "test-interval", "interval" );
     rename_field( spec, "sample-count", "packet-count" );
+    delete spec.tool;
 
 
     if ( testspec[ "interval" ] ) {
@@ -153,6 +148,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
         testspec.udp = true;
         delete testspec.protocol;
     }
+
 
     // handle newer "ipversion" format
     // old: ipv4-only, ipv6-only
@@ -304,14 +300,12 @@ function set_test_meta( test, key, value ) {
 }
 
 function generate_group_members( test, group, type, host_groups, host_catalog, next, addr_prefix ) {
-    console.log("TYPE", type);
     if ( ( typeof addr_prefix == "undefined" ) || ( type == "mesh" ) ) {
         addr_prefix = "";
     }
     var group_prefix = addr_prefix.replace("-", "");
     if ( group_prefix == "" ) group_prefix = "a";
     var group_field = group_prefix + "group";
-    console.log("group_field", group_field);
     resolve_hostgroup(group, function(err, hosts) {
         var addr = addr_prefix + "addresses";
         if ( ! ( test.name in host_groups ) ) {
@@ -322,15 +316,13 @@ function generate_group_members( test, group, type, host_groups, host_catalog, n
         if ( ! ( addr in host_groups[ test.name ] ) ) {
             host_groups[ test.name ][ addr ] = [];
         }
+
         set_test_meta( test, "_hostgroup", test.name );
         set_test_meta( test, "_test", test.name );
-        set_test_meta( test, "_tool", convert_tool( test.testspec.specs.tool ) );
-
-        console.log("TEST", test);
+        set_test_meta( test, "_tool", convert_tool( test.testspec.specs.tool ));
 
         if(err) return next(err);
         test[ group_field ] = hosts;
-        console.log("prefix " + addr_prefix + " group hosts", hosts);
         hosts.forEach(function(host) {
             host_catalog[host._id] = host;
             //console.log("host", host);
@@ -502,15 +494,14 @@ exports.generate = function(_config, opts, cb) {
                     logger.debug(service);
                     return;
                 }
-                console.log("SERVICE", service);
-            console.log("_HOST", _host);
+                //console.log("SERVICE", service);
 
                 //console.log("SERVICE", service);
                 //TODO: add HOSTS section
 
                 if ( format == "psconfig" ) {
                     var maInfo = generate_mainfo(service, format);
-                    console.log("maInfo", maInfo);
+                    //console.log("maInfo", maInfo);
                     var maName = "archive" + last_ma_number;
                     var url = maInfo.data.url;
                     if ( ! ( url in maHash ) ) {
@@ -520,7 +511,6 @@ exports.generate = function(_config, opts, cb) {
                         if ( ! ( _host.hostname in psc_hosts) ) psc_hosts[ _host.hostname ]  = {};
                         if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
                         psc_hosts[ _host.hostname ].archives.push( maName );
-                        console.log( "HOST MAs",  psc_hosts );
                         last_ma_number++;
                         maHash[url] = 1;
                     } else {
@@ -601,8 +591,6 @@ exports.generate = function(_config, opts, cb) {
 
             psc_tests[ name ].spec = testspec.specs;
 
-            console.log("testspec", test.testspec);
-
             var spec = testspec.specs;
 
 
@@ -616,11 +604,13 @@ exports.generate = function(_config, opts, cb) {
             psc_tasks[ name ] = {
                 "schedule": "repeat-" + interval,
                 "group": test._meta._hostgroup,
-                "test": test._meta._test,
-                "tool": test._meta._tool
-
-
+                "test": test._meta._test
             };
+
+            if ( ( "_tool" in test._meta ) &&  typeof test._meta._tool != "undefined" ) {
+                psc_tasks[ name ].tools = [ test._meta._tool ];
+
+            }
 
             var parameters = test.testspec.specs;
             if ( format != "psconfig" ) parameters.type = get_type(test.service_type);
@@ -635,8 +625,6 @@ exports.generate = function(_config, opts, cb) {
         psconfig.schedules = psc_schedules;
         psconfig.tasks = psc_tasks;
         psconfig.hosts = psc_hosts;
-
-        console.log("HOSTS", psc_hosts);
 
         //all done
         if ( format == "psconfig" ) {
