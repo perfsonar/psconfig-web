@@ -118,10 +118,10 @@
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
                         <div class="checkbox">
-                            <label><input type="checkbox" name="no_agent" 
+                            <label><input type="checkbox" name="no_agent"
                                 ng-disabled="!selected._canedit" ng-model="selected.no_agent"> No Agent</label>
                             <p class="help-block">If checked, this host will not read the mesh config. This is significant because it means those that test to it are responsible for initiating tests in both directions and storing the results. If un-checked, it means other testers can assume this host is reading the mesh and will initiate its portion of the tests accordingly.</p>
-                        </div>    
+                        </div>
                     </div>
                 </div>
 
@@ -143,8 +143,18 @@
                     </div>
                 </div>
 
-                <h3>Services / Measurement Archive(MA) endpoints</h3>
-                <p class="help-block">You can request each service to send measurements to non-local MA</p>
+                <h3>Measurement Archive (MA) Settings</h3>
+                <p class="help-block">You can configure whether to store test results in the host's local MA, as well as additional MAs to store results for all tests involving this host.</p>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <div class="checkbox">
+                            <label><input type="checkbox" name="local_ma"
+                                ng-disabled="!selected._canedit" ng-model="selected.local_ma"> Use local MA</label>
+                            <p class="help-block">If checked, test results for all tests involving this host will be written to the host's local MA. Not all hosts
+                            run their own MA, so in some cases this may not be desired (disabled by default).</p>
+                        </div>
+                    </div>
+                </div>
                 <div class="form-group" 
                     ng-repeat="service in selected.services | orderObjectBy: 'name'"
                     ng-class="{'slide-down': !service._id}"

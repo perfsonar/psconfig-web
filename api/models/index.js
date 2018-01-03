@@ -67,6 +67,9 @@ var hostSchema = mongoose.Schema({
     toolkit_url: String,
     no_agent: {type: Boolean, default: false},
 
+    // whether to use the local host MA
+    local_ma: {type: Boolean, default: false},
+
     //host info (pshost-toolkitversion, host-hardware-memory, host-os-version, host-hadeware-processorspeed, host-hadware-processorcount)
     //and location info (location-state, location-city, location-country, etc..)
     info: mongoose.Schema.Types.Mixed,
