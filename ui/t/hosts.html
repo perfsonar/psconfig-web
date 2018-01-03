@@ -165,40 +165,6 @@
                     </div>
                 </div>
 
-
-                <div class="form-group" 
-                    ng-repeat="service in selected.services | orderObjectBy: 'name'"
-                    ng-class="{'slide-down': !service._id}"
-                    >
-                    <label class="col-sm-2 control-label">
-                        {{service.type}}
-                        <i class="fa fa-trash text-muted clickable" 
-                            ng-click="removeservice(service)" 
-                            ng-if="selected._canedit && !selected.lsid"></i>
-                    </label>
-                    <div class="col-sm-10" ng-if="service.type != 'ma'">
-                        <div class="input-group">
-                            <span class="input-group-addon">MA</span>
-                            <ui-select ng-model="service.ma" ng-disabled="!selected._canedit">
-                                <ui-select-match placeholder="Use local measurement archive" allow-clear>
-                                    <div style="padding-top: 2px; font-size: 12px">
-                                        <code>{{$select.selected.hostname||'removed'}}</code>
-                                        {{$select.selected.sitename}} 
-                                    </div>
-                                </ui-select-match>
-                                <ui-select-choices 
-                                    group-by="'sitename'"
-                                    refresh-delay="200"
-                                    refresh="refreshHosts($select.search, service)"
-                                    repeat="ma._id as ma in ma_hosts">
-                                    <span class="label label-default" ng-if="ma.lsid">{{ma.lsid}}</span>
-                                    <span class="label label-warning" ng-if="!ma.lsid">Adhoc</span>
-                                    <code>{{ma.hostname||'removed'}}</code>
-                                </ui-select-choices>
-                            </ui-select>
-                        </div><!--input-group-->
-                    </div><!--row-->
-
                     <div class="col-sm-10" ng-if="service.type == 'ma'">
                         <div class="input-group">
                             <span class="input-group-addon">Locator</span>
