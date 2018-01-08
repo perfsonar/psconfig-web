@@ -53,10 +53,16 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
         if(err) return next(err);
         db.Host.count(find).exec(function(err, count) {
             if(err) return next(err);
-            
-            //append canedit flag
+
             hosts.forEach(function(host) {
+                //append canedit flag
                 host._canedit = canedit(req.user, host);
+                // format ma_urls
+                if ( ( "ma_urls" in host ) && Array.isArray( host.ma_urls ) && host.ma_urls.length > 0 ) {
+                    console.log("MA_URLS", host.ma_urls);
+                    host.ma_urls = host.ma_urls.join("\n");
+
+                }
             });
             res.json({hosts: hosts, count: count});
         });
@@ -119,7 +125,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
         if(err) return next(err);
         if(!host) return res.status(404).end();
         if(!canedit(req.user, host)) return res.status(401).end();
-        
+
         //somehow, mongo doesn't clear ma ref if it's *not set*.. I have to explicity set it to *undefined* 
         //to force mongo from clearing the ref.
         req.body.services.forEach(function(service) {
@@ -129,6 +135,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
         //things always allowed to edit (TODO - shouldn't I have to mask fields not set?)
         host.no_agent = req.body.no_agent;
         host.local_ma = req.body.local_ma;
+        host.ma_urls = req.body.ma_urls.split("\n");
         host.toolkit_url = req.body.toolkit_url;
         host.desc = req.body.desc;
         host.services = req.body.services; //TODO should restrict to just MAs?

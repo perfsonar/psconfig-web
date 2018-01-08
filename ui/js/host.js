@@ -35,9 +35,9 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         return $http.get(appconf.api+'/hosts?select='+encodeURIComponent(select)+
             '&sort=sitename hostname&find='+encodeURIComponent(JSON.stringify(find)))
         .then(function(res) {
-            //console.log("search results");
+            //console.log("SEARCH RESULTS");
             //console.dir(res.data.hosts);
-            $scope.ma_hosts = res.data.hosts;
+            //$scope.ma_hosts = res.data.hosts;
         });
     };
 
@@ -90,7 +90,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
 
         hosts.getDetail(host).then(function(_host) {
             find_missing_services();
-            reset_mapinfo(); 
+            reset_mapinfo();
             $scope.refreshHosts();
         });
 
@@ -227,6 +227,8 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         } else {
             hosts.update($scope.selected).then(function(host) {
                 toaster.success("Host updated successfully!");
+                console.log("SUBMIT HOST", host);
+                host.ma_urls = host.ma_urls.join("\n");
                 $scope.form.$setPristine();
             }).catch($scope.toast_error);
         }
