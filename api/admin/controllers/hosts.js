@@ -135,7 +135,10 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
         //things always allowed to edit (TODO - shouldn't I have to mask fields not set?)
         host.no_agent = req.body.no_agent;
         host.local_ma = req.body.local_ma;
-        host.ma_urls = req.body.ma_urls.split("\n");
+        host.local_ma_url = req.body.local_ma_url;
+        if( typeof host.ma_urls != "undefined" ) {
+            host.ma_urls = req.body.ma_urls.split("\n");
+        }
         host.toolkit_url = req.body.toolkit_url;
         host.desc = req.body.desc;
         host.services = req.body.services; //TODO should restrict to just MAs?
