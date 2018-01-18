@@ -166,6 +166,7 @@ var configSchema = mongoose.Schema({
     admins: [ String ], //array of user ids (sub string in auth service)
     create_date: {type: Date, default: Date.now},
     update_date: {type: Date, default: Date.now},
+    ma_urls: [ String ] // an array of measurement archive URLs to archive test results to
 
 });
 exports.Config = mongoose.model('Config', configSchema);

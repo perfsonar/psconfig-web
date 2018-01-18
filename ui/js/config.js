@@ -199,6 +199,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
         } else {
             configs.update($scope.selected).then(function(config) {
                 toaster.success("config updated successfully!");
+                config.ma_urls = config.ma_urls.join("\n");
                 $scope.form.$setPristine();
             }).catch($scope.toast_error);
         }

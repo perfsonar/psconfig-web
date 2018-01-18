@@ -41,7 +41,7 @@ function canedit(user, config) {
 router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var find = {};
     if(req.query.find) find = JSON.parse(req.query.find);
-    
+
     //we need to select admins , or can't get _canedit set
     var select = req.query.select;
     if(select && !~select.indexOf("admins")) select += " admins";
@@ -59,6 +59,10 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
             if(err) return next(err);
             configs.forEach(function(config) {
                 config._canedit = canedit(req.user, config);
+                if ( "ma_urls" in config ) {
+                    config.ma_urls = config.ma_urls.join("\n");
+
+                }
             });
             res.json({configs: configs, count: count});
         });
@@ -126,6 +130,13 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             config.tests = req.body.tests;
             config.admins = req.body.admins;
             config.update_date = new Date();
+            if ( "ma_urls" in req.body ) {
+                console.log("ma urls",  req.body.ma_urls.split("\n") );
+
+                config.ma_urls = req.body.ma_urls.split("\n");
+
+
+            }
             config.save(function(err) {
                 if(err) return next(err);
                 config = JSON.parse(JSON.stringify(config));
