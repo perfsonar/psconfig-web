@@ -190,6 +190,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     }
 
     $scope.submit = function() {
+        console.log("submitted! scope.selected", $scope.selected);
         if(!$scope.selected._id) {
             configs.create($scope.selected).then(function(config) {
                 toaster.success("config created successfully!");

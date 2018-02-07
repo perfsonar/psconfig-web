@@ -275,6 +275,12 @@ function generate_mainfo(service, format) {
         //pinger, traceroute
         type = service.type;
     }
+
+    return generate_mainfo_url(locator, format);
+}
+
+function generate_mainfo_url(locator, format) {
+    
     if ( format != "psconfig" ) {
         return {
             read_url: locator,
@@ -291,7 +297,9 @@ function generate_mainfo(service, format) {
         };
 
     }
+
 }
+
 
 function set_test_meta( test, key, value ) {
     if ( ! test._meta ) test._meta = {};
@@ -504,7 +512,7 @@ exports.generate = function(_config, opts, cb) {
                 if ( format == "psconfig" ) {
                     var maInfo = generate_mainfo(service, format);
                     //console.log("maInfo", maInfo);
-                    var maName = "archive" + last_ma_number;
+                    var maName = "host-archive" + last_ma_number;
                     var url = maInfo.data.url;
                     if ( ! ( url in maHash ) ) {
                         psc_archives[ maName ] = maInfo;
@@ -540,14 +548,34 @@ exports.generate = function(_config, opts, cb) {
             if(_host.info['location-code']) site.location['postal_code'] = _host.info['location-code'];//odd one
             org.sites.push(site);
         }
+
+        console.log("_config.ma_urls", _config.ma_urls);
+        var ma_prefix = "test-archive";
+        var last_test_ma_number = 0;
+        _config.ma_urls.forEach(function(url) {
+            var maName = "test-archive" + last_test_ma_number;
+            var maInfo = generate_mainfo_url(url, "psconfig");
+            psc_archives[ maName ] = maInfo;
+            console.log("maInfo", maInfo);
+
+
+
+
+
+            last_test_ma_number++;
+        });
+        // Retrieve MA URLs from the _config object
+
         psconfig.archives = psc_archives;
         psconfig.addresses = psc_addresses;
         psconfig.groups = host_groups;
         //psconfig.groups = psc_groups;
         mc.organizations.push(org);
 
+
         //now the most interesting part..
         _config.tests.forEach(function(test) {
+            //console.log("TESTz", test);
 
             function has_service(host_id) {
                 var host = host_catalog[host_id];

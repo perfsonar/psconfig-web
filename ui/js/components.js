@@ -51,7 +51,7 @@ app.directive('mcTests', function() {
         controller: function($scope, services) {
             services.then(function(_services) { 
 
-                //find the service specified via uuid        
+                //find the service specified via uuid
                 $scope.get_service = function(uuid) {
                     for(var type in _services.recs) {
                         var recs = _services.recs[type];
@@ -61,9 +61,9 @@ app.directive('mcTests', function() {
                     }
                     return null;
                 }
-            }); 
+            });
         }
-    } 
+    }
 });
 
 app.directive('mcAdmins', function() {
@@ -84,7 +84,7 @@ app.directive('mcSpecs', function() {
             }
             $scope.add = function() {
                 $scope.specs[$scope.k] = $scope.v;
-                
+
                 //reset
                 $scope.k = "";
                 $scope.v = "";
