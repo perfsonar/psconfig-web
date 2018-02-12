@@ -280,7 +280,7 @@ function generate_mainfo(service, format) {
 }
 
 function generate_mainfo_url(locator, format) {
-    
+
     if ( format != "psconfig" ) {
         return {
             read_url: locator,
@@ -552,11 +552,15 @@ exports.generate = function(_config, opts, cb) {
         console.log("_config.ma_urls", _config.ma_urls);
         var ma_prefix = "test-archive";
         var last_test_ma_number = 0;
+        var test_mas = [];
         _config.ma_urls.forEach(function(url) {
             var maName = "test-archive" + last_test_ma_number;
+            test_mas.push( maName );
             var maInfo = generate_mainfo_url(url, "psconfig");
             psc_archives[ maName ] = maInfo;
             console.log("maInfo", maInfo);
+
+            //TODO: insert these MAs for all hosts
 
 
 
@@ -609,13 +613,16 @@ exports.generate = function(_config, opts, cb) {
             var name = test.name;
             var testspec = test.testspec;
 
+            console.log("CONFIG  ma_urls", _config.ma_urls);
+            var config_archives = _config.ma_urls;
+
+
             psc_tests[ name ] = {
                 "type": test.service_type,
                 "spec": {
                     "source": "{% address[0] %}",
                     "dest": "{% address[1] %}"
-
-                }
+                },
             };
 
 
@@ -634,7 +641,8 @@ exports.generate = function(_config, opts, cb) {
             psc_tasks[ name ] = {
                 "schedule": "repeat-" + interval,
                 "group": test._meta._hostgroup,
-                "test": test._meta._test
+                "test": test._meta._test,
+                "archives": test_mas
             };
 
             if ( ( "_tool" in test._meta ) &&  typeof test._meta._tool != "undefined" ) {
