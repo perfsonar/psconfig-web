@@ -52,7 +52,7 @@ function resolve_users(uids) {
     if(!profile_cache) return null; //auth profile not loaded yet?
     var users = [];
     uids.forEach(function(uid) {
-        users.push(profile_cache[uid]);  
+        users.push(profile_cache[uid]);
     });
     return users;
 }
@@ -118,6 +118,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
     rename_field( spec, "test-interval", "interval" );
     rename_field( spec, "sample-count", "packet-count" );
     delete spec.tool;
+    delete spec["force-bidirectional"];
 
 
     if ( testspec[ "interval" ] ) {
@@ -137,6 +138,8 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
             psc_schedules[ interval_name ].slip = slip;
 
         }
+
+        delete spec["random-start-percentage"];
 
         //console.log("psc_schedules", psc_schedules);
         //delete testspec[ "test-interval" ];
@@ -435,7 +438,7 @@ exports.generate = function(_config, opts, cb) {
             schedules: {},
             tasks: {},
             _meta: {
-                description: _config.name
+                "display-name": _config.name
             },
 
         }
@@ -506,10 +509,12 @@ exports.generate = function(_config, opts, cb) {
                 }
                 //console.log("SERVICE", service);
 
-                //console.log("SERVICE", service);
-                //TODO: add HOSTS section
+                console.log("_HOST", _host);
 
                 if ( format == "psconfig" ) {
+                    if (!_host.local_ma) {
+                        return;
+                    }
                     var maInfo = generate_mainfo(service, format);
                     //console.log("maInfo", maInfo);
                     var maName = "host-archive" + last_ma_number;
@@ -560,12 +565,6 @@ exports.generate = function(_config, opts, cb) {
             psc_archives[ maName ] = maInfo;
             console.log("maInfo", maInfo);
 
-            //TODO: insert these MAs for all hosts
-
-
-
-
-
             last_test_ma_number++;
         });
         // Retrieve MA URLs from the _config object
@@ -579,7 +578,7 @@ exports.generate = function(_config, opts, cb) {
 
         //now the most interesting part..
         _config.tests.forEach(function(test) {
-            //console.log("TESTz", test);
+            console.log("TESTz", test);
 
             function has_service(host_id) {
                 var host = host_catalog[host_id];
@@ -613,7 +612,6 @@ exports.generate = function(_config, opts, cb) {
             var name = test.name;
             var testspec = test.testspec;
 
-            console.log("CONFIG  ma_urls", _config.ma_urls);
             var config_archives = _config.ma_urls;
 
 
@@ -625,8 +623,12 @@ exports.generate = function(_config, opts, cb) {
                 },
             };
 
+            console.log("psc_tests[ name ].spec",  psc_tests[ name ].spec);
+            console.log("testspec.specs", testspec.specs);
 
-            psc_tests[ name ].spec = testspec.specs;
+            psc_tests[ name + "Z" ] = psc_tests[name];
+             psc_tests[ name ].spec = testspec.specs;
+            //psc_tests[ name ].spec = Object.assign( psc_tests[name].spec, testspec.specs );
 
             var spec = testspec.specs;
 
@@ -642,7 +644,11 @@ exports.generate = function(_config, opts, cb) {
                 "schedule": "repeat-" + interval,
                 "group": test._meta._hostgroup,
                 "test": test._meta._test,
-                "archives": test_mas
+                "archives": test_mas,
+                "_meta": {
+                    "display-name": name
+
+                }
             };
 
             if ( ( "_tool" in test._meta ) &&  typeof test._meta._tool != "undefined" ) {
