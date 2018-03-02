@@ -148,6 +148,7 @@
                     <div class="col-sm-10">
                         <ul class="list-group" ng-if="selected.tests.length > 0">
                             <li class="list-group-item" ng-repeat="test in selected.tests" ng-class="{disabled: !test.enabled, 'slide-down': !test._id}">
+				{{show_map}}
                                 <ng-include src="'t/testeditor.html'"></ng-include>
                             </li>
                         </ul>
