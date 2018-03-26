@@ -267,7 +267,7 @@ function get_type(service_type) {
 }
 
 function generate_mainfo(service, format) {
-    //console.log("generate_mainfo format", format);
+    console.log("generate_mainfo format", format);
     var locator = "http://"+service.ma.hostname+"/esmond/perfsonar/archive";
 
     var type = null;
@@ -279,10 +279,12 @@ function generate_mainfo(service, format) {
         type = service.type;
     }
 
-    return generate_mainfo_url(locator, format);
+    console.log("TYPE", type);
+    if ( typeof type == "undefined" ) console.log("NO TYPE; service, service");
+    return generate_mainfo_url(locator, format, type);
 }
 
-function generate_mainfo_url(locator, format) {
+function generate_mainfo_url(locator, format, type) {
 
     if ( format != "psconfig" ) {
         return {
