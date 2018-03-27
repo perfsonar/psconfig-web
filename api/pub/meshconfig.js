@@ -370,7 +370,7 @@ exports.generate = function(_config, opts, cb) {
 
     var format = opts.format;
     console.log("generate format", format);
-    console.log("_config", _config);
+    //console.log("_config", _config);
     console.log("opts", opts);
 
     //resolve all db entries first
@@ -511,7 +511,7 @@ exports.generate = function(_config, opts, cb) {
                 }
                 //console.log("SERVICE", service);
 
-                console.log("_HOST", _host);
+                //console.log("_HOST", _host);
 
                 if ( format == "psconfig" ) {
                     if (!_host.local_ma) {
@@ -560,15 +560,17 @@ exports.generate = function(_config, opts, cb) {
         var ma_prefix = "test-archive";
         var last_test_ma_number = 0;
         var test_mas = [];
-        _config.ma_urls.forEach(function(url) {
-            var maName = "test-archive" + last_test_ma_number;
-            test_mas.push( maName );
-            var maInfo = generate_mainfo_url(url, "psconfig");
-            psc_archives[ maName ] = maInfo;
-            console.log("maInfo", maInfo);
+        if ( "ma_urls" in _config ) {
+            _config.ma_urls.forEach(function(url) {
+                var maName = "test-archive" + last_test_ma_number;
+                test_mas.push( maName );
+                var maInfo = generate_mainfo_url(url, "psconfig");
+                psc_archives[ maName ] = maInfo;
+                console.log("maInfo", maInfo);
 
-            last_test_ma_number++;
-        });
+                last_test_ma_number++;
+            });
+        }
         // Retrieve MA URLs from the _config object
 
         psconfig.archives = psc_archives;
