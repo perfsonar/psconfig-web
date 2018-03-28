@@ -109,9 +109,8 @@ router.get('/config/:url/:format?', function(req, res, next) {
     //if ( req.params.ma_override) opts.ma_override = req.params.ma_override;
     db.Config.findOne({url: req.params.url}).lean().exec(function(err, config) {
         //console.log("res", res);
-        console.log("err", err);
         if(err) return next(err);
-        console.log("RES.STATUS", res.status);
+        //console.log("RES.STATUS", res.status);
         //if( ! ("status" in res ) ) return next();
         //if ( ! ( "text" in res.status ) ) return next();
 

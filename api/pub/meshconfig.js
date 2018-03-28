@@ -103,7 +103,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
         "duration",
         "interval",
         "test-interval",
-        "packet-interval",
+        //"packet-interval",
         "bucket-width"
     ];
 
@@ -115,15 +115,19 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
     }
 
+    console.log("SPEC BEFORE RENAMES", spec);
     rename_field( spec, "test-interval", "interval" );
     rename_field( spec, "sample-count", "packet-count" );
+
+    console.log("SPEC", spec);
     delete spec.tool;
     delete spec["force-bidirectional"];
 
 
-    if ( testspec[ "interval" ] ) {
+    if ( "interval" in testspec ) {
         var interval = testspec[ "interval" ];
         var interval_name = "repeat-" + interval;
+        console.log("INTERVAL", interval, "INTERVAL_NAME", interval_name);
         psc_schedules[ interval_name ] = {
             "repeat": interval,
             "sliprand": true
@@ -143,6 +147,9 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
         //console.log("psc_schedules", psc_schedules);
         //delete testspec[ "test-interval" ];
+    } else {
+        //console.log("INTERVAL NOT FOUND", testspec);
+
     }
 
 
@@ -556,7 +563,6 @@ exports.generate = function(_config, opts, cb) {
             org.sites.push(site);
         }
 
-        console.log("_config.ma_urls", _config.ma_urls);
         var ma_prefix = "test-archive";
         var last_test_ma_number = 0;
         var test_mas = [];
@@ -630,8 +636,7 @@ exports.generate = function(_config, opts, cb) {
             console.log("psc_tests[ name ].spec",  psc_tests[ name ].spec);
             console.log("testspec.specs", testspec.specs);
 
-            psc_tests[ name + "Z" ] = psc_tests[name];
-             psc_tests[ name ].spec = testspec.specs;
+            psc_tests[ name ].spec = testspec.specs;
             //psc_tests[ name ].spec = Object.assign( psc_tests[name].spec, testspec.specs );
 
             var spec = testspec.specs;
@@ -642,10 +647,10 @@ exports.generate = function(_config, opts, cb) {
             }
 
 
-            var interval = psc_tests[ name ].spec.interval;
+            var interval = psc_tests[ name ].spec["interval"];
+
 
             psc_tasks[ name ] = {
-                "schedule": "repeat-" + interval,
                 "group": test._meta._hostgroup,
                 "test": test._meta._test,
                 "archives": test_mas,
@@ -654,6 +659,13 @@ exports.generate = function(_config, opts, cb) {
 
                 }
             };
+
+            if ( interval ) {
+                psc_tasks[ name ].schedule = "repeat-" +  interval;
+
+            }
+
+            delete psc_tests[ name ].spec["test-interval"];
 
             if ( ( "_tool" in test._meta ) &&  typeof test._meta._tool != "undefined" ) {
                 psc_tasks[ name ].tools = [ test._meta._tool ];

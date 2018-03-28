@@ -18,7 +18,6 @@ exports.profile = {
             json: true,
             headers: { 'Authorization': 'Bearer '+config.common.auth_jwt }
         }, function (err, res, profiles) {
-            if(err) console.log("ERRRRRRRRRRR", err);
             if(err) return cb(err);
             if (res.statusCode != 200) {
                 return cb({message: "couldn't load user profiles from profile service:", code: res.statusCode});
