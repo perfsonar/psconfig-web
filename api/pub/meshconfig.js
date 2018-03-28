@@ -497,6 +497,7 @@ exports.generate = function(_config, opts, cb) {
             //console.log("_host", _host);
             psc_addresses[ _host.hostname ] = {
                 "address":  _host.hostname,
+                "host": _host.hostname,
                 "_meta": {
                     "display-name": _host.desc||_host.sitename
                     // TODO: add org?
@@ -504,6 +505,7 @@ exports.generate = function(_config, opts, cb) {
 
                 }
             };
+            if ( ! ( _host.hostname in psc_hosts) ) psc_hosts[ _host.hostname ]  = {};
 
             //create ma entry for each service
             _host.services.forEach(function(service) {
@@ -532,7 +534,6 @@ exports.generate = function(_config, opts, cb) {
                         psc_archives[ maName ] = maInfo;
                         if ( ! ( "_archive" in _host ) ) _host._archive = [];
                         _host._archive.push(maName);
-                        if ( ! ( _host.hostname in psc_hosts) ) psc_hosts[ _host.hostname ]  = {};
                         if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
                         psc_hosts[ _host.hostname ].archives.push( maName );
                         last_ma_number++;
