@@ -102,9 +102,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
     var iso_fields = [
         "duration",
         "interval",
-        "test-interval",
-        //"packet-interval",
-        "bucket-width"
+        "test-interval"
     ];
 
     for(var i in iso_fields) {
