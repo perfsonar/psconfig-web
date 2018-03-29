@@ -113,11 +113,9 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
     }
 
-    console.log("SPEC BEFORE RENAMES", spec);
     rename_field( spec, "test-interval", "interval" );
     rename_field( spec, "sample-count", "packet-count" );
 
-    console.log("SPEC", spec);
     delete spec.tool;
     delete spec["force-bidirectional"];
 
@@ -125,7 +123,6 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
     if ( "interval" in testspec ) {
         var interval = testspec[ "interval" ];
         var interval_name = "repeat-" + interval;
-        console.log("INTERVAL", interval, "INTERVAL_NAME", interval_name);
         psc_schedules[ interval_name ] = {
             "repeat": interval,
             "sliprand": true
@@ -143,7 +140,6 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
         delete spec["random-start-percentage"];
 
-        //console.log("psc_schedules", psc_schedules);
         //delete testspec[ "test-interval" ];
     } else {
         //console.log("INTERVAL NOT FOUND", testspec);
@@ -272,7 +268,6 @@ function get_type(service_type) {
 }
 
 function generate_mainfo(service, format) {
-    console.log("generate_mainfo format", format);
     var locator = "http://"+service.ma.hostname+"/esmond/perfsonar/archive";
 
     var type = null;
@@ -284,8 +279,7 @@ function generate_mainfo(service, format) {
         type = service.type;
     }
 
-    console.log("TYPE", type);
-    if ( typeof type == "undefined" ) console.log("NO TYPE; service, service");
+    //if ( typeof type == "undefined" ) console.log("NO TYPE; service, service");
     return generate_mainfo_url(locator, format, type);
 }
 
@@ -345,9 +339,6 @@ function generate_group_members( test, group, type, host_groups, host_catalog, n
         test[ group_field ] = hosts;
         hosts.forEach(function(host) {
             host_catalog[host._id] = host;
-            //console.log("host", host);
-            //console.log("host.hostname", host.hostname);
-            //console.log("host ADDRESSES", host.addresses);
             if ( host.hostname ) {
                 host_groups[ test.name ][ addr ].push( 
                     { "name": host.hostname }
@@ -374,14 +365,10 @@ exports.generate = function(_config, opts, cb) {
     var host_groups = {};
 
     var format = opts.format;
-    console.log("generate format", format);
-    //console.log("_config", _config);
-    console.log("opts", opts);
 
     //resolve all db entries first
     if(_config.admins) _config.admins = resolve_users(_config.admins);
     async.eachSeries(_config.tests, function(test, next_test) {
-        console.log("test", test);
         var type = test.mesh_type;
 
         if(!test.enabled) return next_test();
@@ -491,8 +478,6 @@ exports.generate = function(_config, opts, cb) {
             if(_host.no_agent) host.no_agent = 1;
             //logger.warn(_host.hostname, _host.services.length);
 
-            //console.log("host", host);
-            //console.log("_host", _host);
             psc_addresses[ _host.hostname ] = {
                 "address":  _host.hostname,
                 "host": _host.hostname,
@@ -516,16 +501,12 @@ exports.generate = function(_config, opts, cb) {
                     logger.debug(service);
                     return;
                 }
-                //console.log("SERVICE", service);
-
-                //console.log("_HOST", _host);
 
                 if ( format == "psconfig" ) {
                     if (!_host.local_ma) {
                         return;
                     }
                     var maInfo = generate_mainfo(service, format);
-                    //console.log("maInfo", maInfo);
                     var maName = "host-archive" + last_ma_number;
                     var url = maInfo.data.url;
                     if ( ! ( url in maHash ) ) {
@@ -571,7 +552,6 @@ exports.generate = function(_config, opts, cb) {
                 test_mas.push( maName );
                 var maInfo = generate_mainfo_url(url, "psconfig");
                 psc_archives[ maName ] = maInfo;
-                console.log("maInfo", maInfo);
 
                 last_test_ma_number++;
             });
@@ -587,7 +567,6 @@ exports.generate = function(_config, opts, cb) {
 
         //now the most interesting part..
         _config.tests.forEach(function(test) {
-            console.log("TESTz", test);
 
             function has_service(host_id) {
                 var host = host_catalog[host_id];
@@ -632,22 +611,15 @@ exports.generate = function(_config, opts, cb) {
                 },
             };
 
-            console.log("psc_tests[ name ].spec",  psc_tests[ name ].spec);
-            console.log("testspec.specs", testspec.specs);
-
             psc_tests[ name ].spec = testspec.specs;
-            //psc_tests[ name ].spec = Object.assign( psc_tests[name].spec, testspec.specs );
 
             var spec = testspec.specs;
-
 
             if ( format == "psconfig" ) {
                 meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules );
             }
 
-
             var interval = psc_tests[ name ].spec["interval"];
-
 
             psc_tasks[ name ] = {
                 "group": test._meta._hostgroup,

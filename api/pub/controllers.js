@@ -100,17 +100,14 @@ router.get('/config', function(req, res, next) {
  */
 router.get('/config/:url/:format?', function(req, res, next) {
     var format = req.params.format || "meshconfig";
-    console.log("URL " , req.params.url);
     config.format = format;
-    console.log("format", format);
-    //console.log("req", req);
+    logger.debug("format", format);
     var opts = {};
     opts.format = format;
     //if ( req.params.ma_override) opts.ma_override = req.params.ma_override;
     db.Config.findOne({url: req.params.url}).lean().exec(function(err, config) {
-        //console.log("res", res);
         if(err) return next(err);
-        //console.log("RES.STATUS", res.status);
+
         //if( ! ("status" in res ) ) return next();
         //if ( ! ( "text" in res.status ) ) return next();
 

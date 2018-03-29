@@ -131,11 +131,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             config.admins = req.body.admins;
             config.update_date = new Date();
             if ( "ma_urls" in req.body ) {
-                console.log("ma urls",  req.body.ma_urls.split("\n") );
-
                 config.ma_urls = req.body.ma_urls.split("\n");
-
-
             }
             config.save(function(err) {
                 if(err) return next(err);

@@ -12,7 +12,6 @@ const db = require('./models');
 
 exports.profile = {
     getall: function(cb) { 
-        console.log( "url " + config.common.auth_api+"/profiles" );
         request.get({
             url: config.common.auth_api+"/profiles",
             json: true,

@@ -110,7 +110,6 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     }
 
     $scope.refreshHosts = function(query, test) {
-        console.log("refreshing hosts");
         var select = "sitename hostname lsid";
         var find = {};
         if(query) {
@@ -190,7 +189,6 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     }
 
     $scope.submit = function() {
-        console.log("submitted! scope.selected", $scope.selected);
         if(!$scope.selected._id) {
             configs.create($scope.selected).then(function(config) {
                 toaster.success("config created successfully!");
@@ -222,7 +220,6 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     }
 
     $scope.import = function() {
-        console.log("importing", $scope.importer_url);
         $http.put(appconf.api+'/configs/import', {url: $scope.importer_url})
         .then(function(res) {
             console.dir(res.data.tests);
