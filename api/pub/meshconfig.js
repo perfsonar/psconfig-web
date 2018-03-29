@@ -52,7 +52,7 @@ function resolve_users(uids) {
     if(!profile_cache) return null; //auth profile not loaded yet?
     var users = [];
     uids.forEach(function(uid) {
-        users.push(profile_cache[uid]);  
+        users.push(profile_cache[uid]);
     });
     return users;
 }
@@ -102,9 +102,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
     var iso_fields = [
         "duration",
         "interval",
-        "test-interval",
-        "packet-interval",
-        "bucket-width"
+        "test-interval"
     ];
 
     for(var i in iso_fields) {
@@ -117,10 +115,12 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
     rename_field( spec, "test-interval", "interval" );
     rename_field( spec, "sample-count", "packet-count" );
+
     delete spec.tool;
+    delete spec["force-bidirectional"];
 
 
-    if ( testspec[ "interval" ] ) {
+    if ( "interval" in testspec ) {
         var interval = testspec[ "interval" ];
         var interval_name = "repeat-" + interval;
         psc_schedules[ interval_name ] = {
@@ -138,8 +138,12 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
         }
 
-        //console.log("psc_schedules", psc_schedules);
+        delete spec["random-start-percentage"];
+
         //delete testspec[ "test-interval" ];
+    } else {
+        //console.log("INTERVAL NOT FOUND", testspec);
+
     }
 
 
@@ -264,7 +268,6 @@ function get_type(service_type) {
 }
 
 function generate_mainfo(service, format) {
-    //console.log("generate_mainfo format", format);
     var locator = "http://"+service.ma.hostname+"/esmond/perfsonar/archive";
 
     var type = null;
@@ -275,6 +278,13 @@ function generate_mainfo(service, format) {
         //pinger, traceroute
         type = service.type;
     }
+
+    //if ( typeof type == "undefined" ) console.log("NO TYPE; service, service");
+    return generate_mainfo_url(locator, format, type);
+}
+
+function generate_mainfo_url(locator, format, type) {
+
     if ( format != "psconfig" ) {
         return {
             read_url: locator,
@@ -291,7 +301,9 @@ function generate_mainfo(service, format) {
         };
 
     }
+
 }
+
 
 function set_test_meta( test, key, value ) {
     if ( ! test._meta ) test._meta = {};
@@ -319,15 +331,14 @@ function generate_group_members( test, group, type, host_groups, host_catalog, n
 
         set_test_meta( test, "_hostgroup", test.name );
         set_test_meta( test, "_test", test.name );
-        set_test_meta( test, "_tool", convert_tool( test.testspec.specs.tool ));
+        if ( ( "testspec" in test ) && ("specs" in test.testspec ) && ( "tool" in test.testspec.specs ) ) {
+            set_test_meta( test, "_tool", convert_tool( test.testspec.specs.tool ));
+        }
 
         if(err) return next(err);
         test[ group_field ] = hosts;
         hosts.forEach(function(host) {
             host_catalog[host._id] = host;
-            //console.log("host", host);
-            //console.log("host.hostname", host.hostname);
-            //console.log("host ADDRESSES", host.addresses);
             if ( host.hostname ) {
                 host_groups[ test.name ][ addr ].push( 
                     { "name": host.hostname }
@@ -354,14 +365,10 @@ exports.generate = function(_config, opts, cb) {
     var host_groups = {};
 
     var format = opts.format;
-    console.log("generate format", format);
-    console.log("_config", _config);
-    console.log("opts", opts);
 
     //resolve all db entries first
     if(_config.admins) _config.admins = resolve_users(_config.admins);
     async.eachSeries(_config.tests, function(test, next_test) {
-        console.log("test", test);
         var type = test.mesh_type;
 
         if(!test.enabled) return next_test();
@@ -425,7 +432,7 @@ exports.generate = function(_config, opts, cb) {
             schedules: {},
             tasks: {},
             _meta: {
-                description: _config.name
+                "display-name": _config.name
             },
 
         }
@@ -471,10 +478,9 @@ exports.generate = function(_config, opts, cb) {
             if(_host.no_agent) host.no_agent = 1;
             //logger.warn(_host.hostname, _host.services.length);
 
-            //console.log("host", host);
-            //console.log("_host", _host);
             psc_addresses[ _host.hostname ] = {
                 "address":  _host.hostname,
+                "host": _host.hostname,
                 "_meta": {
                     "display-name": _host.desc||_host.sitename
                     // TODO: add org?
@@ -482,6 +488,7 @@ exports.generate = function(_config, opts, cb) {
 
                 }
             };
+            if ( ! ( _host.hostname in psc_hosts) ) psc_hosts[ _host.hostname ]  = {};
 
             //create ma entry for each service
             _host.services.forEach(function(service) {
@@ -494,21 +501,18 @@ exports.generate = function(_config, opts, cb) {
                     logger.debug(service);
                     return;
                 }
-                //console.log("SERVICE", service);
-
-                //console.log("SERVICE", service);
-                //TODO: add HOSTS section
 
                 if ( format == "psconfig" ) {
+                    if (!_host.local_ma) {
+                        return;
+                    }
                     var maInfo = generate_mainfo(service, format);
-                    //console.log("maInfo", maInfo);
-                    var maName = "archive" + last_ma_number;
+                    var maName = "host-archive" + last_ma_number;
                     var url = maInfo.data.url;
                     if ( ! ( url in maHash ) ) {
                         psc_archives[ maName ] = maInfo;
                         if ( ! ( "_archive" in _host ) ) _host._archive = [];
                         _host._archive.push(maName);
-                        if ( ! ( _host.hostname in psc_hosts) ) psc_hosts[ _host.hostname ]  = {};
                         if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
                         psc_hosts[ _host.hostname ].archives.push( maName );
                         last_ma_number++;
@@ -538,11 +542,28 @@ exports.generate = function(_config, opts, cb) {
             if(_host.info['location-code']) site.location['postal_code'] = _host.info['location-code'];//odd one
             org.sites.push(site);
         }
+
+        var ma_prefix = "test-archive";
+        var last_test_ma_number = 0;
+        var test_mas = [];
+        if ( "ma_urls" in _config ) {
+            _config.ma_urls.forEach(function(url) {
+                var maName = "test-archive" + last_test_ma_number;
+                test_mas.push( maName );
+                var maInfo = generate_mainfo_url(url, "psconfig");
+                psc_archives[ maName ] = maInfo;
+
+                last_test_ma_number++;
+            });
+        }
+        // Retrieve MA URLs from the _config object
+
         psconfig.archives = psc_archives;
         psconfig.addresses = psc_addresses;
         psconfig.groups = host_groups;
         //psconfig.groups = psc_groups;
         mc.organizations.push(org);
+
 
         //now the most interesting part..
         _config.tests.forEach(function(test) {
@@ -579,33 +600,43 @@ exports.generate = function(_config, opts, cb) {
             var name = test.name;
             var testspec = test.testspec;
 
+            var config_archives = _config.ma_urls;
+
+
             psc_tests[ name ] = {
                 "type": test.service_type,
                 "spec": {
                     "source": "{% address[0] %}",
                     "dest": "{% address[1] %}"
-
-                }
+                },
             };
-
 
             psc_tests[ name ].spec = testspec.specs;
 
             var spec = testspec.specs;
 
-
             if ( format == "psconfig" ) {
                 meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules );
             }
 
-
-            var interval = psc_tests[ name ].spec.interval;
+            var interval = psc_tests[ name ].spec["interval"];
 
             psc_tasks[ name ] = {
-                "schedule": "repeat-" + interval,
                 "group": test._meta._hostgroup,
-                "test": test._meta._test
+                "test": test._meta._test,
+                "archives": test_mas,
+                "_meta": {
+                    "display-name": name
+
+                }
             };
+
+            if ( interval ) {
+                psc_tasks[ name ].schedule = "repeat-" +  interval;
+
+            }
+
+            delete psc_tests[ name ].spec["test-interval"];
 
             if ( ( "_tool" in test._meta ) &&  typeof test._meta._tool != "undefined" ) {
                 psc_tasks[ name ].tools = [ test._meta._tool ];

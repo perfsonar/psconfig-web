@@ -158,7 +158,7 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
     db.Testspec.findById(req.params.id, function(err, testspec) {
         if(err) return next(err);
         if(!testspec) return next(new Error("can't find a testspec with id:"+req.params.id));
-        
+
         async.series([
             //check access 
             function(cb) {

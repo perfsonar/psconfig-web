@@ -14,7 +14,8 @@ mongoose.Promise = global.Promise;
 
 exports.init = function(cb) {
     mongoose.connect(config.mongodb, {
-        server: { reconnectTries: Number.MAX_VALUE}
+        reconnectTries: Number.MAX_VALUE
+        , useMongoClient: true
     }, function(err) {
         if(err) {
             logger.error(err);
@@ -66,6 +67,13 @@ var hostSchema = mongoose.Schema({
 
     toolkit_url: String,
     no_agent: {type: Boolean, default: false},
+
+    // whether to use the local host MA
+    local_ma: {type: Boolean, default: false},
+
+    local_ma_url: String,
+
+    ma_urls: [ String ],
 
     //host info (pshost-toolkitversion, host-hardware-memory, host-os-version, host-hadeware-processorspeed, host-hadware-processorcount)
     //and location info (location-state, location-city, location-country, etc..)
@@ -159,6 +167,7 @@ var configSchema = mongoose.Schema({
     admins: [ String ], //array of user ids (sub string in auth service)
     create_date: {type: Date, default: Date.now},
     update_date: {type: Date, default: Date.now},
+    ma_urls: [ String ] // an array of measurement archive URLs to archive test results to
 
 });
 exports.Config = mongoose.model('Config', configSchema);
