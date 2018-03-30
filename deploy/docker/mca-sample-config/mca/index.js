@@ -9,7 +9,7 @@ exports.meshconfig = {
     //service-types to support
     service_types: {
         "owamp": {label: "Latency"},
-        "bwctl": {label: "Bandwidth"},
+        "bwctl": {label: "Throughput"},
         "traceroute": {label: "Traceroute"},
         "ping": {label: "Pinger"},
     },

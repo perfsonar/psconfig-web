@@ -258,10 +258,10 @@ function generate_members(hosts) {
 
 function get_type(service_type) {
     switch(service_type) {
-    case "bwctl": 
-    case "owamp": 
+    case "bwctl":
+    case "owamp":
         return "perfsonarbuoy/"+service_type;
-    case "ping": 
+    case "ping":
         return "pinger";
     }
     return service_type; //no change
@@ -269,6 +269,10 @@ function get_type(service_type) {
 
 function generate_mainfo(service, format) {
     var locator = "http://"+service.ma.hostname+"/esmond/perfsonar/archive";
+
+    if ( service.ma.local_ma_url ) {
+        locator = service.ma.local_ma_url;
+    }
 
     var type = null;
     switch(service.type) {
@@ -521,7 +525,7 @@ exports.generate = function(_config, opts, cb) {
 
                     }
                 } else {
-                    host.measurement_archives.push(generate_mainfo(service));
+                    host.measurement_archives.push(generate_mainfo(service, format));
                 }
 
             });

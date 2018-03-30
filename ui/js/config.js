@@ -139,7 +139,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
             hostids.push(id);
         });
         if(test.center) hostids.push(test.center);
-    
+
         //load hosts from hostids
         var select = "sitename hostname lsid info.location-latitude info.location-longitude";
         var find = {_id: {$in: hostids}};

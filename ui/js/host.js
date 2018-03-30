@@ -64,7 +64,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
             } else $scope.select(_hosts[0]); //select first one then
         });
     });
-    
+
     function reset_mapinfo() {
         delete $scope.selected.map;
         if( !$scope.selected.info["location-latitude"] ||
@@ -99,7 +99,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
             '&find='+encodeURIComponent(JSON.stringify({"hosts":host._id})))
         .then(function(res) {
             $scope.hostgroups = res.data.hostgroups;
-            
+
             //then load tests that these hostgroups are used in
             var hostgroup_ids = $scope.hostgroups.map(function(hostgroup) { return hostgroup._id});
             //console.dir(hostgroup_ids);
@@ -227,7 +227,6 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         } else {
             hosts.update($scope.selected).then(function(host) {
                 toaster.success("Host updated successfully!");
-                console.log("SUBMIT HOST", host);
                 host.ma_urls = host.ma_urls.join("\n");
                 $scope.form.$setPristine();
             }).catch($scope.toast_error);

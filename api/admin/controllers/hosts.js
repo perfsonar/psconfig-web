@@ -59,7 +59,6 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
                 host._canedit = canedit(req.user, host);
                 // format ma_urls
                 if ( ( "ma_urls" in host ) && Array.isArray( host.ma_urls ) && host.ma_urls.length > 0 ) {
-                    console.log("MA_URLS", host.ma_urls);
                     host.ma_urls = host.ma_urls.join("\n");
 
                 }
@@ -136,8 +135,13 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
         host.no_agent = req.body.no_agent;
         host.local_ma = req.body.local_ma;
         host.local_ma_url = req.body.local_ma_url;
-        if( typeof host.ma_urls != "undefined" ) {
-            host.ma_urls = req.body.ma_urls.split("\n");
+        if( ( typeof req.body.ma_urls ) != "undefined" ) {
+            if ( req.body.ma_urls != "" ) {
+                host.ma_urls = req.body.ma_urls.split("\n");
+            } else {
+                host.ma_urls = [];
+
+            }
         }
         host.toolkit_url = req.body.toolkit_url;
         host.desc = req.body.desc;
@@ -156,7 +160,6 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
 
         host.save(function(err) {
             if(err) return next(err);
-            //console.log(JSON.stringify(host.services, null, 4));
             host = JSON.parse(JSON.stringify(host));
             host._canedit = canedit(req.user, host);
             res.json(host);
