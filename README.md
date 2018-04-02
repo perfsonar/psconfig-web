@@ -52,7 +52,7 @@ You should install logrotate for docker container log
 
 /etc/logrotate.d/docker-container
 ```
-/docker/containers/*/*.log {
+/var/lib/docker/containers/*/*.log {
   rotate 7
   daily
   compress

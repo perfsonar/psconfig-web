@@ -335,9 +335,10 @@ function generate_group_members( test, group, type, host_groups, host_catalog, n
 
         set_test_meta( test, "_hostgroup", test.name );
         set_test_meta( test, "_test", test.name );
+
         if ( ( "testspec" in test ) && ("specs" in test.testspec ) && ( "tool" in test.testspec.specs ) ) {
             set_test_meta( test, "_tool", convert_tool( test.testspec.specs.tool ));
-        }
+        } 
 
         if(err) return next(err);
         test[ group_field ] = hosts;

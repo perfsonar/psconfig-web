@@ -63,7 +63,7 @@ function create_hostrec(service, uri, cb) {
         var rec = {
             info: get_hostinfo(host),
             communities: host['group-communities']||[],
-            services: [],
+            services: [{type: "traceroute"}, {type: "ping"}],
 
             //TODO .. I am not sure what we can do with host-administrators
             //host['host-administrators'],
@@ -177,7 +177,7 @@ function cache_ls(hosts, ls, lsid, cb) {
                     //"https://192.12.15.111/services/MP/OWAMP",
                     //"https://[2620:0:210:1::111]/services/MP/OWAMP"
                     //],
-                    var len = service['service-locator'].length;
+                    //var len = service['service-locator'].length;
                     //var locator = service['service-locator'][len-1];
 
                     //construct service record
