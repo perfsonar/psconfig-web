@@ -39,7 +39,7 @@
 
 <div class="form-group">
     <label class="col-sm-2 control-label"></label>
-    <div class="col-sm-10">
+    <div class="col-sm-10" ng-if="show_map">
         <ui-gmap-google-map center="test.map.center" zoom="test.map.zoom" options="test.map.options">
             <ui-gmap-markers fit="true" models="test.map.markers" coords="'self'" icon="'icon'"></ui-gmap-markers>
         </ui-gmap-google-map>

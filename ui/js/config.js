@@ -1,9 +1,9 @@
 
 app.controller('ConfigsController',
-function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, hostgroups, configs, $routeParams, testspecs, uiGmapGoogleMapApi) {
+function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, hostgroups, configs, $routeParams, testspecs, uiGmapGoogleMapApi, $timeout) {
     scaMessage.show(toaster);
     $scope.active_menu = "configs";
-    //$scope.importer_url = "";
+    $scope.show_map = false;
 
     //start loading things (should I parallelize)
     users.getAll().then(function(_users) {
@@ -25,6 +25,12 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
                         //select first one
                         if($scope.configs.length > 0) $scope.select($scope.configs[0]);
                     }
+
+		    //delay showing map slightly to prevent gmap to miss resize event?
+		    //TODO - figure out what's going on with gmap and fix it instead of this hack..
+		    $timeout(()=>{
+			$scope.show_map = true;
+		    });
                 });
             });
         });
@@ -42,12 +48,6 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
         $location.update_path("/configs/"+config._id);
         window.scrollTo(0,0);
     }
-
-    /*
-    $scope.$watchCollection('selected.config', function() {
-        console.log("config changed");
-    });
-    */
 
     function reset_map(test) {
         test.map = {
