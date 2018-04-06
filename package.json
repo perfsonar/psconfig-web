@@ -1,6 +1,6 @@
 {
   "name": "MCA",
-  "version": "3.0.2",
+  "version": "3.0.4",
   "description": "Tools to generate / publish meshconfig",
   "scripts": {
     "test": "mocha",

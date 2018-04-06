@@ -1,7 +1,7 @@
 {
   "name": "mca-ui",
-  "version": "1.0.0",
-  "description": "UI components for SCA authentication service",
+  "version": "3.0.4",
+  "description": "UI components for MCA UI service",
   "main": "config.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
