@@ -116,6 +116,7 @@ exports.datasource = {
     lses: {
         //Global LS
         //if hostname collision happens, first datasource will take precedence
+/*
         "atlas": {
             label: 'ATLAS',
             type: 'global-sls',
@@ -134,12 +135,22 @@ exports.datasource = {
             activehosts_url: 'http://ps1.es.net:8096/lookup/activehosts.json',
             query: '?type=service&group-communities=OSG,opensciencegrid&group-communities-operator=any',
         },
+*/
+        //gLS instance
+        "gls": {
+            label: 'GLS',
+            type: 'global-sls',
+            activehosts_url: 'http://ps1.es.net:8096/lookup/activehosts.json',
+            query: '?type=service',
+        }
+/*
         "test": {
             label: 'test',
             type: 'global-sls',
             activehosts_url: 'http://ps1.es.net:8096/lookup/activehosts.json',
             query: '?type=service&group-communities=pS-Testbed&group-communities-operator=any',
         },
+*/
 
         // Private sLS instance
         // only uncomment this if you are running a private sLS instance
