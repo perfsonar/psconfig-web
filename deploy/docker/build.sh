@@ -5,9 +5,16 @@ rm -rf mca-admin/tmp
 mkdir mca-admin/tmp
 cp -r ../../api mca-admin/tmp
 rm -f mca-admin/tmp/api/config.js
+rm -f mca-admin/tmp/api/auth.pub
+rm -f mca-admin/tmp/api/auth.key
+rm -f mca-admin/tmp/api/user.jwt
+
 cp -r ../../ui mca-admin/tmp
 cp -r ../../package.json mca-admin/tmp
 rm -rf mca-admin/tmp/api/config
+rm -f mca-admin/tmp/api/auth.pub
+rm -f mca-admin/tmp/api/auth.key
+rm -f mca-admin/tmp/api/user.jwt
 
 docker build mca-admin -t perfsonar/mca-admin
 if [ ! $? -eq 0 ]; then
