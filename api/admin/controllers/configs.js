@@ -11,6 +11,7 @@ const request = require('request');
 //mine
 const config = require('../../config');
 const logger = new winston.Logger(config.logger.winston);
+
 const db = require('../../models');
 const importer = require('./importer');
 
@@ -119,6 +120,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
     db.Config.findById(req.params.id, function(err, config) {
         if(err) return next(err);
         if(!config) return next(new Error("can't find a config with id:"+req.params.id));
+
         if(canedit(req.user, config)) {
             config.url = req.body.url;
             if ( req.body.name ) {
@@ -129,6 +131,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             }
             config.tests = req.body.tests;
             config.admins = req.body.admins;
+            config.force_endpoint_mas = req.body.force_endpoint_mas;
             config.update_date = new Date();
             if ( "ma_urls" in req.body ) {
                 config.ma_urls = req.body.ma_urls.split("\n");

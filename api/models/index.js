@@ -167,7 +167,8 @@ var configSchema = mongoose.Schema({
     admins: [ String ], //array of user ids (sub string in auth service)
     create_date: {type: Date, default: Date.now},
     update_date: {type: Date, default: Date.now},
-    ma_urls: [ String ] // an array of measurement archive URLs to archive test results to
+    ma_urls: [ String ], // an array of measurement archive URLs to archive test results to
+    force_endpoint_mas: {type: Boolean, default: false} // bool determining whether to force archiving to MAs on all hosts in the config
 
 });
 exports.Config = mongoose.model('Config', configSchema);

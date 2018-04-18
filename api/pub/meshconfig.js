@@ -508,7 +508,7 @@ exports.generate = function(_config, opts, cb) {
                 }
 
                 if ( format == "psconfig" ) {
-                    if (!_host.local_ma) {
+                    if ( !_host.local_ma && !_config.force_endpoint_mas ) {
                         return;
                     }
                     var maInfo = generate_mainfo(service, format);
