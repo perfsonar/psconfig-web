@@ -258,11 +258,12 @@ function generate_members(hosts) {
 
 function get_type(service_type) {
     switch(service_type) {
-    case "bwctl":
-    case "owamp":
-        return "perfsonarbuoy/"+service_type;
-    case "ping":
-        return "pinger";
+        case "bwctl":
+            return "perfsonarbuoy/"+service_type;
+        case "owamp":
+            return "perfsonarbuoy/"+service_type;
+        case "ping":
+            return "pinger";
     }
     return service_type; //no change
 }
@@ -275,12 +276,17 @@ function generate_mainfo(service, format) {
     }
 
     var type = null;
-    switch(service.type) {
-    case "bwctl": type = "perfsonarbuoy/bwctl"; break;
-    case "owamp": type = "perfsonarbuoy/owamp"; break;
-    default:
-        //pinger, traceroute
+    if ( format == "pscheduler" ) {
+        switch(service.type) {
+            case "bwctl": type = "perfsonarbuoy/bwctl"; break;
+            case "owamp": type = "perfsonarbuoy/owamp"; break;
+            default:
+                          //pinger, traceroute
+                          type = service.type;
+        }
+    } else {
         type = service.type;
+
     }
 
     //if ( typeof type == "undefined" ) console.log("NO TYPE; service, service");
@@ -426,6 +432,7 @@ exports.generate = function(_config, opts, cb) {
             organizations: [],
             tests: [],
             description: _config.name,
+            archives: []
         };
 
         //psconfig root template
@@ -462,6 +469,8 @@ exports.generate = function(_config, opts, cb) {
 
         var last_ma_number = 0;
         var maHash = {};
+        var mc_test_types = {};
+        var config_mas = [];
         var psc_addresses = {};
         var psc_groups = {};
         // make a list of the psconfig archives
@@ -496,37 +505,45 @@ exports.generate = function(_config, opts, cb) {
             if ( ! ( _host.hostname in psc_hosts) ) psc_hosts[ _host.hostname ]  = {};
 
             //create ma entry for each service
+            // TODO: change this to check test types under _config rather than _service
+            // and then make sure thay the service exists on the host also?
             _host.services.forEach(function(service) {
                 if(service.type == "mp-bwctl") return;
                 if(service.type == "ma") return;
                 if(service.type == "mp-owamp") return;
                 if(opts.ma_override) service.ma = { hostname: opts.ma_override }
+                mc_test_types[ service.type ] = 1;
                 if(!service.ma) {
                     logger.error("NO MA service running on ..");
                     logger.debug(service);
                     return;
                 }
 
+                if ( !_host.local_ma && !_config.force_endpoint_mas ) {
+                    return;
+                }
+                var maInfo = generate_mainfo(service, format);
+                var maName = "host-archive" + last_ma_number;
+                var url = "";
                 if ( format == "psconfig" ) {
-                    if ( !_host.local_ma && !_config.force_endpoint_mas ) {
-                        return;
-                    }
-                    var maInfo = generate_mainfo(service, format);
-                    var maName = "host-archive" + last_ma_number;
-                    var url = maInfo.data.url;
-                    if ( ! ( url in maHash ) ) {
-                        psc_archives[ maName ] = maInfo;
-                        if ( ! ( "_archive" in _host ) ) _host._archive = [];
-                        _host._archive.push(maName);
-                        if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
-                        psc_hosts[ _host.hostname ].archives.push( maName );
-                        last_ma_number++;
-                        maHash[url] = 1;
-                    } else {
-
-                    }
+                    url = maInfo.data.url;
                 } else {
-                    host.measurement_archives.push(generate_mainfo(service, format));
+                    url = maInfo.write_url;
+                }
+
+                if ( ! ( url in maHash ) ) {
+                    psc_archives[ maName ] = maInfo;
+                    if ( ! ( "_archive" in _host ) ) _host._archive = [];
+                    _host._archive.push(maName);
+                    if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
+                    psc_hosts[ _host.hostname ].archives.push( maName );
+
+                host.measurement_archives.push(generate_mainfo(service, format));
+
+                    last_ma_number++;
+                    maHash[url] = 1;
+                } else {
+
                 }
 
             });
@@ -552,14 +569,26 @@ exports.generate = function(_config, opts, cb) {
         var last_test_ma_number = 0;
         var test_mas = [];
         if ( "ma_urls" in _config ) {
-            _config.ma_urls.forEach(function(url) {
+            for(var i in _config.ma_urls ) {
+                var url = _config.ma_urls[i];
+
                 var maName = "test-archive" + last_test_ma_number;
                 test_mas.push( maName );
-                var maInfo = generate_mainfo_url(url, "psconfig");
+                var maInfo;
+
+                for(var type in mc_test_types ) {
+                    maInfo = generate_mainfo_url(url, format);
+                    if ( format != "psconfig" ) type = get_type(type);
+                    maInfo.type = type;
+                    if ( typeof maInfo.type == "undefined" ) return;
+                    config_mas.push( maInfo );
+
+                }
+
                 psc_archives[ maName ] = maInfo;
 
                 last_test_ma_number++;
-            });
+            }
         }
         // Retrieve MA URLs from the _config object
 
@@ -568,6 +597,7 @@ exports.generate = function(_config, opts, cb) {
         psconfig.groups = host_groups;
         //psconfig.groups = psc_groups;
         mc.organizations.push(org);
+        mc.archives.push(config_mas);
 
 
         //now the most interesting part..

@@ -20,7 +20,7 @@ var cache_status = null;
  * @apiSuccess {String} status 'ok' or 'failed'
  */
 router.get('/health', function(req, res) {
-    
+
     var status = "ok";
     var msg = "everything looks good";
 
