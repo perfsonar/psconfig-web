@@ -299,7 +299,7 @@ function generate_mainfo_url(locator, format, type) {
         return {
             read_url: locator,
             write_url: locator,
-            type: type,
+            type: get_type(type),
         };
     } else {
         return {
@@ -471,6 +471,7 @@ exports.generate = function(_config, opts, cb) {
         var maHash = {};
         var mc_test_types = {};
         var config_mas = [];
+        var config_service_types = [];
         var psc_addresses = {};
         var psc_groups = {};
         // make a list of the psconfig archives
@@ -479,6 +480,15 @@ exports.generate = function(_config, opts, cb) {
         var psc_schedules = {};
         var psc_tasks = {};
         var psc_hosts = {};
+
+        _config.tests.forEach(function(test) {
+            var service = test.service_type;
+            //var maInfo = generate_mainfo(service, format);
+            config_service_types.push( service );
+
+
+        });
+
 
         //register sites(hosts)
         for(var id in host_catalog) {
@@ -505,8 +515,6 @@ exports.generate = function(_config, opts, cb) {
             if ( ! ( _host.hostname in psc_hosts) ) psc_hosts[ _host.hostname ]  = {};
 
             //create ma entry for each service
-            // TODO: change this to check test types under _config rather than _service
-            // and then make sure thay the service exists on the host also?
             _host.services.forEach(function(service) {
                 if(service.type == "mp-bwctl") return;
                 if(service.type == "ma") return;
@@ -529,7 +537,13 @@ exports.generate = function(_config, opts, cb) {
                     url = maInfo.data.url;
                 } else {
                     url = maInfo.write_url;
+                    var mc_type = get_type(service.type);
+                    if(config_service_types.indexOf(service.type) != -1) {
+
+                        host.measurement_archives.push(generate_mainfo(service, format));
+                    }
                 }
+
 
                 if ( ! ( url in maHash ) ) {
                     psc_archives[ maName ] = maInfo;
@@ -538,7 +552,6 @@ exports.generate = function(_config, opts, cb) {
                     if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
                     psc_hosts[ _host.hostname ].archives.push( maName );
 
-                host.measurement_archives.push(generate_mainfo(service, format));
 
                     last_ma_number++;
                     maHash[url] = 1;
@@ -577,11 +590,17 @@ exports.generate = function(_config, opts, cb) {
                 var maInfo;
 
                 for(var type in mc_test_types ) {
-                    maInfo = generate_mainfo_url(url, format);
+                    maInfo = generate_mainfo_url(url, format, type);
+                    if ( typeof maInfo.type == "undefined" ) continue;
+
+
+                    if(config_service_types.indexOf(type) != -1) {
+                        config_mas.push( maInfo );
+                    }
                     if ( format != "psconfig" ) type = get_type(type);
+                    var service = maInfo.type;
                     maInfo.type = type;
-                    if ( typeof maInfo.type == "undefined" ) return;
-                    config_mas.push( maInfo );
+
 
                 }
 
