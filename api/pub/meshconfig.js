@@ -432,7 +432,7 @@ exports.generate = function(_config, opts, cb) {
             organizations: [],
             tests: [],
             description: _config.name,
-            archives: []
+            measurement_archives: []
         };
 
         //psconfig root template
@@ -514,6 +514,19 @@ exports.generate = function(_config, opts, cb) {
             };
             if ( ! ( _host.hostname in psc_hosts) ) psc_hosts[ _host.hostname ]  = {};
 
+
+            var last_host_ma_number = 0;
+            var extra_mas = {};
+            if ( "ma_urls" in _host &&  _host.ma_urls.length > 0  ) {
+                for(var i in _host.ma_urls ) {
+                    var extra_url = _host.ma_urls[i];
+                    var maInfo = generate_mainfo_url(extra_url, format, service);
+                    var maName = "host-additional-archive" + last_host_ma_number;
+                    extra_mas[maName] = extra_url;
+                    last_host_ma_number++;
+                }
+            }
+
             //create ma entry for each service
             _host.services.forEach(function(service) {
                 if(service.type == "mp-bwctl") return;
@@ -527,35 +540,55 @@ exports.generate = function(_config, opts, cb) {
                     return;
                 }
 
-                if ( !_host.local_ma && !_config.force_endpoint_mas ) {
+                if ( !_host.local_ma && !_config.force_endpoint_mas && !_host.ma_urls ) {
                     return;
                 }
                 var maInfo = generate_mainfo(service, format);
                 var maName = "host-archive" + last_ma_number;
                 var url = "";
+                
                 if ( format == "psconfig" ) {
                     url = maInfo.data.url;
                 } else {
                     url = maInfo.write_url;
                     var mc_type = get_type(service.type);
-                    if(config_service_types.indexOf(service.type) != -1) {
+                    if(config_service_types.indexOf(service.type) != -1 && _host.local_ma) {
 
                         host.measurement_archives.push(generate_mainfo(service, format));
                     }
                 }
 
+                // Handle host main MA 
+                if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
+                if ( ! ( "_archive" in _host ) ) _host._archive = [];
 
-                if ( ! ( url in maHash ) ) {
+                if ( ( ! ( url in maHash ) ) && _host.local_ma ) {
                     psc_archives[ maName ] = maInfo;
-                    if ( ! ( "_archive" in _host ) ) _host._archive = [];
                     _host._archive.push(maName);
-                    if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
                     psc_hosts[ _host.hostname ].archives.push( maName );
 
 
                     last_ma_number++;
                     maHash[url] = 1;
                 } else {
+                }
+
+                // Handle extra host MAs
+
+                for(var key in extra_mas ) {
+                    var maName = key;
+                    var url = extra_mas[key];
+                    var maInfo =  generate_mainfo_url( url, format, service.type);
+
+                    if ( ! ( url in maHash ) ) {
+                        psc_archives[ maName ] = maInfo;
+                        psc_hosts[ _host.hostname ].archives.push( maName );
+                        maHash[url] = 1;
+                    }
+                    if(config_service_types.indexOf(service.type) != -1) {
+                        _host._archive.push(maName);
+                        host.measurement_archives.push( maInfo );
+                    }
 
                 }
 
@@ -616,7 +649,7 @@ exports.generate = function(_config, opts, cb) {
         psconfig.groups = host_groups;
         //psconfig.groups = psc_groups;
         mc.organizations.push(org);
-        mc.archives.push(config_mas);
+        mc.measurement_archives = config_mas;
 
 
         //now the most interesting part..
