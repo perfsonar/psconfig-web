@@ -134,16 +134,24 @@ exports.import = function(url, sub, cb) {
 
         var meshconfig_desc = meshconfig.description;
 
+        var out = meshconfig;
+        out = JSON.stringify( out, null, "\t" );
+        logger.debug("IMPORTED MESHCONFIG\n" + out);
+
         //process hosts
         var hosts_info = [];
         meshconfig.organizations.forEach(function(org) {
             org.sites.forEach(function(site) {
+                if ( !( "hosts" in site ) ) return;
                 site.hosts.forEach(function(host) {
                     var services = [];
-                    host.measurement_archives.forEach(function(ma) {
-                        var read_url = ma.read_url; //TODO
-                        services.push({type: get_service_type(ma.type)});
-                    });
+
+                    if ( "measurement_archives" in host ) {
+                        host.measurement_archives.forEach(function(ma) {
+                            var read_url = ma.read_url; //TODO
+                            services.push({type: get_service_type(ma.type)});
+                        });
+                    }
 
                     var host_info = {
                         services: services,
