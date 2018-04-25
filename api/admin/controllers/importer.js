@@ -81,7 +81,7 @@ function ensure_hostgroups(hostgroups, cb) {
             if(_hostgroup) {
                 logger.debug("hostgroup seems to already exists");
                 hostgroup._id = _hostgroup._id;
-                return next_hostgroup(); 
+                return next_hostgroup();
             } else {
                 logger.debug("need to create hostgroup resolving hosts..", hostgroup._hosts);
                 resolve_hosts(hostgroup._hosts, function(err, hosts) {
@@ -91,7 +91,7 @@ function ensure_hostgroups(hostgroups, cb) {
                     db.Hostgroup.create(hostgroup, function(err, _hostgroup) {
                         if(err) return next_hostgroup(err);
                         hostgroup._id = _hostgroup._id;
-                        logger.debug(JSON.stringify(_hostgroup, null, 4));       
+                        logger.debug(JSON.stringify(_hostgroup, null, 4));
                         next_hostgroup();
                     });
                 });
@@ -116,7 +116,7 @@ function ensure_testspecs(testspecs, cb) {
                 db.Testspec.create(testspec, function(err, _testspec) {
                     if(err) return next_testspec(err);
                     testspec._id = _testspec._id;
-                    logger.debug(JSON.stringify(_testspec, null, 4));       
+                    logger.debug(JSON.stringify(_testspec, null, 4));
                     next_testspec();
                 });
             }
@@ -124,9 +124,24 @@ function ensure_testspecs(testspecs, cb) {
     }, cb);
 }
 
+// remove extraneous test parameters
+function remove_extraneous_test_parameters( spec ) {
+
+    console.log("spec", spec);
+    if ( typeof spec == "undefined" ) return spec;
+
+    delete spec.session_count;
+    delete spec.loss_threshold;
+    delete spec.type;
+
+    console.log("spec AFTER", spec);
+
+    return spec;
+}
+
 exports.import = function(url, sub, cb) {
     logger.debug("config importer", url);
-    
+
     //load requested json
     request.get({url:url, json:true, timeout: 3000}, function(err, r, meshconfig) {
         if(err) return cb(err);
@@ -187,6 +202,9 @@ exports.import = function(url, sub, cb) {
             };
             hostgroups.push(hostgroup);
 
+            test.parameters = remove_extraneous_test_parameters( test.parameters );
+            console.log("TEST.PARAMETERS after removal", test.parameters);
+
             var testspec = {
                 name: test.description+" Testspecs",
                 desc: "Imported by MCA importer",
@@ -199,7 +217,7 @@ exports.import = function(url, sub, cb) {
             tests.push({
                 name: test.description,
                 //desc: "imported", //I don't think this is used anymore
-                service_type: get_service_type(test.parameters.type),
+                service_type: type ,
                 mesh_type: "mesh", 
                 enabled: true,
                 nahosts: [],

@@ -562,6 +562,7 @@ exports.generate = function(_config, opts, cb) {
                 if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
                 if ( ! ( "_archive" in _host ) ) _host._archive = [];
 
+                    console.log("host main MA maInfo maName", maInfo, maName);
                 if ( ( ! ( url in maHash ) ) && _host.local_ma ) {
                     psc_archives[ maName ] = maInfo;
                     _host._archive.push(maName);
@@ -593,6 +594,13 @@ exports.generate = function(_config, opts, cb) {
                 }
 
             });
+
+            // If there are no archives for this host, delete the 'archives' object
+
+            if ( ( "archives" in psc_hosts[ _host.hostname ] ) &&  psc_hosts[ _host.hostname ].archives.length == 0 ) {
+                delete psc_hosts[ _host.hostname ].archives;
+
+            }
 
                 // TODO figure out how to have multiple tests of same type
                 // (need unique hostgroup names)
