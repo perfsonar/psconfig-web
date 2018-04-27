@@ -153,6 +153,21 @@ exports.import = function(url, sub, cb) {
         out = JSON.stringify( out, null, "\t" );
         logger.debug("IMPORTED MESHCONFIG\n" + out);
 
+        // config_params holds parameters to pass back to the callback
+        var config_params = {};
+
+        // process central MAs
+        var ma_url_obj = {};
+        meshconfig.measurement_archives.forEach(function(ma) {
+            if ( ! ( "archives" in config_params ) ) config_params.archives = [];
+            ma_url_obj[ ma.write_url ] = 1;
+        });
+
+        var ma_urls = Object.keys( ma_url_obj );
+        config_params.archives = ma_urls;
+        meshconfig.ma_urls = ma_urls;
+        console.log("MA_URLS IMPORTED", ma_urls);
+
         //process hosts
         var hosts_info = [];
         meshconfig.organizations.forEach(function(org) {
@@ -163,7 +178,6 @@ exports.import = function(url, sub, cb) {
 
                     if ( "measurement_archives" in host ) {
                         host.measurement_archives.forEach(function(ma) {
-                            var read_url = ma.read_url; //TODO
                             services.push({type: get_service_type(ma.type)});
                         });
                     }
@@ -183,10 +197,13 @@ exports.import = function(url, sub, cb) {
             });
         });
 
+
         //process hostgroups / testspecs
         var hostgroups = [];
         var testspecs = [];
         var tests = [];
+
+
         meshconfig.tests.forEach(function(test) {
             var member_type = test.members.type;
             if(member_type != "mesh") return cb("only mesh type is supported currently");
@@ -236,7 +253,7 @@ exports.import = function(url, sub, cb) {
                         test.agroup = test._agroup._id;
                         test.testspec = test._testspec._id;
                     });
-                    cb(null, tests);
+                    cb(null, tests, config_params);
                 });
             });
         });
