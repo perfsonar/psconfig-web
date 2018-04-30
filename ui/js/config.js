@@ -227,7 +227,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
             testspecs.getAll().then(function(_testspecs) {
                 $scope.testspecs = _testspecs;
                 if ( "config_params" in res.data ) {
-                    if ( "archives" in res.data.config_params ) {
+                    if ( ( "archives" in res.data.config_params ) && ( res.data.config_params.archives.length > 0  ) ) {
                         $scope.selected.ma_urls = res.data.config_params.archives.join("\n");
                     }
                     if ( "description" in res.data.config_params ) {

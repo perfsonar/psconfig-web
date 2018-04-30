@@ -155,10 +155,12 @@ exports.import = function(url, sub, cb) {
 
         // process central MAs
         var ma_url_obj = {};
-        meshconfig.measurement_archives.forEach(function(ma) {
-            if ( ! ( "archives" in config_params ) ) config_params.archives = [];
-            ma_url_obj[ ma.write_url ] = 1;
-        });
+        if ( "measurement_archives" in meshconfig ) {
+            meshconfig.measurement_archives.forEach(function(ma) {
+                if ( ! ( "archives" in config_params ) ) config_params.archives = [];
+                ma_url_obj[ ma.write_url ] = 1;
+            });
+        }
 
         var ma_urls = Object.keys( ma_url_obj );
         config_params.archives = ma_urls;
