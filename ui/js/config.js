@@ -226,6 +226,14 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
             testspecs.clear();
             testspecs.getAll().then(function(_testspecs) {
                 $scope.testspecs = _testspecs;
+                if ( "config_params" in res.data ) {
+                    if ( "archives" in res.data.config_params ) {
+                        $scope.selected.ma_urls = res.data.config_params.archives.join("\n");
+                    }
+                    if ( "description" in res.data.config_params ) {
+                        $scope.selected.desc = res.data.config_params.description;
+                    }
+                }
                 hostgroups.clear();
                 hostgroups.getAll().then(function(_hostgroups) {
                     $scope.hostgroups = _hostgroups;

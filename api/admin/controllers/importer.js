@@ -127,14 +127,11 @@ function ensure_testspecs(testspecs, cb) {
 // remove extraneous test parameters
 function remove_extraneous_test_parameters( spec ) {
 
-    console.log("spec", spec);
     if ( typeof spec == "undefined" ) return spec;
 
     delete spec.session_count;
     delete spec.loss_threshold;
     delete spec.type;
-
-    console.log("spec AFTER", spec);
 
     return spec;
 }
@@ -149,12 +146,12 @@ exports.import = function(url, sub, cb) {
 
         var meshconfig_desc = meshconfig.description;
 
-        var out = meshconfig;
-        out = JSON.stringify( out, null, "\t" );
-        logger.debug("IMPORTED MESHCONFIG\n" + out);
+        console.log("meshconfig_desc", meshconfig_desc);
+
 
         // config_params holds parameters to pass back to the callback
         var config_params = {};
+        config_params.description = meshconfig_desc;
 
         // process central MAs
         var ma_url_obj = {};
@@ -166,7 +163,13 @@ exports.import = function(url, sub, cb) {
         var ma_urls = Object.keys( ma_url_obj );
         config_params.archives = ma_urls;
         meshconfig.ma_urls = ma_urls;
-        console.log("MA_URLS IMPORTED", ma_urls);
+        //meshconfig.config_params = config_params;
+
+        console.log("ma_urls", ma_urls);
+
+        var out = meshconfig;
+        out = JSON.stringify( out, null, "\t" );
+        logger.debug("IMPORTED MESHCONFIG\n" + out);
 
         //process hosts
         var hosts_info = [];
@@ -220,7 +223,6 @@ exports.import = function(url, sub, cb) {
             hostgroups.push(hostgroup);
 
             test.parameters = remove_extraneous_test_parameters( test.parameters );
-            console.log("TEST.PARAMETERS after removal", test.parameters);
 
             var testspec = {
                 name: test.description+" Testspecs",
