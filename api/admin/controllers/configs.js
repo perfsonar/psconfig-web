@@ -96,6 +96,7 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
 
 router.put('/import', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     if(!req.user.scopes.mca || !~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
+    console.log("req.user", req.user);
     importer.import(req.body.url, req.user.sub, function(err, tests, new_config_params) {
         if(err) return next(err);
         console.log("CONFIG PARAMS RECEIVED FROM CALLBACK!!!", new_config_params);

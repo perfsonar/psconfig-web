@@ -138,6 +138,7 @@ function remove_extraneous_test_parameters( spec ) {
 
 exports.import = function(url, sub, cb) {
     logger.debug("config importer", url);
+    console.log("importer SUB", sub.toString());
 
     //load requested json
     request.get({url:url, json:true, timeout: 3000}, function(err, r, meshconfig) {
@@ -171,7 +172,7 @@ exports.import = function(url, sub, cb) {
 
         var out = meshconfig;
         out = JSON.stringify( out, null, "\t" );
-        logger.debug("IMPORTED MESHCONFIG\n" + out);
+        //logger.debug("IMPORTED MESHCONFIG\n" + out);
 
         //process hosts
         var hosts_info = [];
