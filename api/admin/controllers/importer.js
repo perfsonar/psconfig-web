@@ -15,12 +15,12 @@ const db = require('../../models');
 
 function get_service_type(mc_type) {
     switch(mc_type) {
-    case "perfsonarbuoy/bwctl": return "bwctl";
-    case "perfsonarbuoy/owamp": return "owamp";
-    case "traceroute": return "traceroute";
-    case "pinger": return "ping";
-    default: 
-        logger.error("unknown meshconfig service type", mc_type);
+        case "perfsonarbuoy/bwctl": return "bwctl";
+        case "perfsonarbuoy/owamp": return "owamp";
+        case "traceroute": return "traceroute";
+        case "pinger": return "ping";
+        default: 
+           logger.error("unknown meshconfig service type", mc_type);
     }
     return null;
 }
@@ -144,125 +144,136 @@ exports.import = function(url, sub, cb) {
     request.get({url:url, json:true, timeout: 3000}, function(err, r, meshconfig) {
         if(err) return cb(err);
         if(r.statusCode != 200) return cb("non-200 response from "+url);
+        exports._process_imported_config( meshconfig, sub, cb );
 
-        var meshconfig_desc = meshconfig.description;
-
-        console.log("meshconfig_desc", meshconfig_desc);
-
-
-        // config_params holds parameters to pass back to the callback
-        var config_params = {};
-        config_params.description = meshconfig_desc;
-
-        // process central MAs
-        var ma_url_obj = {};
-        if ( "measurement_archives" in meshconfig ) {
-            meshconfig.measurement_archives.forEach(function(ma) {
-                if ( ! ( "archives" in config_params ) ) config_params.archives = [];
-                ma_url_obj[ ma.write_url ] = 1;
-            });
-        }
-
-        var ma_urls = Object.keys( ma_url_obj );
-        config_params.archives = ma_urls;
-        meshconfig.ma_urls = ma_urls;
-        //meshconfig.config_params = config_params;
-
-        console.log("ma_urls", ma_urls);
-
-        var out = meshconfig;
-        out = JSON.stringify( out, null, "\t" );
-        //logger.debug("IMPORTED MESHCONFIG\n" + out);
-
-        //process hosts
-        var hosts_info = [];
-        meshconfig.organizations.forEach(function(org) {
-            org.sites.forEach(function(site) {
-                if ( !( "hosts" in site ) ) return;
-                site.hosts.forEach(function(host) {
-                    var services = [];
-
-                    if ( "measurement_archives" in host ) {
-                        host.measurement_archives.forEach(function(ma) {
-                            services.push({type: get_service_type(ma.type)});
-                        });
-                    }
-
-                    var host_info = {
-                        services: services,
-                        no_agent: false,
-                        hostname: host.addresses[0], 
-                        sitename: host.description,
-                        info: {},
-                        communities: [],
-                        admins: [sub.toString()],
-                    };
-                    if(host.toolkit_url && host.toolkit_url != "auto") host_info.toolkit_url = host.toolkit_url;
-                    hosts_info.push(host_info);
-                });
-            });
-        });
-
-
-        //process hostgroups / testspecs
-        var hostgroups = [];
-        var testspecs = [];
-        var tests = [];
-
-
-        meshconfig.tests.forEach(function(test) {
-            var member_type = test.members.type;
-            if(member_type != "mesh") return cb("only mesh type is supported currently");
-
-            var type = get_service_type(test.parameters.type);
-            var hostgroup = {
-                name: test.description+" Group",
-                desc: "Imported by MCA importer",
-                type: "static",
-                service_type: type,
-                admins: [sub.toString()],
-                _hosts: test.members.members, //hostnames that needs to be converted to host id
-            };
-            hostgroups.push(hostgroup);
-
-            test.parameters = remove_extraneous_test_parameters( test.parameters );
-
-            var testspec = {
-                name: test.description+" Testspecs",
-                desc: "Imported by MCA importer",
-                service_type: type,
-                admins: [sub.toString()],
-                specs: test.parameters,
-            };
-            testspecs.push(testspec);
-
-            tests.push({
-                name: test.description,
-                //desc: "imported", //I don't think this is used anymore
-                service_type: type ,
-                mesh_type: "mesh", 
-                enabled: true,
-                nahosts: [],
-                _agroup: hostgroup, //
-                _testspec: testspec //tmp
-            });
-        });
-
-
-        //now do update (TODO - should I let caller handle this?)
-        ensure_hosts(hosts_info, function(err) {
-            ensure_hostgroups(hostgroups, function(err) {
-                ensure_testspecs(testspecs, function(err) {
-                    //add correct db references
-                    tests.forEach(function(test) {
-                        test.agroup = test._agroup._id;
-                        test.testspec = test._testspec._id;
-                    });
-                    cb(null, tests, config_params);
-                });
-            });
-        });
 
     }); //loading meshconfig json
 }
 
+exports._process_imported_config = function ( meshconfig, sub, cb, disable_ensure_hosts) {
+    sub = sub.toString();
+    var meshconfig_desc = meshconfig.description;
+
+    console.log("meshconfig_desc", meshconfig_desc);
+
+
+    // config_params holds parameters to pass back to the callback
+    var config_params = {};
+    config_params.description = meshconfig_desc;
+
+    // process central MAs
+    var ma_url_obj = {};
+    if ( "measurement_archives" in meshconfig ) {
+        meshconfig.measurement_archives.forEach(function(ma) {
+            if ( ! ( "archives" in config_params ) ) config_params.archives = [];
+            ma_url_obj[ ma.write_url ] = 1;
+        });
+    }
+
+    var ma_urls = Object.keys( ma_url_obj );
+    config_params.archives = ma_urls;
+    meshconfig.ma_urls = ma_urls;
+    //meshconfig.config_params = config_params;
+
+    console.log("IMPORTER ma_urls", ma_urls);
+
+    var out = meshconfig;
+    out = JSON.stringify( out, null, "\t" );
+    //logger.debug("IMPORTED MESHCONFIG\n" + out);
+
+    //process hosts
+    var hosts_info = [];
+    meshconfig.organizations.forEach(function(org) {
+        org.sites.forEach(function(site) {
+            if ( !( "hosts" in site ) ) return;
+            site.hosts.forEach(function(host) {
+                var services = [];
+
+                if ( "measurement_archives" in host ) {
+                    host.measurement_archives.forEach(function(ma) {
+                        services.push({type: get_service_type(ma.type)});
+                    });
+                }
+
+                var host_info = {
+                    services: services,
+                no_agent: false,
+                hostname: host.addresses[0],
+                sitename: host.description,
+                info: {},
+                communities: [],
+                admins: [sub.toString()],
+                };
+                if(host.toolkit_url && host.toolkit_url != "auto") host_info.toolkit_url = host.toolkit_url;
+                hosts_info.push(host_info);
+            });
+        });
+    });
+
+
+    //process hostgroups / testspecs
+    var hostgroups = [];
+    var testspecs = [];
+    var tests = [];
+
+
+    meshconfig.tests.forEach(function(test) {
+        var member_type = test.members.type;
+        if(member_type != "mesh") return cb("only mesh type is supported currently");
+
+        var type = get_service_type(test.parameters.type);
+        var hostgroup = {
+            name: test.description+" Group",
+        desc: "Imported by MCA importer",
+        type: "static",
+        service_type: type,
+        admins: [sub.toString()],
+        _hosts: test.members.members, //hostnames that needs to be converted to host id
+        };
+        hostgroups.push(hostgroup);
+
+        test.parameters = remove_extraneous_test_parameters( test.parameters );
+
+        var testspec = {
+            name: test.description+" Testspecs",
+        desc: "Imported by MCA importer",
+        service_type: type,
+        admins: [sub.toString()],
+        specs: test.parameters,
+        };
+        testspecs.push(testspec);
+
+        tests.push({
+            name: test.description,
+            //desc: "imported", //I don't think this is used anymore
+            service_type: type ,
+            mesh_type: "mesh", 
+            enabled: true,
+            nahosts: [],
+            _agroup: hostgroup, //
+            _testspec: testspec //tmp
+        });
+    });
+
+
+
+    //now do update (TODO - should I let caller handle this?)
+    if (! disable_ensure_hosts ) {
+    ensure_hosts(hosts_info, function(err) {
+        ensure_hostgroups(hostgroups, function(err) {
+            ensure_testspecs(testspecs, function(err) {
+                //add correct db references
+                tests.forEach(function(test) {
+                    test.agroup = test._agroup._id;
+                    test.testspec = test._testspec._id;
+                });
+                cb(null, tests, config_params);
+            });
+        });
+    });
+    } else {
+        cb(null, tests, config_params);
+
+    }
+
+}
