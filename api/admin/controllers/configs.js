@@ -101,6 +101,13 @@ router.put('/import', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
         if(err) return next(err);
         console.log("CONFIG PARAMS RECEIVED FROM CALLBACK!!!", new_config_params);
         res.json({msg: "Created testspecs / host / hostgroups records", tests: tests, config_params: new_config_params});
+        var results = {
+            err: err,
+            tests: tests,
+            config_params: config_params
+        };
+        console.log("results websvc", results);
+
     });
 });
 

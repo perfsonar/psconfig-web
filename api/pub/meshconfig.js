@@ -552,7 +552,7 @@ exports.generate = function(_config, opts, cb) {
                 } else {
                     url = maInfo.write_url;
                     var mc_type = get_type(service.type);
-                    if(config_service_types.indexOf(service.type) != -1 && _host.local_ma) {
+                    if(config_service_types.indexOf(service.type) != -1 && ( _host.local_ma || _config.force_endpoint_mas ) ) {
 
                         host.measurement_archives.push(generate_mainfo(service, format));
                     }
@@ -562,8 +562,12 @@ exports.generate = function(_config, opts, cb) {
                 if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
                 if ( ! ( "_archive" in _host ) ) _host._archive = [];
 
-                    console.log("host main MA maInfo maName", maInfo, maName);
-                if ( ( ! ( url in maHash ) ) && _host.local_ma ) {
+                console.log("host main MA maInfo maName", maInfo, maName);
+                console.log("maHash", maHash);
+
+                if ( ( ! ( url in maHash ) ) && ( _host.local_ma || _config.force_endpoint_mas   ) ) {
+                console.log("maHash2", maHash);
+                    console.log("Adding ma url:",  _host.hostname );
                     psc_archives[ maName ] = maInfo;
                     _host._archive.push(maName);
                     psc_hosts[ _host.hostname ].archives.push( maName );

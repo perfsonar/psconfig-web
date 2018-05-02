@@ -154,12 +154,17 @@ exports._process_imported_config = function ( meshconfig, sub, cb, disable_ensur
     sub = sub.toString();
     var meshconfig_desc = meshconfig.description;
 
+    var out = meshconfig;
+    out = JSON.stringify( out, null, "\t" );
+    //logger.debug("IMPORTED MESHCONFIG\n" + out);
     console.log("meshconfig_desc", meshconfig_desc);
 
 
     // config_params holds parameters to pass back to the callback
     var config_params = {};
-    config_params.description = meshconfig_desc;
+    if ( meshconfig_desc ) {
+        config_params.description = meshconfig_desc;
+    }
 
     // process central MAs
     var ma_url_obj = {};
@@ -177,9 +182,6 @@ exports._process_imported_config = function ( meshconfig, sub, cb, disable_ensur
 
     console.log("IMPORTER ma_urls", ma_urls);
 
-    var out = meshconfig;
-    out = JSON.stringify( out, null, "\t" );
-    //logger.debug("IMPORTED MESHCONFIG\n" + out);
 
     //process hosts
     var hosts_info = [];
@@ -259,18 +261,18 @@ exports._process_imported_config = function ( meshconfig, sub, cb, disable_ensur
 
     //now do update (TODO - should I let caller handle this?)
     if (! disable_ensure_hosts ) {
-    ensure_hosts(hosts_info, function(err) {
-        ensure_hostgroups(hostgroups, function(err) {
-            ensure_testspecs(testspecs, function(err) {
-                //add correct db references
-                tests.forEach(function(test) {
-                    test.agroup = test._agroup._id;
-                    test.testspec = test._testspec._id;
+        ensure_hosts(hosts_info, function(err) {
+            ensure_hostgroups(hostgroups, function(err) {
+                ensure_testspecs(testspecs, function(err) {
+                    //add correct db references
+                    tests.forEach(function(test) {
+                        test.agroup = test._agroup._id;
+                        test.testspec = test._testspec._id;
+                    });
+                    cb(null, tests, config_params);
                 });
-                cb(null, tests, config_params);
             });
         });
-    });
     } else {
         cb(null, tests, config_params);
 
