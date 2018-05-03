@@ -157,7 +157,6 @@ exports._process_imported_config = function ( meshconfig, sub, cb, disable_ensur
     var out = meshconfig;
     out = JSON.stringify( out, null, "\t" );
     //logger.debug("IMPORTED MESHCONFIG\n" + out);
-    console.log("meshconfig_desc", meshconfig_desc);
 
 
     // config_params holds parameters to pass back to the callback
@@ -180,7 +179,7 @@ exports._process_imported_config = function ( meshconfig, sub, cb, disable_ensur
     meshconfig.ma_urls = ma_urls;
     //meshconfig.config_params = config_params;
 
-    console.log("IMPORTER ma_urls", ma_urls);
+    //console.log("IMPORTER ma_urls", ma_urls);
 
 
     //process hosts
