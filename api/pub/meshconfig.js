@@ -562,12 +562,9 @@ exports.generate = function(_config, opts, cb) {
                 if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
                 if ( ! ( "_archive" in _host ) ) _host._archive = [];
 
-                console.log("host main MA maInfo maName", maInfo, maName);
-                console.log("maHash", maHash);
+                //console.log("host main MA maInfo maName", maInfo, maName);
 
                 if ( ( ! ( url in maHash ) ) && ( _host.local_ma || _config.force_endpoint_mas   ) ) {
-                console.log("maHash2", maHash);
-                    console.log("Adding ma url:",  _host.hostname );
                     psc_archives[ maName ] = maInfo;
                     _host._archive.push(maName);
                     psc_hosts[ _host.hostname ].archives.push( maName );
