@@ -163,6 +163,16 @@
                      "description" : "ps-4-0-xenial.qalab.geant.net (Ubuntu16, 4.0)"
                   }
                ]
+            },
+            {
+               "hosts" : [
+                  {
+                     "addresses" : [
+                        "ps-bionic.qalab.geant.net"
+                     ],
+                     "description" : "ps-bionic.qalab.geant.net (Ubuntu18, 4.0)"
+                  }
+               ]
             }
          ],
          "administrators" : [
@@ -223,6 +233,7 @@
                "perfsonar-liva.lbl.gov",
                "ps-4-0.qalab.geant.net",
                "ps-4-0-xenial.qalab.geant.net",
+               "ps-bionic.qalab.geant.net",
                "pstest2.geant.carnet.hr"
             ],
             "type" : "mesh"
@@ -251,6 +262,7 @@
                "ps-dev-deb8-2.es.net",
                "ps-4-0.qalab.geant.net",
                "ps-4-0-xenial.qalab.geant.net",
+               "ps-bionic.qalab.geant.net",
                "pstest2.geant.carnet.hr"
             ],
             "type" : "mesh"
@@ -279,6 +291,7 @@
                "ps-dev-deb8-2.es.net",
                "ps-4-0.qalab.geant.net",
                "ps-4-0-xenial.qalab.geant.net",
+               "ps-bionic.qalab.geant.net",
                "pstest2.geant.carnet.hr"
             ],
             "type" : "mesh"
@@ -311,6 +324,7 @@
                "perfsonar-liva.lbl.gov",
                "ps-4-0.qalab.geant.net",
                "ps-4-0-xenial.qalab.geant.net",
+               "ps-bionic.qalab.geant.net",
                "pstest2.geant.carnet.hr"
             ],
             "type" : "mesh"
@@ -339,6 +353,7 @@
                "perfsonar-liva.lbl.gov",
                "ps-4-0.qalab.geant.net",
                "ps-4-0-xenial.qalab.geant.net",
+               "ps-bionic.qalab.geant.net",
                "pstest2.geant.carnet.hr"
             ],
             "type" : "mesh"
@@ -366,6 +381,7 @@
                "ps-dev-deb8-2.es.net",
                "ps-4-0.qalab.geant.net",
                "ps-4-0-xenial.qalab.geant.net",
+               "ps-bionic.qalab.geant.net",
                "pstest2.geant.carnet.hr"
             ],
             "type" : "mesh"

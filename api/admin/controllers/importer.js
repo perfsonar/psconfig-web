@@ -34,15 +34,25 @@ function resolve_hosts(hostnames, cb) {
 }
 
 //make sure all hosts exist
-function ensure_hosts(hosts_info, cb) {
+function ensure_hosts(hosts_info, tests, cb) {
+    var service_types = [];
+    /*
+    tests.forEach( function( test ) {
+        service_types.push( test.service_type );
+        //service_types[ test.service_type ] = 1;
+
+    });
+    */
+
     async.eachSeries(hosts_info, function(host, next_host) {
         db.Host.findOne({hostname: host.hostname}, function(err, _host) {
             if(err) return next_host(err);
 
             if(_host) {
                 logger.debug("host already exists", host.hostname);
-                if(_host.lsid) next_host();
-                else {
+                if(_host.lsid) {
+                    return next_host();
+                } else {
                     //for adhoc host, make sure we have all services listed
                     host.services.forEach(function(service) {
                         //look for the service
@@ -59,12 +69,16 @@ function ensure_hosts(hosts_info, cb) {
                     _host.save(next_host);
                 }
             } else {
-                logger.debug("missing host found - inserting");
+                logger.debug("missing host found - inserting " + host.hostname);
+                //var types = {};
+                service_types.forEach(function(service) {
+                    host.services.push({ "type": service });
+                });
                 db.Host.create(host, function(err, _host) {
-                    if(err) next_host(err);
+                    if(err) return next_host(err);
                     logger.debug("created host");
                     logger.debug(JSON.stringify(_host, null, 4));
-                    next_host()
+                    return next_host()
                 });
             }
         });
@@ -138,7 +152,6 @@ function remove_extraneous_test_parameters( spec ) {
 
 exports.import = function(url, sub, cb) {
     logger.debug("config importer", url);
-    console.log("importer SUB", sub.toString());
 
     //load requested json
     request.get({url:url, json:true, timeout: 3000}, function(err, r, meshconfig) {
@@ -156,8 +169,6 @@ exports._process_imported_config = function ( meshconfig, sub, cb, disable_ensur
 
     var out = meshconfig;
     out = JSON.stringify( out, null, "\t" );
-    //logger.debug("IMPORTED MESHCONFIG\n" + out);
-
 
     // config_params holds parameters to pass back to the callback
     var config_params = {};
@@ -196,14 +207,24 @@ exports._process_imported_config = function ( meshconfig, sub, cb, disable_ensur
                     });
                 }
 
+                var addr_array = [];
+                for(var i in host.addresses) {
+                    var addr = host.addresses[i];
+                    addr_array.push( {
+                        address: addr
+                    } );
+
+                }
+
                 var host_info = {
                     services: services,
-                no_agent: false,
-                hostname: host.addresses[0],
-                sitename: host.description,
-                info: {},
-                communities: [],
-                admins: [sub.toString()],
+                    no_agent: false,
+                    hostname: host.addresses[0],
+                    sitename: host.description,
+                    addresses: addr_array,
+                    info: {},
+                    communities: [],
+                    admins: [sub.toString()]
                 };
                 if(host.toolkit_url && host.toolkit_url != "auto") host_info.toolkit_url = host.toolkit_url;
                 hosts_info.push(host_info);
@@ -218,6 +239,7 @@ exports._process_imported_config = function ( meshconfig, sub, cb, disable_ensur
     var tests = [];
 
 
+    var hosts_service_types = {};
     meshconfig.tests.forEach(function(test) {
         var member_type = test.members.type;
         if(member_type != "mesh") return cb("only mesh type is supported currently");
@@ -225,11 +247,11 @@ exports._process_imported_config = function ( meshconfig, sub, cb, disable_ensur
         var type = get_service_type(test.parameters.type);
         var hostgroup = {
             name: test.description+" Group",
-        desc: "Imported by MCA importer",
-        type: "static",
-        service_type: type,
-        admins: [sub.toString()],
-        _hosts: test.members.members, //hostnames that needs to be converted to host id
+            desc: "Imported by MCA importer",
+            type: "static",
+            service_type: type,
+            admins: [sub.toString()],
+            _hosts: test.members.members, //hostnames that needs to be converted to host id
         };
         hostgroups.push(hostgroup);
 
@@ -237,18 +259,31 @@ exports._process_imported_config = function ( meshconfig, sub, cb, disable_ensur
 
         var testspec = {
             name: test.description+" Testspecs",
-        desc: "Imported by MCA importer",
-        service_type: type,
-        admins: [sub.toString()],
-        specs: test.parameters,
+            desc: "Imported by MCA importer",
+            service_type: type,
+            admins: [sub.toString()],
+            specs: test.parameters,
         };
         testspecs.push(testspec);
+
+        // TODO: add a lookup object for service types and what hosts go under them
+        var hosts_obj = {};
+        hostgroup._hosts.forEach( function( host )  {
+            //hosts_obj[ host ] = 1;
+            if (! ( host in hosts_service_types ) ) {
+                hosts_service_types[ host ] = {};
+            }
+            hosts_service_types[ host ][ type ] = 1;
+        });
+
+        //hosts_service_types[ type ] = hostgroup._hosts ;
+        //hosts_service_types[ type ] = hosts_obj ;
 
         tests.push({
             name: test.description,
             //desc: "imported", //I don't think this is used anymore
             service_type: type ,
-            mesh_type: "mesh", 
+            mesh_type: "mesh", // TODO: allow other mesh_types
             enabled: true,
             nahosts: [],
             _agroup: hostgroup, //
@@ -257,10 +292,21 @@ exports._process_imported_config = function ( meshconfig, sub, cb, disable_ensur
     });
 
 
+    hosts_info.forEach( function( host ) {
+        var hostname = host.hostname;        
+        var host_types = hosts_service_types[ hostname ];
+        if ( typeof host_types == "undefined" ) return;
+        var types = Object.keys( host_types );
+        types.forEach( function( type ) {            
+            host.services.push( { "type": type } );
+        });
+
+    });
+
 
     //now do update (TODO - should I let caller handle this?)
     if (! disable_ensure_hosts ) {
-        ensure_hosts(hosts_info, function(err) {
+        ensure_hosts(hosts_info, tests, function(err) {
             ensure_hostgroups(hostgroups, function(err) {
                 ensure_testspecs(testspecs, function(err) {
                     //add correct db references

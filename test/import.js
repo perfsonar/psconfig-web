@@ -13,9 +13,6 @@ testfiles.push( 'data/testbed.json' );
 testfiles.push( 'data/testbed2-noarchives.json' );
 testfiles.push( 'data/testbed3-nodescription.json' );
 testfiles.push( 'data/testbed4-no_endpoint_description.json' );
-//var testfile = 'data/testbed.json';
-//var testfile = 'data/testbed2-noarchives.json';
-//var testfile = 'data/testbed3-nodescription.json';
 
 
 function formatlog( obj ) {
@@ -24,8 +21,8 @@ function formatlog( obj ) {
 }
 
 describe('import', function() {
-    for( var i in testfiles ) {
-        var testfile = testfiles[i];
+    testfiles.forEach( function( testfile ) {
+        console.log("TESTFILE", testfile);
 
         it( testfile + ' import', function(done) {
             var sub = 1;
@@ -64,6 +61,7 @@ describe('import', function() {
                 }
                 //console.log("EXPECTED DATA", data);
                 expected_output = JSON.parse(data);
+                //console.log("AFTER JSON PARSE", data);
                 //console.error("expected output\n", JSON.stringify( expected_output, null, 3 ) );
 
             });
@@ -83,6 +81,5 @@ describe('import', function() {
 
 
         });
-    }
-
+    });
 });
