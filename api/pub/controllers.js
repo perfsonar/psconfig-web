@@ -98,8 +98,8 @@ router.get('/config', function(req, res, next) {
  *                              Override the host version provided via sLS (like.. to suppress v4 options)
  *
  */
-router.get('/config/:url/:format?', function(req, res, next) {
-    var format = req.params.format || "meshconfig";
+router.get('/config/:url', function(req, res, next) {
+    var format = req.query.format || "meshconfig";
     config.format = format;
     logger.debug("format", format);
     var opts = {};
@@ -113,6 +113,7 @@ router.get('/config/:url/:format?', function(req, res, next) {
 
         if(!config) return res.status(404).text("Couldn't find config with URL:"+req.params.url);
         config._host_version = req.query.host_version;
+        //log_json( config, opts );
         meshconfig.generate(config, opts, function(err, m) {
             if(err) return next(err);
             res.json(m);
@@ -189,3 +190,6 @@ router.get('/auto/:address', function(req, res, next) {
 
 module.exports = router;
 
+function log_json( json_text ) {
+    logger.debug(JSON.stringify(json_text, null, 3));
+}

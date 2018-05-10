@@ -289,7 +289,6 @@ function generate_mainfo(service, format) {
 
     }
 
-    //if ( typeof type == "undefined" ) console.log("NO TYPE; service, service");
     return generate_mainfo_url(locator, format, type);
 }
 
@@ -562,8 +561,6 @@ exports.generate = function(_config, opts, cb) {
                 if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
                 if ( ! ( "_archive" in _host ) ) _host._archive = [];
 
-                //console.log("host main MA maInfo maName", maInfo, maName);
-
                 if ( ( ! ( url in maHash ) ) && ( _host.local_ma || _config.force_endpoint_mas   ) ) {
                     psc_archives[ maName ] = maInfo;
                     _host._archive.push(maName);
@@ -762,3 +759,6 @@ exports.generate = function(_config, opts, cb) {
     });
 }
 
+function log_json( json_text ) {
+    logger.debug(JSON.stringify(json_text, null, 3));
+}
