@@ -5,7 +5,7 @@ var chai = require('chai');
 
 //mine
 var config = require('../api/config');
-var importer = require('../api/admin/controllers/importer');
+var publisher = require('../api/pub/meshconfig');
 fs = require('fs');
 
 var testfiles = [];
@@ -24,7 +24,7 @@ describe('publisher', function() {
     testfiles.forEach( function( testfile ) {
         console.log("TESTFILE", testfile);
 
-        it( testfile + ' import', function(done) {
+        it( testfile + ' publish', function(done) {
             var sub = 1;
             var meshconfig;
             var testfile_expected = testfile + "-expected";
@@ -75,7 +75,7 @@ describe('publisher', function() {
                 //console.log(data);
                 meshconfig = JSON.parse(data);
                 //console.error("meshconfig before\n", JSON.stringify( meshconfig, null, 3 ) );
-                importer._process_imported_config ( meshconfig, sub, cb, true );
+                publisher._process_published_config ( meshconfig, sub, cb, true );
                 //console.log("meshconfig after\n", JSON.stringify( meshconfig, null, 3 ) );
             });
 
