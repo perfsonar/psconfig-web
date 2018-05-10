@@ -51,6 +51,13 @@ function ensure_hosts(hosts_info, tests, cb) {
             if(_host) {
                 logger.debug("host already exists", host.hostname);
                 if(_host.lsid) {
+                    if ( "sitename" in host ) {
+                        var sitename = host.sitename;
+                        if ( typeof sitename != "undefined" ) {
+                            _host.desc = sitename;
+                            _host.save();
+                        }
+                    }
                     return next_host();
                 } else {
                     //for adhoc host, make sure we have all services listed
@@ -216,6 +223,8 @@ exports._process_imported_config = function ( meshconfig, sub, cb, disable_ensur
 
                 }
 
+                console.log("description", host.description);
+
                 var host_info = {
                     services: services,
                     no_agent: false,
@@ -266,18 +275,13 @@ exports._process_imported_config = function ( meshconfig, sub, cb, disable_ensur
         };
         testspecs.push(testspec);
 
-        // TODO: add a lookup object for service types and what hosts go under them
         var hosts_obj = {};
         hostgroup._hosts.forEach( function( host )  {
-            //hosts_obj[ host ] = 1;
             if (! ( host in hosts_service_types ) ) {
                 hosts_service_types[ host ] = {};
             }
             hosts_service_types[ host ][ type ] = 1;
         });
-
-        //hosts_service_types[ type ] = hostgroup._hosts ;
-        //hosts_service_types[ type ] = hosts_obj ;
 
         tests.push({
             name: test.description,
