@@ -492,11 +492,12 @@ exports.generate = function(_config, opts, cb) {
         //register sites(hosts)
         for(var id in host_catalog) {
             var _host = host_catalog[id];
+            var toolkit_url = _host.toolkit_url || "auto";
             var host = {
                 addresses: [ _host.hostname ],
                 measurement_archives: [ ],
                 description: _host.desc||_host.sitename,
-                toolkit_url: _host.toolkit_url||"auto",
+                toolkit_url: toolkit_url,
             }
             if(_host.no_agent) host.no_agent = 1;
             //logger.warn(_host.hostname, _host.services.length);
@@ -505,7 +506,8 @@ exports.generate = function(_config, opts, cb) {
                 "address":  _host.hostname,
                 "host": _host.hostname,
                 "_meta": {
-                    "display-name": _host.desc||_host.sitename
+                    "display-name": _host.desc||_host.sitename,
+                    "display-url": toolkit_url
                     // TODO: add org?
                     //"organization": _host.org
 
