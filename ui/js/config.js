@@ -198,9 +198,14 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
         } else {
             configs.update($scope.selected).then(function(config) {
                 toaster.success("config updated successfully!");
-                config.ma_urls = config.ma_urls.join("\n");
+                if ( ( "ma_urls" in config ) && _.isArray( config.ma_urls ) ) {
+                    config.ma_urls = config.ma_urls.join("\n");
+                }
                 $scope.form.$setPristine();
-            }).catch($scope.toast_error);
+            }).catch( function( err ) {
+                //console.log("err", err);
+                $scope.toast_error(err);
+            });
         }
     }
     $scope.cancel = function() {
@@ -251,6 +256,8 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
             });
         }).catch(function(res) {
             console.error(res);
+            console.log("Oops. Failed to import specified URL.");
+
             toaster.error("Oops. Failed to import specified URL.");
         });
     }
