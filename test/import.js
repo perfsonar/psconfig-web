@@ -6,7 +6,9 @@ var chai = require('chai');
 //mine
 var config = require('../api/config');
 var importer = require('../api/admin/controllers/importer');
-fs = require('fs');
+var fs = require('fs');
+
+var save_output = false;
 
 var testfiles = [];
 testfiles.push( 'data/testbed.json' );
@@ -22,13 +24,13 @@ function formatlog( obj ) {
 
 describe('import', function() {
     testfiles.forEach( function( testfile ) {
-        console.log("TESTFILE", testfile);
+        //console.log("TESTFILE", testfile);
 
         it( testfile + ' import', function(done) {
             var sub = 1;
             var meshconfig;
             var testfile_expected = testfile + "-expected";
-            console.log("testfile_expected", testfile_expected);
+            //console.log("testfile_expected", testfile_expected);
             var testfile_out = testfile + "-out";
             var expected_output;
             var cb = function( err, tests, config_params) {
@@ -39,13 +41,15 @@ describe('import', function() {
                     config_params: config_params
                 };
 
-                fs.writeFile(testfile_out, JSON.stringify( results ), function (err) {
-                      if (err) {
-                          console.log("ERROR writing file", err);
-                          throw err;
-                      }
-                      console.log('Saved!');
-                });
+                if ( save_output ) {
+                    fs.writeFile(testfile_out, JSON.stringify( results ), function (err) {
+                        if (err) {
+                            console.log("ERROR writing file", err);
+                            throw err;
+                        }
+                        console.log('Saved!');
+                    });
+                }
 
                 //console.log("RESULTS", formatlog( results ) );
                 //console.log("EXPECTED_OUTPUT", formatlog( expected_output ) );

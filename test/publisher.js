@@ -22,13 +22,13 @@ function formatlog( obj ) {
 
 describe('publisher', function() {
     testfiles.forEach( function( testfile ) {
-        console.log("TESTFILE", testfile);
+        //console.log("TESTFILE", testfile);
 
         it( testfile + ' publish', function(done) {
             var sub = 1;
             var meshconfig;
             var testfile_expected = testfile + "-expected";
-            console.log("testfile_expected", testfile_expected);
+            //console.log("testfile_expected", testfile_expected);
             var testfile_out = testfile + "-out";
             var expected_output;
             var cb = function( err, tests, config_params) {
