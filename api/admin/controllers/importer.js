@@ -153,6 +153,7 @@ function remove_extraneous_test_parameters( spec ) {
     delete spec.session_count;
     delete spec.loss_threshold;
     delete spec.type;
+    delete spec.force_bidirectional;
 
     return spec;
 }
@@ -222,8 +223,6 @@ exports._process_imported_config = function ( meshconfig, sub, cb, disable_ensur
                     } );
 
                 }
-
-                console.log("description", host.description);
 
                 var host_info = {
                     services: services,
