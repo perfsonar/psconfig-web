@@ -1,14 +1,14 @@
-# perfSONAR Meshconfig Administrator
+# perfSONAR psConfig Web Admin (PWA)
 
-MeshConfig Administrator GUI and tools to publish generated meshconfig
+psConfig Web-based administration GUI and tools to publish generated meshconfig/psconfig output
 
-![Alt text](/readme/mca.png?raw=true "MCA screenshot")
+![Alt text](/readme/pwa.png?raw=true "pwa screenshot")
 
 ## Installation
 
 ### VM Host
 
-To install MCA, you will need a VM with any OS that supports Docker; such as CentOS7
+To install PWA, you will need a VM with any OS that supports Docker; such as CentOS7
 
 Minimum resource requirements are..
 
@@ -65,30 +65,30 @@ You should install logrotate for docker container log
 
 ### Configuration
 
-Before we start installing MCA, you should prepare your configuration files first. You can bootstrap it by
-downloading and deploying MCA's default configuration files from git repo.
+Before we start installing PWA, you should prepare your configuration files first. You can bootstrap it by
+downloading and deploying PWA's default configuration files from git repo.
 
 ```bash
-wget https://github.com/perfsonar/meshconfig-admin/raw/master/deploy/docker/mca.sample.tar.gz
-tar -xzf mca.sample.tar.gz -C /etc
+wget https://github.com/perfsonar/meshconfig-admin/raw/master/deploy/docker/pwa.sample.tar.gz
+tar -xzf pwa.sample.tar.gz -C /etc
 ```
-1. For MCA
+1. For PWA
 
-    `/etc/mca/index.js` 
+    `/etc/pwa/index.js` 
 
     * Edit defaults `testspecs` if necessary (`meshconfig.defaults.testspecs`)
     * Edit datasource section which determines which host you'd like to load from sLS to construct your host config.
-    * Update pub.url with the hostname that your MCA instance will be exposed as.
+    * Update pub.url with the hostname that your PWA instance will be exposed as.
 
 2. For Authentication Service
 
-    `/etc/mca/auth/index.js`
+    `/etc/pwa/auth/index.js`
 
     Update `from` address to administrator's email address used to send email to confirmation new user accounts. If you'd like to skip email confirmation when user signup, simply comment out the whole email_confirmation section. 
 
     ```javascript
     exports.email_confirmation = {
-        subject: 'Meshconfig Account Confirmation',
+        subject: 'psConfig Web Admin Account Confirmation',
         from: 'user@domain.tld',  //most mail server will reject if this is not replyable address
     };
 
@@ -98,32 +98,30 @@ tar -xzf mca.sample.tar.gz -C /etc
 
     Nginx will expose various functionalities provides by various containers to the actual users. The default configuration should work, but if you need to modify the configuration, edit..
 
-    `/etc/mca/nginx`
+    `/etc/pwa/nginx`
 
 #### Host Certificates
 
-You will need SSL certificates for https access. On /etc/grid-security/host, you should see your host certificate with following file names. 
+You will need SSL certificates for https access. On /etc/pwa/auth, you should see your host certificate with following file names, or place them there if not.
 
 ```bash
-$ ls /etc/grid-security/host
+$ ls /etc/pwa/auth
 cert.pem 
 key.pem
 ```
 
-If not, please request for new certificate (at IU, see https://kb.iu.edu/d/bevd). If you don't want to store them under /etc/grid-security/host, then you have to modify the docker run script below.
-
-If you are enabling x509 authentication, then you will also need `trusted.pem` inside /etc/grid-security/host. This file contains list of all CAs that you trust and grant access to MCA. For OSG, trusted.pem can be created by running `cat /etc/grid-security/certificates/*.pem > /etc/grid-security/host/trusted.pem`. Please see [osg-ca-cert](https://twiki.grid.iu.edu/bin/view/Documentation/Release3/InstallCertAuth) for more information.
+If you are enabling x509 authentication, then you will also need `trusted.pem`. This file contains list of all CAs that you trust and grant access to PWA. 
 
 > Unlike Apache, Nginx uses a single CA file for better performance.. so you have to join all .pem into a single .pem file.
 
 ### Container Installation
 
-Now we have all configuration files necessary to start installing MCA servicves.
+Now we have all configuration files necessary to start installing PWA servicves.
 
-1. First, create a docker network to group all MCA containers (so that you don't have --link them)
+1. First, create a docker network to group all PWA containers (so that you don't have --link them)
 
     ```bash
-    docker network create mca
+    docker network create pwa
     ```
 
 2. Create mongoDB container. Use -v to persist data on host directory (/usr/local/data/mongo)
@@ -132,7 +130,7 @@ Now we have all configuration files necessary to start installing MCA servicves.
     mkdir -p /usr/local/data
     docker run \
             --restart=always \
-            --net mca \
+            --net pwa \
             --name mongo \
             -v /usr/local/data/mongo:/data/db \
             -d mongo
@@ -143,9 +141,9 @@ Now we have all configuration files necessary to start installing MCA servicves.
     ```bash
     docker run \
         --restart=always \
-        --net mca \
+        --net pwa \
         --name sca-auth \
-        -v /etc/mca/auth:/app/api/config \
+        -v /etc/pwa/auth:/app/api/config \
         -v /usr/local/data/auth:/db \
         -d perfsonar/sca-auth
     ```
@@ -153,15 +151,15 @@ Now we have all configuration files necessary to start installing MCA servicves.
     > sca-auth container will generate a few files under /config directory when it's first started, so don't mount it with `ro`.
     > I am persisting the user account DB on /usr/local/data/auth.
 
-4. Create MCA's main UI/API container.
+4. Create PWA's main UI/API container.
 
     ```bash
     docker run \
         --restart=always \
-        --net mca \
-        --name mca-admin1 \
-        -v /etc/mca:/app/api/config:ro \
-        -d perfsonar/mca-admin
+        --net pwa \
+        --name pwa-admin1 \
+        -v /etc/pwa:/app/api/config:ro \
+        -d perfsonar/pwa-admin
     ```
 
 5. Create meshconfig publishers.
@@ -169,21 +167,21 @@ Now we have all configuration files necessary to start installing MCA servicves.
     ```bash
     docker run \
         --restart=always \
-        --net mca \
-        --name mca-pub1 \
-        -v /etc/mca:/app/api/config:ro \
-        -d perfsonar/mca-pub
+        --net pwa \
+        --name pwa-pub1 \
+        -v /etc/pwa:/app/api/config:ro \
+        -d perfsonar/pwa-pub
     ```
 
-You can create as many mca-pub containers as desired (make sure to use unique names `mca-pub1`, `mca-pub2`, etc..) based on available resource (mainly CPU) . 1 or 2 should be fine for most cases.
+You can create as many pwa-pub containers as desired (make sure to use unique names `pwa-pub1`, `pwa-pub2`, etc..) based on available resource (mainly CPU) . 1 or 2 should be fine for most cases.
 
-If you use more than 1 instance, please edit `/etc/mca/nginx/conf.d/mca.conf` to include all instances, like..
+If you use more than 1 instance, please edit `/etc/pwa/nginx/conf.d/pwa.conf` to include all instances, like..
 
 ```
-upstream mcpub {
-    server mca-pub1:8080;
-    server mca-pub2:8080;
-    server mca-pub3:8080;
+upstream pwapub {
+    server pwa-pub1:8080;
+    server pwa-pub2:8080;
+    server pwa-pub3:8080;
 }
 ```
 
@@ -193,10 +191,10 @@ upstream mcpub {
     ```bash
     docker run \
         --restart=always \
-        --net mca \
+        --net pwa \
         --name nginx \
-        -v /etc/mca/shared:/shared:ro \
-        -v /etc/mca/nginx:/etc/nginx:ro \
+        -v /etc/pwa/shared:/shared:ro \
+        -v /etc/pwa/nginx:/etc/nginx:ro \
         -v /etc/grid-security/host:/certs:ro \
         -p 80:80 \
         -p 443:443 \
@@ -209,8 +207,8 @@ Now you should see all 5 containers running.
 ```bash
 docker container list
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                                              NAMES
-42efd21ff7f1        perfsonar/mca-pub     "node /app/api/mcp..."   18 seconds ago      Up 17 seconds       8080/tcp                                                           mca-pub1
-ab3936c7ab8c        perfsonar/mca-admin   "/start.sh"              19 seconds ago      Up 18 seconds       80/tcp, 8080/tcp                                                   mca-admin1
+42efd21ff7f1        perfsonar/pwa-pub     "node /app/api/mcp..."   18 seconds ago      Up 17 seconds       8080/tcp                                                           pwa-pub1
+ab3936c7ab8c        perfsonar/pwa-admin   "/start.sh"              19 seconds ago      Up 18 seconds       80/tcp, 8080/tcp                                                   pwa-admin1
 90cfbb8ba096        perfsonar/sca-auth    "/app/docker/start.sh"   24 seconds ago      Up 24 seconds       80/tcp, 8080/tcp                                                   sca-auth
 aa6471073c01        nginx               "nginx -g 'daemon ..."   11 hours ago        Up 11 hours         0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 0.0.0.0:9443->9443/tcp   nginx
 10fdf3b63e4f        mongo               "/entrypoint.sh mo..."   12 hours ago        Up 12 hours         27017/tcp                                                          mongo
@@ -220,11 +218,11 @@ aa6471073c01        nginx               "nginx -g 'daemon ..."   11 hours ago   
 
 Note: sometimes, docker containers will initially not have connectivity to the outside world. Usually this can be resolved by running `systemctl restart docker`
 
-You should now be able to access MCA by accessing your host on your browser on the host. You should be prompted to the login page. You should signup / confirm your email address, then define host gruops / testspecs, and construct new meshconfig using those test entries.
+You should now be able to access PWA by accessing your host on your browser on the host. You should be prompted to the login page. You should signup / confirm your email address, then define host gruops / testspecs, and construct new meshconfig using those test entries.
 
-MCA reports the current health status via following API endpoint (for mcadmin and mccache)
+PWA reports the current health status via following API endpoint (for pwa-admin and pwa-cache)
 
-`https://<hostname>/api/mca/health`
+`https://<hostname>/api/pwa/health`
 
 ```javascript
 {
@@ -239,7 +237,7 @@ MCA reports the current health status via following API endpoint (for mcadmin an
 
 You can configure your monitoring systems (Sensu, Nagious, etc..) to check for `status` and make sure it's set to 'ok'. 
 
-For mca-pub instances, you should run separate test at `http://<hostname>/pub/health` (not https://)
+For pwa-pub instances, you should run separate test at `http://<hostname>/pub/health` (not https://)
 
 ```javascript
 {
@@ -247,7 +245,7 @@ For mca-pub instances, you should run separate test at `http://<hostname>/pub/he
 }
 ```
 
-> Please note.. if you are running multiple instances of mca-pub, then /pub/health is just from one of the instances (not all)
+> Please note.. if you are running multiple instances of pwa-pub, then /pub/health is just from one of the instances (not all)
 
 You should also monitor the authentication service status
 
@@ -264,7 +262,7 @@ You can also monitor docker stdout/stderr log - similar to syslog.
 
 ### Update
 
-To update MCA containers to the latest version, do `docker pull` the container you are trying to update and rerun the same `docker run ...` command you used to start it.
+To update PWA containers to the latest version, do `docker pull` the container you are trying to update and rerun the same `docker run ...` command you used to start it.
 
 ### Firewall
 
@@ -272,40 +270,40 @@ Docker will take care of its own firewall rules, so you don't have to worry abou
 
 However, following are the ports used by nginx container.
 
-* 443 (For MCA administrative GUI)
-* 80 (For MCA configuration publisher)
-* 9443 (For x509 authentication to MCA administrative GUI)
+* 443 (For PWA administrative GUI)
+* 80 (For PWA configuration publisher)
+* 9443 (For x509 authentication to PWA administrative GUI)
 
-## MCA API 
+## PWA API
 
-MCA allows you to create / update meshconfig via REST API. You can use this to automate various configuration adminsitration.
+PWA allows you to create / update meshconfig via REST API. You can use this to automate various configuration adminsitration.
 
-Before you can start using the API, you need to obtain the access token. First, find your user ID you'd like to use (probably your user account). Login to MCA, and go to settings > account > Nerdy Things and look for `sub`.
+Before you can start using the API, you need to obtain the access token. First, find your user ID you'd like to use (probably your user account). Login to PWA, and go to settings > account > Nerdy Things and look for `sub`.
 
-Once you know your sub, login to your MCA server, and run something like following..
+Once you know your sub, login to your PWA server, and run something like following..
 
 ```
 $ docker exec -it sca-auth bash
-$ /app/bin/auth.js issue --scopes '{"mca": ["user"]}' --sub '0' 
+$ /app/bin/auth.js issue --scopes '{"pwa": ["user"]}' --sub '0' 
 eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3NjYS5pdS5lZHUvYXV0aCIsImlhdCI6MTQ4NzYyNzE2OS45NjMsInNjb3BlcyI6eyJtY2EiOlsidXNlciJdfSwic3ViIjowfQ.hmKr5GAhabMwSltdyq21__-JSGFXFyhxLB7HxhucXLMOslqVo2yOx4qZoLprBDKcCFnKQ7fQNY0fI9coi9ix40clci--p5iSD-w4gzXaxRm2wvldUDQeA...
 $ exit
 ```
 
 > '0' is where you put your user ID
 
-Copy the output from auth.js which is your access token. Store this on your server somewhere and make sure only you can access it (like chmod 600 `~/.mca.token.jwt`)
+Copy the output from auth.js which is your access token. Store this on your server somewhere and make sure only you can access it (like chmod 600 `~/.pwa.token.jwt`)
 
-You can now use most of the MCA REST APIs as documented here.
+You can now use most of the PWA REST APIs as documented here.
 > https://<hostname>/apidoc/
 
 For example, to query for the hostgroups, you can do something like
 
 ```bash
-jwt=`cat ~/.mca.token.jwt`
+jwt=`cat ~/.pwa.token.jwt`
 curl -k \
     -H "Authorization: Bearer $jwt" \
     -H "Content-Type: application/json" \
-    -X POST https://meshconfig-itb.grid.iu.edu/api/mca/hostgroup?limit=1
+    -X POST https://<hostname>/api/pwa/hostgroup?limit=1
 ```
 
 ```json
