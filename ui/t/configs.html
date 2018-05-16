@@ -2,8 +2,8 @@
 <div class="sca-sidebar-page">
     <div class="subbar">
         <div style="padding-left: 20px; margin-bottom: 10px;">
-            <h2>Mesh Configs</h2>
-            <p class="help-block">Showing registered mesh configs</p>
+            <h2>Configs</h2>
+            <p class="help-block">Showing registered configs</p>
             <br>
             <!--
             <div class="btn-group pull-right" style="left: -20px;top: -5px;">
@@ -21,12 +21,12 @@
                 </ul>
             </div>
             -->
-            <span class="text-muted">{{configs.length}} Mesh Configs</span>
+            <span class="text-muted">{{configs.length}} Configs</span>
         </div>
         <hr style="margin: 0px;">
 
         <div class="subbar-list" style="bottom: 160px;">
-            <p class="alert alert-info" ng-if="configs.length == 0">Please register a mesh config.</p>
+            <p class="alert alert-info" ng-if="configs.length == 0">Please register a config.</p>
             <div class="subbar-list-item" 
                 ng-repeat="config in configs" 
                 ng-class="{active: selected == config}"

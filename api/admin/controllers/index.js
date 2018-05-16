@@ -27,15 +27,15 @@ router.get('/health', function(req, res) {
     //check mccache status
     if(!cache_status) {
         status = "failed";
-        msg = "no status report from mccache service (yet?)";
+        msg = "no status report from pwacache service (yet?)";
     } else {
         if(Date.now() - cache_status.update_time > config.datasource.delay) {
             status = "failed";
-            msg = "mccache hasn't reported back for more than "+config.datasource.delay + " msec";
+            msg = "pwacache hasn't reported back for more than "+config.datasource.delay + " msec";
         }
         if(cache_status.hosts < 10) {
             status = "failed";
-            msg = "mccache is reporting unusually low hosts count..";
+            msg = "pwacache is reporting unusually low hosts count..";
         }
     }
 

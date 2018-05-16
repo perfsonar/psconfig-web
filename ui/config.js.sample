@@ -1,10 +1,10 @@
 
 angular.module('app.config', []).constant('appconf', {
     //title to display
-    title: 'MeshConfig Admin',
+    title: 'pSConfig Web Admin',
 
-    //url base for meshconfig api
-    api: '../api/meshconfig',
+    //url base for pwa api
+    api: '../api/pwa',
 
     //url base for meshconfig publisher
     pub_url: 'http://'+location.hostname+location.pathname+'pub/',
