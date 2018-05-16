@@ -1,23 +1,23 @@
-#docker network create mca
+#docker network create pwa
 
-docker rm -f mca-admin1
+docker rm -f pwa-admin1
 docker run \
     --restart=always \
-    --net mca \
-    --name mca-admin1 \
+    --net pwa \
+    --name pwa-admin1 \
     -v `pwd`/config:/app/api/config \
     -p 10080:80 \
     -p 18080:8080 \
-    -d perfsonar/mca-admin
+    -d perfsonar/pwa-admin
 
-docker rm -f mca-pub1
+docker rm -f pwa-pub1
 docker run \
     --restart=always \
-    --net mca \
-    --name mca-pub1 \
+    --net pwa \
+    --name pwa-pub1 \
     -v `pwd`/config:/app/api/config \
     -p 18081:8080 \
-    -d perfsonar/mca-pub
+    -d perfsonar/pwa-pub
 
-#docker exec -it mca-admin1 bash
+#docker exec -it pwa-admin1 bash
 

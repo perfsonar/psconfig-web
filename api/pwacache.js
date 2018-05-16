@@ -307,7 +307,7 @@ function run() {
 
                 //report health status to mcadmin
                 var mcadmin = "http://"+(config.admin.host||"localhost")+":"+config.admin.port;
-                request.post({url: mcadmin+"/health/mccache", json: {hosts: host_count}}, function(err, res, body) {
+                request.post({url: mcadmin+"/health/pwacache", json: {hosts: host_count}}, function(err, res, body) {
                     if(err) logger.error(err);
                     logger.info("finished caching .. sleeping for "+config.datasource.delay +" msec");
                     setTimeout(run, config.datasource.delay);

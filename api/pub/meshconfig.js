@@ -239,7 +239,7 @@ function resolve_hostgroup(id, cb) {
     db.Hostgroup.findById(id).exec(function(err, hostgroup) {
         if(err) return cb(err);
         if(!hostgroup) return cb("can't find hostgroup:"+id);
-        //hosts will contain hostid for both static and dynamic (cached by mccache)
+        //hosts will contain hostid for both static and dynamic (cached by pwacache)
         resolve_hosts(hostgroup.hosts, function(err, hosts) {
             if(err) return cb(err);
             cb(null, hosts);
