@@ -165,7 +165,7 @@ exports.datasource = {
     }
 }
 
-exports.mongodb = "mongodb://mongo/mca";
+exports.mongodb = "mongodb://mongo/pwa";
 
 //admin api
 exports.admin = {

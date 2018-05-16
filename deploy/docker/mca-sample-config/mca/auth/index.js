@@ -7,7 +7,7 @@ exports.auth = {
     default: {
         scopes: {
             sca: ["user"],
-            mca: ["user"], //needed by mca
+            pwa: ["user"], //needed by pwa
         },
         gids: [ /*1*/ ],
     },
@@ -28,7 +28,7 @@ exports.auth = {
 
 //comment this out if you don't want to confirm email
 exports.email_confirmation = {
-    subject: 'Meshconfig Account Confirmation',
+    subject: 'pSConfig Web Admin Account Confirmation',
     from: 'user@domain.tld',  //most mail server will reject if this is not replyable address
 };
 
@@ -39,11 +39,11 @@ exports.local = {
 
     //comment this out if you don't want to confirm email
     email_confirmation: {
-	    subject: 'Meshconfig Account Confirmation',
+	    subject: 'pSConfig Web Admin Account Confirmation',
 	    from: 'user@domain.tld',  //most mail server will reject if this is not replyable address
     },
     email_passreset: {
-	    subject: 'Meshconfig Password Reset',
+	    subject: 'pSConfig Web Admin Password Reset',
 	    from: 'user@domain.tld',  //most mail server will reject if this is not replyable address
     }
 };
