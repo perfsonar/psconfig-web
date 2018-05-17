@@ -1,5 +1,5 @@
 {
-  "name": "psConfig Web Admin",
+  "name": "psconfigwebadmin",
   "version": "3.0.4",
   "description": "Tools to generate / publish perfSONAR meshconfig/psconfig topologies",
   "scripts": {
