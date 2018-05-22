@@ -14,7 +14,7 @@ const db = require('../../models');
 
 function canedit(user, host) {
     if(user) {
-        if(user.scopes.mca && ~user.scopes.mca.indexOf('admin')) return true; //admin can edit whaterver..
+        if(user.scopes.pwa && ~user.scopes.pwa.indexOf('admin')) return true; //admin can edit whaterver..
         if(host.admins && ~host.admins.indexOf(user.sub.toString())) return true;
     }
     return false;
@@ -23,7 +23,7 @@ function canedit(user, host) {
 /**
  * @api {get} /hosts            Query Hosts
  * @apiGroup                    Hosts
- * @apiDescription              Query hosts known to MCA
+ * @apiDescription              Query hosts known to PWA
  *
  * @apiParam {Object} [find]    Mongo find query JSON.stringify & encodeURIComponent-ed - defaults to {}
  *                              To pass regex, you need to use {$regex: "...."} format instead of js: /.../ 
@@ -78,7 +78,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
  * @apiParam {String} [desc]        host description used in meshconfig - sitename will be used if missing
  * @apiParam {Boolean} [no_agent]   Set to true if this host should not read the meshconfig (passive) (default: false)
  * @apiParam {String} [hostname]    (Adhoc only) hostname
- * @apiParam {String} [sitename]    (Adhoc only) sitename to show to assist hostname lookup inside MCA
+ * @apiParam {String} [sitename]    (Adhoc only) sitename to show to assist hostname lookup inside PWA
  * @apiParam {Object} [info]        (Adhoc only) host information (key/value pairs of various info - TODO document)
  * @apiParam {String[]} [communities] (Adhoc only) list of community names that this host is registered in LS
  * @apiParam {String[]} [admins]    Array of admin IDs who can update information on this host (default to submitter)
@@ -87,7 +87,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
  * @apiSuccess {Object}         Adhoc host registered
  */
 router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    if(!req.user.scopes.mca || !~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
+    if(!req.user.scopes.pwa || !~req.user.scopes.pwa.indexOf('user')) return res.status(401).end();
     if(req.body.lsid) delete res.body.lsid;// make sure lsid is not set
 
     //default admins to submitter
@@ -111,7 +111,7 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
  * @apiParam {String} [desc]        host description used in meshconfig - sitename will be used if missing
  * @apiParam {Boolean} [no_agent] Set to true if this host should not read the meshconfig (passive) (default: false)
  * @apiParam {String} [hostname] (Adhoc only) hostname
- * @apiParam {String} [sitename] (Adhoc only) sitename to show to assist hostname lookup inside MCA
+ * @apiParam {String} [sitename] (Adhoc only) sitename to show to assist hostname lookup inside PWA
  * @apiParam {Object} [info]    (Adhoc only) host information (key/value pairs of various info - TODO document)
  * @apiParam {String[]} [communities] (Adhoc only) list of community names that this host is registered in LS
  * @apiParam {String[]} [admins] Array of admin IDs who can update information on this host
@@ -174,7 +174,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
  * @apiGroup                    Hosts
  * @apiDescription              Remove host registration - if it's not used by any hostgroup / config. 
  *                              Also, if it's not adhoc, the host will be reregistered again by cache service.
- * @apiHeader {String} authorization 
+ * @apiHeader {String} authorization
  *                              A valid JWT token "Bearer: xxxxx"
  * @apiSuccessExample {json} Success-Response:
  *     HTTP/1.1 200 OK
@@ -186,9 +186,9 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
     db.Host.findById(req.params.id, function(err, host) {
         if(err) return next(err);
         if(!host) return next(new Error("can't find a host with id:"+req.params.id));
-        
+
         async.series([
-            //check access 
+            //check access
             function(cb) {
                 if(canedit(req.user, host)) {
                     cb();
@@ -196,7 +196,7 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
                     cb("You don't have access to remove this host");
                 }
             },
-            
+
             //check foreign key dependencies on host.ma
             function(cb) {
                 db.Host.find({"services.ma": host._id}, function(err, hosts) {

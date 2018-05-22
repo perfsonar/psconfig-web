@@ -14,7 +14,7 @@ const meshconfig = require('./meshconfig');
 /**
  * @apiGroup            Publisher
  * @api {get} /health   Get API status for publisher
- * @apiDescription      Get current API status for MCA publisher
+ * @apiDescription      Get current API status for PWA publisher
  *
  * @apiSuccess {String} status 'ok' or 'failed'
  */

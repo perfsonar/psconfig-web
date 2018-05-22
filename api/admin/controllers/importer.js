@@ -255,7 +255,7 @@ exports._process_imported_config = function ( meshconfig, sub, cb, disable_ensur
         var type = get_service_type(test.parameters.type);
         var hostgroup = {
             name: test.description+" Group",
-            desc: "Imported by MCA importer",
+            desc: "Imported by PWA importer",
             type: "static",
             service_type: type,
             admins: [sub.toString()],
@@ -267,7 +267,7 @@ exports._process_imported_config = function ( meshconfig, sub, cb, disable_ensur
 
         var testspec = {
             name: test.description+" Testspecs",
-            desc: "Imported by MCA importer",
+            desc: "Imported by PWA importer",
             service_type: type,
             admins: [sub.toString()],
             specs: test.parameters,

@@ -461,7 +461,7 @@ exports.generate = function(_config, opts, cb) {
         }
 
         //convert services to sites/hosts entries
-        //mca currently doesn't handle the concept of organization
+        //pwa currently doesn't handle the concept of organization
         var org = {
             sites: [],
         };

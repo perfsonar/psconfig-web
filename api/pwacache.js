@@ -241,7 +241,7 @@ function update_dynamic_hostgroup(cb) {
 }
 
 function run() {
-    //mca host records keyed by uri (hostname could duplicate)
+    //pwa host records keyed by uri (hostname could duplicate)
     //hostname found first will take precedence
     //host.simulated will have less precedence
     var hosts = {};
@@ -305,9 +305,9 @@ function run() {
             update_dynamic_hostgroup(function(err) {
                 if(err) logger.error(err);
 
-                //report health status to mcadmin
-                var mcadmin = "http://"+(config.admin.host||"localhost")+":"+config.admin.port;
-                request.post({url: mcadmin+"/health/pwacache", json: {hosts: host_count}}, function(err, res, body) {
+                //report health status to pwadmin
+                var pwadmin = "http://"+(config.admin.host||"localhost")+":"+config.admin.port;
+                request.post({url: pwadmin+"/health/pwacache", json: {hosts: host_count}}, function(err, res, body) {
                     if(err) logger.error(err);
                     logger.info("finished caching .. sleeping for "+config.datasource.delay +" msec");
                     setTimeout(run, config.datasource.delay);

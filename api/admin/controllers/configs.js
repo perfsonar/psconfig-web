@@ -17,7 +17,7 @@ const importer = require('./importer');
 
 function canedit(user, config) {
     if(user) {
-        if(user.scopes.mca && ~user.scopes.mca.indexOf('admin')) return true;
+        if(user.scopes.pwa && ~user.scopes.pwa.indexOf('admin')) return true;
         if(~config.admins.indexOf(user.sub.toString())) return true;
     }
     return false;
@@ -85,7 +85,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
  * @apiSuccess {Object}         Config created
  */
 router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    if(!req.user.scopes.mca || !~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
+    if(!req.user.scopes.pwa || !~req.user.scopes.pwa.indexOf('user')) return res.status(401).end();
     db.Config.create(req.body, function(err, config) {
         if(err) return next(err);
         config = JSON.parse(JSON.stringify(config));
@@ -95,7 +95,7 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
 });
 
 router.put('/import', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    if(!req.user.scopes.mca || !~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
+    if(!req.user.scopes.pwa || !~req.user.scopes.pwa.indexOf('user')) return res.status(401).end();
     importer.import(req.body.url, req.user.sub, function(err, tests, new_config_params) {
         if(err) return next(err);
         res.json({msg: "Created testspecs / host / hostgroups records", tests: tests, config_params: new_config_params});

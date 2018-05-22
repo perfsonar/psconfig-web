@@ -15,7 +15,7 @@ const common = require('../../common');
 
 function canedit(user, hostgroup) {
     if(user) {
-        if(user.scopes.mca && ~user.scopes.mca.indexOf('admin')) return true;
+        if(user.scopes.pwa && ~user.scopes.pwa.indexOf('admin')) return true;
         if(~hostgroup.admins.indexOf(user.sub.toString())) return true;
     }
     return false;
@@ -82,7 +82,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
  * @apiSuccess {Object}         Hostgroup created
  */
 router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    if(!req.user.scopes.mca || !~req.user.scopes.mca.indexOf('user')) return res.status(401).end();
+    if(!req.user.scopes.pwa || !~req.user.scopes.pwa.indexOf('user')) return res.status(401).end();
     db.Hostgroup.create(req.body, function(err, hostgroup) {
         if(err) return next(err);
         hostgroup = JSON.parse(JSON.stringify(hostgroup));

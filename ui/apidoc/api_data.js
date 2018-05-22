@@ -162,7 +162,7 @@ define({ "api": [
             "type": "String",
             "optional": true,
             "field": "desc",
-            "description": "<p>Description for this meshconfig (MCA use only)</p>"
+            "description": "<p>Description for this meshconfig (PWA use only)</p>"
           },
           {
             "group": "Parameter",
@@ -240,7 +240,7 @@ define({ "api": [
             "type": "String",
             "optional": true,
             "field": "desc",
-            "description": "<p>Description for this meshconfig (MCA use only)</p>"
+            "description": "<p>Description for this meshconfig (PWA use only)</p>"
           },
           {
             "group": "Parameter",
@@ -623,7 +623,7 @@ define({ "api": [
     "url": "/hosts",
     "title": "Query Hosts",
     "group": "Hosts",
-    "description": "<p>Query hosts known to MCA</p>",
+    "description": "<p>Query hosts known to PWA</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -745,7 +745,7 @@ define({ "api": [
             "type": "String",
             "optional": true,
             "field": "sitename",
-            "description": "<p>(Adhoc only) sitename to show to assist hostname lookup inside MCA</p>"
+            "description": "<p>(Adhoc only) sitename to show to assist hostname lookup inside PWA</p>"
           },
           {
             "group": "Parameter",
@@ -851,7 +851,7 @@ define({ "api": [
             "type": "String",
             "optional": true,
             "field": "sitename",
-            "description": "<p>(Adhoc only) sitename to show to assist hostname lookup inside MCA</p>"
+            "description": "<p>(Adhoc only) sitename to show to assist hostname lookup inside PWA</p>"
           },
           {
             "group": "Parameter",
@@ -1053,7 +1053,7 @@ define({ "api": [
     "type": "get",
     "url": "/health",
     "title": "Get API status for publisher",
-    "description": "<p>Get current API status for MCA publisher</p>",
+    "description": "<p>Get current API status for PWA publisher</p>",
     "success": {
       "fields": {
         "Success 200": [
