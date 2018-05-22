@@ -77,7 +77,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
  *
  * @apiParam {String} [url]     URL to expose this config ("config" will be published under "/pub/config") - needs to be unique
  * @apiParam {String} [name]    Name of this meshconfig (will be published on the meshconfig)
- * @apiParam {String} [desc]    Description for this meshconfig (MCA use only)
+ * @apiParam {String} [desc]    Description for this meshconfig (PWA use only)
  * @apiParam {Object[]} [tests] Array of test objects (TODO - need documentation)
  * @apiParam {String[]} [admins] Array of admin IDs
  *
@@ -115,7 +115,7 @@ router.put('/import', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
  *
  * @apiParam {String} [url]     URL to expose this config ("config" will be published under "/pub/config")
  * @apiParam {String} [name]    Name of this meshconfig (will be published on the meshconfig)
- * @apiParam {String} [desc]    Description for this meshconfig (MCA use only)
+ * @apiParam {String} [desc]    Description for this meshconfig (PWA use only)
  * @apiParam {Object[]} [tests] Array of test objects (TODO - need documentation)
  * @apiParam {String[]} [admins] Array of admin IDs
  *
