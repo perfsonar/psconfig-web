@@ -3,10 +3,10 @@
 angular.module('app.config', [])
 .constant('appconf', {
 
-    title: 'MCA Authentication Service',
+    title: 'PWA Authentication Service',
 
-    admin_email: 'hayashis@iu.edu',
-    logo_400_url: 'images/meshconfig_logo.jpg',
+    admin_email: 'user@domain.tld',
+    logo_400_url: 'images/pscweb_logo.png',
 
     oidc_logo: 'images/cilogon.png',
 
@@ -37,7 +37,7 @@ angular.module('app.config', [])
         github: false,
         facebook: false,
 
-        oidc: true, //cilogon openid-connect service
+        oidc: false, //cilogon openid-connect service
         //oidc_selector: false, //show idp selector
 
         signup: true,

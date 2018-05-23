@@ -24,18 +24,18 @@ router.get('/health', function(req, res) {
     var status = "ok";
     var msg = "everything looks good";
 
-    //check mccache status
+    //check pwacache status
     if(!cache_status) {
         status = "failed";
-        msg = "no status report from mccache service (yet?)";
+        msg = "no status report from pwacache service (yet?)";
     } else {
         if(Date.now() - cache_status.update_time > config.datasource.delay) {
             status = "failed";
-            msg = "mccache hasn't reported back for more than "+config.datasource.delay + " msec";
+            msg = "pwacache hasn't reported back for more than "+config.datasource.delay + " msec";
         }
         if(cache_status.hosts < 10) {
             status = "failed";
-            msg = "mccache is reporting unusually low hosts count..";
+            msg = "pwacache is reporting unusually low hosts count..";
         }
     }
 
@@ -53,9 +53,9 @@ router.get('/health', function(req, res) {
     });
 });
 
-//used by mccache to report cache status
+//used by pwacache to report cache status
 //it should contain hosts counts
-router.post('/health/mccache', function(req, res) {
+router.post('/health/pwacache', function(req, res) {
     cache_status = req.body;
     cache_status.update_time = Date.now();
     logger.debug(req.body);

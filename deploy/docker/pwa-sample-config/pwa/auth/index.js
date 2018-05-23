@@ -7,13 +7,13 @@ exports.auth = {
     default: {
         scopes: {
             sca: ["user"],
-            mca: ["user"], //needed by mca
+            pwa: ["user"], //needed by pwa
         },
         gids: [ /*1*/ ],
     },
 
     //isser to use for generated jwt token
-    iss: "https://host.domain.tld/auth",
+    iss: "https://<pwa_hostname>/auth",
     //ttl for jwt
     ttl: 24*3600*1000, //1 day
 
@@ -28,23 +28,23 @@ exports.auth = {
 
 //comment this out if you don't want to confirm email
 exports.email_confirmation = {
-    subject: 'Meshconfig Account Confirmation',
-    from: 'user@domain.tld',  //most mail server will reject if this is not replyable address
+    subject: 'pSConfig Web Admin Account Confirmation',
+    from: '<email_address>',  //most mail server will reject if this is not replyable address
 };
 
 //for local user/pass login (you should use either local, or ldap - but not both)
 exports.local = {
     //url base for callbacks only used if req.header.referer is not set (like via cli)
-    //url: 'https://host.domain.tld/auth',
+    //url: 'https://<pwa_hostname>/auth',
 
     //comment this out if you don't want to confirm email
     email_confirmation: {
-	    subject: 'Meshconfig Account Confirmation',
-	    from: 'user@domain.tld',  //most mail server will reject if this is not replyable address
+	    subject: 'pSConfig Web Admin Account Confirmation',
+	    from: '<email_address>',  //most mail server will reject if this is not replyable address
     },
     email_passreset: {
-	    subject: 'Meshconfig Password Reset',
-	    from: 'user@domain.tld',  //most mail server will reject if this is not replyable address
+	    subject: 'pSConfig Web Admin Password Reset',
+	    from: '<email_address>',  //most mail server will reject if this is not replyable address
     }
 };
 
@@ -60,7 +60,7 @@ exports.oidc = {
     token_url: "https://cilogon.org/oauth2/token",
     userinfo_url: "https://cilogon.org/oauth2/userinfo", //specific to openid connect
 
-    callback_url: "https://host.domain.tld/api/auth/oidc/callback",
+    callback_url: "https://<pwa_hostname>/api/auth/oidc/callback",
     scope: "openid profile email org.cilogon.userinfo",
 
     client_id: "myproxy:oa4mp,2012:/client_id/234dba466fc3dd2dd30e3414087e3c1b",

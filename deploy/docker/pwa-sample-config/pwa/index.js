@@ -165,7 +165,7 @@ exports.datasource = {
     }
 }
 
-exports.mongodb = "mongodb://mongo/mca";
+exports.mongodb = "mongodb://mongo/pwa";
 
 //admin api
 exports.admin = {
@@ -183,7 +183,7 @@ exports.pub = {
     host: "0.0.0.0",
     port: 8080,
 
-    url: 'http://host.domain.tld/pub/',
+    url: 'http://<pwa_hostname>/pub/',
 };
 
 exports.common = {
