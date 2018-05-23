@@ -77,19 +77,23 @@ tar -xzf pwa.sample.tar.gz -C /etc
     `/etc/pwa/index.js` 
 
     * Edit defaults `testspecs` if necessary (`meshconfig.defaults.testspecs`)
-    * Edit datasource section which determines which host you'd like to load from sLS to construct your host config.
-    * Update pub.url with the hostname that your PWA instance will be exposed as.
+    * Update pub.url with the hostname that your PWA instance will be exposed as. The easiest way to do this is to replace <pwa_hostname> with the FQDN of your Docker host (removing the brackets).
+    * Edit datasource section which determines which host you'd like to load from sLS to construct your host config, if applicable (if you are not running a private LS, this most likely does not apply to you)
 
 2. For Authentication Service
 
     `/etc/pwa/auth/index.js`
 
-    Update `from` address to administrator's email address used to send email to confirmation new user accounts. If you'd like to skip email confirmation when user signup, simply comment out the whole email_confirmation section. 
+    Update the hostname in the config by performing a search and replace in this file. Replace <pwa_hostname> with the hostname (FQDN) of the host that holds your docker containers (remove the brackets).
+
+    Update `from` address to administrator's email address used to send email to confirmation new user accounts. You can do this by doing a search and replace in the file, replacing <email_address> with the full e-mail address you want to use (remove the brackets).
+
+    If you'd like to skip email confirmation when user signup, simply comment out the whole email_confirmation section.
 
     ```javascript
     exports.email_confirmation = {
         subject: 'psConfig Web Admin Account Confirmation',
-        from: 'user@domain.tld',  //most mail server will reject if this is not replyable address
+        from: '<email_address>',  //most mail server will reject if this is not replyable address
     };
 
     ```

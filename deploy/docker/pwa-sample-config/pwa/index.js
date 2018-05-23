@@ -183,7 +183,7 @@ exports.pub = {
     host: "0.0.0.0",
     port: 8080,
 
-    url: 'http://host.domain.tld/pub/',
+    url: 'http://<pwa_hostname>/pub/',
 };
 
 exports.common = {
