@@ -1,4 +1,4 @@
-# perfSONAR psConfig Web Admin (PWA)
+# psConfig Web Administrator (PWA)
 
 psConfig Web-based administration GUI and tools to publish generated meshconfig/psconfig output
 
