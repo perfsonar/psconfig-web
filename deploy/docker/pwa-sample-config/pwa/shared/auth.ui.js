@@ -33,14 +33,14 @@ angular.module('app.config', [])
         iucas: false,
         google: false,
         git: false,
-        x509: true,
+        x509: false,
         github: false,
         facebook: false,
 
         oidc: false, //cilogon openid-connect service
         //oidc_selector: false, //show idp selector
 
-        signup: true,
+        signup: false,
     },
 });
 

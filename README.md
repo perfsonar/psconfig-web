@@ -108,6 +108,8 @@ tar -xzf pwa.sample.tar.gz -C /etc
 
 You will need SSL certificates for https access. On /etc/pwa/auth, you should see your host certificate with following file names, or place them there if not.
 
+# TODO: show how to create certs
+
 ```bash
 $ ls /etc/pwa/auth
 cert.pem 
