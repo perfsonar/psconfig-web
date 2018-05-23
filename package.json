@@ -10,7 +10,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/perfsonar/psconfig-web-admin"
+    "url": "https://github.com/perfsonar/psconfig-web"
   },
   "dependencies": {
     "async": "^2.3.0",
