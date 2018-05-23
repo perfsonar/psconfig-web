@@ -69,7 +69,7 @@ Before we start installing PWA, you should prepare your configuration files firs
 downloading and deploying PWA's default configuration files from git repo.
 
 ```bash
-wget https://github.com/perfsonar/meshconfig-admin/raw/master/deploy/docker/pwa.sample.tar.gz
+wget https://github.com/perfsonar/psconfig-web/raw/master/deploy/docker/pwa.sample.tar.gz
 tar -xzf pwa.sample.tar.gz -C /etc
 ```
 1. For PWA
