@@ -8,6 +8,8 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
     $scope.active_menu = "hosts";
     $scope.loading = true;
     $scope.hosts_filter = $cookies.get('hosts_filter');
+    $scope.address_families = [{'id':'4', name:'ipv4'}, {'id':'6', name:'ipv6'}];
+    //$scope.selectedFamily = null;
 
     $scope.refreshHosts = function(query, service) {
         var select = "sitename hostname lsid";
@@ -90,9 +92,14 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
 
         hosts.getDetail(host).then(function(_host) {
             find_missing_services();
+            $scope.addresses = _host.addresses;
+            console.log("_host.addresses", _host.addresses);
+            //$scope.setFamilyValues( _host.addresses );
+            $scope.selectedFamily = $scope.address_families[0];
             reset_mapinfo();
             $scope.refreshHosts();
         });
+
 
         //load hostgroups that this host is member of
         $http.get(appconf.api+'/hostgroups?select='+encodeURIComponent("name desc service_type")+
@@ -120,7 +127,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
             $(".subbar").removeClass("subbar-shown");
         }
 
-
+        $scope.addresses = host.addresses;
 
         $scope.closesubbar();
         $location.update_path("/hosts/"+host._id);
@@ -131,6 +138,43 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         $scope.closesubbar();
         $location.update_path("/hosts");
         find_missing_services();
+    }
+
+    /*
+    $scope.setFamilyValues = function( ) {
+        for(var i in $scope.addresses ) {
+            var addr = $scope.addresses[i];
+
+
+        }
+
+    }
+    */
+
+    $scope.setFamilyValue = function( addr ) {
+        //var addr = $scope.selectedFamily;
+        console.log("$scope", $scope);
+        console.log("addr", addr);
+        //console.log("$id", $scope.$id );
+        var options = $scope.address_families;
+
+        console.log("options", options);
+
+        for( var i in options ) {
+            var opt = options[i];
+            if ( addr != null &&  addr.id == opt.id ) {
+                console.log("selecting family", opt);
+                $scope.selectedFamily = opt;
+                $scope.addresses[i].family = opt.id; // TODO: fix, not working
+                console.log("i", i);
+                return $scope.selectedFamily;
+            }
+
+        }
+        //$scope.selectedOption = $scope.options[1];
+
+        //var def = $scope.serverconf.defaults.testspecs[type];
+        //$scope.selected.specs = angular.copy(def);
     }
 
     $scope.filter_hosts = function(hosts) {
@@ -150,7 +194,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
             var hostname = host.hostname.toLowerCase();
             var sitename = host.sitename.toLowerCase();
             var lsid = (host.lsid?host.lsid.toLowerCase():"adhoc");
-            
+
             //all tokens must match somewhere
             var tokens = $scope.hosts_filter.toLowerCase().split(" ");
             var accept = true;
