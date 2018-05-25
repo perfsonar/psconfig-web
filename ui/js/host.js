@@ -9,7 +9,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
     $scope.loading = true;
     $scope.hosts_filter = $cookies.get('hosts_filter');
     $scope.address_families = [{'id':'4', name:'ipv4'}, {'id':'6', name:'ipv6'}];
-    //$scope.selectedFamily = null;
+    $scope.selectedFamily = [];
 
     $scope.refreshHosts = function(query, service) {
         var select = "sitename hostname lsid";
@@ -95,7 +95,17 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
             $scope.addresses = _host.addresses;
             console.log("_host.addresses", _host.addresses);
             //$scope.setFamilyValues( _host.addresses );
-            $scope.selectedFamily = $scope.address_families[0];
+
+            $scope.addresses.forEach( function ( address, i ) {
+                console.log("select i, address", i, address);
+                //$scope.selectedFamily[i] = address;
+                $scope.selectedFamily[i] = $scope.address_families[i];
+
+            });
+
+            console.log("$scope.selectedFamily", $scope.selectedFamily );
+
+            //$scope.selectedFamily = $scope.address_families[index];
             reset_mapinfo();
             $scope.refreshHosts();
         });
@@ -151,22 +161,30 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
     }
     */
 
-    $scope.setFamilyValue = function( addr ) {
+    $scope.setFamilyValue = function( formFamily, index ) {
         //var addr = $scope.selectedFamily;
         console.log("$scope", $scope);
-        console.log("addr", addr);
+        console.log("formFamily", formFamily);
+        console.log("index", index);
         //console.log("$id", $scope.$id );
         var options = $scope.address_families;
 
-        console.log("options", options);
+        var addresses = $scope.addresses;
+        var address = addresses[index];
+        console.log("addresses", addresses);
+
+        console.log("options index", index, options);
 
         for( var i in options ) {
             var opt = options[i];
-            if ( addr != null &&  addr.id == opt.id ) {
-                console.log("selecting family", opt);
-                $scope.selectedFamily = opt;
-                $scope.addresses[i].family = opt.id; // TODO: fix, not working
+            if ( formFamily != null && formFamily[index].id == opt.id ) {
+                //console.log("selecting family", address.family);
+                console.log("selecting family", opt.id);
+                $scope.selectedFamily[ index ] = opt;
+                //$scope.addresses[i].family = address.family; // TODO: fix, not working
+                $scope.addresses[index].family = opt.id;
                 console.log("i", i);
+                console.log("family after setting", $scope.selectedFamily);
                 return $scope.selectedFamily;
             }
 

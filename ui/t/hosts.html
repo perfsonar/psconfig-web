@@ -291,9 +291,10 @@
                 <!-- <li ng-repeat="com in selected.communities">{{com}}</li> -->
                 <div class="form-group" ng-repeat="addr in addresses">
                     <p>Family: "{{addr.family}}"</p>
+                    <p>Family dynamic: "{{selectedFamily[ $index ].id}}"</p>
                     <label class="col-sm-2 control-label">Address</label>
                     <div class="col-sm-6">
-                        <input type="text" class="form-control" name="address" 
+                        <input type="text" class="form-control" name="address{{$index}}" 
                             ng-disabled="!selected._canedit" ng-model="addr.address">
 
                         <p class="help-block">This allows you to override the local MA URL for this host, in case you need https instead of http, alternative ports, etc.</p>
@@ -301,11 +302,11 @@
                     <label class="col-sm-2 control-label">Protocol</label>
                     <div class="col-sm-2">
                         <select class="form-control"
-                            name="family"
+                            name="family{{$index}}"
                             ng-disabled="!selected._canedit"
-                            ng-model="selectedFamily"
+                            ng-model="selectedFamily[$index]"
                             ng-options="family.name for family in address_families track by family.id"
-                            ng-change="setFamilyValue(selectedFamily)"
+                            ng-change="setFamilyValue(selectedFamily,{{$index}})"
                                 required>
                         </select>
 
