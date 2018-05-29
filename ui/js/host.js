@@ -93,13 +93,14 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         hosts.getDetail(host).then(function(_host) {
             find_missing_services();
             $scope.addresses = _host.addresses;
-            console.log("_host.addresses", _host.addresses);
             //$scope.setFamilyValues( _host.addresses );
 
             $scope.addresses.forEach( function ( address, i ) {
-                console.log("select i, address", i, address);
-                //$scope.selectedFamily[i] = address;
-                $scope.selectedFamily[i] = $scope.address_families[i];
+                $scope.address_families.forEach(function( family, j) {
+                    if ( family.id == address.family ) {
+                        $scope.selectedFamily[i] = $scope.address_families[j];
+                    }
+                });
 
             });
 
@@ -148,7 +149,15 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         $scope.closesubbar();
         $location.update_path("/hosts");
         find_missing_services();
+        clear_addresses();
     }
+
+   function clear_addresses() {
+       $scope.addresses = [];
+       $scope.selectedFamily = [];
+
+
+   } 
 
     /*
     $scope.setFamilyValues = function( ) {
