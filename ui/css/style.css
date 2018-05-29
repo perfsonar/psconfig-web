@@ -249,3 +249,9 @@ div.well-detail {
 .panel-default > .panel-heading + .panel-collapse > .panel-body {
   border-color: #ccc;
 }
+
+.host-addresses i.fa {
+    float: left;
+    font-size: 20px;
+
+}

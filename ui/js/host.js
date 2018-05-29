@@ -8,6 +8,10 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
     $scope.active_menu = "hosts";
     $scope.loading = true;
     $scope.hosts_filter = $cookies.get('hosts_filter');
+    $scope.address_families = [{'id':'4', name:'ipv4'}, {'id':'6', name:'ipv6'}];
+    $scope.selectedFamily = [];
+    $scope.newAddressFamily = $scope.address_families[0];
+    $scope.newAddress = "";
 
     $scope.refreshHosts = function(query, service) {
         var select = "sitename hostname lsid";
@@ -21,12 +25,6 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         } else {
             /*
             //only search for what's already selected
-            var host_ids = [];
-            $scope.selected.services.forEach(service=>{
-                if(service.ma) host_ids.push(service.ma);
-            });
-            if(host_ids.length == 0) return [];
-            find._id = {$in: host_ids};
             */
             if(service && service.ma) find._id = service.ma;
             else return;
@@ -35,9 +33,6 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         return $http.get(appconf.api+'/hosts?select='+encodeURIComponent(select)+
             '&sort=sitename hostname&find='+encodeURIComponent(JSON.stringify(find)))
         .then(function(res) {
-            //console.log("SEARCH RESULTS");
-            //console.dir(res.data.hosts);
-            //$scope.ma_hosts = res.data.hosts;
         });
     };
 
@@ -90,9 +85,21 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
 
         hosts.getDetail(host).then(function(_host) {
             find_missing_services();
+            $scope.addresses = _host.addresses;
+
+            $scope.addresses.forEach( function ( address, i ) {
+                $scope.address_families.forEach(function( family, j) {
+                    if ( family.id == address.family ) {
+                        $scope.selectedFamily[i] = $scope.address_families[j];
+                    }
+                });
+
+            });
+
             reset_mapinfo();
             $scope.refreshHosts();
         });
+
 
         //load hostgroups that this host is member of
         $http.get(appconf.api+'/hostgroups?select='+encodeURIComponent("name desc service_type")+
@@ -120,7 +127,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
             $(".subbar").removeClass("subbar-shown");
         }
 
-
+        $scope.addresses = host.addresses;
 
         $scope.closesubbar();
         $location.update_path("/hosts/"+host._id);
@@ -131,6 +138,33 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         $scope.closesubbar();
         $location.update_path("/hosts");
         find_missing_services();
+        clear_addresses();
+    }
+
+   function clear_addresses() {
+       $scope.addresses = [];
+       $scope.selectedFamily = [];
+   } 
+
+    $scope.setFamilyValue = function( formFamily, index ) {
+        var options = $scope.address_families;
+
+        var addresses = $scope.addresses;
+        var address = addresses[index];
+
+        for( var i in options ) {
+            var opt = options[i];
+            if ( formFamily != null && formFamily[index].id == opt.id ) {
+                $scope.selectedFamily[ index ] = opt;
+                $scope.addresses[index].family = opt.id;
+                return $scope.selectedFamily;
+            }
+
+        }
+        //$scope.selectedOption = $scope.options[1];
+
+        //var def = $scope.serverconf.defaults.testspecs[type];
+        //$scope.selected.specs = angular.copy(def);
     }
 
     $scope.filter_hosts = function(hosts) {
@@ -150,7 +184,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
             var hostname = host.hostname.toLowerCase();
             var sitename = host.sitename.toLowerCase();
             var lsid = (host.lsid?host.lsid.toLowerCase():"adhoc");
-            
+
             //all tokens must match somewhere
             var tokens = $scope.hosts_filter.toLowerCase().split(" ");
             var accept = true;
@@ -241,6 +275,35 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
             $scope.selected = null;
         }).catch($scope.toast_error);
     }
+    $scope.addAddress = function( event, address, addressFamily ) {
+        var newAddr = { "address": address, "family": addressFamily };
+        event.preventDefault();
+        $scope.addresses.push( newAddr );
+        $scope.address_families.forEach(function( family, j) {
+            if ( family.id == addressFamily ) {
+                $scope.selectedFamily.push( $scope.address_families[j]  );
+            }
+        });
+
+    }
+    $scope.clearNewAddress = function() {
+            $scope.newAddress = "";
+            // TODO: fix that the new address field is not getting cleared
+    }
+    $scope.removeAddress = function( index ) {
+
+        try {
+            $scope.addresses.splice(index, 1);
+            $scope.selectedFamily.splice(index, 1);
+            $scope.form.$setDirty();
+            $timeout(function () {
+                toaster.success("Removed address successfully");
+            }, 0);
+        } catch (error) {
+            $scope.toast_error(error);
+        }
+    }
+
     $scope.click_hostgroup = function(hostgroup) {
         $location.path("/hostgroups/"+hostgroup._id);
     }

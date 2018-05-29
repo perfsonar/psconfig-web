@@ -115,7 +115,9 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
  * @apiParam {Object} [info]    (Adhoc only) host information (key/value pairs of various info - TODO document)
  * @apiParam {String[]} [communities] (Adhoc only) list of community names that this host is registered in LS
  * @apiParam {String[]} [admins] Array of admin IDs who can update information on this host
- *
+ 
+ * TODO: ADD addresses field 
+ 
  * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"
  * @apiSuccess {Object}         Host updated
  */
@@ -143,6 +145,12 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
 
             }
         }
+
+        if ( ( typeof req.body.addresses ) != "undefined" ) {
+            var addresses = req.body.addresses;
+            host.addresses = addresses;
+        }
+
         host.toolkit_url = req.body.toolkit_url;
         host.desc = req.body.desc;
         host.services = req.body.services; //TODO should restrict to just MAs?

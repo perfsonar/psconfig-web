@@ -9,24 +9,24 @@
         </div>
         <div class="filterbox" ng-class="{active: hosts_filter}">
             <i class="fa fa-times pull-right remove" ng-click="hosts_filter = ''"></i>
-            <input type="text" class="form-control" 
+            <input type="text" class="form-control"
                 ng-model="hosts_filter" ng-model-options="{debounce: 200}" placeholder="Filter"></input>
         </div>
 
         <div class="subbar-list" style="top: 159px;">
             <p class="alert alert-default" ng-if="loading"><i class="fa fa-circle-o-notch fa-spin"></i> Loading..</p>
             <p class="alert alert-info" ng-if="hosts.length == 0">Please register the first meshconfig.</p>
-            <div class="subbar-list-item" 
+            <div class="subbar-list-item"
                 id="{{host._id}}"
                 ng-repeat="host in filter_hosts(hosts)"
                 ng-class="{'active': selected == host}"
                 ng-click="select(host)">
                 <div class="list-header">
                     <small>
-                        <span class="label label-info pull-right" ng-if="host.lsid && !host.url">Simulated</span> 
+                        <span class="label label-info pull-right" ng-if="host.lsid && !host.url">Simulated</span>
                         <span class="label label-default" ng-if="host.lsid">{{host.lsid}}</span>
-                        <span class="label label-warning" ng-if="!host.lsid">Adhoc</span> 
-                        <span class="label label-danger" ng-if="host.url && host._stale">Stale</span> 
+                        <span class="label label-warning" ng-if="!host.lsid">Adhoc</span>
+                        <span class="label label-danger" ng-if="host.url && host._stale">Stale</span>
                         {{host.hostname||'removed'}} 
                         <i ng-if="!host._canedit" class="fa fa-lock text-muted" title="readonly"></i>
                     </small>
@@ -44,7 +44,7 @@
         <form name="form" class="form-horizontal margin30" ng-submit="submit()" ng-show="selected" confirm-on-exit>
             <div class="fixed-top">
                 <h2>
-                    <i class="fa fa-trash-o clickable" aria-hidden="true" 
+                    <i class="fa fa-trash-o clickable" aria-hidden="true"
                         ng-if="selected._id && selected._canedit"
                         ng-confirm-click="Are you sure you want to remove this host?"
                         confirmed-click="remove()"></i>&nbsp;&nbsp;&nbsp;
@@ -92,7 +92,7 @@
                         <input type="text" class="form-control" id="sitename" 
                             ng-model="selected.sitename" 
                             ng-disabled="!selected._canedit || selected.lsid" 
-                            placeholder="Like.. AGLT2" required>
+                            placeholder="Include location and/or organization info" required>
                         <p class="help-block">Comes from the lookup service (or guessed if it's not set)</p>
                     </div>
                 </div>
@@ -171,7 +171,7 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label">Additional MA URLs</label>
                     <div class="col-sm-10">
-                        <textarea class="form-control" name="ma_urls" id="ma_urls" ng-model="selected.ma_urls" ng-disabled="!selected._canedit" style="" rows="5"></textarea>
+                        <textarea class="form-control" name="ma_urls" id="ma_urls" ng-model="selected.ma_urls" ng-disabled="!selected._canedit" style="" rows="3"></textarea>
 
                         <p class="help-block">Providing additional MA URLs (one per line) will allow you to send test results for all tests involving this host to additional MAs.</p>
                     </div>
@@ -282,7 +282,76 @@
                 </div>
 
                 <br><br>
-                
+
+                <h3>Addresses</h3>
+                <p ng-if="addresses.length == 0" class="help-block">This host has no addresses associated with it.</p>
+                <p ng-if="addresses.length > 0" class="help-block">This host has {{addresses.length}} address(es)</p>
+
+
+                <!-- <li ng-repeat="com in selected.communities">{{com}}</li> -->
+                <div class="form-group host-addresses" ng-repeat="addr in addresses">
+
+                    <label class="col-sm-2 control-label">Address
+                        <i class="fa fa-trash-o clickable ng-scope" ng-if="selected._id && selected._canedit" ng-confirm-click="Are you sure you want to remove this address? {{addr.address}}" confirmed-click="removeAddress({{$index}}); return" style=""></i>
+                    </label>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" name="address{{$index}}" 
+                            ng-disabled="!selected._canedit" ng-model="addr.address">
+
+                        <p class="help-block">IP address</p>
+                    </div>
+                    <label class="col-sm-2 control-label">Protocol</label>
+                    <div class="col-sm-2">
+                        <select class="form-control"
+                            name="family{{$index}}"
+                            ng-disabled="!selected._canedit"
+                            ng-model="selectedFamily[$index]"
+                            ng-options="family.name for family in address_families track by family.id"
+                            ng-change="setFamilyValue(selectedFamily,{{$index}})"
+                                required>
+                        </select>
+
+                        <p class="help-block">Address family (ipv4 or ipv6)</p>
+                    </div>
+                </div>
+
+<div ng-controller="paramsAccordion">
+    <accordion close-others="false">
+        <accordion-group is-open="status.open">
+            <accordion-heading>
+                <h3>Add address
+                    <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                </h3>
+            </accordion-heading>
+
+
+                    <label class="col-sm-2 control-label">Address</label>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" name="newAddress" 
+                            ng-disabled="!selected._canedit" ng-model="newAddress">
+
+                        <p class="help-block">IP address</p>
+                    </div>
+                    <label class="col-sm-2 control-label">Protocol</label>
+                    <div class="col-sm-2">
+                        <select class="form-control"
+                            name="newAddressFamily"
+                            ng-disabled="!selected._canedit"
+                            ng-model="newAddressFamily"
+                            ng-options="family.name for family in address_families track by family.id"
+                                required>
+                        </select>
+
+                        <p class="help-block">Address family (ipv4 or ipv6)</p>
+                        <p><button name="addAddress" ng-click="addAddress($event, newAddress, newAddressFamily.id);clearNewAddress()">Add address</button></p>
+                    </div>
+
+        </accordion-group>
+    </accordion>
+</div>
+
+
+
                 <div ng-if="appconf.debug">
                     <h3>Debug</h3>
                     <pre>{{selected|json}}</pre>
