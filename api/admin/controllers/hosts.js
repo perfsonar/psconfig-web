@@ -148,7 +148,6 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
 
         if ( ( typeof req.body.addresses ) != "undefined" ) {
             var addresses = req.body.addresses;
-            console.log("ADDRESSES", addresses);
             host.addresses = addresses;
         }
 
@@ -171,7 +170,6 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             if(err) return next(err);
             host = JSON.parse(JSON.stringify(host));
             host._canedit = canedit(req.user, host);
-            console.log("HOST SAVED", host);
             res.json(host);
         }).catch(function(err) {
             next(err);

@@ -147,29 +147,16 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
    } 
 
     $scope.setFamilyValue = function( formFamily, index ) {
-        //var addr = $scope.selectedFamily;
-        console.log("$scope", $scope);
-        console.log("formFamily", formFamily);
-        console.log("index", index);
-        //console.log("$id", $scope.$id );
         var options = $scope.address_families;
 
         var addresses = $scope.addresses;
         var address = addresses[index];
-        console.log("addresses", addresses);
-
-        console.log("options index", index, options);
 
         for( var i in options ) {
             var opt = options[i];
             if ( formFamily != null && formFamily[index].id == opt.id ) {
-                //console.log("selecting family", address.family);
-                console.log("selecting family", opt.id);
                 $scope.selectedFamily[ index ] = opt;
-                //$scope.addresses[i].family = address.family; // TODO: fix, not working
                 $scope.addresses[index].family = opt.id;
-                console.log("i", i);
-                console.log("family after setting", $scope.selectedFamily);
                 return $scope.selectedFamily;
             }
 
@@ -291,9 +278,6 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
     $scope.addAddress = function( event, address, addressFamily ) {
         var newAddr = { "address": address, "family": addressFamily };
         event.preventDefault();
-        console.log("adding new address ...", address);
-        console.log("addressFamily", addressFamily);
-        console.log("newAddr", newAddr);
         $scope.addresses.push( newAddr );
         $scope.address_families.forEach(function( family, j) {
             if ( family.id == addressFamily ) {
@@ -304,7 +288,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
     }
     $scope.clearNewAddress = function() {
             $scope.newAddress = "";
-            // TODO: fix that address is not getting cleared
+            // TODO: fix that the new address field is not getting cleared
     }
     $scope.removeAddress = function( index ) {
 
@@ -312,7 +296,9 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
             $scope.addresses.splice(index, 1);
             $scope.selectedFamily.splice(index, 1);
             $scope.form.$setDirty();
-            toaster.success("Removed address successfully");
+            $timeout(function () {
+                toaster.success("Removed address successfully");
+            }, 0);
         } catch (error) {
             $scope.toast_error(error);
         }
