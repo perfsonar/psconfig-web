@@ -10,6 +10,8 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
     $scope.hosts_filter = $cookies.get('hosts_filter');
     $scope.address_families = [{'id':'4', name:'ipv4'}, {'id':'6', name:'ipv6'}];
     $scope.selectedFamily = [];
+    $scope.newAddressFamily = $scope.address_families[0];
+    $scope.newAddress = "";
 
     $scope.refreshHosts = function(query, service) {
         var select = "sitename hostname lsid";
@@ -23,12 +25,6 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         } else {
             /*
             //only search for what's already selected
-            var host_ids = [];
-            $scope.selected.services.forEach(service=>{
-                if(service.ma) host_ids.push(service.ma);
-            });
-            if(host_ids.length == 0) return [];
-            find._id = {$in: host_ids};
             */
             if(service && service.ma) find._id = service.ma;
             else return;
@@ -37,9 +33,6 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         return $http.get(appconf.api+'/hosts?select='+encodeURIComponent(select)+
             '&sort=sitename hostname&find='+encodeURIComponent(JSON.stringify(find)))
         .then(function(res) {
-            //console.log("SEARCH RESULTS");
-            //console.dir(res.data.hosts);
-            //$scope.ma_hosts = res.data.hosts;
         });
     };
 
@@ -93,7 +86,6 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         hosts.getDetail(host).then(function(_host) {
             find_missing_services();
             $scope.addresses = _host.addresses;
-            //$scope.setFamilyValues( _host.addresses );
 
             $scope.addresses.forEach( function ( address, i ) {
                 $scope.address_families.forEach(function( family, j) {
@@ -104,9 +96,6 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
 
             });
 
-            console.log("$scope.selectedFamily", $scope.selectedFamily );
-
-            //$scope.selectedFamily = $scope.address_families[index];
             reset_mapinfo();
             $scope.refreshHosts();
         });
@@ -155,20 +144,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
    function clear_addresses() {
        $scope.addresses = [];
        $scope.selectedFamily = [];
-
-
    } 
-
-    /*
-    $scope.setFamilyValues = function( ) {
-        for(var i in $scope.addresses ) {
-            var addr = $scope.addresses[i];
-
-
-        }
-
-    }
-    */
 
     $scope.setFamilyValue = function( formFamily, index ) {
         //var addr = $scope.selectedFamily;
@@ -312,6 +288,36 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
             $scope.selected = null;
         }).catch($scope.toast_error);
     }
+    $scope.addAddress = function( event, address, addressFamily ) {
+        var newAddr = { "address": address, "family": addressFamily };
+        event.preventDefault();
+        console.log("adding new address ...", address);
+        console.log("addressFamily", addressFamily);
+        console.log("newAddr", newAddr);
+        $scope.addresses.push( newAddr );
+        $scope.address_families.forEach(function( family, j) {
+            if ( family.id == addressFamily ) {
+                $scope.selectedFamily.push( $scope.address_families[j]  );
+            }
+        });
+
+    }
+    $scope.clearNewAddress = function() {
+            $scope.newAddress = "";
+            // TODO: fix that address is not getting cleared
+    }
+    $scope.removeAddress = function( index ) {
+
+        try {
+            $scope.addresses.splice(index, 1);
+            $scope.selectedFamily.splice(index, 1);
+            $scope.form.$setDirty();
+            toaster.success("Removed address successfully");
+        } catch (error) {
+            $scope.toast_error(error);
+        }
+    }
+
     $scope.click_hostgroup = function(hostgroup) {
         $location.path("/hostgroups/"+hostgroup._id);
     }
