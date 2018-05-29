@@ -6,8 +6,8 @@ function($scope, toaster, $http, jwtHelper, serverconf, users, $modal, scaMessag
     $scope.filter = $cookies.get('hostgroups_filter');
 
     $scope.tabs = {
-        static: {},
-        dynamic: {},
+        static: { "active": true },
+        dynamic: { "active": false },
     };
 
     users.getAll().then(function(_users) {
@@ -123,12 +123,18 @@ function($scope, toaster, $http, jwtHelper, serverconf, users, $modal, scaMessag
         $location.update_path("/hostgroups");
     }
 
-    $scope.changetype = function(type) {
+    $scope.changetype = function(event, type) {
+
         if(!$scope.selected) return;
-        if($scope.selected.type != type) {
-            $scope.selected.type = type;
-            $scope.form.$setDirty();
-            if(type == "dynamic") $scope.run_dynamic();
+        if ( type == "dynamic" ) {
+            //$scope.run_dynamic();
+        } else { 
+            $scope.refreshHosts();
+            if($scope.selected.type != type) {
+                $scope.selected.type = type;
+                $scope.form.$setDirty();
+
+            }
         }
     }
 
