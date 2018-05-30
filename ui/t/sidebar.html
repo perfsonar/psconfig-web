@@ -4,40 +4,39 @@
         <h3><i class="fa fa-bars"></i></h3> 
     </div>
 
-    <!--<center class="label" style="padding: 0px; color: #666;">Perfsonar<br>MeshConfig<br>Administrator</center>-->
     <h2 class="text-muted" ng-click="openpage('/home');" style="padding-top: 0px; cursor: pointer;">
         <!--<i class="fa fa-flask" aria-hidden="true"></i>-->
-        <img src="images/logoicon.45.png" width="35">
+        <img src="images/logoicon.45.png" width="35" alt="PWA Home">
     </h2>
     <br>
     <br>
 
-    <div class="menu" ng-class="{'active':  active_menu == 'configs'}" ng-click="openpage('/configs')">
-        <h3><i class="fa fa-globe" aria-hidden="true"></i></h3> 
-        <span class="label">Configs</span>
+    <div class="menu" ng-class="{'active':  active_menu == 'configs'}" >
+        <a ng-href="{{getpageurl('/configs')}}">
+            <h3><i class="fa fa-globe" aria-hidden="true"></i></h3> 
+            <span class="label">Configs</span>
+        </a>
     </div>
     <hr>
 
-    <div class="menu" ng-class="{'active':  active_menu == 'hosts'}" ng-click="openpage('/hosts')">
-        <h3><i class="fa fa-laptop" aria-hidden="true"></i></h3> 
-        <span class="label">Hosts</span>
+    <div class="menu" ng-class="{'active':  active_menu == 'hosts'}">
+        <a ng-href="{{getpageurl('/hosts')}}">
+            <h3><i class="fa fa-laptop" aria-hidden="true"></i></h3> 
+            <span class="label">Hosts</span>
+        </a>
     </div>
-    <div class="menu" ng-class="{'active':  active_menu == 'hostgroups'}" ng-click="openpage('/hostgroups')">
-        <h3><i class="fa fa-server" aria-hidden="true"></i></h3> 
-        <span class="label">Host Groups</span>
+    <div class="menu" ng-class="{'active':  active_menu == 'hostgroups'}" >
+        <a ng-href="{{getpageurl('/hostgroups')}}">
+            <h3><i class="fa fa-server" aria-hidden="true"></i></h3> 
+            <span class="label">Host Groups</span>
+        </a>
     </div>
-    <div class="menu" ng-class="{'active':  active_menu == 'testspecs'}" ng-click="openpage('/testspecs')">
-        <h3><i class="fa fa-flask" aria-hidden="true"></i></h3> 
-        <span class="label">Testspecs</span>
+    <div class="menu" ng-class="{'active':  active_menu == 'testspecs'}" >
+        <a ng-href="{{getpageurl('/testspecs')}}">
+            <h3><i class="fa fa-flask" aria-hidden="true"></i></h3> 
+            <span class="label">Testspecs</span>
+        </a>
     </div>
-
-    <!--
-    <hr>
-    <div class="menu" ng-class="{'active':  active_menu == 'about'}" ng-click="openpage('/about')">
-        <h3><i class="fa fa-home" aria-hidden="true"></i></h3> 
-        <span class="label">About</span>
-    </div>
-    -->
 
     <div class="bottom">
         <div class="menu" ng-click="relocate('https://github.com/perfsonar/psconfig-web/issues')">
@@ -49,9 +48,11 @@
             <!--<span class="label">Docs</span>-->
         </div>
         <hr>
-        <div class="menu" ng-click="relocate('/auth/#!/settings/account', true)">
-            <h3><i class="fa fa-cog" aria-hidden="true"></i></h3> 
-            <span class="label">Settings</span>
+        <div class="menu">
+            <a ng-href="/auth/#!/settings/account" target="_blank">
+                <h3><i class="fa fa-cog" aria-hidden="true"></i></h3> 
+                <span class="label">Settings</span>
+            </a>
         </div>
     </div>
 
