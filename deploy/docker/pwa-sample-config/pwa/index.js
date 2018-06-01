@@ -43,6 +43,9 @@ exports.meshconfig = {
                 bucket_width: 0.001,
                 force_bidirectional: false,
                 ipv4_only: true,
+                interval: 3600,
+                duration: 60,
+                tool: "owping",
             },
             traceroute: {
                 tool: 'traceroute',
