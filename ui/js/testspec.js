@@ -30,6 +30,10 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
         $location.update_path("/testspecs/"+testspec._id);
         window.scrollTo(0,0);
 
+        console.log("selected testspec", testspec);
+
+        //$scope.setdefault(testspec.service_type);
+
         $scope.minver = $scope.serverconf.minver[testspec.service_type];
     }
 
@@ -53,6 +57,7 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
     $scope.setdefault = function(type) {
         var def = $scope.serverconf.defaults.testspecs[type];
         $scope.selected.specs = angular.copy(def);
+        console.log("selected.specs", $scope.selected.specs);
     }
 
     //some special behaviors on form
