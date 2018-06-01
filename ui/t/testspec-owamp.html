@@ -24,18 +24,25 @@
         </div>
 
 
-    <h4>Test Schedule</h4>
-                        <tabset>
-                            <tab heading="Continuous streaming (recommended)"
-                                select="changeSchedule('continuous',$event)"
-                                active="tabs['continuous'].active">
-                                <p>Continuously streaming one-way delay tests is recommended; otherwise loss events etc may be missed.</p>
+        <h4>Test Schedule</h4>
+        <h3>Schedule: {{schedule}}</h3>
+<div class="form-group">
+        <div class="radio">
+            <label>
+                <input type="radio" ng-model="schedule" ng-value="continuous" name="schedule" ng-change="changeSchedule('continuous')">
+                Continuous
+            </label>
+        </div>
+        <div class="radio">
+            <label>
+                <input type="radio" ng-model="schedule" ng-value="interval" name="schedule" ng-change="changeSchedule('interval')">
+                Interval
+            </label>
+        </div>
 
-                                </tab>
 
-                            <tab heading="At regular intervals"
-                                select="changeSchedule('interval',$event)"
-                                active="tabs['interval'].active">
+</div>
+
 <div class="form-group">
                                 <p>Please configure your test schedule.</p>
                                 <p>Note that continuously streaming one-way delay tests is recommended; otherwise loss events etc may be missed.</p>
@@ -64,8 +71,6 @@
                 </div>
 
 
-                            </tab>
-                        </tabset>
 
 
 <div class="form-group">

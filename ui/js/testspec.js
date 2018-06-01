@@ -1,14 +1,15 @@
 
-app.controller('TestspecsController', 
+app.controller('TestspecsController',
 function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMessage, users, testspecs, $modal, $routeParams, $cookies) {
     scaMessage.show(toaster);
     $scope.active_menu = "testspecs";
     $scope.filter = $cookies.get('testspecs_filter');
+    $scope.schedule = "continuous";
 
     users.getAll().then(function(_users) {
         $scope.users = _users;
-        testspecs.getAll().then(function(_testspecs) { 
-            $scope.testspecs = _testspecs; 
+        testspecs.getAll().then(function(_testspecs) {
+            $scope.testspecs = _testspecs;
             //find task specified
             if($routeParams.id) {
                 $scope.testspecs.forEach(function(testspec) {
@@ -24,7 +25,9 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
     $scope.selected = null;
     $scope.select = function(testspec) {
         //TODO - maybe I should catch $dirty flag here.. but what about page nagivation?
-        $scope.selected = testspec; 
+        $scope.selected = testspec;
+
+        console.log("$scope.schedule", $scope.schedule);
 
         $scope.closesubbar();
         $location.update_path("/testspecs/"+testspec._id);
@@ -58,6 +61,13 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
         var def = $scope.serverconf.defaults.testspecs[type];
         $scope.selected.specs = $.extend( true, {}, def, $scope.selected.specs );
         console.log("selected.specs", $scope.selected.specs);
+    }
+
+    $scope.changeSchedule = function( schedule ) {
+        console.log("new schedule", schedule);
+
+        //$scope.schedule = schedule;
+
     }
 
     //some special behaviors on form
