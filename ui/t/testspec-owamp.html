@@ -25,17 +25,17 @@
 
 
         <h4>Test Schedule</h4>
-        <h3>Schedule: {{schedule}}</h3>
+        <h3>Schedule: '{{selected.schedule}}'</h3>
 <div class="form-group">
         <div class="radio">
             <label>
-                <input type="radio" ng-model="schedule" ng-value="continuous" name="schedule" ng-change="changeSchedule('continuous')">
+                <input type="radio" ng-model="selected.schedule" value="continuous" ng-change="changeSchedule('continuous')" >
                 Continuous
             </label>
         </div>
         <div class="radio">
             <label>
-                <input type="radio" ng-model="schedule" ng-value="interval" name="schedule" ng-change="changeSchedule('interval')">
+                <input type="radio" ng-model="selected.schedule" value="interval" ng-change="changeSchedule('interval')">
                 Interval
             </label>
         </div>

@@ -25,6 +25,7 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
     $scope.selected = null;
     $scope.select = function(testspec) {
         //TODO - maybe I should catch $dirty flag here.. but what about page nagivation?
+        testspec.schedule = $scope.schedule || 'continuous';
         $scope.selected = testspec;
 
         console.log("$scope.schedule", $scope.schedule);
@@ -66,7 +67,7 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
     $scope.changeSchedule = function( schedule ) {
         console.log("new schedule", schedule);
 
-        //$scope.schedule = schedule;
+        $scope.selected.schedule = schedule;
 
     }
 
