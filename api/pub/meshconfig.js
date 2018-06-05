@@ -84,17 +84,16 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
     };
 
-    console.log("test", test);
+    //console.log("test", test);
 
 
     if ( test.type in service_types ) {
         test.type = service_types[ test.type ];
-        console.log("setting test.type", test);
-        if ( test.type == "latencybg" && test.schedule_type == "interval" ) {
-            test.type = "latency";
-        }
-        console.log("setting test.type AFTER", test);
+        //console.log("setting test setting type", test);
 
+
+    } else {
+        console.log("test.type NOT in service_types: test.type", test.type);
 
     }
 
@@ -556,7 +555,7 @@ exports.generate = function(_config, opts, cb) {
                 var maInfo = generate_mainfo(service, format);
                 var maName = "host-archive" + last_ma_number;
                 var url = "";
-                
+
                 if ( format == "psconfig" ) {
                     url = maInfo.data.url;
                 } else {
@@ -704,11 +703,12 @@ exports.generate = function(_config, opts, cb) {
             var name = test.name;
             var testspec = test.testspec;
 
+
             var config_archives = _config.ma_urls;
 
 
             psc_tests[ name ] = {
-                "type": test.service_type,
+                "type": test.service_type,                
                 "spec": {
                     "source": "{% address[0] %}",
                     "dest": "{% address[1] %}"
@@ -716,14 +716,28 @@ exports.generate = function(_config, opts, cb) {
             };
 
             psc_tests[ name ].spec = testspec.specs;
+            psc_tests[ name ].schedule_type = testspec.schedule_type;
 
             var spec = testspec.specs;
+
+
+
 
             if ( format == "psconfig" ) {
                 meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules );
             }
 
             var interval = psc_tests[ name ].spec["interval"];
+
+
+            var current_test = psc_tests[name];
+
+            console.log("current_test.schedule_type", current_test.schedule_type);
+            console.log("current_test", current_test);
+        if ( current_test.type == "latencybg" && current_test.schedule_type == "interval" ) {
+            console.log("SETTING TYPE LATENCY INSTEAD OF LAETNCYGB!!!");
+            current_test.type = "latency";
+        }
 
             psc_tasks[ name ] = {
                 "group": test._meta._hostgroup,
@@ -752,7 +766,7 @@ exports.generate = function(_config, opts, cb) {
             mc.tests.push({
                 members: members,
                 parameters: parameters,
-                description: test.name,
+                description: test.name
             });
         });
 
