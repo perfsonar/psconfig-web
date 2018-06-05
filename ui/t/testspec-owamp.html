@@ -21,29 +21,31 @@
                         </select>
                         <p class="help-block">The tool to use in performing the one-way delay test <code>tool</code></p>
                     </div>
-        </div>
+    </div>
 
-
-        <h4>Test Schedule</h4>
-        <h3>Schedule: '{{selected.schedule}}'</h3>
+        <h4>Schedule Type</h4>
 <div class="form-group">
         <div class="radio">
             <label>
                 <input type="radio" ng-model="selected.schedule" value="continuous" ng-change="changeSchedule('continuous')" >
-                Continuous
+                Continuous (recommended)
             </label>
         </div>
         <div class="radio">
             <label>
                 <input type="radio" ng-model="selected.schedule" value="interval" ng-change="changeSchedule('interval')">
-                Interval
+                Interval (required for twamp tests)
             </label>
         </div>
 
 
 </div>
 
+
+<div class="schedule-section" ng-if="selected.schedule == 'interval'">
+
 <div class="form-group">
+        <h4>Test Schedule</h4>
                                 <p>Please configure your test schedule.</p>
                                 <p>Note that continuously streaming one-way delay tests is recommended; otherwise loss events etc may be missed.</p>
 </div>
@@ -70,6 +72,7 @@
                     </div>
                 </div>
 
+</div>
 
 
 

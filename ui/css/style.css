@@ -263,3 +263,10 @@ div.well-detail {
 .sca-sidebar .menu.active a {
     color:#fff;
 }
+
+.schedule-section {
+    background-color: #dedede;
+    margin-bottom: 1em;
+    padding: 1em;
+}
+
