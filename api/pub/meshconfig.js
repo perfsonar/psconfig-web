@@ -90,6 +90,11 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
     if ( test.type in service_types ) {
         test.type = service_types[ test.type ];
         console.log("setting test.type", test);
+        if ( test.type == "latencybg" && test.schedule_type == "interval" ) {
+            test.type = "latency";
+        }
+        console.log("setting test.type AFTER", test);
+
 
     }
 
@@ -129,7 +134,6 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
         psc_schedules[ interval_name ] = {
             "repeat": interval,
             "sliprand": true
-
         };
 
         // "slip"
