@@ -129,6 +129,7 @@ var testspecSchema = mongoose.Schema({
     service_type: String,
     name: String,
     desc: String,
+    schedule_type: String,
     specs: mongoose.Schema.Types.Mixed,
 
     admins: [ String ], //array of user ids (sub string in auth service)

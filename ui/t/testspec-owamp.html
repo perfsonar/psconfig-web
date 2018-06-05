@@ -24,25 +24,26 @@
     </div>
 
         <h4>Schedule Type</h4>
-<div class="form-group">
+<div class="form-group schedule">
         <div class="radio">
             <label>
-                <input type="radio" ng-model="selected.schedule" value="continuous" ng-change="changeSchedule('continuous')" >
-                Continuous (recommended)
+                <input type="radio" ng-model="selected.schedule_type" value="continuous" ng-change="changeSchedule('continuous')" >
+                Continuous (recommended) - runs continuously in the background
             </label>
         </div>
         <div class="radio">
             <label>
-                <input type="radio" ng-model="selected.schedule" value="interval" ng-change="changeSchedule('interval')">
-                Interval (required for twamp tests)
+                <input type="radio" ng-model="selected.schedule_type" value="interval" ng-change="changeSchedule('interval')">
+                Interval (required if tool is <code>twamp</code>) - runs at regularly-scheduled intervals (every <code>n</code> seconds)
             </label>
         </div>
 
 
 </div>
+            <input type="hidden" ng-name="schedule_type" ng-model="selected.schedule_type" ng-value="selected.schedule_type" />
 
 
-<div class="schedule-section" ng-if="selected.schedule == 'interval'">
+<div class="schedule-section" ng-if="selected.schedule_type == 'interval'">
 
 <div class="form-group">
         <h4>Test Schedule</h4>

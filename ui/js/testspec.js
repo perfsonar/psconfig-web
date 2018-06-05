@@ -4,7 +4,7 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
     scaMessage.show(toaster);
     $scope.active_menu = "testspecs";
     $scope.filter = $cookies.get('testspecs_filter');
-    $scope.schedule = "continuous";
+    $scope.schedule_type = "continuous";
 
     users.getAll().then(function(_users) {
         $scope.users = _users;
@@ -25,10 +25,10 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
     $scope.selected = null;
     $scope.select = function(testspec) {
         //TODO - maybe I should catch $dirty flag here.. but what about page nagivation?
-        testspec.schedule = $scope.schedule || 'continuous';
+        testspec.schedule_type = $scope.schedule_type || 'continuous';
         $scope.selected = testspec;
 
-        console.log("$scope.schedule", $scope.schedule);
+        console.log("$scope.schedule_type", $scope.schedule_type);
 
         $scope.closesubbar();
         $location.update_path("/testspecs/"+testspec._id);
@@ -64,10 +64,10 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
         console.log("selected.specs", $scope.selected.specs);
     }
 
-    $scope.changeSchedule = function( schedule ) {
-        console.log("new schedule", schedule);
+    $scope.changeSchedule = function( schedule_type ) {
+        console.log("new schedule_type", schedule_type);
 
-        $scope.selected.schedule = schedule;
+        $scope.selected.schedule_type = schedule_type;
 
     }
 

@@ -84,9 +84,12 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
     };
 
+    console.log("test", test);
+
 
     if ( test.type in service_types ) {
         test.type = service_types[ test.type ];
+        console.log("setting test.type", test);
 
     }
 
@@ -108,7 +111,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
     for(var i in iso_fields) {
         var field = iso_fields[i];
         if ( testspec[ field ] ) {
-            testspec[ field ] = seconds_to_iso8601(spec[ field ] );
+            testspec[ field ] = seconds_to_iso8601(testspec[ field ] );
         }
 
     }
@@ -189,8 +192,10 @@ function rename_field( obj, oldname, newname ) {
 
 }
 
-function seconds_to_iso8601( seconds ) {
-    return moment.duration(seconds, 'seconds').toISOString();
+function seconds_to_iso8601( dur ) {
+    var isoOut = moment.duration(dur * 1000); // moment.duration expects milliseconds
+    isoOut = isoOut.toISOString();
+    return isoOut;
 }
 
 

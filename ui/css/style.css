@@ -267,6 +267,8 @@ div.well-detail {
 .schedule-section {
     background-color: #dedede;
     margin-bottom: 1em;
-    padding: 1em;
+    padding: 0.5em;
 }
-
+.form-group.schedule {
+    margin-bottom:1em;
+}

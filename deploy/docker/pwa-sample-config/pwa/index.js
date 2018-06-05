@@ -36,15 +36,13 @@ exports.meshconfig = {
             },
             owamp: {
                 packet_interval: 0.1,
-                loss_threshold: 10,
-                session_count: 10800,
                 sample_count: 600,
                 packet_padding: 0,
                 bucket_width: 0.001,
                 force_bidirectional: false,
                 ipv4_only: true,
                 interval: 3600,
-                duration: 60,
+                duration: 30,
                 tool: "owping",
             },
             traceroute: {
