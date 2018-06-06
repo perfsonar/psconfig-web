@@ -84,18 +84,9 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
     };
 
-    //console.log("test", test);
-
-
     if ( test.type in service_types ) {
         test.type = service_types[ test.type ];
-        //console.log("setting test setting type", test);
-
-
-    } else {
-        console.log("test.type NOT in service_types: test.type", test.type);
-
-    }
+    } 
 
     // change underscores to dashes in all field names in the "spec" stanza
     rename_underscores_to_dashes( spec );
