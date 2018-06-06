@@ -44,6 +44,7 @@ exports.meshconfig = {
                 interval: 3600,
                 duration: 30,
                 tool: "owping",
+                schedule_type: "continuous"
             },
             traceroute: {
                 tool: 'traceroute',
@@ -51,7 +52,7 @@ exports.meshconfig = {
                 random_start_percentage: 10,
                 protocol: 'icmp',
                 first_ttl: 1,
-                packet_size: 1200, //TODO - set to somenumber
+                packet_size: 1200,
                 force_bidirectional: false,
                 ipv4_only: false,
                 ipv6_only: false,
