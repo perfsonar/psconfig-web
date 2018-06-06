@@ -28,13 +28,9 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
         testspec.schedule_type = testspec.schedule_type || 'continuous';
         $scope.selected = testspec;
 
-        console.log("$scope.schedule_type", $scope.schedule_type);
-
         $scope.closesubbar();
         $location.update_path("/testspecs/"+testspec._id);
         window.scrollTo(0,0);
-
-        console.log("selected testspec", testspec);
 
         $scope.setdefault(testspec.service_type);
 
@@ -61,14 +57,10 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
     $scope.setdefault = function(type) {
         var def = $scope.serverconf.defaults.testspecs[type];
         $scope.selected.specs = $.extend( true, {}, def, $scope.selected.specs );
-        console.log("selected.specs", $scope.selected.specs);
     }
 
     $scope.changeSchedule = function( schedule_type ) {
-        console.log("new schedule_type", schedule_type);
-
         $scope.selected.schedule_type = schedule_type;
-
     }
 
     //some special behaviors on form
