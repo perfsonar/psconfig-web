@@ -29,8 +29,6 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
         testspec.schedule_type = testspec.schedule_type || 'continuous';
         $scope.selected = testspec;
 
-        console.log("testspec", testspec);
-
         $scope.closesubbar();
         $location.update_path("/testspecs/"+testspec._id);
         window.scrollTo(0,0);
