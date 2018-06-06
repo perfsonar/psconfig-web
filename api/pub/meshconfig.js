@@ -732,12 +732,13 @@ exports.generate = function(_config, opts, cb) {
 
             var current_test = psc_tests[name];
 
-            console.log("current_test.schedule_type", current_test.schedule_type);
-            console.log("current_test", current_test);
-        if ( current_test.type == "latencybg" && current_test.schedule_type == "interval" ) {
-            console.log("SETTING TYPE LATENCY INSTEAD OF LAETNCYGB!!!");
-            current_test.type = "latency";
-        }
+            if ( current_test.type == "latencybg" && current_test.schedule_type == "interval" ) {
+                current_test.type = "latency";
+                delete current_test.spec.interval;
+                delete current_test.spec.duration;
+            }
+
+            delete current_test.schedule_type;
 
             psc_tasks[ name ] = {
                 "group": test._meta._hostgroup,
