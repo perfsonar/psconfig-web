@@ -22,7 +22,7 @@
                 <time class="help-block pull-right">{{testspec.create_date|date}}</time>
                 <div class="list-header">
                     <small>
-                        <span class="label label-default">{{testspec.service_type}}</span> {{testspec.name}}
+                        <span class="label label-default">{{friendly_type(testspec.service_type)}}</span> {{testspec.name}}
                         <i ng-if="!testspec._canedit" class="fa fa-lock text-muted"></i>
                     </small>
                 </div>

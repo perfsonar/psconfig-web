@@ -249,9 +249,21 @@ div.well-detail {
 .panel-default > .panel-heading + .panel-collapse > .panel-body {
   border-color: #ccc;
 }
-
 .host-addresses i.fa {
-    float: left;
-    font-size: 20px;
-
+  float: left;
+  font-size: 20px;
+}
+.sca-sidebar .menu a {
+  text-decoration: none;
+}
+.sca-sidebar .menu.active a {
+  color: #fff;
+}
+.schedule-section {
+  background-color: #dedede;
+  margin-bottom: 1em;
+  padding: 0.5em;
+}
+.form-group.schedule {
+  margin-bottom: 1em;
 }

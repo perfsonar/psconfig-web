@@ -128,6 +128,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             testspec.name = req.body.name;
             testspec.desc = req.body.desc;
             testspec.specs = req.body.specs;
+            testspec.schedule_type = req.body.schedule_type;
             testspec.admins = req.body.admins;
             testspec.update_date = new Date();
             testspec.save(function(err) {

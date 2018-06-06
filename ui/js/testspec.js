@@ -1,14 +1,15 @@
 
-app.controller('TestspecsController', 
+app.controller('TestspecsController',
 function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMessage, users, testspecs, $modal, $routeParams, $cookies) {
     scaMessage.show(toaster);
     $scope.active_menu = "testspecs";
     $scope.filter = $cookies.get('testspecs_filter');
+    //$scope.schedule_type = "continuous";
 
     users.getAll().then(function(_users) {
         $scope.users = _users;
-        testspecs.getAll().then(function(_testspecs) { 
-            $scope.testspecs = _testspecs; 
+        testspecs.getAll().then(function(_testspecs) {
+            $scope.testspecs = _testspecs;
             //find task specified
             if($routeParams.id) {
                 $scope.testspecs.forEach(function(testspec) {
@@ -22,15 +23,34 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
     });
 
     $scope.selected = null;
+
     $scope.select = function(testspec) {
         //TODO - maybe I should catch $dirty flag here.. but what about page nagivation?
-        $scope.selected = testspec; 
+        testspec.schedule_type = testspec.schedule_type || 'continuous';
+        $scope.selected = testspec;
 
         $scope.closesubbar();
         $location.update_path("/testspecs/"+testspec._id);
         window.scrollTo(0,0);
 
+        $scope.setdefault(testspec.service_type);
+
         $scope.minver = $scope.serverconf.minver[testspec.service_type];
+    }
+
+    $scope.friendly_type = function( type ) {
+        var ret = type;
+        try {
+            var type_lookup = $scope.serverconf.service_types;
+            if (type in type_lookup) {
+                ret = type_lookup[type].label.toLowerCase();
+            }
+        } catch(error) {
+            console.log("Error converting service type to friendly type: ", type);
+        } finally {
+            return ret;
+        }
+
     }
 
     $scope.add = function() {
@@ -52,7 +72,11 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
 
     $scope.setdefault = function(type) {
         var def = $scope.serverconf.defaults.testspecs[type];
-        $scope.selected.specs = angular.copy(def);
+        $scope.selected.specs = $.extend( true, {}, def, $scope.selected.specs );
+    }
+
+    $scope.changeSchedule = function( schedule_type ) {
+        $scope.selected.schedule_type = schedule_type;
     }
 
     //some special behaviors on form

@@ -11,7 +11,7 @@ exports.meshconfig = {
         "owamp": {label: "Latency"},
         "bwctl": {label: "Throughput"},
         "traceroute": {label: "Traceroute"},
-        "ping": {label: "Pinger"},
+        "ping": {label: "Ping"},
     },
 
     //mesh types
@@ -36,13 +36,15 @@ exports.meshconfig = {
             },
             owamp: {
                 packet_interval: 0.1,
-                loss_threshold: 10,
-                session_count: 10800,
                 sample_count: 600,
                 packet_padding: 0,
                 bucket_width: 0.001,
                 force_bidirectional: false,
                 ipv4_only: true,
+                interval: 3600,
+                duration: 30,
+                tool: "owping",
+                schedule_type: "continuous"
             },
             traceroute: {
                 tool: 'traceroute',
@@ -50,7 +52,7 @@ exports.meshconfig = {
                 random_start_percentage: 10,
                 protocol: 'icmp',
                 first_ttl: 1,
-                packet_size: 1200, //TODO - set to somenumber
+                packet_size: 1200,
                 force_bidirectional: false,
                 ipv4_only: false,
                 ipv6_only: false,

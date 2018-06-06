@@ -22,9 +22,13 @@ app.controller('HeaderController', function($scope, appconf, $route, serverconf,
             $(".subbar").removeClass("subbar-shown");
         }
 
-        console.log("path to "+page);
         $location.path(page);
         window.scrollTo(0,0);
+
+    }
+    $scope.getpageurl = function(page) {
+        var pageURL = "/#!" + page;
+        return pageURL;
 
     }
     $scope.back = function() {

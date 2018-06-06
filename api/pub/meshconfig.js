@@ -84,11 +84,9 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
     };
 
-
     if ( test.type in service_types ) {
         test.type = service_types[ test.type ];
-
-    }
+    } 
 
     // change underscores to dashes in all field names in the "spec" stanza
     rename_underscores_to_dashes( spec );
@@ -108,7 +106,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
     for(var i in iso_fields) {
         var field = iso_fields[i];
         if ( testspec[ field ] ) {
-            testspec[ field ] = seconds_to_iso8601(spec[ field ] );
+            testspec[ field ] = seconds_to_iso8601(testspec[ field ] );
         }
 
     }
@@ -126,7 +124,6 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
         psc_schedules[ interval_name ] = {
             "repeat": interval,
             "sliprand": true
-
         };
 
         // "slip"
@@ -189,8 +186,10 @@ function rename_field( obj, oldname, newname ) {
 
 }
 
-function seconds_to_iso8601( seconds ) {
-    return moment.duration(seconds, 'seconds').toISOString();
+function seconds_to_iso8601( dur ) {
+    var isoOut = moment.duration(dur * 1000); // moment.duration expects milliseconds
+    isoOut = isoOut.toISOString();
+    return isoOut;
 }
 
 
@@ -547,7 +546,7 @@ exports.generate = function(_config, opts, cb) {
                 var maInfo = generate_mainfo(service, format);
                 var maName = "host-archive" + last_ma_number;
                 var url = "";
-                
+
                 if ( format == "psconfig" ) {
                     url = maInfo.data.url;
                 } else {
@@ -695,11 +694,12 @@ exports.generate = function(_config, opts, cb) {
             var name = test.name;
             var testspec = test.testspec;
 
+
             var config_archives = _config.ma_urls;
 
 
             psc_tests[ name ] = {
-                "type": test.service_type,
+                "type": test.service_type,                
                 "spec": {
                     "source": "{% address[0] %}",
                     "dest": "{% address[1] %}"
@@ -707,14 +707,29 @@ exports.generate = function(_config, opts, cb) {
             };
 
             psc_tests[ name ].spec = testspec.specs;
+            psc_tests[ name ].schedule_type = testspec.schedule_type;
 
             var spec = testspec.specs;
+
+
+
 
             if ( format == "psconfig" ) {
                 meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules );
             }
 
             var interval = psc_tests[ name ].spec["interval"];
+
+
+            var current_test = psc_tests[name];
+
+            if ( current_test.type == "latencybg" && current_test.schedule_type == "interval" ) {
+                current_test.type = "latency";
+                delete current_test.spec.interval;
+                delete current_test.spec.duration;
+            }
+
+            delete current_test.schedule_type;
 
             psc_tasks[ name ] = {
                 "group": test._meta._hostgroup,
@@ -743,7 +758,7 @@ exports.generate = function(_config, opts, cb) {
             mc.tests.push({
                 members: members,
                 parameters: parameters,
-                description: test.name,
+                description: test.name
             });
         });
 

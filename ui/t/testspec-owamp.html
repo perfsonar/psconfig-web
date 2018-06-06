@@ -10,6 +10,72 @@
             </accordion-heading>
 
 <div class="form-section">
+    <div class="form-group">
+                    <label for="tool" class="col-sm-2 control-label">Tool *</label>
+                    <div class="col-sm-4">
+                        <select class="form-control" name="tool" 
+                            ng-disabled="!selected._canedit"
+                            ng-model="selected.specs.tool" required>
+                            <option value="owping">owamp</option>
+                            <option value="twping">twamp</option>
+                        </select>
+                        <p class="help-block">The tool to use in performing the one-way delay test <code>tool</code></p>
+                    </div>
+    </div>
+
+        <h4>Schedule Type</h4>
+<div class="form-group schedule">
+        <div class="radio">
+            <label>
+                <input type="radio" ng-model="selected.schedule_type" value="continuous" ng-change="changeSchedule('continuous')" >
+                Continuous (recommended) - runs continuously in the background
+            </label>
+        </div>
+        <div class="radio">
+            <label>
+                <input type="radio" ng-model="selected.schedule_type" value="interval" ng-change="changeSchedule('interval')">
+                Interval (required if tool is <code>twamp</code>) - runs at regularly-scheduled intervals (every <code>n</code> seconds)
+            </label>
+        </div>
+
+
+</div>
+            <input type="hidden" ng-name="schedule_type" ng-model="selected.schedule_type" ng-value="selected.schedule_type" />
+
+
+<div class="schedule-section" ng-if="selected.schedule_type == 'interval'">
+
+<div class="form-group">
+        <h4>Test Schedule</h4>
+                                <p>Please configure your test schedule.</p>
+                                <p>Note that continuously streaming one-way delay tests is recommended; otherwise loss events etc may be missed.</p>
+</div>
+                <div class="form-group">
+                    <label for="interval" class="col-sm-2 control-label">Interval *</label>
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input type="number" string-to-number step="1" class="form-control" name="interval" 
+                                ng-disabled="!selected._canedit"
+                                ng-model="selected.specs.interval" required>
+                            <div class="input-group-addon">seconds</div>
+                        </div>
+                        <p class="help-block">The time in between one-way delay tests in seconds <code>test_interval</code></p>
+                    </div>
+                    <label for="duration" class="col-sm-2 control-label">Duration *</label>
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input type="number" string-to-number step="1" class="form-control" name="duration" 
+                                ng-disabled="!selected._canedit"
+                                ng-model="selected.specs.duration" required>
+                            <div class="input-group-addon">seconds</div>
+                        </div>
+                        <p class="help-block">The length to run each one-way delay test in seconds <code>duration</code></p>
+                    </div>
+                </div>
+
+</div>
+
+
 
 <div class="form-group">
 
