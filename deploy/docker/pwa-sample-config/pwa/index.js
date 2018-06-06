@@ -11,7 +11,7 @@ exports.meshconfig = {
         "owamp": {label: "Latency"},
         "bwctl": {label: "Throughput"},
         "traceroute": {label: "Traceroute"},
-        "ping": {label: "Pinger"},
+        "ping": {label: "Ping"},
     },
 
     //mesh types

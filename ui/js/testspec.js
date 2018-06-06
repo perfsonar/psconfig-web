@@ -23,10 +23,13 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
     });
 
     $scope.selected = null;
+
     $scope.select = function(testspec) {
         //TODO - maybe I should catch $dirty flag here.. but what about page nagivation?
         testspec.schedule_type = testspec.schedule_type || 'continuous';
         $scope.selected = testspec;
+
+        console.log("testspec", testspec);
 
         $scope.closesubbar();
         $location.update_path("/testspecs/"+testspec._id);
@@ -35,6 +38,21 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
         $scope.setdefault(testspec.service_type);
 
         $scope.minver = $scope.serverconf.minver[testspec.service_type];
+    }
+
+    $scope.friendly_type = function( type ) {
+        var ret = type;
+        try {
+            var type_lookup = $scope.serverconf.service_types;
+            if (type in type_lookup) {
+                ret = type_lookup[type].label.toLowerCase();
+            }
+        } catch(error) {
+            console.log("Error converting service type to friendly type: ", type);
+        } finally {
+            return ret;
+        }
+
     }
 
     $scope.add = function() {
