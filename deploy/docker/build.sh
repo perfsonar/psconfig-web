@@ -22,7 +22,7 @@ if [ ! $? -eq 0 ]; then
     exit
 fi
 
-docker tag perfsonar/pwa-admin perfsonar/pwa-admin:3.0.4
+docker tag perfsonar/pwa-admin perfsonar/pwa-admin:4.0b1
 docker push perfsonar/pwa-admin
 
 echo "preparing pwa-pub"
@@ -39,5 +39,5 @@ if [ ! $? -eq 0 ]; then
     exit
 fi
 
-docker tag perfsonar/pwa-pub perfsonar/pwa-pub:3.0.4
+docker tag perfsonar/pwa-pub perfsonar/pwa-pub:4.0b1
 docker push perfsonar/pwa-pub

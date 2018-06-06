@@ -1,6 +1,6 @@
 define({
   "name": "MCA",
-  "version": "3.0.1",
+  "version": "4.0r1",
   "description": "Tools to generate / publish meshconfig",
   "sampleUrl": false,
   "apidoc": "0.2.0",
