@@ -88,6 +88,13 @@ define({ "api": [
           },
           {
             "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "populate",
+            "description": "<p>Fields to populate</p>"
+          },
+          {
+            "group": "Parameter",
             "type": "Number",
             "optional": true,
             "field": "limit",
@@ -872,7 +879,7 @@ define({ "api": [
             "type": "String[]",
             "optional": true,
             "field": "admins",
-            "description": "<p>Array of admin IDs who can update information on this host</p>"
+            "description": "<p>Array of admin IDs who can update information on this host TODO: ADD addresses field</p>"
           }
         ]
       }

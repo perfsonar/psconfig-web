@@ -1,6 +1,6 @@
 {
   "name": "pwa-ui",
-  "version": "4.0b1",
+  "version": "4.1.0-beta.1",
   "description": "UI components for PWA UI service",
   "main": "config.js",
   "scripts": {

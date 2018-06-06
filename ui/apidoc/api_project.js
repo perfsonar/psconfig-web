@@ -1,13 +1,14 @@
 define({
-  "name": "MCA",
-  "version": "4.0r1",
-  "description": "Tools to generate / publish meshconfig",
+  "name": "psconfig-web-admin",
+  "version": "4.1.0-beta.1",
+  "description": "Tools to generate / publish perfSONAR meshconfig/psconfig topologies",
   "sampleUrl": false,
-  "apidoc": "0.2.0",
+  "defaultVersion": "0.0.0",
+  "apidoc": "0.3.0",
   "generator": {
     "name": "apidoc",
-    "time": "2017-03-27T17:35:49.940Z",
+    "time": "2018-06-06T17:54:27.927Z",
     "url": "http://apidocjs.com",
-    "version": "0.16.1"
+    "version": "0.17.6"
   }
 });
