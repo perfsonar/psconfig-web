@@ -117,6 +117,22 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
     delete spec.tool;
     delete spec["force-bidirectional"];
 
+    for( var key in spec ) {
+        var val = spec[key];
+
+        // do not convert true/false to numbers
+        if ( val !== true && val !== false ) {
+            // if the value is a number, convert it
+            if ( !isNaN( val ) ) {
+                val = Number(val);
+                spec[key] = val;
+            }
+
+        }
+
+    }
+
+
 
     if ( "interval" in testspec ) {
         var interval = testspec[ "interval" ];
@@ -136,8 +152,8 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
         }
 
         delete spec["random-start-percentage"];
+        delete spec.interval;
 
-        //delete testspec[ "test-interval" ];
     } else {
         //console.log("INTERVAL NOT FOUND", testspec);
 
@@ -304,7 +320,7 @@ function generate_mainfo_url(locator, format, type) {
             archiver: "esmond",
             data: {
                 url: locator,
-                "measurement_agent": "{% scheduled_by_address %}",
+                "measurement-agent": "{% scheduled_by_address %}",
             }
         };
 
