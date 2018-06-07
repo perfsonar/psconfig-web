@@ -113,6 +113,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
     rename_field( spec, "test-interval", "interval" );
     rename_field( spec, "sample-count", "packet-count" );
+    rename_field( spec, "udp-bandwidth", "bandwidth" ); // TODO: remove backwards compat hack
 
     delete spec.tool;
     delete spec["force-bidirectional"];
@@ -161,10 +162,10 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
 
     // rename protocol: udp to udp: true
-    if ( ( "protocol" in  testspec ) &&  testspec.protocol == "udp" ) {
+    if ( ( "protocol" in testspec ) && testspec.protocol == "udp" ) {
         testspec.udp = true;
-        delete testspec.protocol;
     }
+    delete testspec.protocol;
 
 
     // handle newer "ipversion" format
