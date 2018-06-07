@@ -111,7 +111,9 @@ router.get('/config/:url', function(req, res, next) {
         //if( ! ("status" in res ) ) return next();
         //if ( ! ( "text" in res.status ) ) return next();
 
-        if(!config) return res.status(404).text("Couldn't find config with URL:"+req.params.url);
+        if(!config) { 
+            return res.status(404).json({error: "404 error: Couldn't find config with URL:"+req.params.url});
+        }
         config._host_version = req.query.host_version;
         //log_json( config, opts );
         meshconfig.generate(config, opts, function(err, m) {

@@ -20,6 +20,7 @@
                             <option value="twping">twamp</option>
                         </select>
                         <p class="help-block">The tool to use in performing the one-way delay test <code>tool</code></p>
+                        <p class="help-block">Any tool other than <code>owamp</code> requires pSConfig and pS 4.1</p>
                     </div>
     </div>
 
@@ -34,7 +35,7 @@
         <div class="radio">
             <label>
                 <input type="radio" ng-model="selected.schedule_type" value="interval" ng-change="changeSchedule('interval')">
-                Interval (required if tool is <code>twamp</code>) - runs at regularly-scheduled intervals (every <code>n</code> seconds)
+                Interval (required if tool is <code>twamp</code>) - runs at regularly-scheduled intervals (every <code>n</code> seconds) <p>requires pSConfig and pS 4.1</p>
             </label>
         </div>
 

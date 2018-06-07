@@ -700,21 +700,16 @@ exports.generate = function(_config, opts, cb) {
 
             psc_tests[ name ] = {
                 "type": test.service_type,                
-                "spec": {
-                    "source": "{% address[0] %}",
-                    "dest": "{% address[1] %}"
-                },
+                "spec": {},
             };
 
             psc_tests[ name ].spec = testspec.specs;
             psc_tests[ name ].schedule_type = testspec.schedule_type;
 
-            var spec = testspec.specs;
-
-
-
 
             if ( format == "psconfig" ) {
+                psc_tests[ name ].spec.source = "{% address[0] %}";            
+                psc_tests[ name ].spec.dest = "{% address[1] %}";
                 meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules );
             }
 
@@ -754,7 +749,25 @@ exports.generate = function(_config, opts, cb) {
             }
 
             var parameters = test.testspec.specs;
+
             if ( format != "psconfig" ) parameters.type = get_type(test.service_type);
+
+            if ( parameters.type == "perfsonarbuoy/owamp" ) {
+                if ( "tool" in parameters ) {
+                    // if tool is not owping, drop this test
+                    if (  parameters.tool != "owping" ) {                        
+                        return;
+                    } else {
+                        // delete the tool parameter because meshconfig doesn't support it
+                        delete parameters.tool;
+                    }
+                }
+                // drop the test from meshconfig format if it has interval/duration parameters
+                if ( "interval" in parameters || "duration" in parameters ) {
+                    return;
+                }
+            }
+
             mc.tests.push({
                 members: members,
                 parameters: parameters,
