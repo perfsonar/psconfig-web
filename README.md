@@ -280,6 +280,9 @@ However, following are the ports used by nginx container.
 * 80 (For PWA configuration publisher)
 * 9443 (For x509 authentication to PWA administrative GUI)
 
+# API
+To use the API, see the [API DOC](API.md)
+
 # Reference
 
 Meshconfig parameters
