@@ -43,7 +43,7 @@ mkdir /etc/docker
 
 Enable & start the docker engine.
 
-```
+```bash
 $ systemctl enable docker
 $ systemctl start docker
 ```
@@ -51,7 +51,7 @@ $ systemctl start docker
 You should install logrotate for docker container log
 
 /etc/logrotate.d/docker-container
-```
+```bash
 /var/lib/docker/containers/*/*.log {
   rotate 7
   daily
@@ -108,7 +108,7 @@ tar -xzf pwa.sample.tar.gz -C /etc
 
 You will need SSL certificates for https access. On /etc/pwa/auth, you should see your host certificate with following file names, or place them there if not.
 
-# TODO: show how to create certs
+#### TODO: show how to create certs
 
 ```bash
 $ ls /etc/pwa/auth
@@ -183,7 +183,7 @@ You can create as many pwa-pub containers as desired (make sure to use unique na
 
 If you use more than 1 instance, please edit `/etc/pwa/nginx/conf.d/pwa.conf` to include all instances, like..
 
-```
+```javascript
 upstream pwapub {
     server pwa-pub1:8080;
     server pwa-pub2:8080;
@@ -288,7 +288,7 @@ Before you can start using the API, you need to obtain the access token. First, 
 
 Once you know your sub, login to your PWA server, and run something like following..
 
-```
+```bash
 $ docker exec -it sca-auth bash
 $ /app/bin/auth.js issue --scopes '{"pwa": ["user"]}' --sub '0' 
 eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3NjYS5pdS5lZHUvYXV0aCIsImlhdCI6MTQ4NzYyNzE2OS45NjMsInNjb3BlcyI6eyJtY2EiOlsidXNlciJdfSwic3ViIjowfQ.hmKr5GAhabMwSltdyq21__-JSGFXFyhxLB7HxhucXLMOslqVo2yOx4qZoLprBDKcCFnKQ7fQNY0fI9coi9ix40clci--p5iSD-w4gzXaxRm2wvldUDQeA...
