@@ -2,7 +2,7 @@
 
 ## PWA API
 
-PWA allows you to create / update meshconfig via REST API. You can use this to automate various configuration adminsitration.
+PWA allows you to create / update meshconfig via REST API. You can use this to automate various configuration administration.
 
 Before you can start using the API, you need to obtain the access token. 
 
