@@ -122,7 +122,7 @@ If you are enabling x509 authentication, then you will also need `trusted.pem`. 
 
 ### Container Installation
 
-Now we have all configuration files necessary to start installing PWA servicves.
+Now we have all configuration files necessary to start installing PWA services.
 
 1. First, create a docker network to group all PWA containers (so that you don't have --link them)
 
