@@ -2,7 +2,7 @@
 
 psConfig Web-based administration GUI and tools to publish generated meshconfig/psconfig output
 
-![Alt text](/readme/pwa.png?raw=true "pwa screenshot")
+![Alt text](/docs/pwa.png?raw=true "pwa screenshot")
 
 ## Installation
 
@@ -252,8 +252,8 @@ By default, following are the ports used by nginx container:
 
 # Other Topics
 
-* [Monitoring/testing](MONITORING.md)
-* PWA provides a developer API -- see the [API DOC](API.md)
+* [Monitoring / Testing](docs/MONITORING.md)
+* PWA provides a developer API -- see the [API DOC](docs/API.md)
 
 # Reference
 
