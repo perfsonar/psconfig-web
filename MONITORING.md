@@ -1,6 +1,6 @@
-## Testing / Monitoring
+## Monitoring / Testing
 
-You should now be able to access PWA by accessing your host on your browser on the host. You should be prompted to the login page. You should signup / confirm your email address, then define host groups / testspecs, and construct new meshconfig using those test entries.
+Once everything is configured, you should now be able to access PWA by accessing your host on your browser. You should be prompted to the login page. You should signup / confirm your email address, then define host groups / testspecs, and construct new meshconfig using those test entries.
 
 PWA reports the current health status via following API endpoint (for pwa-admin and pwa-cache)
 
@@ -17,7 +17,7 @@ PWA reports the current health status via following API endpoint (for pwa-admin 
 }
 ```
 
-You can configure your monitoring systems (Sensu, Nagious, etc..) to check for `status` and make sure it's set to 'ok'. 
+You can configure your monitoring systems (Sensu, Nagios, etc..) to check for `status` and make sure it's set to 'ok'. 
 
 For pwa-pub instances, you should run separate test at `http://<hostname>/pub/health` (not https://)
 
@@ -40,4 +40,7 @@ You should also monitor the authentication service status
 
 ```
 
-You can also monitor docker stdout/stderr log - similar to syslog.
+You can also monitor docker stdout/stderr log - similar to syslog:
+
+`sudo docker exec -it pwa-admin1 pm2 logs`
+
