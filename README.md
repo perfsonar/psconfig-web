@@ -2,7 +2,7 @@
 
 psConfig Web-based administration GUI and tools to publish generated meshconfig/psconfig output
 
-![Alt text](/docs/pwa.png?raw=true "pwa screenshot")
+![Alt text](docs/pwa.png?raw=true "pwa screenshot")
 
 ## Installation
 
