@@ -18,11 +18,11 @@ Files that have changed/that you need to change
 
 You will also need to add the new `pwa` role to each user:
 ```bash
-docker exec -it sca-auth /app/bin/auth.js modscope --username apertome --add '{"pwa": ["user"]}'
+docker exec -it sca-auth /app/bin/auth.js modscope --username user --add '{"pwa": ["user"]}'
 ```
 
 To make them an admin:
 ```bash
-docker exec -it sca-auth /app/bin/auth.js modscope --username apertome --add '{"pwa": ["admin"]}'
+docker exec -it sca-auth /app/bin/auth.js modscope --username user --add '{"pwa": ["admin"]}'
 ```
 
