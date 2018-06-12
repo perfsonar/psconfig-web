@@ -10,12 +10,10 @@ Login to your PWA server, and run something like following..
 
 ```bash
 $ docker exec -it sca-auth bash
-$ /app/bin/auth.js issue --scopes '{"pwa": ["user"]}' -- username 'username' 
+$ /app/bin/auth.js issue --scopes '{"pwa": ["user"]}' --username 'username' 
 eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3NjYS5pdS5lZHUvYXV0aCIsImlhdCI6MTQ4NzYyNzE2OS45NjMsInNjb3BlcyI6eyJtY2EiOlsidXNlciJdfSwic3ViIjowfQ.hmKr5GAhabMwSltdyq21__-JSGFXFyhxLB7HxhucXLMOslqVo2yOx4qZoLprBDKcCFnKQ7fQNY0fI9coi9ix40clci--p5iSD-w4gzXaxRm2wvldUDQeA...
 $ exit
 ```
-
-> '0' is where you put your user ID
 
 Copy the output from auth.js which is your access token. Store this on your server somewhere and make sure only you can access it (like chmod 600 `~/.pwa.token.jwt`)
 
