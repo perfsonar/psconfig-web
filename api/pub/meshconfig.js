@@ -153,7 +153,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
         }
 
         delete spec["random-start-percentage"];
-        delete spec.interval;
+        //delete spec.interval;
 
     } else {
         //console.log("INTERVAL NOT FOUND", testspec);
@@ -732,7 +732,6 @@ exports.generate = function(_config, opts, cb) {
 
             var interval = psc_tests[ name ].spec["interval"];
 
-
             var current_test = psc_tests[name];
 
             if ( current_test.type == "latencybg" && current_test.schedule_type == "interval" ) {
@@ -742,6 +741,7 @@ exports.generate = function(_config, opts, cb) {
             }
 
             delete current_test.schedule_type;
+            delete current_test.spec.interval;
 
             psc_tasks[ name ] = {
                 "group": test._meta._hostgroup,
