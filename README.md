@@ -252,7 +252,7 @@ By default, following are the ports used by nginx container:
 
 # Other Topics
 
-* [Monitoring/testing](MONITORING.MD)
+* [Monitoring/testing](MONITORING.md)
 * PWA provides a developer API -- see the [API DOC](API.md)
 
 # Reference
