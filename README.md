@@ -244,14 +244,16 @@ Re-run the container using the same `docker run ...` command you used to start i
 
 Docker will take care of its own firewall rules, so you don't have to worry about opening ports manually. 
 
-However, following are the ports used by nginx container.
+By default, following are the ports used by nginx container:
 
 * 443 (For PWA administrative GUI)
 * 80 (For PWA configuration publisher)
 * 9443 (For x509 authentication to PWA administrative GUI)
 
-# API
-To use the API, see the [API DOC](API.md)
+# Other Topics
+
+* [Monitoring/testing](MONITORING.MD)
+* PWA provides a developer API -- see the [API DOC](API.md)
 
 # Reference
 
