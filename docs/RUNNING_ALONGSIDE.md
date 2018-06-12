@@ -21,11 +21,15 @@ becomes
 AND
 
 
-``listen       443 ssl;``
+```javascript
+listen       443 ssl;
+```
 
 becomes
 
-``listen        8443;``
+```javascript
+listen        8443;
+```
 
 You also need to run the nginx container differently:
 
