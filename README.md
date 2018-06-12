@@ -229,14 +229,16 @@ Note: sometimes, docker containers will initially not have connectivity to the o
 
 To update PWA containers to the latest version, stop/remove the current container. This example updates the pwa-admin image, but you might also need to do the same thing for ``pwa-pub`` and/or ``sca-auth``, as well.
 
-::
-    docker stop pwa-admin1
-    docker rm pwa-admin1
+```bash
+docker stop pwa-admin1
+docker rm pwa-admin1
+```
 
 Pull down the latest version using:
 
-::
-    docker pull perfsonar/pwa-admin1
+```bash
+docker pull perfsonar/pwa-admin1
+```
 
 Re-run the container using the same `docker run ...` command you used to start it.
 
