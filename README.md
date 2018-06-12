@@ -222,55 +222,23 @@ aa6471073c01        nginx               "nginx -g 'daemon ..."   11 hours ago   
 10fdf3b63e4f        mongo               "/entrypoint.sh mo..."   12 hours ago        Up 12 hours         27017/tcp                                                          mongo
 ```
 
-### Testing / Monitoring
-
 Note: sometimes, docker containers will initially not have connectivity to the outside world. Usually this can be resolved by running `systemctl restart docker`
 
-You should now be able to access PWA by accessing your host on your browser on the host. You should be prompted to the login page. You should signup / confirm your email address, then define host gruops / testspecs, and construct new meshconfig using those test entries.
 
-PWA reports the current health status via following API endpoint (for pwa-admin and pwa-cache)
+### Updating
 
-`https://<hostname>/api/pwa/health`
+To update PWA containers to the latest version, stop/remove the current container. This example updates the pwa-admin image, but you might also need to do the same thing for ``pwa-pub`` and/or ``sca-auth``, as well.
 
-```javascript
-{
-    status: "ok",
-    msg: "everything looks good",
-    cache: {
-        hosts: 255,
-        update_time: 1486994021924
-    }
-}
-```
+::
+    docker stop pwa-admin1
+    docker rm pwa-admin1
 
-You can configure your monitoring systems (Sensu, Nagious, etc..) to check for `status` and make sure it's set to 'ok'. 
+Pull down the latest version using:
 
-For pwa-pub instances, you should run separate test at `http://<hostname>/pub/health` (not https://)
+::
+    docker pull perfsonar/pwa-admin1
 
-```javascript
-{
-    status: "ok"
-}
-```
-
-> Please note.. if you are running multiple instances of pwa-pub, then /pub/health is just from one of the instances (not all)
-
-You should also monitor the authentication service status
-
-`https://<hostname>/api/auth/health`
-```javascript
-{
-    status: "ok",
-    headers: {...}
-}
-
-```
-
-You can also monitor docker stdout/stderr log - similar to syslog.
-
-### Update
-
-To update PWA containers to the latest version, do `docker pull` the container you are trying to update and rerun the same `docker run ...` command you used to start it.
+Re-run the container using the same `docker run ...` command you used to start it.
 
 ### Firewall
 
