@@ -65,7 +65,7 @@ You should install logrotate for docker container log
 
 ### Configuration
 
-**Note:** if you are upgrading from an older MCA instance, read [UPGRADING FROM MCA](UPGRADING_FROM_MCA.md)
+**Note:** if you are upgrading from an older MCA instance, read [UPGRADING FROM MCA](docs/UPGRADING_FROM_MCA.md)
 
 Before we start installing PWA, you should prepare your configuration files first. You can bootstrap it by
 downloading and deploying PWA's default configuration files from git repo.
