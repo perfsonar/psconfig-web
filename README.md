@@ -65,7 +65,9 @@ You should install logrotate for docker container log
 
 ### Configuration
 
-**Note:** if you are upgrading from an older MCA instance, read [UPGRADING FROM MCA](docs/UPGRADING_FROM_MCA.md)
+**Upgrading:** If you are upgrading from a legacy MCA instance, read [UPGRADING FROM MCA](docs/UPGRADING_FROM_MCA.md)
+
+**Interaction with other web applications:** If you want to run PWA on a node that is already running other web applications, such as MadDash or the perfSONAR Toolkit web interface, you will need to do a couple things differently. See [Running alongside other web applications](docs/RUNNING_ALONGSIDE.md)
 
 Before we start installing PWA, you should prepare your configuration files first. You can bootstrap it by
 downloading and deploying PWA's default configuration files from git repo.
