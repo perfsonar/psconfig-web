@@ -255,7 +255,7 @@
                 </table>
                 -->
                 <p ng-if="hostgroups.length > 0" class="help-block">This host is member of following hostgroups</p>
-                <p ng-if="hostgroups.length == 0" class="help-block">This host does not belong to any hostgroup</p>
+                <p ng-if="hostgroups.length == 0" class="help-block">This host does not belong to any hostgroups</p>
                 <div class="well well-sm clickable" style="margin-bottom: 5px;" ng-repeat="hostgroup in hostgroups" ng-click="click_hostgroup(hostgroup)">
                     <span class="label label-default">{{hostgroup.service_type}}</span>
                     <b><!--<i class="fa fa-server"></i>-->{{hostgroup.name}}</b>
@@ -263,8 +263,8 @@
                 </div>
 
                 <br>
-                <p ng-if="configs.length > 0" class="help-block">Which is used in following meshconfig</p>
-                <p ng-if="configs.length == 0" class="help-block">Which is not used in any meshconfig</p>
+                <p ng-if="configs.length > 0" class="help-block">Which are used in following Configs</p>
+                <p ng-if="configs.length == 0" class="help-block">Which are not used in any Configs</p>
                 <div class="well well-sm clickable" style="margin-bottom: 5px;" ng-repeat="config in configs" ng-click="click_config(config)">
                     <span class="label label-default">/{{config.url}}</span>
                     <b>{{config.name}}</b>
