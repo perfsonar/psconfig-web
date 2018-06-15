@@ -28,7 +28,7 @@
             <option ng-repeat="(id, type) in serverconf.service_types" value="{{id}}">{{type.label}}</option>
         </select>
     </div>
-    <label class="col-sm-2 control-label">Mesh Type</label>
+    <label class="col-sm-2 control-label">Topology</label>
     <div class="col-sm-4">
         <select class="form-control" ng-model="test.mesh_type" 
             ng-disabled="!selected._canedit" required>
