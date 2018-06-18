@@ -1,3 +1,4 @@
+
 'use strict';
 
 //contrib
@@ -100,7 +101,10 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
     var iso_fields = [
         "duration",
         "interval",
-        "test-interval"
+        "test-interval",
+        "report-interval",
+        "waittime",
+        "timeout",
     ];
 
     for(var i in iso_fields) {
@@ -111,9 +115,12 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
     }
 
-    rename_field( spec, "test-interval", "interval" );
+    rename_field( spec, "interval", "test-interval" );
+    delete spec.interval;
     rename_field( spec, "sample-count", "packet-count" );
     rename_field( spec, "udp-bandwidth", "bandwidth" ); // TODO: remove backwards compat hack
+    rename_field( spec, "waittime", "sendwait" );
+    rename_field( spec, "timeout", "wait" );
 
     delete spec.tool;
     delete spec["force-bidirectional"];
@@ -135,8 +142,8 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
 
 
-    if ( "interval" in testspec ) {
-        var interval = testspec[ "interval" ];
+    if ( "test-interval" in testspec ) {
+        var interval = testspec[ "test-interval" ];
         var interval_name = "repeat-" + interval;
         psc_schedules[ interval_name ] = {
             "repeat": interval,
@@ -153,10 +160,8 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
         }
 
         delete spec["random-start-percentage"];
-        //delete spec.interval;
 
-    } else {
-        //console.log("INTERVAL NOT FOUND", testspec);
+        //delete spec.interval;
 
     }
 
@@ -178,6 +183,12 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
     if ("ipv6-only" in testspec ) {
         testspec["ip-version"] = 6;
         delete testspec["ipv6-only"];
+    }
+
+    if ( "report-interval" in testspec ) {
+        rename_field( testspec, "report-interval", "interval" );
+        delete testspec["report-interval"];
+
     }
 
     delete spec.type;
@@ -730,18 +741,18 @@ exports.generate = function(_config, opts, cb) {
                 meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules );
             }
 
-            var interval = psc_tests[ name ].spec["interval"];
+            var interval = psc_tests[ name ].spec["test-interval"];
 
             var current_test = psc_tests[name];
 
             if ( current_test.type == "latencybg" && current_test.schedule_type == "interval" ) {
                 current_test.type = "latency";
-                delete current_test.spec.interval;
+                //delete current_test.spec.interval;
                 delete current_test.spec.duration;
             }
 
             delete current_test.schedule_type;
-            delete current_test.spec.interval;
+            delete current_test.spec["test-interval"];
 
             psc_tasks[ name ] = {
                 "group": test._meta._hostgroup,
