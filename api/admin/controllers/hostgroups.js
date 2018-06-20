@@ -32,9 +32,9 @@ function canedit(user, hostgroup) {
  * @apiParam {String} [select]  Fields to return (admins will always be added). Multiple fields can be entered with %20 as delimiter
  * @apiParam {Number} [limit]   Maximum number of records to return - defaults to 100
  * @apiParam {Number} [skip]    Record offset for pagination (default to 0)
+ * @apiSuccess {Object} [hostgroups]         hostgroups: list of hostgroups, and count: total number of hostgroup (for paging)
  * @apiHeader {String}          Authorization A valid JWT token "Bearer: xxxxx"
  *
- * @apiSuccess {Object}         hostgroups: list of hostgroupx, and count: total number of hostgroup (for paging)
  */
 router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
     var find = {};
@@ -74,7 +74,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
  * @apiParam {String} type      Host group type (static, or dynamic)
  * @apiParam {String[]} [hosts] Array of host IDs for static host group.
  *                              (For dynamic host, this field is used to store *currently* resolved hosts (auto-updated periodically)
- * @apiParam {String} [host_filter] Dynamic hostgroup script (only for dynamic hsot group)
+ * @apiParam {String} [host_filter] Dynamic hostgroup script (only for dynamic host group)
  * @apiParam {String[]} [admins] Array of admin IDs
  *
  * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"
@@ -104,7 +104,7 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
  * @apiParam {String} [type]      Host group type (static, or dynamic)
  * @apiParam {String[]} [hosts] Array of host IDs for static host group.
  *                              (For dynamic host, this field is used to store *currently* resolved hosts (auto-updated periodically)
- * @apiParam {String} [host_filter] Dynamic hostgroup script (only for dynamic hsot group)
+ * @apiParam {String} [host_filter] Dynamic hostgroup script (only for dynamic host group)
  * @apiParam {String[]} [admins] Array of admin IDs
  *
  * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"

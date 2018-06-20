@@ -26,7 +26,7 @@ function canedit(user, config) {
 /**
  * @api {get} /configs          Query Configs
  * @apiGroup                    Configs
- * @apiDescription              Query registered meshconfigs and its basic details
+ * @apiDescription              Query registered Configs and their basic details
  *
  * @apiParam {Object} [find]    Mongo find query JSON.stringify & encodeURIComponent-ed - defaults to {}
  *                              To pass regex, you need to use {$regex: "...."} format instead of js: /.../ 
@@ -37,7 +37,7 @@ function canedit(user, config) {
  * @apiParam {Number} [skip]    Record offset for pagination (default to 0)
  * @apiHeader {String}          Authorization A valid JWT token "Bearer: xxxxx"
  *
- * @apiSuccess {Object}         configs: List of meshconfig registrations, count: total number of meshconfig (for paging)
+ * @apiSuccess {Object}         configs: List of Config registrations, count: total number of Configs (for paging)
  */
 router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var find = {};
@@ -73,12 +73,14 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
 /**
  * @api {post} /configs         New Config
  * @apiGroup                    Configs
- * @apiDescription              Register new meshconfig
+ * @apiDescription              Register new Config
  *
  * @apiParam {String} [url]     URL to expose this config ("config" will be published under "/pub/config") - needs to be unique
- * @apiParam {String} [name]    Name of this meshconfig (will be published on the meshconfig)
- * @apiParam {String} [desc]    Description for this meshconfig (PWA use only)
+ * @apiParam {String} [name]    Name of this Config (will be published on the Config)
+ * @apiParam {String} [desc]    Description for this Config (PWA use only)
  * @apiParam {Object[]} [tests] Array of test objects (TODO - need documentation)
+ * @apiParam {String[]} [ma_urls] Array of MA URLs to which to archive all test results in this Config
+ * @apiParam {Boolean} [force_endpoint_mas] Allows you to force writing to measurement archives on all endpoints for tests associated with this Config 
  * @apiParam {String[]} [admins] Array of admin IDs
  *
  * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"
@@ -111,11 +113,11 @@ router.put('/import', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
 /**
  * @api {put} /configs/:id      Update Config
  * @apiGroup                    Configs
- * @apiDescription              Update registered meshconfig
+ * @apiDescription              Update registered Config
  *
  * @apiParam {String} [url]     URL to expose this config ("config" will be published under "/pub/config")
- * @apiParam {String} [name]    Name of this meshconfig (will be published on the meshconfig)
- * @apiParam {String} [desc]    Description for this meshconfig (PWA use only)
+ * @apiParam {String} [name]    Name of this Config (will be published on the Config)
+ * @apiParam {String} [desc]    Description for this Config (PWA use only)
  * @apiParam {Object[]} [tests] Array of test objects (TODO - need documentation)
  * @apiParam {String[]} [admins] Array of admin IDs
  *
@@ -160,7 +162,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
 /**
  * @api {delete} /configs/:id   Remove Config
  * @apiGroup                    Configs
- * @apiDescription              Remove registered meshconfig
+ * @apiDescription              Remove registered Config
  * @apiHeader {String} authorization 
  *                              A valid JWT token "Bearer: xxxxx"
  * @apiSuccessExample {json} Success-Response:

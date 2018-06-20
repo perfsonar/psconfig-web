@@ -28,7 +28,7 @@
     "url": "/configs/:id",
     "title": "Remove Config",
     "group": "Configs",
-    "description": "<p>Remove registered meshconfig</p>",
+    "description": "<p>Remove registered Config</p>",
     "header": {
       "fields": {
         "Header": [
@@ -61,7 +61,7 @@
     "url": "/configs",
     "title": "Query Configs",
     "group": "Configs",
-    "description": "<p>Query registered meshconfigs and its basic details</p>",
+    "description": "<p>Query registered Configs and their basic details</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -131,7 +131,7 @@
             "type": "Object",
             "optional": false,
             "field": "configs:",
-            "description": "<p>List of meshconfig registrations, count: total number of meshconfig (for paging)</p>"
+            "description": "<p>List of Config registrations, count: total number of Configs (for paging)</p>"
           }
         ]
       }
@@ -146,7 +146,7 @@
     "url": "/configs",
     "title": "New Config",
     "group": "Configs",
-    "description": "<p>Register new meshconfig</p>",
+    "description": "<p>Register new Config</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -162,14 +162,14 @@
             "type": "String",
             "optional": true,
             "field": "name",
-            "description": "<p>Name of this meshconfig (will be published on the meshconfig)</p>"
+            "description": "<p>Name of this Config (will be published on the Config)</p>"
           },
           {
             "group": "Parameter",
             "type": "String",
             "optional": true,
             "field": "desc",
-            "description": "<p>Description for this meshconfig (PWA use only)</p>"
+            "description": "<p>Description for this Config (PWA use only)</p>"
           },
           {
             "group": "Parameter",
@@ -177,6 +177,20 @@
             "optional": true,
             "field": "tests",
             "description": "<p>Array of test objects (TODO - need documentation)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String[]",
+            "optional": true,
+            "field": "ma_urls",
+            "description": "<p>Array of MA URLs to which to archive all test results in this Config</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Boolean",
+            "optional": true,
+            "field": "force_endpoint_mas",
+            "description": "<p>Allows you to force writing to measurement archives on all endpoints for tests associated with this Config</p>"
           },
           {
             "group": "Parameter",
@@ -224,7 +238,7 @@
     "url": "/configs/:id",
     "title": "Update Config",
     "group": "Configs",
-    "description": "<p>Update registered meshconfig</p>",
+    "description": "<p>Update registered Config</p>",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -240,14 +254,14 @@
             "type": "String",
             "optional": true,
             "field": "name",
-            "description": "<p>Name of this meshconfig (will be published on the meshconfig)</p>"
+            "description": "<p>Name of this Config (will be published on the Config)</p>"
           },
           {
             "group": "Parameter",
             "type": "String",
             "optional": true,
             "field": "desc",
-            "description": "<p>Description for this meshconfig (PWA use only)</p>"
+            "description": "<p>Description for this Config (PWA use only)</p>"
           },
           {
             "group": "Parameter",
@@ -377,6 +391,19 @@
         ]
       }
     },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": true,
+            "field": "hostgroups",
+            "description": "<p>hostgroups: list of hostgroups, and count: total number of hostgroup (for paging)</p>"
+          }
+        ]
+      }
+    },
     "header": {
       "fields": {
         "Header": [
@@ -386,19 +413,6 @@
             "optional": false,
             "field": "Authorization",
             "description": "<p>A valid JWT token &quot;Bearer: xxxxx&quot;</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Object",
-            "optional": false,
-            "field": "hostgroups:",
-            "description": "<p>list of hostgroupx, and count: total number of hostgroup (for paging)</p>"
           }
         ]
       }
@@ -457,7 +471,7 @@
             "type": "String",
             "optional": true,
             "field": "host_filter",
-            "description": "<p>Dynamic hostgroup script (only for dynamic hsot group)</p>"
+            "description": "<p>Dynamic hostgroup script (only for dynamic host group)</p>"
           },
           {
             "group": "Parameter",
@@ -549,7 +563,7 @@
             "type": "String",
             "optional": true,
             "field": "host_filter",
-            "description": "<p>Dynamic hostgroup script (only for dynamic hsot group)</p>"
+            "description": "<p>Dynamic hostgroup script (only for dynamic host group)</p>"
           },
           {
             "group": "Parameter",
@@ -774,6 +788,34 @@
             "optional": true,
             "field": "admins",
             "description": "<p>Array of admin IDs who can update information on this host (default to submitter)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Object[]",
+            "optional": true,
+            "field": "addresses",
+            "description": "<p>List of addresses for this host</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Boolean",
+            "optional": true,
+            "field": "local_ma",
+            "description": "<p>Whether to archive test results to the local MA</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "local_ma_url",
+            "description": "<p>URL of the local MA - typically this is autogenerated and should work that way, but you can override it with this field</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String[]",
+            "optional": true,
+            "field": "ma_urls",
+            "description": "<p>MA URLs to save all test results for this host to</p>"
           }
         ]
       }
@@ -879,7 +921,35 @@
             "type": "String[]",
             "optional": true,
             "field": "admins",
-            "description": "<p>Array of admin IDs who can update information on this host TODO: ADD addresses field</p>"
+            "description": "<p>Array of admin IDs who can update information on this host</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Object[]",
+            "optional": true,
+            "field": "addresses",
+            "description": "<p>List of addresses for this host</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Boolean",
+            "optional": true,
+            "field": "local_ma",
+            "description": "<p>Whether to archive test results to the local MA</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "local_ma_url",
+            "description": "<p>URL of the local MA - typically this is autogenerated and should work that way, but you can override it with this field</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String[]",
+            "optional": true,
+            "field": "ma_urls",
+            "description": "<p>MA URLs to save all test results for this host to</p>"
           }
         ]
       }
