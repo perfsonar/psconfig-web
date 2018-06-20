@@ -14,6 +14,17 @@ const logger = new winston.Logger(config.logger.winston);
 const db = require('../models');
 const common = require('../common');
 
+// TODO: Remove bwctl hack
+// This is a ps 3.5/bwctl backwards-compatibility hack
+const bwctl_tool_lookup = { // TODO: Remove bwctl hack 
+    iperf3: "bwctliperf3",
+    iperf2: "bwctliperf2",
+    ping: "bwctlping",
+    traceroute: "bwctltraceroute",
+    tracepath: "bwctltracepath"
+};
+
+
 var profile_cache = null;
 var profile_cache_date = null;
 function load_profile(cb) {
@@ -776,6 +787,8 @@ exports.generate = function(_config, opts, cb) {
 
             }
 
+           add_bwctl_tools( psc_tasks[ name ] ); 
+
             var parameters = test.testspec.specs;
 
             if ( format != "psconfig" ) parameters.type = get_type(test.service_type);
@@ -815,6 +828,23 @@ exports.generate = function(_config, opts, cb) {
             cb(null, mc);
         }
     });
+}
+
+// TODO: Remove bwctl hack
+// This function adds bwctl backwards-compatible tools to the list of tools
+function add_bwctl_tools ( task ) {
+    if ( ! ("tools" in task ) ) {
+        return;
+    }
+    for( var i in task.tools ) {
+        var tool = task.tools[i];
+        if ( ( tool in bwctl_tool_lookup ) && ( ! (bwctl_tool_lookup[ tool ] in task.tools ) ) ) {
+            task.tools.push( bwctl_tool_lookup[ tool ] );
+
+        }
+
+    }
+
 }
 
 function log_json( json_text ) {
