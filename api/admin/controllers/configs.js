@@ -78,7 +78,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
  * @apiParam {String} [url]     URL to expose this config ("config" will be published under "/pub/config") - needs to be unique
  * @apiParam {String} [name]    Name of this Config (will be published on the Config)
  * @apiParam {String} [desc]    Description for this Config (PWA use only)
- * @apiParam {Object[]} [tests] Array of test objects (TODO - need documentation)
+ * @apiParam {Object[]} [tests] Array of test objects
  * @apiParam {String[]} [ma_urls] Array of MA URLs to which to archive all test results in this Config
  * @apiParam {Boolean} [force_endpoint_mas] Allows you to force writing to measurement archives on all endpoints for tests associated with this Config 
  * @apiParam {String[]} [admins] Array of admin IDs
@@ -118,7 +118,7 @@ router.put('/import', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
  * @apiParam {String} [url]     URL to expose this config ("config" will be published under "/pub/config")
  * @apiParam {String} [name]    Name of this Config (will be published on the Config)
  * @apiParam {String} [desc]    Description for this Config (PWA use only)
- * @apiParam {Object[]} [tests] Array of test objects (TODO - need documentation)
+ * @apiParam {Object[]} [tests] Array of test objects
  * @apiParam {String[]} [admins] Array of admin IDs
  *
  * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"

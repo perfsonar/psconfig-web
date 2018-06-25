@@ -176,7 +176,7 @@ define({ "api": [
             "type": "Object[]",
             "optional": true,
             "field": "tests",
-            "description": "<p>Array of test objects (TODO - need documentation)</p>"
+            "description": "<p>Array of test objects</p>"
           },
           {
             "group": "Parameter",
@@ -268,7 +268,7 @@ define({ "api": [
             "type": "Object[]",
             "optional": true,
             "field": "tests",
-            "description": "<p>Array of test objects (TODO - need documentation)</p>"
+            "description": "<p>Array of test objects</p>"
           },
           {
             "group": "Parameter",
@@ -731,7 +731,7 @@ define({ "api": [
             "type": "Object[]",
             "optional": false,
             "field": "services",
-            "description": "<p>List of service objects for this host (TODO - need documentation)</p>"
+            "description": "<p>List of service objects for this host, in this format: [ {type: &quot;bwctl&quot;}, {type: &quot;owamp&quot;} ]</p>"
           },
           {
             "group": "Parameter",
@@ -773,7 +773,7 @@ define({ "api": [
             "type": "Object",
             "optional": true,
             "field": "info",
-            "description": "<p>(Adhoc only) host information (key/value pairs of various info - TODO document)</p>"
+            "description": "<p>(Adhoc only) host information (key/value pairs of various info)</p>"
           },
           {
             "group": "Parameter",
@@ -865,7 +865,7 @@ define({ "api": [
             "type": "Object[]",
             "optional": false,
             "field": "services",
-            "description": "<p>List of service objects for this host (TODO - need documentation)</p>"
+            "description": "<p>List of service objects for this host, in this format: [ {type: &quot;bwctl&quot;}, {type: &quot;owamp&quot;} ]</p>"
           },
           {
             "group": "Parameter",
@@ -907,7 +907,7 @@ define({ "api": [
             "type": "Object",
             "optional": true,
             "field": "info",
-            "description": "<p>(Adhoc only) host information (key/value pairs of various info - TODO document)</p>"
+            "description": "<p>(Adhoc only) host information (key/value pairs of various info)</p>"
           },
           {
             "group": "Parameter",

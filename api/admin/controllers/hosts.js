@@ -73,13 +73,13 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
  * @apiGroup                        Hosts
  * @apiDescription                  Register new adhoc host
  *
- * @apiParam {Object[]} services    List of service objects for this host (TODO - need documentation)
+ * @apiParam {Object[]} services    List of service objects for this host, in this format: [ {type: "bwctl"}, {type: "owamp"} ]
  * @apiParam {String} [toolkit_url] (default: use hostname) URL to show for MadDash (leave it not set for "auto")
  * @apiParam {String} [desc]        host description used in meshconfig - sitename will be used if missing
  * @apiParam {Boolean} [no_agent]   Set to true if this host should not read the meshconfig (passive) (default: false)
  * @apiParam {String} [hostname]    (Adhoc only) hostname
  * @apiParam {String} [sitename]    (Adhoc only) sitename to show to assist hostname lookup inside PWA
- * @apiParam {Object} [info]        (Adhoc only) host information (key/value pairs of various info - TODO document)
+ * @apiParam {Object} [info]        (Adhoc only) host information (key/value pairs of various info)
  * @apiParam {String[]} [communities] (Adhoc only) list of community names that this host is registered in LS
  * @apiParam {String[]} [admins]    Array of admin IDs who can update information on this host (default to submitter)
  * @apiParam {Object[]} [addresses] List of addresses for this host 
@@ -110,13 +110,13 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
  * @apiGroup                    Hosts
  * @apiDescription              Update host registration (non-Adhoc host can only update services, no_agent, desc, and toolkit_url)
  *
- * @apiParam {Object[]} services List of service objects for this host (TODO - need documentation)
+ * @apiParam {Object[]} services List of service objects for this host, in this format: [ {type: "bwctl"}, {type: "owamp"} ]
  * @apiParam {Boolean} [toolkit_url] (default: use hostname) URL to show for MadDash
  * @apiParam {String} [desc]        host description used in meshconfig - sitename will be used if missing
  * @apiParam {Boolean} [no_agent] Set to true if this host should not read the meshconfig (passive) (default: false)
  * @apiParam {String} [hostname] (Adhoc only) hostname
  * @apiParam {String} [sitename] (Adhoc only) sitename to show to assist hostname lookup inside PWA
- * @apiParam {Object} [info]    (Adhoc only) host information (key/value pairs of various info - TODO document)
+ * @apiParam {Object} [info]    (Adhoc only) host information (key/value pairs of various info)
  * @apiParam {String[]} [communities] (Adhoc only) list of community names that this host is registered in LS
  * @apiParam {String[]} [admins] Array of admin IDs who can update information on this host
  * @apiParam {Object[]} [addresses] List of addresses for this host 
