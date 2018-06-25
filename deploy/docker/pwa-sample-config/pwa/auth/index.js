@@ -23,7 +23,8 @@ exports.auth = {
     //option for jwt.sign
     sign_opt: {algorithm: 'RS256'},
 
-    //allow_signup: false, //prevent user from signing in
+    //prevent users from registering new accounts (set to true to allow registration)
+    allow_signup: false, 
 };
 
 //comment this out if you don't want to confirm email

@@ -40,6 +40,7 @@ angular.module('app.config', [])
         oidc: false, //cilogon openid-connect service
         //oidc_selector: false, //show idp selector
 
+        // to allow signup, set signup to true
         signup: false,
     },
 });
