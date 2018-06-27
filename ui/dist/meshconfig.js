@@ -57,7 +57,7 @@ app.directive('confirmOnExit', function() {
             }
             $scope.$on('$locationChangeStart', function(event, next, current) {
                 if ($scope.form.$dirty) {
-                    if(!confirm("Do you want to abondon unsaved changes?")) {
+                    if(!confirm("Do you want to abandon unsaved changes?")) {
                         event.preventDefault();
                     }
                 }

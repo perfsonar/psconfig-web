@@ -59,7 +59,7 @@ app.directive('confirmOnExit', function($window, $location) {
             }
             $scope.$on('$locationChangeStart', function(event, next, current) {
                 if ($scope.form.$dirty) {
-                    if(!confirm("Do you want to abondon unsaved changes?")) {
+                    if(!confirm("Do you want to abandon unsaved changes?")) {
                         event.preventDefault();
                         //TODO controller might have already changed selected item on the menu.. 
                         //I somehow need to revert, but not sure how..
