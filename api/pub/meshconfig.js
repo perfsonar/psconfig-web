@@ -116,6 +116,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
         "report-interval",
         "waittime",
         "timeout",
+        "packet-interval"
     ];
 
     for(var i in iso_fields) {
@@ -132,6 +133,10 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
     rename_field( spec, "udp-bandwidth", "bandwidth" ); // TODO: remove backwards compat hack
     rename_field( spec, "waittime", "sendwait" );
     rename_field( spec, "timeout", "wait" );
+
+    rename_field( spec, "packet-count", "count");
+    rename_field( spec, "packet-interval", "interval");
+    rename_field( spec, "packet-size", "length");
 
     delete spec.tool;
     delete spec["force-bidirectional"];
@@ -738,7 +743,7 @@ exports.generate = function(_config, opts, cb) {
 
 
             psc_tests[ name ] = {
-                "type": test.service_type,                
+                "type": test.service_type,
                 "spec": {},
             };
 
@@ -747,7 +752,7 @@ exports.generate = function(_config, opts, cb) {
 
 
             if ( format == "psconfig" ) {
-                psc_tests[ name ].spec.source = "{% address[0] %}";            
+                psc_tests[ name ].spec.source = "{% address[0] %}";
                 psc_tests[ name ].spec.dest = "{% address[1] %}";
                 meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules );
             }
@@ -839,7 +844,7 @@ function add_bwctl_tools ( task ) {
     for( var i in task.tools ) {
         var tool = task.tools[i];
         if ( ( tool in bwctl_tool_lookup ) && ( ! (bwctl_tool_lookup[ tool ] in task.tools ) ) ) {
-            task.tools.push( bwctl_tool_lookup[ tool ] );
+            task.tools.unshift( bwctl_tool_lookup[ tool ] );
 
         }
 
