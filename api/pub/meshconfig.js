@@ -587,6 +587,7 @@ exports.generate = function(_config, opts, cb) {
                 if ( !_host.local_ma && !_config.force_endpoint_mas && !_host.ma_urls ) {
                     return;
                 }
+
                 var maInfo = generate_mainfo(service, format);
                 var maName = "host-archive" + last_ma_number;
                 var url = "";
@@ -706,30 +707,21 @@ exports.generate = function(_config, opts, cb) {
         //now the most interesting part..
         _config.tests.forEach(function(test) {
 
-            function has_service(host_id) {
-                var host = host_catalog[host_id];
-                var found = false;
-                host.services.forEach(function(service) {
-                    if(service.type == test.service_type) found = true;
-                });
-                return found;
-            }
-
             if(!test.enabled) return;
             var members = {
                 type: test.mesh_type
             };
             switch(test.mesh_type) {
                 case "disjoint":
-                    members.a_members = generate_members(test.agroup.filter(host=>has_service(host._id)));
-                    members.b_members = generate_members(test.bgroup.filter(host=>has_service(host._id)));
+                    members.a_members = generate_members(test.agroup);
+                    members.b_members = generate_members(test.bgroup);
                     break;
                 case "mesh":
-                    members.members = generate_members(test.agroup.filter(host=>has_service(host._id)));
+                    members.members = generate_members(test.agroup);
                     break;
             }
             if(test.nahosts && test.nahosts.length > 0) {
-                members.no_agents = generate_members(test.nahosts.filter(host=>has_service(host._id)));
+                members.no_agents = generate_members(test.nahosts);
                 members.no_agents.forEach( function( host ) {
                     psconfig.addresses[ host ][ "no-agent" ] = true;
                 });
