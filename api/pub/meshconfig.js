@@ -116,7 +116,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
         "report-interval",
         "waittime",
         "timeout",
-        "packet-interval"
+        //"packet-interval"
     ];
 
     for(var i in iso_fields) {
@@ -133,8 +133,6 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
     rename_field( spec, "udp-bandwidth", "bandwidth" ); // TODO: remove backwards compat hack
     rename_field( spec, "waittime", "sendwait" );
     rename_field( spec, "timeout", "wait" );
-
-    console.log("test.type", test.type);
 
     if ( test.type == "rtt" ) { // TODO: figure out a better way to support different field names for different test types
         rename_field( spec, "packet-count", "count");
