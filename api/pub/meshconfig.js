@@ -504,7 +504,9 @@ exports.generate = function(_config, opts, cb) {
         if(_config.admins) {
             mc.administrators = [];
             _config.admins.forEach(function(admin) {
-                mc.administrators.push({name: admin.fullname, email: admin.email});
+                if ( ( typeof admin ) != "undefined" ) {
+                    mc.administrators.push({name: admin.fullname, email: admin.email});
+                }
             });
         }
 
