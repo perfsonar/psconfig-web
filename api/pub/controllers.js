@@ -10,6 +10,8 @@ const config = require('../config');
 const logger = new winston.Logger(config.logger.winston);
 const db = require('../models');
 const meshconfig = require('./meshconfig');
+const url = require('url');
+
 
 /**
  * @apiGroup            Publisher
@@ -76,10 +78,21 @@ router.get('/config', function(req, res, next) {
             q += "host_version="+req.query.host_version;
         }
         if(q!="") q="?"+q;
-        console.dir(req.headers);
+
+        var proto = "http";
         if(req.headers['x-forwarded-proto']) proto = req.headers['x-forwarded-proto'];
+        var urlObj = url.parse(config.pub.url);
+
+        var base_url = proto + "://" + urlObj.host;
+        /* may want to add port later
+        if ( urlObj.port !== null ) {
+            base_url += ":port";
+        }
+        */
+        base_url += urlObj.path + 'config/';
+
         var urls = configs.map((_config)=>{
-            return {include: [ config.pub.url+'config/'+_config.url+q ]};
+            return {include: [ base_url + _config.url + q ]};
         });
         res.json(urls);
     }); 
