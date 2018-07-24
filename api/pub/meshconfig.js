@@ -644,6 +644,9 @@ exports.generate = function(_config, opts, cb) {
                 }
 
             });
+            if (  host.measurement_archives.length == 0 ) {
+                delete host.measurement_archives;
+            }
 
             // If there are no archives for this host, delete the 'archives' object
 
@@ -675,6 +678,7 @@ exports.generate = function(_config, opts, cb) {
         if ( "ma_urls" in _config ) {
             for(var i in _config.ma_urls ) {
                 var url = _config.ma_urls[i];
+                if ( url == "" ) continue;
 
                 var maName = "test-archive" + last_test_ma_number;
                 test_mas.push( maName );
@@ -707,7 +711,12 @@ exports.generate = function(_config, opts, cb) {
         psconfig.groups = host_groups;
         //psconfig.groups = psc_groups;
         mc.organizations.push(org);
-        mc.measurement_archives = config_mas;
+        if ( config_mas.length > 0 ) {
+            mc.measurement_archives = config_mas;
+        } else {
+            delete mc.measurement_archives;
+        }
+
 
 
         //now the most interesting part..
