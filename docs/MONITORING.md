@@ -1,4 +1,4 @@
-## Monitoring / Testing
+## Monitoring
 
 Once everything is configured, you should now be able to access PWA by accessing your host on your browser. You should be prompted to the login page. You should signup / confirm your email address, then define host groups / testspecs, and construct new meshconfig using those test entries.
 
