@@ -1,5 +1,3 @@
-# psConfig Web Administrator (PWA) API
-
 ## PWA API
 
 PWA allows you to create / update meshconfig via REST API. You can use this to automate various configuration administration.
