@@ -16,6 +16,10 @@ var path = 'manual-tests/';
 var testfiles = [];
 testfiles.push( { before: 'owamp-master-ma.json', after: 'owamp-branch-ma.json' });
 testfiles.push( { before: 'owamp-pscheduler-master-ma.json', after: 'owamp-pscheduler-branch-ma.json' });
+testfiles.push( { before: 'nightly-before-ma-fixes-psconfig.json', after: 'nightly-after-ma-fixes-psconfig.json' } );
+
+testfiles.push( { before: 'nightly-before-ma-fixes.json', after: 'nightly-after-ma-fixes.json' } );
+
 
 
 function formatlog( obj ) {
@@ -30,7 +34,7 @@ describe('manual', function() {
         //console.log("TESTFILE", testfile);
         var output_after;
 
-        it( 'checks manually', function(done) {
+        it( 'checks manually ' + before, function(done) {
             var output_before;
             fs.readFile(path + before, 'utf8', function (err,data) {
                 if (err) {
