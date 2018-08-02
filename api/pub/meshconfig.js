@@ -248,31 +248,17 @@ function resolve_testspec(id, cb) {
 function resolve_ma(host, next, service_types) {
     //for each service, lookup ma host
     
-
-    //console.log("resolve_ma service_types", service_types);
-
-    //console.log("host", host);
-
-    //console.log("host.services", host.services , "\n" + host.hostname);
-
-    //TODO: FIX SERVICES HERE
     async.eachSeries(service_types, function(service, next_service) {
-        console.log("service", service);
-        console.log("host", host);
 
         if(! service.ma ) {
             //use host if not set or set to the host itself
-            console.error("using host for " + host.hostname);
             service.ma = host; 
-            console.log("service.ma after", service.ma);
             next_service();
         } else {
             //find the ma host
-            console.error("using _host for " + host.hostname);
             resolve_host(service.ma, function(err, _host) {
                 if(err) return next_service(err);
                 service.ma = _host;
-            console.log("service.ma after", service.ma);
                 next_service();
             });
         }
@@ -290,24 +276,17 @@ function resolve_host(id, cb) {
 
 function resolve_hosts(hostgroup, cb) {
     var ids = hostgroup.hosts;
-    console.error("ids", ids);
     var service_types = hostgroup.test_service_types;
-    console.log("service_ty8pe4 in resolve_hosts", service_types);
     db.Host.find({_id: {$in: ids}}).lean().exec(function(err, hosts) {
-        //console.error("hosts first", hosts);
         if(err) {
-            console.error("error finding hosts in hostgroup", err);
             return cb(err);
         }
         async.eachSeries(hosts, 
             function( host, ma_cb ) {
-                console.log("in eachaseries");
-                //console.error("HOST", host);
                 resolve_ma(host, ma_cb, service_types);
                 //ma_cb();
             },
             function(err) {
-                //console.log("hosts", hosts);
             //if(err) return cb(err);
             cb(err, hosts);
         });
@@ -320,10 +299,8 @@ function resolve_hostgroup(id, test_service_types, cb) {
         if(!hostgroup) return cb("can't find hostgroup:"+id);
         //hosts will contain hostid for both static and dynamic (cached by pwacache)
         hostgroup.test_service_types = test_service_types;
-        console.error("HOSTGROUP", hostgroup);
         resolve_hosts(hostgroup, function(err, hosts) {
             if(err) return cb(err);
-            //console.log("hosts after", hosts);
             cb(null, hosts);
         }); 
     });
@@ -332,7 +309,6 @@ function resolve_hostgroup(id, test_service_types, cb) {
 function generate_members(hosts) {
     var members = [];
     hosts.forEach(function(host) {
-        //console.dir(host);
         members.push(host.hostname);
     });
     return members;
@@ -413,11 +389,9 @@ function get_test_service_type( test ) {
 }
 
 function generate_group_members( test, group, test_service_types, type, host_groups, host_catalog, next, addr_prefix ) {
-    console.log("generate_group_members test", test);
 
     var test_service_type = get_test_service_type( test );
     //test_service_types.push( test_service_type );
-    console.log("ggm test_service_types", test_service_types);
 
     if ( ( typeof addr_prefix == "undefined" ) || ( type == "mesh" ) ) {
         addr_prefix = "";
@@ -426,7 +400,6 @@ function generate_group_members( test, group, test_service_types, type, host_gro
     if ( group_prefix == "" ) group_prefix = "a";
     var group_field = group_prefix + "group";
     resolve_hostgroup(group, test_service_types, function(err, hosts) {
-        console.error("ggg hosts", hosts);
         var addr = addr_prefix + "addresses";
         if ( ! ( test.name in host_groups ) ) {
             host_groups[ test.name ] = {
@@ -463,7 +436,6 @@ function generate_group_members( test, group, test_service_types, type, host_gro
 
 
         });
-        console.log("ggg host_groups", host_groups);
         next();
     });
 
@@ -482,16 +454,13 @@ exports.generate = function(_config, opts, cb) {
 
     var service_type_obj = {};
     _config.tests.forEach( function( tmptest ) {
-        //console.log("tmptest", tmptest);
         service_type_obj[ tmptest.service_type ] = get_test_service_type( tmptest );
 
     });
 
-    console.log("service_type_obj", service_type_obj);
 
     var test_service_types = Object.keys(service_type_obj).map(e => service_type_obj[e]);
     
-    console.log("service_types", test_service_types);
 
     async.eachSeries(_config.tests, function(test, next_test) {
         var type = test.mesh_type;
@@ -597,8 +566,6 @@ exports.generate = function(_config, opts, cb) {
         var psc_tasks = {};
         var psc_hosts = {};
 
-        console.log("BEFORE TESTS");
-
         _config.tests.forEach(function(test) {
             var service = test.service_type;
             //var maInfo = generate_mainfo(service, format);
@@ -650,8 +617,6 @@ exports.generate = function(_config, opts, cb) {
             //create ma entry for each service
             test_service_types.forEach(function(service) {
                 service.ma = _host;
-                //console.log('service.ma', service.ma);
-                //console.log("host service", service);
                 if(service.type == "mp-bwctl") return;
                 if(service.type == "ma") return;
                 if(service.type == "mp-owamp") return;
@@ -874,7 +839,6 @@ exports.generate = function(_config, opts, cb) {
 
            add_bwctl_tools( psc_tasks[ name ] ); 
 
-            console.log("members EARLY", members);
             var parameters = test.testspec.specs;
 
             if ( format != "psconfig" ) parameters.type = get_type(test.service_type);
@@ -895,7 +859,6 @@ exports.generate = function(_config, opts, cb) {
                 }
             }
 
-            console.log("members", members);
             mc.tests.push({
                 members: members,
                 parameters: parameters,
