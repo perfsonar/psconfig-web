@@ -15,6 +15,7 @@ var path = 'manual-tests/';
 
 var testfiles = [];
 testfiles.push( { before: 'owamp-master-ma.json', after: 'owamp-branch-ma.json' });
+testfiles.push( { before: 'owamp-pscheduler-master-ma.json', after: 'owamp-pscheduler-branch-ma.json' });
 
 
 function formatlog( obj ) {
