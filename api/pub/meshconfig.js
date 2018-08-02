@@ -92,7 +92,6 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
         "owamp": "latencybg",
         "ping": "rtt",
         "traceroute": "trace"
-
     };
 
     if ( test.type in service_types ) {
@@ -246,10 +245,12 @@ function resolve_testspec(id, cb) {
 }
 
 //doesn't check if the ma host actually provides ma service
-function resolve_ma(host, next) {
+function resolve_ma(host, next, service_types) {
     //for each service, lookup ma host
-    async.eachSeries(host.services, function(service, next_service) {
-        if(!service.ma || service.ma == host._id) {
+    
+    async.eachSeries(service_types, function(service, next_service) {
+
+        if(! service.ma ) {
             //use host if not set or set to the host itself
             service.ma = host; 
             next_service();
@@ -273,21 +274,32 @@ function resolve_host(id, cb) {
     });
 }
 
-function resolve_hosts(ids, cb) {
+function resolve_hosts(hostgroup, cb) {
+    var ids = hostgroup.hosts;
+    var service_types = hostgroup.test_service_types;
     db.Host.find({_id: {$in: ids}}).lean().exec(function(err, hosts) {
-        if(err) return cb(err);
-        async.eachSeries(hosts, resolve_ma, function(err) {
+        if(err) {
+            return cb(err);
+        }
+        async.eachSeries(hosts, 
+            function( host, ma_cb ) {
+                resolve_ma(host, ma_cb, service_types);
+                //ma_cb();
+            },
+            function(err) {
+            //if(err) return cb(err);
             cb(err, hosts);
         });
     });
 }
 
-function resolve_hostgroup(id, cb) {
+function resolve_hostgroup(id, test_service_types, cb) {
     db.Hostgroup.findById(id).exec(function(err, hostgroup) {
         if(err) return cb(err);
         if(!hostgroup) return cb("can't find hostgroup:"+id);
         //hosts will contain hostid for both static and dynamic (cached by pwacache)
-        resolve_hosts(hostgroup.hosts, function(err, hosts) {
+        hostgroup.test_service_types = test_service_types;
+        resolve_hosts(hostgroup, function(err, hosts) {
             if(err) return cb(err);
             cb(null, hosts);
         }); 
@@ -297,7 +309,6 @@ function resolve_hostgroup(id, cb) {
 function generate_members(hosts) {
     var members = [];
     hosts.forEach(function(host) {
-        //console.dir(host);
         members.push(host.hostname);
     });
     return members;
@@ -328,7 +339,6 @@ function generate_mainfo(service, format) {
             case "bwctl": type = "perfsonarbuoy/bwctl"; break;
             case "owamp": type = "perfsonarbuoy/owamp"; break;
             default:
-                          //pinger, traceroute
                           type = service.type;
         }
     } else {
@@ -367,14 +377,29 @@ function set_test_meta( test, key, value ) {
 
 }
 
-function generate_group_members( test, group, type, host_groups, host_catalog, next, addr_prefix ) {
+function get_test_service_type( test ) {
+    var type = test.service_type;
+
+    var service = {
+        type: type
+    };
+
+    return service;
+
+}
+
+function generate_group_members( test, group, test_service_types, type, host_groups, host_catalog, next, addr_prefix ) {
+
+    var test_service_type = get_test_service_type( test );
+    //test_service_types.push( test_service_type );
+
     if ( ( typeof addr_prefix == "undefined" ) || ( type == "mesh" ) ) {
         addr_prefix = "";
     }
     var group_prefix = addr_prefix.replace("-", "");
     if ( group_prefix == "" ) group_prefix = "a";
     var group_field = group_prefix + "group";
-    resolve_hostgroup(group, function(err, hosts) {
+    resolve_hostgroup(group, test_service_types, function(err, hosts) {
         var addr = addr_prefix + "addresses";
         if ( ! ( test.name in host_groups ) ) {
             host_groups[ test.name ] = {
@@ -384,6 +409,7 @@ function generate_group_members( test, group, type, host_groups, host_catalog, n
         if ( ! ( addr in host_groups[ test.name ] ) ) {
             host_groups[ test.name ][ addr ] = [];
         }
+
 
         set_test_meta( test, "_hostgroup", test.name );
         set_test_meta( test, "_test", test.name );
@@ -418,13 +444,24 @@ function generate_group_members( test, group, type, host_groups, host_catalog, n
 //synchronous function to construct meshconfig from admin config
 exports.generate = function(_config, opts, cb) {
     //catalog of all hosts referenced in member groups keyed by _id
-    var host_catalog = {}; 
+    var host_catalog = {};
     var host_groups = {};
 
     var format = opts.format;
 
     //resolve all db entries first
     if(_config.admins) _config.admins = resolve_users(_config.admins);
+
+    var service_type_obj = {};
+    _config.tests.forEach( function( tmptest ) {
+        service_type_obj[ tmptest.service_type ] = get_test_service_type( tmptest );
+
+    });
+
+
+    var test_service_types = Object.keys(service_type_obj).map(e => service_type_obj[e]);
+    
+
     async.eachSeries(_config.tests, function(test, next_test) {
         var type = test.mesh_type;
 
@@ -433,12 +470,12 @@ exports.generate = function(_config, opts, cb) {
             function(next) {
                 //a group
                 if(!test.agroup) return next();
-                generate_group_members( test, test.agroup, type, host_groups, host_catalog, next, "a-" );
+                generate_group_members( test, test.agroup, test_service_types, type, host_groups, host_catalog, next, "a-" );
             },
             function(next) {
                 //b group
                 if(!test.bgroup) return next();
-                generate_group_members( test, test.bgroup, type, host_groups, host_catalog, next, "b-" );
+                generate_group_members( test, test.bgroup, test_service_types, type, host_groups, host_catalog, next, "b-" );
             },
             function(next) {
                 if(!test.nahosts) return next();
@@ -578,7 +615,8 @@ exports.generate = function(_config, opts, cb) {
             }
 
             //create ma entry for each service
-            _host.services.forEach(function(service) {
+            test_service_types.forEach(function(service) {
+                service.ma = _host;
                 if(service.type == "mp-bwctl") return;
                 if(service.type == "ma") return;
                 if(service.type == "mp-owamp") return;
@@ -602,8 +640,7 @@ exports.generate = function(_config, opts, cb) {
                     url = maInfo.data.url;
                 } else {
                     url = maInfo.write_url;
-                    var mc_type = get_type(service.type);
-                    if(config_service_types.indexOf(service.type) != -1 && ( _host.local_ma || _config.force_endpoint_mas ) ) {
+                    if( _host.local_ma || _config.force_endpoint_mas ) {
 
                         host.measurement_archives.push(generate_mainfo(service, format));
                     }
@@ -744,6 +781,7 @@ exports.generate = function(_config, opts, cb) {
 
             var name = test.name;
             var testspec = test.testspec;
+
 
 
             var config_archives = _config.ma_urls;
