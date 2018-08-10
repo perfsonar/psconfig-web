@@ -49,6 +49,7 @@ function lookup_addresses(address, cb) {
     }
 }
 
+// TODO: review
 function create_hostrec(service, uri, cb) {
     //truncate the last 2 path (/lookup/record) which is already part of service-host
     var pathname_tokens = uri.pathname.split("/");
@@ -57,9 +58,10 @@ function create_hostrec(service, uri, cb) {
 
     //reconstruct the url for the host record
     var url = uri.protocol+"//"+uri.host+pathname+'/'+service['service-host'][0];
+    console.log("host record url", url);
     request({url: url, timeout: 1000*10, json: true}, function(err, res, host) {
         if(err) return cb(err);
-        if(res.statusCode != 200) return cb(new Error("failed to cache host from:"+url+" statusCode:"+res.statusCode));
+        if(res.statusCode != 200) return cb(new Error("failed to cache host from: "+url+" statusCode:"+res.statusCode));
         var rec = {
             info: get_hostinfo(host),
             communities: host['group-communities']||[],
@@ -130,9 +132,13 @@ function cache_ls(hosts, ls, lsid, cb) {
 
         function get_host(uri, service, _cb) {
             if(hosts[uri] !== undefined) return _cb(null, hosts[uri]);
+            //console.log("sent to create_hostrec: service, res.request.uri", services, res.request.uri);
+            //TODO: may need to fix something here
             create_hostrec(service, res.request.uri, function(err, host) {
                 if(err) {
+                    var service_url = ls.url.replace(/lookup\/.+$/, "") + service.uri;
                     logger.error("failed to create hostrecord for ",ls.url, service.uri, service['service-locator'], uri);
+                    console.log("service_url", service_url);
                     hosts[uri] = null; //make it null to signal we failed to create hostrec for this
                     return _cb(err);
                 }
@@ -262,6 +268,7 @@ function run() {
     }, function(err) {
         if(err) logger.error(err); //continue
         async.eachOfSeries(hosts, function(host, id, next) {
+            console.log("host_update", host);
             if(!host) return next(); //ignore null host
 
             //dump everything
@@ -273,9 +280,18 @@ function run() {
             }
             if(host.url) {
                 //real record.. update existing record
-                db.Host.findOneAndUpdate({
-                    hostname: host.hostname
-                }, {$set: host}, {upsert: true, setDefaultsOnInsert: true}, function(err) {
+                var uuid = host.uuid;
+                var filter = {};
+                if ( uuid ) {
+                    console.log(host.hostname + " filtering on uuid " + uuid);
+                    filter.uuid = uuid;
+                } else {
+                    console.log(host.hostname + " filtering on hostname " + host.hostname);
+                    filter.hostname = host.hostname;
+                }
+
+                db.Host.findOneAndUpdate( filter ,
+                    {$set: host}, {upsert: true, setDefaultsOnInsert: true}, function(err) {
                     if(err) logger.error(err); //continue
                     next();
                 });
