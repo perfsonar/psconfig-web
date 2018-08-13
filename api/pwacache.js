@@ -84,7 +84,7 @@ function create_hostrec(service, uri, cb) {
         if(host['location-sitename']) rec.sitename = host['location-sitename'][0];
         else {
             var mockname = service['service-name'][0];
-            if(host['group-domains']) mockname += " at "+host['group-domains'][0];
+            if(host['group-domains'] && ( typeof( host['group-domains'] ) != "undefined" )) mockname += " at "+host['group-domains'][0];
             rec.sitename = "("+mockname+")";
             logger.error("location-sitename not set!! using mockup name."+mockname);
         }
@@ -94,10 +94,17 @@ function create_hostrec(service, uri, cb) {
         if(!ip) return cb("host-name not set in LS");
         if(hostname !== undefined) rec.hostname = hostname;
         lookup_addresses(ip, function(err, hostname, addresses) {
-            if(err) return cb(err);
+            if(err) {
+                logger.error("Error performing reverse DNS lookup; using IP instead:", ip);
+                rec.hostname = ip;
+                rec.addresses = [ get_address_record(ip) ];
+                //console.log("guessed addresses", rec.addresses);
+                return cb(null, rec);
+            }
             if(hostname) rec.hostname = hostname;
             rec.addresses = addresses;
-            cb(null, rec);
+            //console.log("addresses", addresses);
+            return cb(null, rec);
         });
     });
 }
@@ -144,6 +151,8 @@ function cache_ls(hosts, ls, lsid, cb) {
                 }
                 logger.debug("creating hostrecord for uri:"+uri+" hostname:"+host.hostname);
                 host.lsid = lsid;
+                console.log("host", host);
+                console.log("uri", uri);
                 hosts[uri] = host;
                 _cb(null, host);
             });
@@ -160,12 +169,16 @@ function cache_ls(hosts, ls, lsid, cb) {
                     return next();
                 } else id = service['service-host'][0];
             } else id = service['client-uuid'][0];
+            console.log("getting host ... id, service", id, service);
             get_host(id, service, function(err, host) {
                 if(err) {
                     logger.error(err);
+                    console.log("ERROR ", id, err);
                     return next(); //continue
                 }
+            
                 if(!host) return next(); //continue... failed to create host rec.. ignore all services for that host
+                console.log("SUCCESS", host.hostname);
 
                 //host information may come from more than 1 datasource (or duplicate within the single source..)
                 //we need to make sure we don't register more than 1 service for each type per host
@@ -333,4 +346,12 @@ function run() {
     });
 }
 
-
+function get_address_record( ip ) {
+    var record = {};
+    var protocol = net.isIP(ip);
+    if( protocol > 0 ) {
+        record.address = ip;
+        record.family = protocol;
+    }
+    return record;
+}
