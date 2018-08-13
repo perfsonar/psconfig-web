@@ -151,8 +151,8 @@ function cache_ls(hosts, ls, lsid, cb) {
                 }
                 logger.debug("creating hostrecord for uri:"+uri+" hostname:"+host.hostname);
                 host.lsid = lsid;
-                console.log("host", host);
-                console.log("uri", uri);
+                //console.log("host", host);
+                //console.log("uri", uri);
                 hosts[uri] = host;
                 _cb(null, host);
             });
@@ -169,7 +169,7 @@ function cache_ls(hosts, ls, lsid, cb) {
                     return next();
                 } else id = service['service-host'][0];
             } else id = service['client-uuid'][0];
-            console.log("getting host ... id, service", id, service);
+            //console.log("getting host ... id, service", id, service);
             get_host(id, service, function(err, host) {
                 if(err) {
                     logger.error(err);
@@ -281,7 +281,7 @@ function run() {
     }, function(err) {
         if(err) logger.error(err); //continue
         async.eachOfSeries(hosts, function(host, id, next) {
-            console.log("host_update", host);
+            //console.log("host_update", host);
             if(!host) return next(); //ignore null host
 
             //dump everything
