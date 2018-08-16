@@ -84,7 +84,11 @@ function create_hostrec(service, uri, cb) {
         if(host['location-sitename']) rec.sitename = host['location-sitename'][0];
         else {
             var mockname = service['service-name'][0];
-            if(host['group-domains'] && ( typeof( host['group-domains'] ) != "undefined" )) mockname += " at "+host['group-domains'][0];
+            var group_domains = host['group-domains'];
+            if(host['group-domains'] 
+                    && ( typeof( host['group-domains'] ) != "undefined" ) 
+                    && ( typeof(  host['group-domains'][0] ) != "undefined" ) ) 
+                        mockname += " at "+host['group-domains'][0];
             rec.sitename = "("+mockname+")";
             logger.error("location-sitename not set!! using mockup name."+mockname);
         }
