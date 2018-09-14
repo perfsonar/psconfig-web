@@ -290,6 +290,7 @@ function run() {
 
             //dump everything
             //console.log(JSON.stringify(host, null, 4));
+            console.log("HOST BEFORE DUPE CHECK", host);
 
             if(host.services.length == 0) { 
                 logger.error("ignoring with host with empty services", host.hostname);
@@ -305,6 +306,20 @@ function run() {
                 } else {
                     console.log(host.hostname + " filtering on hostname " + host.hostname);
                     filter.hostname = host.hostname;
+                }
+
+                // check for duplicate hosts
+                if ( "uuid" in filter ) {
+                    console.log("CHECKING FOR DUPE RECORDS!");
+                    db.Host.find({"uuid": uuid}, function(err, uuidhosts) {
+                        if ( err ) logger.error(err);
+                        if ( uuidhosts.length > 1 ) {
+                            console.log("Possible DUPE UUIDHOSTS", uuidhosts.length, uuidhosts);
+                        }
+
+
+
+                    });
                 }
 
                 db.Host.findOneAndUpdate( filter ,
