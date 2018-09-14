@@ -15,6 +15,9 @@ const logger = new winston.Logger(config.logger.winston);
 const db = require('./models');
 const common = require('./common');
 
+var lsHostArr = [];
+var lsQueried = {};
+
 db.init(function(err) {
     if(err) throw err;
     logger.info("connected to db");
@@ -34,26 +37,38 @@ var hostsToQuery = [
 console.log("hostsToQuery", hostsToQuery);
 
 function run() {
-    var host_results = {};
+    var host_results = [];
     //go through each LS
     async.eachOfSeries(config.datasource.lses, function(service, id, next) {
         logger.info("processing datasource:"+id,"................................................................................");
         console.log("service", service);
         switch(service.type) {
             case "sls":
-                getHostsFromLS( host_results, hostsToQuery, service, id, next);
+                var newLSResults = getHostsFromLS( host_results, hostsToQuery, service, id, next);
+                host_results.concat( newLSResults);
                 //cache_ls(hosts, service, id, next);
                 break;
             case "global-sls":
                 //cache_global_ls(hosts, service, id, next);
-                getHostsFromGlobalLS(host_results, hostsToQuery, service, id, next);
+                var newLSResults = getHostsFromGlobalLS(host_results, hostsToQuery, service, id, next);
+                host_results.concat( newLSResults);
                 break;
             default:
                 logger.error("unknown datasource/service type:"+service.type);
         }
     }, function(err) {
         if(err) logger.error(err); //continue
-        console.log("host_results", host_results);
+        console.log("lsHostArr", lsHostArr.slice(0, 10));
+        console.log("num result", lsHostArr.length);
+    /*
+        for( var i in host_results ) {
+            var row = host_results[i];
+            console.log("hostid", i);
+            console.log("number of hosts: " + row.length);
+            console.log("host_result:", row);
+
+        }
+        */
         //async.eachOfSeries(hosts, function(host, id, next) {
         
         // retrieve the host record from the local db
@@ -76,7 +91,7 @@ function run() {
                     console.log("host addresses", host.addresses);
 
                 }
-                
+
 
             });
         }
@@ -84,7 +99,7 @@ function run() {
     });
 }
 
-function getHostsFromLS( hostsObj, hostsToQuery, ls, lsid, cb ) {
+function getHostsFromLS( hostsArr, hostsToQuery, ls, lsid, cb ) {
     //console.warn("Getting host from LS ", lsid, ls);
     var ah_url = ls.url;
     var query = "?type=host";
@@ -93,20 +108,25 @@ function getHostsFromLS( hostsObj, hostsToQuery, ls, lsid, cb ) {
         for( var key in hostQuery ) {
             var val = hostQuery[key];
 
-            query += "&" + key + "=" + val;
+            //query += "&" + key + "=" + val;
         }
-        
+
         var url = ah_url + query;
         console.log("host url: " + url);
+        if ( ah_url in lsQueried ) {
+            console.log("ALREADY QUERIED LS (skipping): " + ah_url);
+            return next();
+        }
         request(url, {timeout: 1000*5}, function(err, res, body) {
+            lsQueried[ah_url] = 1;
             if(err) return cb(err);
             if(res.statusCode != 200) return cb(new Error("failed to download activehosts.json from:"+service.activehosts_url+" statusCode:"+res.statusCode));
             body = JSON.parse(body);
-            console.warn("host result", body);
+            //console.warn("host result", body);
             var objKey = key + "-" + val;
             if ( body.length > 0 ) {
-                if ( ! (objKey in hostsObj) ) hostsObj[objKey] = [];
-                hostsObj[objKey] = hostsObj[objKey].concat( body );
+                lsHostArr = lsHostArr.concat( body );
+                console.log("lsHostArr.length", lsHostArr.length);
 
             }
             next();
@@ -114,6 +134,7 @@ function getHostsFromLS( hostsObj, hostsToQuery, ls, lsid, cb ) {
         });
     }, function(err) {
             if(err) logger.error(err);
+            console.log("lsHostArr after finishing loplp", lsHostArr.length);
             if(cb) cb();
         
     });
@@ -122,7 +143,7 @@ function getHostsFromLS( hostsObj, hostsToQuery, ls, lsid, cb ) {
 
 }
 
-function getHostsFromGlobalLS( hostsObj, hostsToQuery, service, id, cb ) {
+function getHostsFromGlobalLS( hostsArr, hostsToQuery, service, id, cb ) {
     request(service.activehosts_url, {timeout: 1000*5}, function(err, res, body) {
         if(err) return cb(err);
         if(res.statusCode != 200) return cb(new Error("failed to download activehosts.json from:"+service.activehosts_url+" statusCode:"+res.statusCode));
@@ -134,10 +155,10 @@ function getHostsFromGlobalLS( hostsObj, hostsToQuery, service, id, cb ) {
                     logger.warn("skipping "+host.locator+" with status:"+host.status);
                     return next();
                 }
-                //massage the service url so that I can use cache_ls to do the rest
+                //massage the service url so I can use cache_ls to do the rest
                 service.url = host.locator;
                 //service.url = host.locator+service.query;
-                getHostsFromLS(hostsObj, hostsToQuery, service, id, function(err) {
+                getHostsFromLS(hostsArr, hostsToQuery, service, id, function(err) {
                     if(err) logger.error(err); //continue
                     next();
                 });
