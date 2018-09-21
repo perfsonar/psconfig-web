@@ -8,6 +8,8 @@ const winston = require('winston');
 const async = require('async');
 const request = require('request');
 const assert = require('assert');
+const urlLib = require('url');
+//const { URL } = require('url');
 
 //mine
 const config = require('./config');
@@ -30,7 +32,8 @@ console.warn("CONFIG", JSON.stringify(config.datasource, null, 4));
 var hostsToQuery = [
 {
     //"host-name": "psb.hpc.utfsm.cl",
-    "client-uuid": "3A7CFE34-FB6D-11E7-928E-D0860605CAE2",
+    //"client-uuid": "3A7CFE34-FB6D-11E7-928E-D0860605CAE2", //CL example
+    "client-uuid": "58daadb8-4382-489e-ba91-39e1784ba940",
 
 }];
 
@@ -88,7 +91,10 @@ function run() {
                 console.error("HOSTS FROM DB - ", hosts.length, hosts);
                 for(var j in hosts) {
                     var host = hosts[j];
-                    console.log("host addresses", host.addresses);
+                    if ( sameHost( host, host ) ) { // TODO: fix 2nd argument
+                        console.log("SAME HOST!!!");
+                    }
+                    //console.log("host addresses", host.addresses);
 
                 }
 
@@ -97,6 +103,36 @@ function run() {
         }
 
     });
+}
+
+// check to see if two records belong to the same host
+function sameHost( host1, host2 ) {
+    const uniqueFields = {
+        "ls": ["client-uuid", "host-name"],
+        "db": ["uuid", "addresses"]
+    };
+
+    var host1Addresses;
+    if (  isLsHost( host1 ) ) {
+        host1Addresses = host1["host-name"];
+    } else {
+        host1Addresses = host1["addresses"].map( address => address.address );
+    }
+    console.log("host1Addresses", host1Addresses);
+
+
+
+}
+
+// check whether we are looking at an LS or a PWA DB host record
+function isLsHost( host ) {
+    // the LS uses "host-name" for the hostname field, while
+    // the PWA db uses "hostname"
+    if ( "host-name" in host ) {
+        return true;
+    }
+    return false;
+
 }
 
 function getHostsFromLS( hostsArr, hostsToQuery, ls, lsid, cb ) {
@@ -125,6 +161,10 @@ function getHostsFromLS( hostsArr, hostsToQuery, ls, lsid, cb ) {
             //console.warn("host result", body);
             var objKey = key + "-" + val;
             if ( body.length > 0 ) {
+                var lsBaseUrl = url;
+                lsBaseUrl= lsBaseUrl.match(/^http.?:\/\/[^\/]+/) + '/';
+                //console.error("lsBaseUrl", lsBaseUrl);
+                formatLsHostRecords( body, lsBaseUrl );
                 lsHostArr = lsHostArr.concat( body );
                 console.log("lsHostArr.length", lsHostArr.length);
 
@@ -136,9 +176,17 @@ function getHostsFromLS( hostsArr, hostsToQuery, ls, lsid, cb ) {
             if(err) logger.error(err);
             console.log("lsHostArr after finishing loplp", lsHostArr.length);
             if(cb) cb();
-        
+
     });
 
+}
+
+function formatLsHostRecords( hosts, ls_url ) {
+    for(var i in hosts ) {
+        var host = hosts[i];
+        host._url_full = ls_url + host.uri;
+    };
+    return hosts;
 
 
 }
