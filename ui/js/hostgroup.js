@@ -30,7 +30,6 @@ function($scope, toaster, $http, jwtHelper, serverconf, users, $modal, scaMessag
     $scope.refreshHosts = function(query) {
         var find = {};
         if(query) { 
-            find["services.type"] = $scope.selected.service_type,
             find.$or = [
                 {hostname: {$regex: query}},
                 {sitename: {$regex: query}},
