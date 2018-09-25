@@ -19,6 +19,8 @@ const common = require('./common');
 
 var lsHostArr = [];
 var lsQueried = {};
+var hostgroupsArr = [];
+var hostgroupLookup = {};
 
 db.init(function(err) {
     if(err) throw err;
@@ -32,8 +34,8 @@ console.warn("CONFIG", JSON.stringify(config.datasource, null, 4));
 var hostsToQuery = [
 {
     //"host-name": "psb.hpc.utfsm.cl",
-    //"client-uuid": "3A7CFE34-FB6D-11E7-928E-D0860605CAE2", //CL example
-    "client-uuid": "58daadb8-4382-489e-ba91-39e1784ba940",
+    "client-uuid": "3A7CFE34-FB6D-11E7-928E-D0860605CAE2", //CL example
+    //"client-uuid": "58daadb8-4382-489e-ba91-39e1784ba940",
 
 }];
 
@@ -41,67 +43,73 @@ console.log("hostsToQuery", hostsToQuery);
 
 function run() {
     var host_results = [];
-    //go through each LS
-    async.eachOfSeries(config.datasource.lses, function(service, id, next) {
-        logger.info("processing datasource:"+id,"................................................................................");
-        console.log("service", service);
-        switch(service.type) {
-            case "sls":
-                var newLSResults = getHostsFromLS( host_results, hostsToQuery, service, id, next);
-                host_results.concat( newLSResults);
-                //cache_ls(hosts, service, id, next);
-                break;
-            case "global-sls":
-                //cache_global_ls(hosts, service, id, next);
-                var newLSResults = getHostsFromGlobalLS(host_results, hostsToQuery, service, id, next);
-                host_results.concat( newLSResults);
-                break;
-            default:
-                logger.error("unknown datasource/service type:"+service.type);
-        }
-    }, function(err) {
-        if(err) logger.error(err); //continue
-        console.log("lsHostArr", lsHostArr.slice(0, 10));
-        console.log("num result", lsHostArr.length);
+    //go through each LSA
     /*
-        for( var i in host_results ) {
-            var row = host_results[i];
-            console.log("hostid", i);
-            console.log("number of hosts: " + row.length);
-            console.log("host_result:", row);
+    getHostgroups().then( function( result ) {
+        expireStaleRecords();
+    });
+    */
+    async.series( [ getHostgroups, 
+            expireStaleRecords],
 
-        }
-        */
-        //async.eachOfSeries(hosts, function(host, id, next) {
-        
-        // retrieve the host record from the local db
-        var options = {};
-        for( var i in hostsToQuery ) {
-            var hostFilter = hostsToQuery[i];
-            for( var key in hostFilter ) {
-                var val = hostFilter[key];
-                key = key.replace("client-uuid", "uuid");
-                key = key.replace("host-name", "hostname");
-                options[key] = val;
-
-            }
-            console.log("db find options", options);
-
-            db.Host.find(options, function(err, hosts) {
-                console.error("HOSTS FROM DB - ", hosts.length, hosts);
-                for(var j in hosts) {
-                    var host = hosts[j];
-                    if ( sameHost( host, host ) ) { // TODO: fix 2nd argument
-                        console.log("SAME HOST!!!");
+            function(err) { //This function gets called after the two tasks have called their "task callbacks"
+                if (err) return err; // next(err);
+                console.log("done with series!");
+                console.log("hostgroupLookup", hostgroupLookup);
+                //Here locals will be populated with `user` and `posts`
+                //Just like in the previous example
+                //res.render('user-profile', locals);
+                async.eachOfSeries(config.datasource.lses, function(service, id, next) {
+                    logger.info("processing datasource:"+id,"................................................................................");
+                    console.log("service", service);
+                    switch(service.type) {
+                        case "sls":
+                            var newLSResults = getHostsFromLS( host_results, hostsToQuery, service, id, next);
+                            host_results.concat( newLSResults);
+                            //cache_ls(hosts, service, id, next);
+                            break;
+                        case "global-sls":
+                            //cache_global_ls(hosts, service, id, next);
+                            var newLSResults = getHostsFromGlobalLS(host_results, hostsToQuery, service, id, next);
+                            host_results.concat( newLSResults);
+                            break;
+                        default:
+                            logger.error("unknown datasource/service type:"+service.type);
                     }
-                    //console.log("host addresses", host.addresses);
+                }, function(err) {
+                    if(err) logger.error(err); //continue
+                    console.log("lsHostArr", lsHostArr.slice(0, 10));
+                    console.log("num result", lsHostArr.length);
 
-                }
+                    // retrieve the host record from the local db
+                    var options = {};
+                    for( var i in hostsToQuery ) {
+                        var hostFilter = hostsToQuery[i];
+                        for( var key in hostFilter ) {
+                            var val = hostFilter[key];
+                            key = key.replace("client-uuid", "uuid");
+                            key = key.replace("host-name", "hostname");
+                            options[key] = val;
+
+                        }
+                        console.log("db find options", options);
+
+                        db.Host.find(options, function(err, hosts) {
+                            console.error("HOSTS FROM DB - ", hosts.length, hosts);
+                            for(var j in hosts) {
+                                var host = hosts[j];
+                                if ( sameHost( host, host ) ) { // TODO: fix 2nd argument
+                                    console.log("SAME HOST!!!");
+                                }
+                                //console.log("host addresses", host.addresses);
+
+                            }
 
 
-            });
-        }
+                        });
+                    }
 
+                });
     });
 }
 
@@ -133,6 +141,72 @@ function isLsHost( host ) {
     }
     return false;
 
+}
+
+// expires stale records; more specifically, anything:
+// * > 7 days old
+// * that is not in use ( does not belong to any hostgroups )
+// * that is not an adhoc host (no lsid set)
+function expireStaleRecords( callback ) {
+    var d = new Date();
+    d.setHours(-24*7);
+    console.log("inside Stale Records: hostgroupsArr", hostgroupsArr[0]);
+
+    var options = {
+        update_date: {"$lt": d},
+        lsid: {"$exists": true}
+    };
+    console.log("stale host options", options);
+
+    // retrieve hosts where update_date is "stale" and
+    // lsid is set (NON-adhoc hosts only)
+    db.Host.find(options).exec( function( err, hosts ) {
+        // Get the hosts 
+        var expireArr = [];
+        async.each(hosts, function(host, next) {
+            //console.log("host", host._id);
+            if ( host._id in hostgroupLookup ) {
+                console.log("Host found in hostgroup; not expiring " , host._id, host.hostname);
+            } else {
+                console.error("Would expire host!!! ", host._id, host.hostname);
+                expireArr.push( host._id );
+            }
+            next();
+        }, function(err) {
+         // if any of the file processing produced an error, err would equal that error
+            if( err ) {
+                // One of the iterations produced an error.
+                // All processing will now stop.      
+                console.log('A host failed to process');
+                callback("error" + err);
+            } else {
+                console.log('All hosts have been processed successfully');
+                console.log("Deleting these: ", expireArr.length, expireArr);
+                var query = {
+                    _id: {$in: expireArr}
+                }
+                db.Host.deleteMany( query , function(err) {
+                    if ( err ) {
+                        console.log("error deleting hosts", err);
+                        callback("error deleting hosts " + err);
+
+
+                    } else {
+                        console.log("successfully deleted hosts");
+                callback();
+
+                    }
+
+
+                });
+
+            }
+
+     });
+
+
+
+    });
 }
 
 function getHostsFromLS( hostsArr, hostsToQuery, ls, lsid, cb ) {
@@ -189,6 +263,50 @@ function formatLsHostRecords( hosts, ls_url ) {
     return hosts;
 
 
+}
+
+function getHostgroups( callback ) {
+    console.log("getHostGroups callback", callback);
+    //return new Promise( function(resolve, reject) {
+    var options = {};
+
+    db.Hostgroup.find(options).exec( function(err, hostgroups) {
+        if ( err ) {
+            console.error("Error retrieving hostgroups: ", err);
+            //reject(err);
+            //return [];
+            callback(err);
+
+        }
+        async.each(hostgroups, function(hostgroup, next) {
+            //console.log("HOSTGROUP_ ", hostgroup);
+            async.each( hostgroup.hosts, function( hostId, nextHost ) {
+                hostgroupLookup[ hostId ] = true;
+                nextHost();
+
+            }, function( err ) {
+                if ( err ) {
+                    nextHost(err);
+                }
+
+            });
+
+            next();
+
+        }
+        , function( err ) {
+            if ( err ) {
+                callback(err);
+            }
+
+        });
+        //console.log("pushing hostgroup", hostgroup);
+        //hostgroupsArr = hostgroup;
+        //resolve(hostgroupsArr);
+        //hostgroupLookup[ host._id ] = true;
+        callback();
+    });
+    //});
 }
 
 function getHostsFromGlobalLS( hostsArr, hostsToQuery, service, id, cb ) {
