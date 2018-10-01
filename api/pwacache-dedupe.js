@@ -127,6 +127,7 @@ function mergeDbHosts( hosts ) {
     for(var i=0; i<hosts.length; i++){
         var hostA = hosts[i];
         var lsHost = getHostFromLsArr( hostA.uuid );
+        var lsUrl = lsHost._url_full;
         if ( hostA._id in hostgroupLookup ) {
             console.log("Host is in a hostgroup", hostA.hostname);
             hostsUpdate.push( hostA );
@@ -137,6 +138,7 @@ function mergeDbHosts( hosts ) {
             var hostB = hosts[j];
             if( sameHost( hostA, hostB ) ){
                 console.log("hosts are equivalent! ", hostA.hostname, hostB.hostname);
+                console.log("would update ", hostA.hostname, lsUrl);
 
             } else {
                 console.log("hosts are NOT equivalent! ", hostA.hostname, hostsB.hostname);
@@ -144,8 +146,10 @@ function mergeDbHosts( hosts ) {
         }
     }
 
-    console.log("hostsDelete", hostsDelete.map( host => host.hostname ) );
-    console.log("hostsUpdate", hostsUpdate.map( host => host.hostname ) );
+    console.log("hostsDelete", hostsDelete.map( host => host._id ) );
+    console.log("hostsUpdate", hostsUpdate.map( host => host._id ) );
+    //console.log("hostsDelete", hostsDelete.map( host => host.hostname ) );
+    //console.log("hostsUpdate", hostsUpdate.map( host => host.hostname ) );
 
 }
 
