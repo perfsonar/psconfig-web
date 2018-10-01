@@ -120,18 +120,32 @@ function run() {
 function mergeDbHosts( hosts ) {
     if ( ( typeof hosts == "undefined") || hosts.length < 2 ) return hosts;
 
+    var hostsDelete = [];
+    var hostsUpdate = [];
+
+
     for(var i=0; i<hosts.length; i++){
-        for(var j=i + 1; j<hosts.length; j++){
-            if( sameHost( hosts[i], hosts[j] ) ){
-                console.log("hosts are equivalent! ", hosts[i].hostname, hosts[j].hostname);
+        var hostA = hosts[i];
+        var lsHost = getHostFromLsArr( hostA.uuid );
+        if ( hostA._id in hostgroupLookup ) {
+            console.log("Host is in a hostgroup", hostA.hostname);
+            hostsUpdate.push( hostA );
+        } else {
+            hostsDelete.push( hostA );
+        }
+        for(var j=i + 1; j<hosts.length; j++) {
+            var hostB = hosts[j];
+            if( sameHost( hostA, hostB ) ){
+                console.log("hosts are equivalent! ", hostA.hostname, hostB.hostname);
 
             } else {
-                console.log("hosts are NOT equivalent! ", hosts[i].hostname, hosts[j].hostname);
+                console.log("hosts are NOT equivalent! ", hostA.hostname, hostsB.hostname);
             }
         }
     }
 
-
+    console.log("hostsDelete", hostsDelete.map( host => host.hostname ) );
+    console.log("hostsUpdate", hostsUpdate.map( host => host.hostname ) );
 
 }
 
@@ -163,10 +177,6 @@ function sameHost( host1, host2 ) {
     console.log("intersection", intersection);
 
     return intersection.length > 0;
-    
-    
-
-
 
 }
 
@@ -207,7 +217,7 @@ function expireStaleRecords( callback ) {
             if ( host._id in hostgroupLookup ) {
                 console.log("Host found in hostgroup; not expiring " , host._id, host.hostname);
             } else {
-                console.error("Would expire host!!! ", host._id, host.hostname);
+                console.error("Expiring host!!! ", host._id, host.hostname);
                 expireArr.push( host._id );
             }
             next();
@@ -346,6 +356,21 @@ function getHostgroups( callback ) {
         callback();
     });
     //});
+}
+
+function getHostFromLsArr( uuid ) {
+    var filter = {};
+    filter["client-uuid"] = uuid;
+    console.log("getHostFromLsArr filter", filter);
+    var result = lsHostArr.filter( function( host ) {
+        //console.log("host", host);
+        return "client-uuid" in host && host["client-uuid"][0] == uuid;
+
+    });
+    result = result.sort( function( a, b ) { return a.expires < b.expires  });
+    console.log("result[0]", result[0]);
+    return result[0];
+
 }
 
 function getHostsFromGlobalLS( hostsArr, hostsToQuery, service, id, cb ) {
