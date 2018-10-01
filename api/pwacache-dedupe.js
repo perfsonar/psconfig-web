@@ -34,8 +34,10 @@ console.warn("CONFIG", JSON.stringify(config.datasource, null, 4));
 var hostsToQuery = [
 {
     //"host-name": "psb.hpc.utfsm.cl",
-    "client-uuid": "3A7CFE34-FB6D-11E7-928E-D0860605CAE2", //CL example
     //"client-uuid": "58daadb8-4382-489e-ba91-39e1784ba940",
+    //"client-uuid": "3A7CFE34-FB6D-11E7-928E-D0860605CAE2", //CL example
+    "client-uuid": "563B435A-D927-11E7-AC93-957AEF439B43" // newy32aoa
+    //"client-uuid": "aa26835a-cfdd-43e7-a145-c8387ba7b5d7" // rrze.uni-erlangen
 
 }];
 
@@ -55,7 +57,6 @@ function run() {
             function(err) { //This function gets called after the two tasks have called their "task callbacks"
                 if (err) return err; // next(err);
                 console.log("done with series!");
-                console.log("hostgroupLookup", hostgroupLookup);
                 //Here locals will be populated with `user` and `posts`
                 //Just like in the previous example
                 //res.render('user-profile', locals);
@@ -96,6 +97,8 @@ function run() {
 
                         db.Host.find(options, function(err, hosts) {
                             console.error("HOSTS FROM DB - ", hosts.length, hosts);
+                            mergeDbHosts( hosts );
+                            /*
                             for(var j in hosts) {
                                 var host = hosts[j];
                                 if ( sameHost( host, host ) ) { // TODO: fix 2nd argument
@@ -104,6 +107,7 @@ function run() {
                                 //console.log("host addresses", host.addresses);
 
                             }
+                            */
 
 
                         });
@@ -111,6 +115,24 @@ function run() {
 
                 });
     });
+}
+
+function mergeDbHosts( hosts ) {
+    if ( ( typeof hosts == "undefined") || hosts.length < 2 ) return hosts;
+
+    for(var i=0; i<hosts.length; i++){
+        for(var j=i + 1; j<hosts.length; j++){
+            if( sameHost( hosts[i], hosts[j] ) ){
+                console.log("hosts are equivalent! ", hosts[i].hostname, hosts[j].hostname);
+
+            } else {
+                console.log("hosts are NOT equivalent! ", hosts[i].hostname, hosts[j].hostname);
+            }
+        }
+    }
+
+
+
 }
 
 // check to see if two records belong to the same host
@@ -127,6 +149,22 @@ function sameHost( host1, host2 ) {
         host1Addresses = host1["addresses"].map( address => address.address );
     }
     console.log("host1Addresses", host1Addresses);
+
+    var host2Addresses;
+    if (  isLsHost( host2 ) ) {
+        host2Addresses = host2["host-name"];
+    } else {
+        host2Addresses = host2["addresses"].map( address => address.address );
+    }
+    console.log("host2Addresses", host2Addresses);
+
+    var intersection = host1Addresses.filter(value => -1 !== host2Addresses.indexOf(value));
+
+    console.log("intersection", intersection);
+
+    return intersection.length > 0;
+    
+    
 
 
 
@@ -157,6 +195,7 @@ function expireStaleRecords( callback ) {
         lsid: {"$exists": true}
     };
     console.log("stale host options", options);
+    console.log("hostgroupLookup", hostgroupLookup);
 
     // retrieve hosts where update_date is "stale" and
     // lsid is set (NON-adhoc hosts only)
@@ -181,7 +220,7 @@ function expireStaleRecords( callback ) {
                 callback("error" + err);
             } else {
                 console.log('All hosts have been processed successfully');
-                console.log("Deleting these: ", expireArr.length, expireArr);
+                console.log("Expiring " + expireArr.length + " hosts:", expireArr);
                 var query = {
                     _id: {$in: expireArr}
                 }
