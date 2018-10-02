@@ -17,6 +17,7 @@ const logger = new winston.Logger(config.logger.winston);
 const db = require('./models');
 const common = require('./common');
 
+var save_output = false;
 var lsHostArr = [];
 var lsQueried = {};
 var hostgroupsArr = [];
@@ -29,15 +30,16 @@ db.init(function(err) {
 });
 
 console.warn("CONFIG", JSON.stringify(config.datasource, null, 4));
-            
+
 //console.log(JSON.stringify(host, null, 4));
 var hostsToQuery = [
 {
     //"host-name": "psb.hpc.utfsm.cl",
     //"client-uuid": "58daadb8-4382-489e-ba91-39e1784ba940",
     //"client-uuid": "3A7CFE34-FB6D-11E7-928E-D0860605CAE2", //CL example
-    "client-uuid": "563B435A-D927-11E7-AC93-957AEF439B43" // newy32aoa
     //"client-uuid": "aa26835a-cfdd-43e7-a145-c8387ba7b5d7" // rrze.uni-erlangen
+    "client-uuid": "563B435A-D927-11E7-AC93-957AEF439B43" // newy32aoa
+    //"client-uuid": "d8a6f0ee-10e5-46bd-add7-e9b73da114c7" // 3 results all different hosts
 
 }];
 
@@ -80,6 +82,15 @@ function run() {
                 }, function(err) {
                     if(err) logger.error(err); //continue
                     console.log("lsHostArr", lsHostArr.slice(0, 10));
+                    if ( save_output ) {
+                        fs.writeFile("lsHostsArr.json", JSON.stringify( lsHostArr ), function (err) {
+                            if (err) {
+                                console.log("ERROR writing file", err);
+                                throw err;
+                            }
+                            console.log('Saved!');
+                        });
+                    }
                     console.log("num result", lsHostArr.length);
 
                     // retrieve the host record from the local db
@@ -128,20 +139,20 @@ function mergeDbHosts( hosts ) {
         var hostA = hosts[i];
         var lsHost = getHostFromLsArr( hostA.uuid );
         var lsUrl = lsHost._url_full;
-        if ( hostA._id in hostgroupLookup ) {
-            console.log("Host is in a hostgroup", hostA.hostname);
-            hostsUpdate.push( hostA );
-        } else {
-            hostsDelete.push( hostA );
-        }
         for(var j=i + 1; j<hosts.length; j++) {
             var hostB = hosts[j];
             if( sameHost( hostA, hostB ) ){
                 console.log("hosts are equivalent! ", hostA.hostname, hostB.hostname);
                 console.log("would update ", hostA.hostname, lsUrl);
+                if ( hostA._id in hostgroupLookup ) {
+                    console.log("Host is in a hostgroup", hostA.hostname);
+                    hostsUpdate.push( hostA );
+                } else {
+                    hostsDelete.push( hostA ); // TODO: FIX
+                }
 
             } else {
-                console.log("hosts are NOT equivalent! ", hostA.hostname, hostsB.hostname);
+                console.log("hosts are NOT equivalent; not modifying! ", hostA.hostname, hostB.hostname);
             }
         }
     }
