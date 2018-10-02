@@ -4,7 +4,8 @@
   "description": "UI components for PWA UI service",
   "main": "config.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "buildcss": "node_modules/node-sass/bin/node-sass --output-style compressed --source-map true --source-map-contents true --precision 6 scss/pwa.scss css/pwa.min.css && node_modules/node-sass/bin/node-sass --output-style expanded --source-map true --source-map-contents true --precision 6 scss/pwa.scss css/pwa.css"
   },
   "author": "Michael Johnson <mj82@globalnoc.iu.edu> (http://globalnoc.iu.edu)",
   "license": "ISC",
@@ -25,12 +26,16 @@
     "angular-ui-ace": "^0.2.3",
     "angularjs-toaster": "^2.1.0",
     "animate.css": "^3.5.2",
-    "bootstrap": "^3.3.7",
+    "bootstrap": "^4.1.2",
     "bootswatch": "^3.3.7",
     "font-awesome": "^4.7.0",
     "jquery": "^3.2.1",
+    "popper.js": "^1.14.4",
     "sca-ng-wf": "^1.0.14",
     "sca-shared": "^0.0.9",
     "ui-select": "^0.19.8"
+  },
+  "devDependencies": {
+    "node-sass": "^4.9.3"
   }
 }

@@ -1,0 +1,38 @@
+// pwa.scss
+// Option A: Include all of Bootstrap
+
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+//$enable-rounded:            true !default;
+//$enable-shadows:            true !default;
+//$enable-gradients:          true !default;
+
+
+button,
+html [type="button"], // 1
+[type="reset"],
+[type="submit"] {
+      -webkit-appearance: none; // 2
+}
+
+
+/*
+.button-flat span[type="button"] { // 1
+      -webkit-appearance: none; // 2 // none
+      -moz-appearance: none; // 2 // none
+}
+*/
+
+.button-flat .btn .label {
+    font-size:85%;
+}
+
+
+.button-flat span[type="button"],
+.ui-select-match span[type="button"] {
+    background-color: darken( $input-bg, 3% );
+}
+
+span.ui-select-match-item .label-default {
+    background-color: #d8d8d8;
+}
