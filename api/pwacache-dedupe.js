@@ -108,7 +108,7 @@ function run() {
 
                         db.Host.find(options, function(err, hosts) {
                             console.error("HOSTS FROM DB - ", hosts.length, hosts);
-                            mergeDbHosts( hosts );
+                            //mergeDbHosts( hosts );
                             updateDbHostsWithLsRecords( hosts );
                             /*
                             for(var j in hosts) {
@@ -129,7 +129,7 @@ function run() {
     });
 }
 
-function updateDbHostsWithLsRecords( hosts ) {
+function updateDbHostsWithLsRecords( hosts, callback ) {
     if ( ( typeof hosts == "undefined") || hosts.length < 1 ) {
         console.log("Can't update hosts with ls records; no hosts specified", hosts);
         return hosts;
@@ -138,23 +138,61 @@ function updateDbHostsWithLsRecords( hosts ) {
     var hostsDelete = [];
     var hostsUpdate = [];
 
-    for(var i=0; i<hosts.length; i++){
-        var host = hosts[i];
+    async.each(hosts, function( host, nextDbHost ) {
         console.log("db hosts addr " + host.hostname, host.addresses, host['uuid'] );
         var lsHosts = getHostFromLsArr( host.uuid );
         // loop over ls hosts
-        for(var j in lsHosts) {
-            var lsHost  = lsHosts[j];
+        async.each( lsHosts, function( lsHost, lsCb ) {
+            /*
+            if ( err ) {
+                console.error("error updating db hosts with ls hosts", err);
+                callback(err);
+            }
+            */
+
             var lsUrl = lsHost._url_full;
             console.log("lsUrl for host ", lsUrl);
             if ( sameHost (host, lsHost) ) {
                 console.log("EQUAVLENT! Would update " + lsUrl + " for " , host );
+                db.Host.findByIdAndUpdate(host._id, {$set: {url: lsUrl}}, function(err, record) {
+                    if ( err ) {
+                        console.log("ERROR UPDATING HOST!!!", err, host.hostname, host._id);
+                       // continue HOSTLOOP;
+                       return lsCb(err);
+                    } else {
+                        console.log("HOST UPDATED SUCCESSFULLY", host.hostname, host._id);
+                        //console.log("record", record);
+                        //return; // TODO: remove!
+                        return lsCb();
+                        //continue HOSTLOOP;
+                    }
 
+                }, function(err) { 
+                    if ( err ) { 
+                        console.log("host was not updated!");
+                        callback(err);
+                        //continue HOSTLOOP;
+                    } else {
+                        console.log("host was updated");
+                        //lsCb();
+                        callback();
+
+
+                    }
+                });
             } else {
                 console.log("host/ls record do not match");
             }
+        });
+    }, function(err) {
+        if ( err ) {
+            nextDbHost(err);
+        } else {
+            nextDbHost();
+
         }
-    }
+        
+    });
 
 }
 function mergeDbHosts( hosts ) {
@@ -280,9 +318,9 @@ function expireStaleRecords( callback ) {
                 var query = {
                     _id: {$in: expireArr}
                 }
-    console.log("SKIPPING HOST DELETION TODO: REMOVE");
-    callback();
-    return;
+    //console.log("SKIPPING HOST DELETION TODO: REMOVE");
+    //callback();
+    //return;
                 db.Host.deleteMany( query , function(err) {
                     if ( err ) {
                         console.log("error deleting hosts", err);
