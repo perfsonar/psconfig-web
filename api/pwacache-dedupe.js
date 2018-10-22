@@ -38,8 +38,8 @@ var hostsToQuery = [
     //"client-uuid": "58daadb8-4382-489e-ba91-39e1784ba940",
     //"client-uuid": "3A7CFE34-FB6D-11E7-928E-D0860605CAE2", //CL example
     //"client-uuid": "aa26835a-cfdd-43e7-a145-c8387ba7b5d7" // rrze.uni-erlangen
-    "client-uuid": "563B435A-D927-11E7-AC93-957AEF439B43" // newy32aoa
-    //"client-uuid": "d8a6f0ee-10e5-46bd-add7-e9b73da114c7" // 3 results all different hosts
+    //"client-uuid": "563B435A-D927-11E7-AC93-957AEF439B43" // newy32aoa
+    "client-uuid": "d8a6f0ee-10e5-46bd-add7-e9b73da114c7" // 3 results all different hosts
 
 }];
 
@@ -81,7 +81,7 @@ function run() {
                     }
                 }, function(err) {
                     if(err) logger.error(err); //continue
-                    console.log("lsHostArr", lsHostArr.slice(0, 10));
+                    console.log("lsHostArr", lsHostArr.slice(0, 5));
                     if ( save_output ) {
                         fs.writeFile("lsHostsArr.json", JSON.stringify( lsHostArr ), function (err) {
                             if (err) {
@@ -109,6 +109,7 @@ function run() {
                         db.Host.find(options, function(err, hosts) {
                             console.error("HOSTS FROM DB - ", hosts.length, hosts);
                             mergeDbHosts( hosts );
+                            updateDbHostsWithLsRecords( hosts );
                             /*
                             for(var j in hosts) {
                                 var host = hosts[j];
@@ -128,8 +129,39 @@ function run() {
     });
 }
 
+function updateDbHostsWithLsRecords( hosts ) {
+    if ( ( typeof hosts == "undefined") || hosts.length < 1 ) {
+        console.log("Can't update hosts with ls records; no hosts specified", hosts);
+        return hosts;
+    }
+
+    var hostsDelete = [];
+    var hostsUpdate = [];
+
+    for(var i=0; i<hosts.length; i++){
+        var host = hosts[i];
+        console.log("db hosts addr " + host.hostname, host.addresses, host['uuid'] );
+        var lsHosts = getHostFromLsArr( host.uuid );
+        // loop over ls hosts
+        for(var j in lsHosts) {
+            var lsHost  = lsHosts[j];
+            var lsUrl = lsHost._url_full;
+            console.log("lsUrl for host ", lsUrl);
+            if ( sameHost (host, lsHost) ) {
+                console.log("EQUAVLENT! Would update " + lsUrl + " for " , host );
+
+            } else {
+                console.log("host/ls record do not match");
+            }
+        }
+    }
+
+}
 function mergeDbHosts( hosts ) {
-    if ( ( typeof hosts == "undefined") || hosts.length < 2 ) return hosts;
+    if ( ( typeof hosts == "undefined") || hosts.length < 1 ) {
+        console.log("Can't merge hosts; none specified", hosts);
+        return hosts;
+    }
 
     var hostsDelete = [];
     var hostsUpdate = [];
@@ -137,8 +169,7 @@ function mergeDbHosts( hosts ) {
 
     for(var i=0; i<hosts.length; i++){
         var hostA = hosts[i];
-        var lsHost = getHostFromLsArr( hostA.uuid );
-        var lsUrl = lsHost._url_full;
+        console.log("db hosts addr " + hostA.hostname, hostA.addresses );
         for(var j=i + 1; j<hosts.length; j++) {
             var hostB = hosts[j];
             if( sameHost( hostA, hostB ) ){
@@ -249,6 +280,9 @@ function expireStaleRecords( callback ) {
                 var query = {
                     _id: {$in: expireArr}
                 }
+    console.log("SKIPPING HOST DELETION TODO: REMOVE");
+    callback();
+    return;
                 db.Host.deleteMany( query , function(err) {
                     if ( err ) {
                         console.log("error deleting hosts", err);
@@ -383,8 +417,9 @@ function getHostFromLsArr( uuid ) {
 
     });
     result = result.sort( function( a, b ) { return a.expires < b.expires  });
-    console.log("result[0]", result[0]);
-    return result[0];
+    //console.log("result from LsArr", result);
+    console.log("result count from LsArr", result.length);
+    return result; // TODO RETURN ENTIRE ARRAY
 
 }
 
