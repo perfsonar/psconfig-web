@@ -66,7 +66,7 @@ function run() {
                 //res.render('user-profile', locals);
                 async.eachOfSeries(config.datasource.lses, function(service, id, next) {
                     logger.info("processing datasource:"+id,"................................................................................");
-                    console.log("service", service);
+                    console.log("lookup service", service);
                     switch(service.type) {
                         case "sls":
                             var newLSResults = getHostsFromLS( host_results, hostsToQuery, service, id, next);
@@ -473,7 +473,6 @@ function formatLsHostRecords( hosts, ls_url ) {
 }
 
 function getHostgroups( callback ) {
-    console.log("getHostGroups callback", callback);
     //return new Promise( function(resolve, reject) {
     var options = {};
 
