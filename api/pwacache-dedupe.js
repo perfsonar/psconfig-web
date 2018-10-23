@@ -22,6 +22,7 @@ var lsHostArr = [];
 var lsQueried = {};
 var hostgroupsArr = [];
 var hostgroupLookup = {};
+var updatedLookup = {};
 
 db.init(function(err) {
     if(err) throw err;
@@ -31,7 +32,7 @@ db.init(function(err) {
 
 console.warn("CONFIG", JSON.stringify(config.datasource, null, 4));
 
-//console.log(JSON.stringify(host, null, 4));
+/*
 var hostsToQuery = [
 {
     //"host-name": "psb.hpc.utfsm.cl",
@@ -39,11 +40,12 @@ var hostsToQuery = [
     //"client-uuid": "3A7CFE34-FB6D-11E7-928E-D0860605CAE2", //CL example
     //"client-uuid": "aa26835a-cfdd-43e7-a145-c8387ba7b5d7" // rrze.uni-erlangen
     //"client-uuid": "563B435A-D927-11E7-AC93-957AEF439B43" // newy32aoa
-    "client-uuid": "d8a6f0ee-10e5-46bd-add7-e9b73da114c7" // 3 results all different hosts
+    //"client-uuid": "d8a6f0ee-10e5-46bd-add7-e9b73da114c7" // 3 results all different hosts
 
 }];
-
-console.log("hostsToQuery", hostsToQuery);
+*/
+var hostsToQuery = [];
+console.log("hostsToQuery (empty means all)", hostsToQuery);
 
 function run() {
     var host_results = [];
@@ -81,7 +83,7 @@ function run() {
                     }
                 }, function(err) {
                     if(err) logger.error(err); //continue
-                    console.log("lsHostArr", lsHostArr.slice(0, 5));
+                    console.log("lsHostArr", lsHostArr.slice(0, 2));
                     if ( save_output ) {
                         fs.writeFile("lsHostsArr.json", JSON.stringify( lsHostArr ), function (err) {
                             if (err) {
@@ -95,19 +97,23 @@ function run() {
 
                     // retrieve the host record from the local db
                     var options = {};
-                    for( var i in hostsToQuery ) {
-                        var hostFilter = hostsToQuery[i];
-                        for( var key in hostFilter ) {
-                            var val = hostFilter[key];
-                            key = key.replace("client-uuid", "uuid");
-                            key = key.replace("host-name", "hostname");
-                            options[key] = val;
+                    if ( hostsToQuery.length == 0 ) {
+                    } else {
+                        for( var i in hostsToQuery ) {
+                            var hostFilter = hostsToQuery[i];
+                            for( var key in hostFilter ) {
+                                var val = hostFilter[key];
+                                key = key.replace("client-uuid", "uuid");
+                                key = key.replace("host-name", "hostname");
+                                options[key] = val;
 
+                            }
                         }
+                    }
                         console.log("db find options", options);
 
                         db.Host.find(options, function(err, hosts) {
-                            console.error("HOSTS FROM DB - ", hosts.length, hosts);
+                            console.error("HOSTS FROM DB - ", hosts.length, hosts.slice(0, 2));
                             //mergeDbHosts( hosts );
                             updateDbHostsWithLsRecords( hosts );
                             /*
@@ -123,7 +129,6 @@ function run() {
 
 
                         });
-                    }
 
                 });
     });
@@ -139,10 +144,10 @@ function updateDbHostsWithLsRecords( hosts, callback ) {
     var hostsUpdate = [];
 
     async.each(hosts, function( host, nextDbHost ) {
-        console.log("db hosts addr " + host.hostname, host.addresses, host['uuid'] );
+        //console.log("db hosts addr " + host.hostname, host.addresses, host['uuid'] );
         var lsHosts = getHostFromLsArr( host.uuid );
         // loop over ls hosts
-        async.each( lsHosts, function( lsHost, lsCb ) {
+        async.eachSeries( lsHosts, function( lsHost, lsCb ) {
             /*
             if ( err ) {
                 console.error("error updating db hosts with ls hosts", err);
@@ -150,45 +155,84 @@ function updateDbHostsWithLsRecords( hosts, callback ) {
             }
             */
 
+            console.log("UPDATEDLOOKUP FOR host._id:", host._id, updatedLookup[host._id]);
+            console.log("UPDATEDLookup", updatedLookup);
+
+            if ( host._id in updatedLookup ) {
+                console.log("HOST ALREADY UPDATED; not updating;", host._id, host.hostname);
+                //lsCb();
+                var fakeErr = new Error();
+                fakeErr.break = true;
+                return lsCb(fakeErr);
+
+            }
             var lsUrl = lsHost._url_full;
             console.log("lsUrl for host ", lsUrl);
             if ( sameHost (host, lsHost) ) {
-                console.log("EQUAVLENT! Would update " + lsUrl + " for " , host );
-                db.Host.findByIdAndUpdate(host._id, {$set: {url: lsUrl}}, function(err, record) {
-                    if ( err ) {
-                        console.log("ERROR UPDATING HOST!!!", err, host.hostname, host._id);
-                       // continue HOSTLOOP;
-                       return lsCb(err);
-                    } else {
-                        console.log("HOST UPDATED SUCCESSFULLY", host.hostname, host._id);
-                        //console.log("record", record);
-                        //return; // TODO: remove!
-                        return lsCb();
-                        //continue HOSTLOOP;
-                    }
+                if ( host.url == lsUrl ) {
+                    console.log("URLs ALREADY EQUAL; not updating;");
+                    //lsCb();
+                            var fakeErr = new Error();
+                            fakeErr.break = true;
+                            return lsCb(fakeErr);
 
-                }, function(err) { 
-                    if ( err ) { 
-                        console.log("host was not updated!");
-                        callback(err);
-                        //continue HOSTLOOP;
-                    } else {
-                        console.log("host was updated");
-                        //lsCb();
-                        callback();
+                } else {
+                    console.log("EQUAVLENT! Would update " + lsUrl + " for " , host._id );
+                    db.Host.findByIdAndUpdate(host._id, {$set: {url: lsUrl, update_date: new Date()}}, function(err, record) {
+                        if ( err ) {
+                            console.log("ERROR UPDATING HOST!!!", err, host.hostname, host._id);
+                            // continue HOSTLOOP;
+                            lsCb(err);
+                        } else {
+                            console.log("HOST UPDATED SUCCESSFULLY", host.hostname, host._id);
+                            //console.log("record", record);
+                            //return; // TODO: remove!
+                            //lsCb();
+                            //continue HOSTLOOP;
+                            // break out of this nested async.each, 
+                            // but continue the main async.each.
+                            //updatedLookup[ host._id ] = true;
+                            //console.log("updatedLookup ===========", updatedLookup);
+                            var fakeErr = new Error();
+                            fakeErr.break = true;
+                            return lsCb(fakeErr);
+                        }
+
+                    }, function(err) { 
+                        console.log("==== updatedLookup", updatedLookup);
+                        if ( err && err.break ) {
+                            // Breaking out early, as we already found a match
+                            console.log("SKIPPING to next host; already have a match");
+                            updatedLookup[ host._id ] = true;
+                            return nextDbHost();
 
 
-                    }
-                });
+                        } else if ( err ) { 
+                            console.log("host was not updated!", err);
+                            nextDbHost(err);
+                        } else {
+                            console.log("host was updated");
+                            nextDbHost();
+                            //lsCb();
+                            //callback();
+
+
+                        }
+                    });
+                }
             } else {
                 console.log("host/ls record do not match");
+                lsCb();
             }
         });
     }, function(err) {
+        
         if ( err ) {
-            nextDbHost(err);
+            console.log("error updating db hosts", err);
+            //nextDbHost(err);
         } else {
-            nextDbHost();
+            console.log("done udpating db hosts");
+            //nextDbHost();
 
         }
         
@@ -246,7 +290,7 @@ function sameHost( host1, host2 ) {
     } else {
         host1Addresses = host1["addresses"].map( address => address.address );
     }
-    console.log("host1Addresses", host1Addresses);
+    //console.log("host1Addresses", host1Addresses);
 
     var host2Addresses;
     if (  isLsHost( host2 ) ) {
@@ -254,7 +298,7 @@ function sameHost( host1, host2 ) {
     } else {
         host2Addresses = host2["addresses"].map( address => address.address );
     }
-    console.log("host2Addresses", host2Addresses);
+    //console.log("host2Addresses", host2Addresses);
 
     var intersection = host1Addresses.filter(value => -1 !== host2Addresses.indexOf(value));
 
@@ -350,7 +394,11 @@ function getHostsFromLS( hostsArr, hostsToQuery, ls, lsid, cb ) {
     var ah_url = ls.url;
     var query = "?type=host";
 
-    async.eachSeries( hostsToQuery, function( hostQuery, next ) {
+    var queryHosts = hostsToQuery;
+    if ( hostsToQuery.length == 0 ) {
+        queryHosts = [{}];
+    }
+    async.eachSeries( queryHosts, function( hostQuery, next ) {
         for( var key in hostQuery ) {
             var val = hostQuery[key];
 
@@ -448,7 +496,7 @@ function getHostgroups( callback ) {
 function getHostFromLsArr( uuid ) {
     var filter = {};
     filter["client-uuid"] = uuid;
-    console.log("getHostFromLsArr filter", filter);
+    //console.log("getHostFromLsArr filter", filter);
     var result = lsHostArr.filter( function( host ) {
         //console.log("host", host);
         return "client-uuid" in host && host["client-uuid"][0] == uuid;
@@ -456,7 +504,7 @@ function getHostFromLsArr( uuid ) {
     });
     result = result.sort( function( a, b ) { return a.expires < b.expires  });
     //console.log("result from LsArr", result);
-    console.log("result count from LsArr", result.length);
+    //console.log("result count from LsArr", result.length);
     return result; // TODO RETURN ENTIRE ARRAY
 
 }
