@@ -143,90 +143,113 @@ function updateDbHostsWithLsRecords( hosts, callback ) {
     var hostsDelete = [];
     var hostsUpdate = [];
 
-    async.each(hosts, function( host, nextDbHost ) {
+    async.eachSeries(hosts, function( host, nextDbHost ) {
         //console.log("db hosts addr " + host.hostname, host.addresses, host['uuid'] );
         var lsHosts = getHostFromLsArr( host.uuid );
-        // loop over ls hosts
-        async.eachSeries( lsHosts, function( lsHost, lsCb ) {
-            /*
-            if ( err ) {
-                console.error("error updating db hosts with ls hosts", err);
-                callback(err);
-            }
-            */
-
-            console.log("UPDATEDLOOKUP FOR host._id:", host._id, updatedLookup[host._id]);
-            console.log("UPDATEDLookup", updatedLookup);
-
-            if ( host._id in updatedLookup ) {
-                console.log("HOST ALREADY UPDATED; not updating;", host._id, host.hostname);
-                //lsCb();
+        //console.log("lsHosts", lsHosts.slice(0, 2));
+        if ( lsHosts.length == 0 ) {
+            //console.log("NO LS MATCH FOR ", host._id);
+            async.setImmediate(function() {
                 var fakeErr = new Error();
                 fakeErr.break = true;
-                return lsCb(fakeErr);
+                nextDbHost();
+            });
 
-            }
-            var lsUrl = lsHost._url_full;
-            console.log("lsUrl for host ", lsUrl);
-            if ( sameHost (host, lsHost) ) {
-                if ( host.url == lsUrl ) {
-                    console.log("URLs ALREADY EQUAL; not updating;");
-                    //lsCb();
+        } else {
+            // loop over ls hosts
+            async.eachSeries( lsHosts, function( lsHost, lsCb ) {
+                /*
+                   if ( err ) {
+                   console.error("error updating db hosts with ls hosts", err);
+                   callback(err);
+                   }
+                   */
+
+                //console.log("UPDATEDLOOKUP FOR host._id:", host._id, updatedLookup[host._id]);
+                //console.log("UPDATEDLookup", updatedLookup);
+
+                if ( host._id in updatedLookup ) {
+                    //console.log("HOST ALREADY UPDATED; not updating;", host._id, host.hostname);
+                    var fakeErr = new Error();
+                    fakeErr.break = true;
+                    async.setImmediate(function() {
+                        return lsCb(fakeErr);
+                    });
+
+                } 
+                var lsUrl = lsHost._url_full;
+                //console.log("lsUrl for host ", lsUrl);
+                if ( sameHost (host, lsHost) ) {
+                    if ( host.url == lsUrl ) {
+                        //console.log("URLs ALREADY EQUAL; not updating;");
+                        async.setImmediate(function() {
                             var fakeErr = new Error();
                             fakeErr.break = true;
                             return lsCb(fakeErr);
+                        });
 
+                    } else {
+                        console.log("EQUAVLENT! Updating " + lsUrl + " for " , host._id );
+                        db.Host.findByIdAndUpdate(host._id, {$set: {url: lsUrl, update_date: new Date()}}, function(err, record) {
+                            if ( err ) {
+                                console.log("ERROR UPDATING HOST!!!", err, host.hostname, host._id);
+                                // continue HOSTLOOP;
+                                async.setImmediate(function() {
+                                    return lsCb(err);
+                                });
+                            } else {
+                                console.log("HOST UPDATED SUCCESSFULLY", host.hostname, host._id);
+                                //console.log("record", record);
+                                //return; // TODO: remove!
+                                //lsCb();
+                                //continue HOSTLOOP;
+                                // break out of this nested async.each, 
+                                // but continue the main async.each.
+                                updatedLookup[ host._id ] = true;
+                                //console.log("updatedLookup ===========", updatedLookup);
+                                async.setImmediate(function() {
+                                    var fakeErr = new Error();
+                                    fakeErr.break = true;
+                                    return lsCb(fakeErr);
+                                });
+                            }
+
+                        });
+                    }
                 } else {
-                    console.log("EQUAVLENT! Would update " + lsUrl + " for " , host._id );
-                    db.Host.findByIdAndUpdate(host._id, {$set: {url: lsUrl, update_date: new Date()}}, function(err, record) {
-                        if ( err ) {
-                            console.log("ERROR UPDATING HOST!!!", err, host.hostname, host._id);
-                            // continue HOSTLOOP;
-                            lsCb(err);
-                        } else {
-                            console.log("HOST UPDATED SUCCESSFULLY", host.hostname, host._id);
-                            //console.log("record", record);
-                            //return; // TODO: remove!
-                            //lsCb();
-                            //continue HOSTLOOP;
-                            // break out of this nested async.each, 
-                            // but continue the main async.each.
-                            //updatedLookup[ host._id ] = true;
-                            //console.log("updatedLookup ===========", updatedLookup);
-                            var fakeErr = new Error();
-                            fakeErr.break = true;
-                            return lsCb(fakeErr);
-                        }
-
-                    }, function(err) { 
-                        console.log("==== updatedLookup", updatedLookup);
-                        if ( err && err.break ) {
-                            // Breaking out early, as we already found a match
-                            console.log("SKIPPING to next host; already have a match");
-                            updatedLookup[ host._id ] = true;
-                            return nextDbHost();
-
-
-                        } else if ( err ) { 
-                            console.log("host was not updated!", err);
-                            nextDbHost(err);
-                        } else {
-                            console.log("host was updated");
-                            nextDbHost();
-                            //lsCb();
-                            //callback();
-
-
-                        }
+                    //console.log("host/ls record do not match");
+                    async.setImmediate(function() {
+                        lsCb();
                     });
                 }
-            } else {
-                console.log("host/ls record do not match");
-                lsCb();
-            }
-        });
+            }, function(err) {
+                if ( err && err.break ) {
+                    // Breaking out early, as we already found a match
+                    //console.log("SKIPPING to next host; already have a match");
+                    async.setImmediate(function() {
+                        nextDbHost();
+                    });
+                } else if ( err ) { 
+                    console.log("host was not updated!", err);
+                    async.setImmediate(function() {
+                        nextDbHost( err );
+                    });
+                } else {
+                    //console.log("host was updated");
+                    async.setImmediate(function() {
+                        nextDbHost();
+                    });
+                    //lsCb();
+                    //callback();
+
+
+                }
+
+
+            });
+        }
     }, function(err) {
-        
+
         if ( err ) {
             console.log("error updating db hosts", err);
             //nextDbHost(err);
@@ -235,7 +258,7 @@ function updateDbHostsWithLsRecords( hosts, callback ) {
             //nextDbHost();
 
         }
-        
+
     });
 
 }
@@ -302,7 +325,7 @@ function sameHost( host1, host2 ) {
 
     var intersection = host1Addresses.filter(value => -1 !== host2Addresses.indexOf(value));
 
-    console.log("intersection", intersection);
+    //console.log("intersection", intersection);
 
     return intersection.length > 0;
 
@@ -505,7 +528,7 @@ function getHostFromLsArr( uuid ) {
     result = result.sort( function( a, b ) { return a.expires < b.expires  });
     //console.log("result from LsArr", result);
     //console.log("result count from LsArr", result.length);
-    return result; // TODO RETURN ENTIRE ARRAY
+    return result;
 
 }
 
