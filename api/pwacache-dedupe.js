@@ -27,7 +27,7 @@ var updatedLookup = {};
 db.init(function(err) {
     if(err) throw err;
     logger.info("connected to db");
-    run(); //this start loop
+    //exports.run(); //this start loop
 });
 
 console.warn("CONFIG", JSON.stringify(config.datasource, null, 4));
@@ -48,7 +48,7 @@ var hostsToQuery = [];
 console.log("hostsToQuery (empty means all)", hostsToQuery);
 var hosts = [];
 
-function run() {
+exports.run = function run() {
     var host_results = [];
     //go through each LSA
     /*
@@ -61,13 +61,13 @@ function run() {
 
             function(err) { //This function gets called after the two tasks have called their "task callbacks"
                 if (err) return err; // next(err);
-                console.log("done with series!");
+                //console.log("done with series!");
                 //Here locals will be populated with `user` and `posts`
                 //Just like in the previous example
                 //res.render('user-profile', locals);
                 async.eachOfSeries(config.datasource.lses, function(service, id, next) {
                     logger.info("processing datasource:"+id,"................................................................................");
-                    console.log("lookup service", service);
+                    logger.info("lookup service", service);
                     switch(service.type) {
                         case "sls":
                             var newLSResults = getHostsFromLS( host_results, hostsToQuery, service, id, next);
@@ -84,7 +84,7 @@ function run() {
                     }
                 }, function(err) {
                     if(err) logger.error(err); //continue
-                    console.log("lsHostArr", lsHostArr.slice(0, 2));
+                    //console.log("lsHostArr", lsHostArr.slice(0, 2));
                     if ( save_output ) {
                         fs.writeFile("lsHostsArr.json", JSON.stringify( lsHostArr ), function (err) {
                             if (err) {
@@ -94,7 +94,7 @@ function run() {
                             console.log('Saved!');
                         });
                     }
-                    console.log("num result", lsHostArr.length);
+                    logger.info("num result", lsHostArr.length);
                    
                     async.series( [ 
                         getHostsFromDb,
@@ -104,7 +104,7 @@ function run() {
                                 console.log("ERROR: FAILED GETTING/UPDATING DB HOSTS", err);
                                 return err;
                             }
-                            console.log("hosts", hosts.slice(0, 2));
+                            //console.log("hosts", hosts.slice(0, 2));
 
 
                         });
@@ -131,7 +131,7 @@ function getHostsFromDb( callback ) {
             }
         }
     }
-    console.log("db find options", options);
+    //console.log("db find options", options);
 
     db.Host.find(options, function(err, hostsRes) {
         if ( err ) {
@@ -178,7 +178,7 @@ function updateDbHostsWithLsRecords( callback ) {
                     var fakeErr = new Error();
                     fakeErr.break = true;
                     async.setImmediate(function() {
-                        return lsCb(fakeErr);
+                        //return lsCb(fakeErr);
                     });
 
                 } 

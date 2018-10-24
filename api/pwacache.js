@@ -14,6 +14,7 @@ const config = require('./config');
 const logger = new winston.Logger(config.logger.winston);
 const db = require('./models');
 const common = require('./common');
+const pwacache_dedupe = require('./pwacache-dedupe');
 
 db.init(function(err) {
     if(err) throw err;
@@ -290,7 +291,7 @@ function run() {
 
             //dump everything
             //console.log(JSON.stringify(host, null, 4));
-            console.log("HOST BEFORE DUPE CHECK", host);
+            //console.log("HOST BEFORE DUPE CHECK", host);
 
             if(host.services.length == 0) { 
                 logger.error("ignoring with host with empty services", host.hostname);
@@ -310,11 +311,11 @@ function run() {
 
                 // check for duplicate hosts
                 if ( "uuid" in filter ) {
-                    console.log("CHECKING FOR DUPE RECORDS!");
+                    //console.log("CHECKING FOR DUPE RECORDS!");
                     db.Host.find({"uuid": uuid}, function(err, uuidhosts) {
                         if ( err ) logger.error(err);
                         if ( uuidhosts.length > 1 ) {
-                            console.log("Possible DUPE UUIDHOSTS", uuidhosts.length, uuidhosts);
+                            //console.log("Possible DUPE UUIDHOSTS", uuidhosts.length, uuidhosts);
                         }
 
 
@@ -358,6 +359,7 @@ function run() {
                 request.post({url: pwadmin+"/health/pwacache", json: {hosts: host_count}}, function(err, res, body) {
                     if(err) logger.error(err);
                     logger.info("finished caching .. sleeping for "+config.datasource.delay +" msec");
+                    setTimeout(pwacache_dedupe.run, 60 * 1000); // 60 s, converted to ms
                     setTimeout(run, config.datasource.delay);
                 });
             });
