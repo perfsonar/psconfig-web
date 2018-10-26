@@ -14,7 +14,7 @@ const config = require('./config');
 const logger = new winston.Logger(config.logger.winston);
 const db = require('./models');
 const common = require('./common');
-const pwacache_dedupe = require('./pwacache-dedupe');
+const pwa_expire = require('./pwacache-expire-dedupe');
 
 db.init(function(err) {
     if(err) throw err;
@@ -333,7 +333,7 @@ function run() {
                 request.post({url: pwadmin+"/health/pwacache", json: {hosts: host_count}}, function(err, res, body) {
                     if(err) logger.error(err);
                     logger.info("finished caching .. sleeping for "+config.datasource.delay +" msec");
-                    setTimeout(pwacache_dedupe.run, 60 * 1000); // 60 s, converted to ms
+                    setTimeout(pwa_expire.run, 60 * 1000); // 60 s, converted to ms
                     setTimeout(run, config.datasource.delay);
                 });
             });
