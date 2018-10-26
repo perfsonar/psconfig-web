@@ -56,7 +56,7 @@ exports.run = function run() {
             expireStaleRecords],
 
             function(err) { //This function gets called after the two tasks have called their "task callbacks"
-                if (err) return err; // next(err);
+                if (err) return err;
                 async.eachOfSeries(config.datasource.lses, function(service, id, next) {
                     logger.info("processing datasource for expiration/duplication prevention:"+id,"................................................................................");
                     logger.info("lookup service", service);
@@ -439,7 +439,6 @@ function getHostsFromGlobalLS( hostsArr, hostsToQuery, service, id, cb ) {
                 }
                 //massage the service url so I can use cache_ls to do the rest
                 service.url = host.locator;
-                //service.url = host.locator+service.query;
                 getHostsFromLS(hostsArr, hostsToQuery, service, id, function(err) {
                     if(err) logger.error(err);
                     next();

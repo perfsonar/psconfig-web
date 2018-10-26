@@ -50,7 +50,6 @@ function lookup_addresses(address, cb) {
     }
 }
 
-// TODO: review
 function create_hostrec(service, uri, cb) {
     //truncate the last 2 path (/lookup/record) which is already part of service-host
     var pathname_tokens = uri.pathname.split("/");
@@ -59,7 +58,6 @@ function create_hostrec(service, uri, cb) {
 
     //reconstruct the url for the host record
     var url = uri.protocol+"//"+uri.host+pathname+'/'+service['service-host'][0];
-    console.log("host record url", url);
     request({url: url, timeout: 1000*10, json: true}, function(err, res, host) {
         if(err) return cb(err);
         if(res.statusCode != 200) return cb(new Error("failed to cache host from: "+url+" statusCode:"+res.statusCode));
@@ -67,16 +65,10 @@ function create_hostrec(service, uri, cb) {
             info: get_hostinfo(host),
             communities: host['group-communities']||[],
             services: [{type: "traceroute"}, {type: "ping"}],
-
-            //TODO .. I am not sure what we can do with host-administrators
-            //host['host-administrators'],
-            //I need to query the real admin records from the cache (gocdb2sls service already genenrates contact records)
-
             update_date: new Date(),
         };
 
         if(!host['simulated']) rec.url = url;
-        //else rec.url = null;
 
         //toolkit v<3.5 didn't have client-uuid
         if(host['client-uuid']) rec.uuid = host['client-uuid'][0];
@@ -108,7 +100,6 @@ function create_hostrec(service, uri, cb) {
             }
             if(hostname) rec.hostname = hostname;
             rec.addresses = addresses;
-            //console.log("addresses", addresses);
             return cb(null, rec);
         });
     });
@@ -148,7 +139,6 @@ function cache_ls(hosts, ls, lsid, cb) {
                 if(err) {
                     var service_url = ls.url.replace(/lookup\/.+$/, "") + service.uri;
                     logger.error("failed to create hostrecord for ",ls.url, service.uri, service['service-locator'], uri);
-                    console.log("service_url", service_url);
                     hosts[uri] = null; //make it null to signal we failed to create hostrec for this
                     return _cb(err);
                 }
@@ -179,7 +169,6 @@ function cache_ls(hosts, ls, lsid, cb) {
                 }
             
                 if(!host) return next(); //continue... failed to create host rec.. ignore all services for that host
-                console.log("SUCCESS", host.hostname);
 
                 //host information may come from more than 1 datasource (or duplicate within the single source..)
                 //we need to make sure we don't register more than 1 service for each type per host
@@ -230,7 +219,7 @@ function cache_global_ls(hosts, service, id, cb) {
 function update_dynamic_hostgroup(cb) {
     logger.debug("update_dynamic_hostgroup");
     db.Hostgroup.find({type: 'dynamic'}, function(err, groups) {
-        if(err) return cb(err); //TODO -- or should I just lot and continue;
+        if(err) return cb(err);
         async.eachSeries(groups, function(group, next) {
             common.dynamic.resolve(group.host_filter, group.service_type, function(err, hosts) {
                 if(err) return next(err);
@@ -269,14 +258,12 @@ function run() {
             logger.error("unknown datasource/service type:"+service.type);
         }
     }, function(err) {
-        if(err) logger.error("ERROR CACHING LSES",err); //continue
+        if(err) logger.error("ERROR CACHING LSES",err);
         async.eachOfSeries(hosts, function(host, id, next) {
-            //console.log("host_update", host);
             if(!host) return next(); //ignore null host
 
             //dump everything
             //console.log(JSON.stringify(host, null, 4));
-            //console.log("HOST BEFORE DUPE CHECK", host);
 
             if(host.services.length == 0) { 
                 logger.error("ignoring with host with empty services", host.hostname);
@@ -287,14 +274,15 @@ function run() {
                 var uuid = host.uuid;
                 var filter = {};
                 if ( uuid ) {
-                    console.log(host.hostname + " filtering on uuid " + uuid);
+                    logger.debug(host.hostname + " filtering on uuid " + uuid);
                     filter.uuid = uuid;
                 } else {
-                    console.log(host.hostname + " filtering on hostname " + host.hostname);
+                    logger.debug(host.hostname + " filtering on hostname " + host.hostname);
                     filter.hostname = host.hostname;
                 }
 
                 // check for duplicate hosts
+                /*
                 if ( "uuid" in filter ) {
                     //console.log("CHECKING FOR DUPE RECORDS!");
                     db.Host.find({"uuid": uuid}, function(err, uuidhosts) {
@@ -307,10 +295,11 @@ function run() {
 
                     });
                 }
+                */
 
                 db.Host.findOneAndUpdate( filter ,
                     {$set: host}, {upsert: true, setDefaultsOnInsert: true}, function(err) {
-                    if(err) logger.error(err); //continue
+                    if(err) logger.error(err);
                     next();
                 });
             } else {
@@ -318,7 +307,7 @@ function run() {
                 db.Host.findOne({
                     hostname: host.hostname,
                 }, function(err, _host) {
-                    if(err) logger.error(err); //continue
+                    if(err) logger.error(err);
                     if(_host) {
                         //if existing record exits, only update if it's also simulated
                         if(!_host.url) db.Host.update({hostname: host.hostname}, {$set: host}, next);
