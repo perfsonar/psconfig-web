@@ -14,6 +14,7 @@ const config = require('./config');
 const logger = new winston.Logger(config.logger.winston);
 const db = require('./models');
 const common = require('./common');
+const pwa_expire = require('./pwacache-expire-dedupe');
 
 db.init(function(err) {
     if(err) throw err;
@@ -59,21 +60,15 @@ function create_hostrec(service, uri, cb) {
     var url = uri.protocol+"//"+uri.host+pathname+'/'+service['service-host'][0];
     request({url: url, timeout: 1000*10, json: true}, function(err, res, host) {
         if(err) return cb(err);
-        if(res.statusCode != 200) return cb(new Error("failed to cache host from:"+url+" statusCode:"+res.statusCode));
+        if(res.statusCode != 200) return cb(new Error("failed to cache host from: "+url+" statusCode:"+res.statusCode));
         var rec = {
             info: get_hostinfo(host),
             communities: host['group-communities']||[],
             services: [{type: "traceroute"}, {type: "ping"}],
-
-            //TODO .. I am not sure what we can do with host-administrators
-            //host['host-administrators'],
-            //I need to query the real admin records from the cache (gocdb2sls service already genenrates contact records)
-
             update_date: new Date(),
         };
 
         if(!host['simulated']) rec.url = url;
-        //else rec.url = null;
 
         //toolkit v<3.5 didn't have client-uuid
         if(host['client-uuid']) rec.uuid = host['client-uuid'][0];
@@ -82,7 +77,11 @@ function create_hostrec(service, uri, cb) {
         if(host['location-sitename']) rec.sitename = host['location-sitename'][0];
         else {
             var mockname = service['service-name'][0];
-            if(host['group-domains']) mockname += " at "+host['group-domains'][0];
+            var group_domains = host['group-domains'];
+            if(host['group-domains'] 
+                    && ( typeof( host['group-domains'] ) != "undefined" ) 
+                    && ( typeof(  host['group-domains'][0] ) != "undefined" ) ) 
+                        mockname += " at "+host['group-domains'][0];
             rec.sitename = "("+mockname+")";
             logger.error("location-sitename not set!! using mockup name."+mockname);
         }
@@ -92,10 +91,16 @@ function create_hostrec(service, uri, cb) {
         if(!ip) return cb("host-name not set in LS");
         if(hostname !== undefined) rec.hostname = hostname;
         lookup_addresses(ip, function(err, hostname, addresses) {
-            if(err) return cb(err);
+            if(err) {
+                logger.error("Error performing reverse DNS lookup; using IP instead:", ip);
+                rec.hostname = ip;
+                rec.addresses = [ get_address_record(ip) ];
+                //console.log("guessed addresses", rec.addresses);
+                return cb(null, rec);
+            }
             if(hostname) rec.hostname = hostname;
             rec.addresses = addresses;
-            cb(null, rec);
+            return cb(null, rec);
         });
     });
 }
@@ -132,6 +137,7 @@ function cache_ls(hosts, ls, lsid, cb) {
             if(hosts[uri] !== undefined) return _cb(null, hosts[uri]);
             create_hostrec(service, res.request.uri, function(err, host) {
                 if(err) {
+                    var service_url = ls.url.replace(/lookup\/.+$/, "") + service.uri;
                     logger.error("failed to create hostrecord for ",ls.url, service.uri, service['service-locator'], uri);
                     hosts[uri] = null; //make it null to signal we failed to create hostrec for this
                     return _cb(err);
@@ -154,11 +160,14 @@ function cache_ls(hosts, ls, lsid, cb) {
                     return next();
                 } else id = service['service-host'][0];
             } else id = service['client-uuid'][0];
+            //console.log("getting host ... id, service", id, service);
             get_host(id, service, function(err, host) {
                 if(err) {
                     logger.error(err);
+                    console.log("ERROR ", id, err);
                     return next(); //continue
                 }
+            
                 if(!host) return next(); //continue... failed to create host rec.. ignore all services for that host
 
                 //host information may come from more than 1 datasource (or duplicate within the single source..)
@@ -169,17 +178,6 @@ function cache_ls(hosts, ls, lsid, cb) {
                     if(_service.type == type) exist = true;
                 });
                 if(!exist) {
-                    //pick the last service locator
-                    //TODO - this could pick IPv6 address.
-                    //service-locator: - [
-                    //"http://192.12.15.111/services/MP/OWAMP",
-                    //"http://[2620:0:210:1::111]/services/MP/OWAMP",
-                    //"https://192.12.15.111/services/MP/OWAMP",
-                    //"https://[2620:0:210:1::111]/services/MP/OWAMP"
-                    //],
-                    //var len = service['service-locator'].length;
-                    //var locator = service['service-locator'][len-1];
-
                     //construct service record
                     host.services.push({
                         type: type,
@@ -221,7 +219,7 @@ function cache_global_ls(hosts, service, id, cb) {
 function update_dynamic_hostgroup(cb) {
     logger.debug("update_dynamic_hostgroup");
     db.Hostgroup.find({type: 'dynamic'}, function(err, groups) {
-        if(err) return cb(err); //TODO -- or should I just lot and continue;
+        if(err) return cb(err);
         async.eachSeries(groups, function(group, next) {
             common.dynamic.resolve(group.host_filter, group.service_type, function(err, hosts) {
                 if(err) return next(err);
@@ -260,7 +258,7 @@ function run() {
             logger.error("unknown datasource/service type:"+service.type);
         }
     }, function(err) {
-        if(err) logger.error(err); //continue
+        if(err) logger.error("ERROR CACHING LSES",err);
         async.eachOfSeries(hosts, function(host, id, next) {
             if(!host) return next(); //ignore null host
 
@@ -273,10 +271,35 @@ function run() {
             }
             if(host.url) {
                 //real record.. update existing record
-                db.Host.findOneAndUpdate({
-                    hostname: host.hostname
-                }, {$set: host}, {upsert: true, setDefaultsOnInsert: true}, function(err) {
-                    if(err) logger.error(err); //continue
+                var uuid = host.uuid;
+                var filter = {};
+                if ( uuid ) {
+                    logger.debug(host.hostname + " filtering on uuid " + uuid);
+                    filter.uuid = uuid;
+                } else {
+                    logger.debug(host.hostname + " filtering on hostname " + host.hostname);
+                    filter.hostname = host.hostname;
+                }
+
+                // check for duplicate hosts
+                /*
+                if ( "uuid" in filter ) {
+                    //console.log("CHECKING FOR DUPE RECORDS!");
+                    db.Host.find({"uuid": uuid}, function(err, uuidhosts) {
+                        if ( err ) logger.error(err);
+                        if ( uuidhosts.length > 1 ) {
+                            //console.log("Possible DUPE UUIDHOSTS", uuidhosts.length, uuidhosts);
+                        }
+
+
+
+                    });
+                }
+                */
+
+                db.Host.findOneAndUpdate( filter ,
+                    {$set: host}, {upsert: true, setDefaultsOnInsert: true}, function(err) {
+                    if(err) logger.error(err);
                     next();
                 });
             } else {
@@ -284,7 +307,7 @@ function run() {
                 db.Host.findOne({
                     hostname: host.hostname,
                 }, function(err, _host) {
-                    if(err) logger.error(err); //continue
+                    if(err) logger.error(err);
                     if(_host) {
                         //if existing record exits, only update if it's also simulated
                         if(!_host.url) db.Host.update({hostname: host.hostname}, {$set: host}, next);
@@ -310,6 +333,7 @@ function run() {
                 request.post({url: pwadmin+"/health/pwacache", json: {hosts: host_count}}, function(err, res, body) {
                     if(err) logger.error(err);
                     logger.info("finished caching .. sleeping for "+config.datasource.delay +" msec");
+                    setTimeout(pwa_expire.run, 60 * 1000); // 60 s, converted to ms
                     setTimeout(run, config.datasource.delay);
                 });
             });
@@ -317,4 +341,12 @@ function run() {
     });
 }
 
-
+function get_address_record( ip ) {
+    var record = {};
+    var protocol = net.isIP(ip);
+    if( protocol > 0 ) {
+        record.address = ip;
+        record.family = protocol;
+    }
+    return record;
+}
