@@ -225,7 +225,7 @@ function updateDbHostsWithLsRecords( callback ) {
         if ( err ) {
             logger.info("error updating db hosts", err);
         } else {
-            logger.info("done udpating db hosts");
+            logger.info("done expiring/updating LS URLs for db hosts");
 
         }
 
