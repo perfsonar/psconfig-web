@@ -327,7 +327,7 @@ function get_type(service_type) {
 }
 
 function generate_mainfo(service, format) {
-    var locator = "http://"+service.ma.hostname+"/esmond/perfsonar/archive";
+    var locator = "https://"+service.ma.hostname+"/esmond/perfsonar/archive";
 
     if ( service.ma.local_ma_url ) {
         locator = service.ma.local_ma_url;
