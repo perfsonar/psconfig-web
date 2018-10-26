@@ -144,8 +144,6 @@ function cache_ls(hosts, ls, lsid, cb) {
 
         function get_host(uri, service, _cb) {
             if(hosts[uri] !== undefined) return _cb(null, hosts[uri]);
-            //console.log("sent to create_hostrec: service, res.request.uri", services, res.request.uri);
-            //TODO: may need to fix something here
             create_hostrec(service, res.request.uri, function(err, host) {
                 if(err) {
                     var service_url = ls.url.replace(/lookup\/.+$/, "") + service.uri;
@@ -156,8 +154,6 @@ function cache_ls(hosts, ls, lsid, cb) {
                 }
                 logger.debug("creating hostrecord for uri:"+uri+" hostname:"+host.hostname);
                 host.lsid = lsid;
-                //console.log("host", host);
-                //console.log("uri", uri);
                 hosts[uri] = host;
                 _cb(null, host);
             });
@@ -193,17 +189,6 @@ function cache_ls(hosts, ls, lsid, cb) {
                     if(_service.type == type) exist = true;
                 });
                 if(!exist) {
-                    //pick the last service locator
-                    //TODO - this could pick IPv6 address.
-                    //service-locator: - [
-                    //"http://192.12.15.111/services/MP/OWAMP",
-                    //"http://[2620:0:210:1::111]/services/MP/OWAMP",
-                    //"https://192.12.15.111/services/MP/OWAMP",
-                    //"https://[2620:0:210:1::111]/services/MP/OWAMP"
-                    //],
-                    //var len = service['service-locator'].length;
-                    //var locator = service['service-locator'][len-1];
-
                     //construct service record
                     host.services.push({
                         type: type,
@@ -284,7 +269,7 @@ function run() {
             logger.error("unknown datasource/service type:"+service.type);
         }
     }, function(err) {
-        if(err) logger.error(err); //continue
+        if(err) logger.error("ERROR CACHING LSES",err); //continue
         async.eachOfSeries(hosts, function(host, id, next) {
             //console.log("host_update", host);
             if(!host) return next(); //ignore null host
