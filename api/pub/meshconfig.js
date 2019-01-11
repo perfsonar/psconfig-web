@@ -587,6 +587,15 @@ exports.generate = function(_config, opts, cb) {
             }
             if(_host.no_agent) host.no_agent = 1;
             //logger.warn(_host.hostname, _host.services.length);
+            //
+            if ( toolkit_url == "auto" ) {
+                // automatically generate the toolkit URL
+                var proto = "https://";
+                var hostname = _host.hostname;
+                var relative_url = "/toolkit/";
+                toolkit_url = proto + hostname + relative_url;
+
+            }
 
             psc_addresses[ _host.hostname ] = {
                 "address":  _host.hostname,
