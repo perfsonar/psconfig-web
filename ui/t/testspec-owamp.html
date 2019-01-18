@@ -149,16 +149,18 @@
 
 <!-- v4 -->
 <div class="form-group">
-    <label for="tos_bits" class="col-sm-2 control-label">Type of Service</label>
-    <div class="col-sm-4">
-        <input type="number" string-to-number step="1" min="0" max="255" class="form-control" name="tos_bits" 
-            ng-disabled="!selected._canedit" 
-            ng-model="selected.specs.tos_bits">
-        <p class="help-block">
-            The type of service to set in the IP header of outgoing packets as an integer from 0-255
-            <code>tos_bits</code>
-            <minver min="minver.tos_bits"></minver>
-        </p>
+    <div  ng-if="selected.schedule_type != 'continuous'">
+        <label for="tos_bits" class="col-sm-2 control-label">Type of Service</label>
+        <div class="col-sm-4">
+            <input type="number" string-to-number step="1" min="0" max="255" class="form-control" name="tos_bits" 
+                ng-disabled="!selected._canedit" 
+                ng-model="selected.specs.tos_bits">
+            <p class="help-block">
+                The type of service to set in the IP header of outgoing packets as an integer from 0-255
+                <code>tos_bits</code>
+                <minver min="minver.tos_bits"></minver>
+            </p>
+        </div>
     </div>
 
     <div class="col-sm-offset-2 col-sm-4">
