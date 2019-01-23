@@ -105,7 +105,7 @@ tar -xzf pwa.sample.tar.gz -C /etc
 
     Now update the `mailer` section depending on whether you are using a separate docker container running postfix, or specifying an smtp server.
 
-    _Separate postfix docker container_
+    ** Using a separate postfix docker container **
     
     Replace `postfix` with the actual name of the postfix container, if you have run it under a different name.
     
@@ -121,6 +121,7 @@ tar -xzf pwa.sample.tar.gz -C /etc
     }
     ```
 
+    ** Using external SMTP server **
     ```javascript
     // example config with SMTP server; make sure the pass path exists, or things will break
     // alternatively, hard-code the password if this is acceptable in your environment
