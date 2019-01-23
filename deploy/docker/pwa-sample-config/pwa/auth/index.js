@@ -46,6 +46,27 @@ exports.local = {
     email_passreset: {
 	    subject: 'pSConfig Web Admin Password Reset',
 	    from: '<email_address>',  //most mail server will reject if this is not replyable address
+    },
+    mailer: {
+// Example using a separate postfix docker container
+/*
+        host: 'postfix',
+        secure: false,
+        port: 25,
+        tls: {
+                // do not fail on invalid certs
+                rejectUnauthorized: false
+        }
+*/
+        // example config with SMTP server; make sure the pass path exists, or things will break
+/*
+        host: 'mail-relay.domain.com',
+        secure: true,
+        auth: {
+            user: 'username',
+            pass: fs.readFileSync(__dirname+'/smtp.password', {encoding: 'ascii'}).trim(),
+        }
+*/
     }
 };
 

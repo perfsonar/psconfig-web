@@ -103,6 +103,37 @@ tar -xzf pwa.sample.tar.gz -C /etc
 
     ```
 
+    Now update the `mailer` section depending on whether you are using a separate docker container running postfix, or specifying an smtp server.
+
+    _Separate postfix docker container_
+    
+    Replace `postfix` with the actual name of the postfix container, if you have run it under a different name.
+    
+    ```javascript
+    mailer: {
+        host: 'postfix',
+        secure: false,
+        port: 25,
+        tls: {
+                // do not fail on invalid certs
+                rejectUnauthorized: false
+        }
+    }
+    ```
+
+    ```javascript
+    // example config with SMTP server; make sure the pass path exists, or things will break
+    // alternatively, hard-code the password if this is acceptable in your environment
+    mailer: {
+        host: 'mail-relay.domain.com',
+        secure: true,
+        auth: {
+            user: 'username',
+            pass: fs.readFileSync(__dirname+'/smtp.password', {encoding: 'ascii'}).trim(),
+        }
+    }
+    ```
+
 3. For Nginx
 
     Nginx will expose various functionalities provides by various containers to the actual users. The default configuration should work, but if you need to modify the configuration, edit..
@@ -212,7 +243,27 @@ upstream pwapub {
         -d nginx
     ```
 
-Now you should see all 5 containers running.
+7. Determine how you want your Auth service to send e-mail
+
+The `sca-auth` service sometimes needs to send e-mails to users, as part of the registration process, or for password resets, etc. It can be configured to use an external SMTP server, or you can run a separate docker container that runs postfix, in which case PWA will send its e-mail notices through that.
+
+If you need it, install a postfix docker container. This one has been tested and appears to work well, but it is not maintained by the perfSONAR project:
+
+[Docker-postfix](https://hub.docker.com/r/yorkshirekev/postfix/)
+
+```bash
+    docker run \
+        --network pwa \
+        -d --name postfix \
+        -p 587:25 \
+        --restart always \
+        yorkshirekev/postfix HOSTNAME
+```
+
+Make sure to replace HOSTNAME with the actual hostname of the main host.
+You might need to try different ports for `-p 587:25`, depending on what is available on the main host.
+
+Now you should see all 5-6 containers running.
 
 ```bash
 docker container list
