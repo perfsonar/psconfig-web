@@ -119,6 +119,7 @@ If you want to generate self-signed certs, you can do so like this, or use [this
 CERT_PATH="/etc/pwa/nginx/certs"
 mkdir -p "$CERT_PATH"
 openssl req -x509 -nodes -days 10000 -newkey rsa:2048 -keyout "$CERT_PATH/key.pem" -out "$CERT_PATH/cert.pem" -batch
+chmod 640 "$CERT_PATH/*.pem"
 ```
 
 If you want to provide your own certs, place them in `/etc/pwa/nginx/certs` with these names:
