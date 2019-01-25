@@ -111,12 +111,12 @@ tar -xzf pwa.sample.tar.gz -C /etc
 
 #### Host Certificates
 
-You will need SSL certificates for https access. If you don't provide them, self-signed certs will be created when you start up either the `pwa-admin` or `pwa-pub` docker container.
+You will need SSL certificates for https access.
 
-If that doesn't work, if you want to generate self-signed certs in another location, you can do so like this (this should not be needed unless you have configured a different cert path in your nginx config):
+If you want to generate self-signed certs, you can do so like this, or use [this script](https://raw.githubusercontent.com/perfsonar/psconfig-web/master/deploy/generate_nginx_cert.sh):
 
 ```bash
-CERT_PATH="/etc/nginx/certs"
+CERT_PATH="/etc/pwa/nginx/certs"
 mkdir -p "$CERT_PATH"
 openssl req -x509 -nodes -days 10000 -newkey rsa:2048 -keyout "$CERT_PATH/key.pem" -out "$CERT_PATH/cert.pem" -batch
 ```

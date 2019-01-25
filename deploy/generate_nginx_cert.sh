@@ -1,5 +1,5 @@
-#!/usr/bin/bash
-CERT_PATH="/etc/nginx/certs"
+#!/bin/bash
+CERT_PATH="/etc/pwa/nginx/certs"
 if [ ! -f "$CERT_PATH/key.pem" ] && [ ! -f "$CERT_PATH/cert.pem" ] && [ ! -f "$CERT_PATH/trusted.pem"  ]; then
     echo "nginx SSL cert/key not found; auto-generated self-signed cert";
     mkdir -p "$CERT_PATH"
