@@ -10,6 +10,9 @@ rm -f pwa-admin/tmp/api/auth.pub
 rm -f pwa-admin/tmp/api/auth.key
 rm -f pwa-admin/tmp/api/user.jwt
 
+mkdir pwa-admin/tmp/bin
+cp ../generate_nginx_cert.sh pwa-admin/tmp/bin
+
 cp -r ../../ui pwa-admin/tmp
 cp -r ../../package.json pwa-admin/tmp
 rm -rf pwa-admin/tmp/api/config
@@ -24,7 +27,7 @@ if [ ! $? -eq 0 ]; then
     exit
 fi
 
-docker tag perfsonar/pwa-admin perfsonar/pwa-admin:$VERSION
-docker push perfsonar/pwa-admin:latest
-docker push perfsonar/pwa-admin:$VERSION
+#docker tag perfsonar/pwa-admin perfsonar/pwa-admin:$VERSION
+#docker push perfsonar/pwa-admin:latest
+#docker push perfsonar/pwa-admin:$VERSION
 

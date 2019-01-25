@@ -111,18 +111,31 @@ tar -xzf pwa.sample.tar.gz -C /etc
 
 #### Host Certificates
 
-You will need SSL certificates for https access. If these don't already exist, they will be created when you start up the `sca-auth` docker container.
+You will need SSL certificates for https access. If you don't provide them, self-signed certs will be created when you start up either the `pwa-admin` or `pwa-pub` docker container.
 
-In `/etc/pwa/auth`, you should see your host certificate with following file names, or place them there if not. If you want to replace the automatically-generated certs with your own, copy them over these files.
+If that doesn't work, if you want to generate self-signed certs in another location, you can do so like this (this should not be needed unless you have configured a different cert path in your nginx config):
 
 ```bash
-$ ls /etc/pwa/auth
-cert.pem 
+CERT_PATH="/etc/nginx/certs"
+mkdir -p "$CERT_PATH"
+openssl req -x509 -nodes -days 10000 -newkey rsa:2048 -keyout "$CERT_PATH/key.pem" -out "$CERT_PATH/cert.pem" -batch
+```
+
+If you want to provide your own certs, place them in `/etc/pwa/nginx/certs` with these names:
+
+```bash
+cert.pem
 key.pem
 ```
-If you are enabling x509 authentication, then you will also need `trusted.pem`. This file contains list of all CAs that you trust and grant access to PWA.
 
-> Unlike Apache, Nginx uses a single CA file for better performance.. so you have to join all .pem into a single .pem file.
+If you are enabling x509 authentication, then you will also need `trusted.pem`; This file contains list of all CAs that you trust and grant access to PWA. You will have to adapt the nginx config in `/etc/pwa/nginx/conf.d/pwa.conf` as follows:
+
+```bash
+ssl_client_certificate /etc/nginx/certs/trusted.pem
+ssl_verify_client on
+```
+
+> Unlike Apache, Nginx uses a single CA file for better performance.. so you have to join all .pem into a single `trusted.pem file`
 
 ### Container Installation
 
