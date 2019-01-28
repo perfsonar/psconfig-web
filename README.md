@@ -93,18 +93,18 @@ tar -xzf pwa.sample.tar.gz -C /etc
 
     Update `from` address to administrator's email address used to send email to confirmation new user accounts. You can do this by doing a search and replace in the file, replacing <email_address> with the full e-mail address you want to use (remove the brackets).
 
-    If you'd like to skip email confirmation when user signup, simply comment out the whole email_confirmation section.
+    If you'd like to skip email confirmation when user signup, simply comment out the whole `email_confirmation` section.
 ```javascript
 exports.email_confirmation = {
     subject: 'psConfig Web Admin Account Confirmation',
     from: '<email_address>'  //most mail server will reject if this is not replyable address
 };
 ```
-Now update the mailer section depending on whether you are using a separate docker container running postfix, or specifying an smtp server.
+    Now update the `mailer` section depending on whether you are using a separate docker container running postfix, or specifying an smtp server.
 
 **Using a separate postfix docker container**
 
-Replace postfix with the actual name of the postfix container, if you have run it under a different name.
+Replace `postfix` with the actual name of the postfix container, if you have run it under a different name.
 ```javascript
 mailer: {
     host: 'postfix',
