@@ -248,7 +248,7 @@ upstream pwapub {
 
 The `sca-auth` service sometimes needs to send e-mails to users, as part of the registration process, or for password resets, etc. It can be configured to use an external SMTP server, or you can run a separate docker container that runs postfix, in which case PWA will send its e-mail notices through that.
 
-If you need it, install a postfix docker container. This one has been tested and appears to work well, but it is not maintained by the perfSONAR project:
+If you are not using an external SMTP server, install a postfix docker container. This one has been tested and appears to work well, but it is not maintained by the perfSONAR project:
 
 [Docker-postfix](https://hub.docker.com/r/yorkshirekev/postfix/)
 
