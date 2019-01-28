@@ -65,23 +65,26 @@ describe('import', function() {
                 }
                 //console.log("EXPECTED DATA", data);
                 expected_output = JSON.parse(data);
+                getData();
                 //console.log("AFTER JSON PARSE", data);
                 //console.error("expected output\n", JSON.stringify( expected_output, null, 3 ) );
 
             });
 
 
-            fs.readFile(testfile, 'utf8', function (err,data) {
-                if (err) {
-                    console.log("ERROR reading file", err);
-                    return;
-                }
-                //console.log(data);
-                meshconfig = JSON.parse(data);
-                //console.error("meshconfig before\n", JSON.stringify( meshconfig, null, 3 ) );
-                importer._process_imported_config ( meshconfig, sub, cb, true );
-                //console.log("meshconfig after\n", JSON.stringify( meshconfig, null, 3 ) );
-            });
+            function getData( ) {
+                fs.readFile(testfile, 'utf8', function (err,data) {
+                    if (err) {
+                        console.log("ERROR reading file", err);
+                        return;
+                    }
+                    //console.log(data);
+                    meshconfig = JSON.parse(data);
+                    //console.error("meshconfig before\n", JSON.stringify( meshconfig, null, 3 ) );
+                    importer._process_imported_config ( meshconfig, sub, cb, true );
+                    //console.log("meshconfig after\n", JSON.stringify( meshconfig, null, 3 ) );
+                });
+            }
 
 
         });
