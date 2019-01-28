@@ -101,7 +101,9 @@ exports.email_confirmation = {
 };
 ```
 Now update the mailer section depending on whether you are using a separate docker container running postfix, or specifying an smtp server.
+
 **Using a separate postfix docker container**
+
 Replace postfix with the actual name of the postfix container, if you have run it under a different name.
 ```javascript
 mailer: {
