@@ -100,7 +100,6 @@ tar -xzf pwa.sample.tar.gz -C /etc
         subject: 'psConfig Web Admin Account Confirmation',
         from: '<email_address>',  //most mail server will reject if this is not replyable address
     };
-
     ```
 
     Now update the `mailer` section depending on whether you are using a separate docker container running postfix, or specifying an smtp server.
