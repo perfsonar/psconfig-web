@@ -2,7 +2,7 @@
 
 psConfig Web-based administration GUI and tools to publish generated meshconfig/psconfig output
 
-![Alt text](docs/pwa.png?raw=true "pwa screenshot")
+![Alt text](images/pwa/pwa_install.png "pwa screenshot")
 
 ## Installation
 
@@ -66,9 +66,9 @@ You should install logrotate for docker container log
 ### Configuration
 
 
-**Interaction with other web applications:** If you want to run PWA on a node that is already running other web applications, such as MadDash or the perfSONAR Toolkit web interface, you will need to do a couple things differently. See [Running alongside other web applications](docs/RUNNING_ALONGSIDE.md)
+**Interaction with other web applications:** If you want to run PWA on a node that is already running other web applications, such as MadDash or the perfSONAR Toolkit web interface, you will need to do a couple things differently. See [Running alongside other web applications](pwa_running_alongside)
 
-**Upgrading:** If you are upgrading from a legacy MCA instance, read [UPGRADING FROM MCA](docs/UPGRADING_FROM_MCA.md)
+**Upgrading:** If you are upgrading from a legacy MCA instance, read [UPGRADING FROM MCA](pwa_upgrading_from_mca)
 
 Before we start installing PWA, you should prepare your configuration files first. You can bootstrap it by
 downloading and deploying PWA's default configuration files from git repo.
@@ -94,45 +94,39 @@ tar -xzf pwa.sample.tar.gz -C /etc
     Update `from` address to administrator's email address used to send email to confirmation new user accounts. You can do this by doing a search and replace in the file, replacing <email_address> with the full e-mail address you want to use (remove the brackets).
 
     If you'd like to skip email confirmation when user signup, simply comment out the whole email_confirmation section.
-
-    ```javascript
-    exports.email_confirmation = {
-        subject: 'psConfig Web Admin Account Confirmation',
-        from: '<email_address>',  //most mail server will reject if this is not replyable address
-    };
-    ```
-
-    Now update the `mailer` section depending on whether you are using a separate docker container running postfix, or specifying an smtp server.
-
-    **Using a separate postfix docker container**
-    
-    Replace `postfix` with the actual name of the postfix container, if you have run it under a different name.
-    
-    ```javascript
-    mailer: {
-        host: 'postfix',
-        secure: false,
-        port: 25,
-        tls: {
-                // do not fail on invalid certs
-                rejectUnauthorized: false
-        }
+```javascript
+exports.email_confirmation = {
+    subject: 'psConfig Web Admin Account Confirmation',
+    from: '<email_address>'  //most mail server will reject if this is not replyable address
+};
+```
+Now update the mailer section depending on whether you are using a separate docker container running postfix, or specifying an smtp server.
+**Using a separate postfix docker container**
+Replace postfix with the actual name of the postfix container, if you have run it under a different name.
+```javascript
+mailer: {
+    host: 'postfix',
+    secure: false,
+    port: 25,
+    tls: {
+            // do not fail on invalid certs
+            rejectUnauthorized: false
     }
-    ```
-
-    **Using external SMTP server**
-    ```javascript
-    // example config with SMTP server; make sure the pass path exists, or things will break
-    // alternatively, hard-code the password if this is acceptable in your environment
-    mailer: {
-        host: 'mail-relay.domain.com',
-        secure: true,
-        auth: {
-            user: 'username',
-            pass: fs.readFileSync(__dirname+'/smtp.password', {encoding: 'ascii'}).trim(),
-        }
+}
+```
+**Using external SMTP server**
+```javascript
+// example config with SMTP server; make sure the pass path exists, or things will break
+// alternatively, hard-code the password if this is acceptable in your environment
+mailer: {
+    host: 'mail-relay.domain.com',
+    secure: true,
+    auth: {
+        user: 'username',
+        pass: fs.readFileSync(__dirname+'/smtp.password', {encoding: 'ascii'}).trim(),
     }
-    ```
+}
+```
 
 3. For Nginx
 
@@ -289,7 +283,7 @@ aa6471073c01        nginx               "nginx -g 'daemon ..."   11 hours ago   
 10fdf3b63e4f        mongo               "/entrypoint.sh mo..."   12 hours ago        Up 12 hours         27017/tcp                                                          mongo
 ```
 
-Note: sometimes, docker containers will initially not have connectivity to the outside world. Usually this can be resolved by running `systemctl restart docker`
+Note: sometimes, docker containers will initially not have connectivity to the outside world. Usually this can be resolved by running `systemctl restart docker`. If you are experiencing this issue, make sure your firewall rules are not being overridden by config management software (puppet, ansible, etc).
 
 
 ### Updating
@@ -321,8 +315,8 @@ By default, following are the ports used by nginx container:
 
 # Other Topics
 
-* [Monitoring / Testing](docs/MONITORING.md)
-* PWA provides a developer API -- see the [API DOC](docs/API.md)
+* [Monitoring / Testing](pwa_monitoring)
+* PWA provides a developer API -- see the [API DOC](pwa_api)
 
 # Reference
 
