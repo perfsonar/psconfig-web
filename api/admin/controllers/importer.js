@@ -7,11 +7,33 @@ const winston = require('winston');
 const jwt = require('express-jwt');
 const async = require('async');
 const request = require('request');
+const _ = require('underscore');
 
 //mine
 const config = require('../../config');
 const logger = new winston.Logger(config.logger.winston);
 const db = require('../../models');
+
+const pSConfigKeys = [
+    "archives",
+    "addresses",
+    "groups",
+    //"tests",
+    "schedules",
+    "tasks",
+    "_meta",
+    "hosts",
+    "err",
+    "config_param"
+];
+
+const meshConfigKeys = [
+    "organizations",
+    //"tests",
+    "description",
+    "measurement_archives",
+    "administrators",
+];
 
 function get_service_type(mc_type) {
     switch(mc_type) {
@@ -20,7 +42,7 @@ function get_service_type(mc_type) {
         case "traceroute": return "traceroute";
         case "pinger": return "ping";
         default: 
-           logger.error("unknown meshconfig service type", mc_type);
+           logger.error("unknown importedConfig service type", mc_type);
     }
     return null;
 }
@@ -162,32 +184,66 @@ exports.import = function(url, sub, cb) {
     logger.debug("config importer", url);
 
     //load requested json
-    request.get({url:url, json:true, timeout: 3000}, function(err, r, meshconfig) {
+    request.get({url:url, json:true, timeout: 3000}, function(err, r, importedConfig) {
         if(err) return cb(err);
         if(r.statusCode != 200) return cb("non-200 response from "+url);
-        exports._process_imported_config( meshconfig, sub, cb );
+        exports._process_imported_config( importedConfig, sub, cb );
 
 
-    }); //loading meshconfig json
+    }); //loading config json
 }
 
-exports._process_imported_config = function ( meshconfig, sub, cb, disable_ensure_hosts) {
-    sub = sub.toString();
-    var meshconfig_desc = meshconfig.description;
+exports._detect_config_type = function( config ) {
+    var format;
+    if ( config !== null 
+            && ( typeof( config ) != "undefined" ) 
+            && !_.isEmpty( config ) 
+            && _.isObject( config ) ) {
 
-    var out = meshconfig;
+       var keys = _.keys( config );
+       /*(
+       console.log("KEYS", keys);
+       console.log("pSConfigKeys", pSConfigKeys);
+       console.log("meshConfigKeys", meshConfigKeys);
+       console.log("intersection meshconfig",  _.intersection( keys, meshConfigKeys ));
+       console.log("intersection meshconfig LENGTH",  _.intersection( keys, meshConfigKeys ).length);
+       */
+       if ( _.intersection( keys, pSConfigKeys ).length > 0 ) {
+           //console.log("format:", "psconfig");
+           format = "psconfig";
+       } else if ( _.intersection( keys, meshConfigKeys ).length > 0  ) {
+           //console.log("format:", "meshconfig");
+           format = "meshconfig";
+       }
+
+
+   } 
+   return format;
+
+};
+
+exports._process_imported_config = function ( importedConfig, sub, cb, disable_ensure_hosts) {
+    var config_desc = importedConfig.description;
+
+    var config_format = exports._detect_config_type( importedConfig );
+
+    var out = importedConfig;
     out = JSON.stringify( out, null, "\t" );
+
+    //console.log("importedConfig", importedConfig);
+    //console.log("OUT", out);
+    sub = sub.toString();
 
     // config_params holds parameters to pass back to the callback
     var config_params = {};
-    if ( meshconfig_desc ) {
-        config_params.description = meshconfig_desc;
+    if ( config_desc ) {
+        config_params.description = config_desc;
     }
 
     // process central MAs
     var ma_url_obj = {};
-    if ( "measurement_archives" in meshconfig ) {
-        meshconfig.measurement_archives.forEach(function(ma) {
+    if ( "measurement_archives" in importedConfig ) {
+        importedConfig.measurement_archives.forEach(function(ma) {
             if ( ! ( "archives" in config_params ) ) config_params.archives = [];
             ma_url_obj[ ma.write_url ] = 1;
         });
@@ -195,15 +251,15 @@ exports._process_imported_config = function ( meshconfig, sub, cb, disable_ensur
 
     var ma_urls = Object.keys( ma_url_obj );
     config_params.archives = ma_urls;
-    meshconfig.ma_urls = ma_urls;
-    //meshconfig.config_params = config_params;
+    importedConfig.ma_urls = ma_urls;
+    //importedConfig.config_params = config_params;
 
     //console.log("IMPORTER ma_urls", ma_urls);
 
 
     //process hosts
     var hosts_info = [];
-    meshconfig.organizations.forEach(function(org) {
+    importedConfig.organizations.forEach(function(org) {
         org.sites.forEach(function(site) {
             if ( !( "hosts" in site ) ) return;
             site.hosts.forEach(function(host) {
@@ -248,7 +304,7 @@ exports._process_imported_config = function ( meshconfig, sub, cb, disable_ensur
 
 
     var hosts_service_types = {};
-    meshconfig.tests.forEach(function(test) {
+    importedConfig.tests.forEach(function(test) {
         var member_type = test.members.type;
         if(member_type != "mesh") return cb("only mesh type is supported currently");
 

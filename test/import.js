@@ -25,14 +25,16 @@ function formatlog( obj ) {
 describe('import', function() {
     testfiles.forEach( function( testfile ) {
         //console.log("TESTFILE", testfile);
+        var expected_output;
+        var output;
 
         it( testfile + ' import', function(done) {
+
             var sub = 1;
             var meshconfig;
             var testfile_expected = testfile + "-expected";
             //console.log("testfile_expected", testfile_expected);
             var testfile_out = testfile + "-out";
-            var expected_output;
             var cb = function( err, tests, config_params) {
                 //console.error("CALLBACK err, tests, config_params", err, tests, config_params);
                 var results = {
@@ -50,6 +52,7 @@ describe('import', function() {
                         console.log('Saved!');
                     });
                 }
+
 
                 //console.log("RESULTS", formatlog( results ) );
                 //console.log("EXPECTED_OUTPUT", formatlog( expected_output ) );
@@ -73,20 +76,32 @@ describe('import', function() {
 
 
             function getData( ) {
+
                 fs.readFile(testfile, 'utf8', function (err,data) {
                     if (err) {
                         console.log("ERROR reading file", err);
                         return;
                     }
                     //console.log(data);
-                    meshconfig = JSON.parse(data);
-                    //console.error("meshconfig before\n", JSON.stringify( meshconfig, null, 3 ) );
-                    importer._process_imported_config ( meshconfig, sub, cb, true );
-                    //console.log("meshconfig after\n", JSON.stringify( meshconfig, null, 3 ) );
+                    output = JSON.parse(data);
+                    //output = meshconfig;
+                    //console.error("output before\n", JSON.stringify( output, null, 3 ) );
+                    importer._process_imported_config ( output, sub, cb, true );
+                    //console.log("output after\n", JSON.stringify( output, null, 3 ) );
                 });
             }
 
-
         });
+            it( testfile + ' detect output format', function(doneFormat) {
+                //console.log("OUTPUT", output);
+                var format = importer._detect_config_type( output );
+                assert.equal(format, "meshconfig");
+                doneFormat();
+            });
+            it( testfile + ' detect expected output format', function(doneFormat2) {
+                var format = importer._detect_config_type( expected_output );
+                assert.equal(format, "psconfig");
+                doneFormat2();
+            });
     });
 });
