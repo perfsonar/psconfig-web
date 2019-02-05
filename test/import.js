@@ -16,6 +16,7 @@ testfiles.push( 'data/testbed.json' );
 testfiles.push( 'data/testbed2-noarchives.json' );
 testfiles.push( 'data/testbed3-nodescription.json' );
 testfiles.push( 'data/testbed4-no_endpoint_description.json' );
+testfiles.push( 'data/latentput-psconfig.json' );
 
 // files for testing psconfig/meshconfig detection
 var formatFiles = [];
@@ -37,7 +38,7 @@ describe('Detect psconfig/meshconfig format', function() {
                     }
                     var output = JSON.parse(data);
                     var format = importer._detect_config_type( output );
-                    assert.equal(format, "meshconfig");
+                    assert.equal(format, "psconfig");
                     done();
 
                 });

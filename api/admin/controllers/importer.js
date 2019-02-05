@@ -224,9 +224,13 @@ exports._detect_config_type = function( config ) {
 
 exports._process_imported_config = function ( importedConfig, sub, cb, disable_ensure_hosts) {
 
-
-
     var config_format = exports._detect_config_type( importedConfig );
+
+    // Main config object
+    var mainConfig = {};
+    mainConfig.tests = [];
+    mainConfig.testspecs = [];
+    mainConfig.hostgroups = [];
 
     //var out = importedConfig;
     //out = JSON.stringify( out, null, "\t" );
@@ -237,15 +241,23 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
 
     // config_params holds parameters to pass back to the callback
     var config_params = {};
-    var tests = [];
 
     if ( config_format == "meshconfig" ) {
-        exports._process_meshconfig( importedConfig, sub, config_params, tests, cb );
+        exports._process_meshconfig( importedConfig, sub, config_params, mainConfig, cb );
     } else if ( config_format == "psconfig" ) {
-        exports._process_psconfig( importedConfig, sub, config_params, tests, cb );
+        exports._process_psconfig( importedConfig, sub, config_params, mainConfig, cb );
 
     }
 
+    //if ( config_format == "psconfig" ) {
+
+        console.log("MAINCONFIG INTERMEDIATE\n");
+        console.log( JSON.stringify( mainConfig, null, 3 ));
+
+        console.log("CONFIG_PARAMS INTERMEDIATE\n");
+        console.log( JSON.stringify( config_params, null, 3 ));
+
+    //}
 
 
     //now do update (TODO - should I let caller handle this?)
@@ -269,7 +281,11 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
 
 };
 
-exports._process_meshconfig = function ( importedConfig, sub, config_params, tests, cb ) {
+exports._process_meshconfig = function ( importedConfig, sub, config_params, mainConfig, cb ) {
+    var tests = mainConfig.tests;
+    var hostgroups = mainConfig.hostgroups;
+    var testspecs = mainConfig.testspecs;
+
     var config_desc = importedConfig.description;
     if ( config_desc ) {
         config_params.description = config_desc;
@@ -287,10 +303,11 @@ exports._process_meshconfig = function ( importedConfig, sub, config_params, tes
 
     var ma_urls = Object.keys( ma_url_obj );
     config_params.archives = ma_urls;
-    importedConfig.ma_urls = ma_urls;
+    //importedConfig.ma_urls = ma_urls;
     //importedConfig.config_params = config_params;
 
     //console.log("IMPORTER ma_urls", ma_urls);
+    //console.log("config_params", config_params);
 
 
     //process hosts
@@ -334,8 +351,8 @@ exports._process_meshconfig = function ( importedConfig, sub, config_params, tes
 
 
     //process hostgroups / testspecs
-    var hostgroups = [];
-    var testspecs = [];
+    //var hostgroups = [];
+    //var testspecs = [];
     //var tests = [];
 
 
@@ -400,6 +417,88 @@ exports._process_meshconfig = function ( importedConfig, sub, config_params, tes
 
 };
 
-exports._process_psconfig = function ( importedConfig, sub, cb, disable_ensure_hosts) {
+exports._process_psconfig = function ( importedConfig, sub, config_params, mainConfig, cb ) {
+    var tests = mainConfig.tests;
+    var hostGroups = mainConfig.hostgroups;
+    var testspecs = mainConfig.testspecs;
+
+    var config_desc = importedConfig._meta["display-name"];
+    if ( config_desc ) {
+        config_params.description = config_desc;
+    }
+
+    var archive_obj = exports._extract_psconfig_mas( importedConfig , config_params );
+
+    console.log("archive_obj", archive_obj);
+
+    config_params.archives = archive_obj.central;
+
+    console.log("config_params", config_params);
+
+    var hosts_obj = {};
+    hosts_obj = exports._extract_psconfig_hosts( importedConfig, config_params );
+    config_params.hosts = hosts_obj.hosts;
+    config_params.addresses = hosts_obj.addresses;
+
+
+
+
+};
+
+exports._extract_psconfig_hosts = function( importedConfig, config_params ) {
+    var hosts_obj = {};
+
+    // Retrieve host info from importedConfig
+    var hosts_info = [];
+
+
+
+    return hosts_info;
+};
+
+exports._extract_psconfig_mas = function( importedConfig, config_params ) {
+    // Use a hash, keyed on archive type, to return the MA info
+    // i.e. archives.central = []
+    // archives.host = [] // Local MAs for testpoints
+    var archives = {};
+    archives.central = [];
+    archives.host = [];
+
+    // process central MAs
+    var ma_url_obj = {};
+    if ( "archives" in importedConfig ) {
+        console.log("ARCHIVES");
+        Object.keys( importedConfig.archives ).forEach(function(ma_name) {
+            var ma = importedConfig.archives[ ma_name ];
+            if ( ! ( "archives" in config_params ) ) config_params.archives = [];
+            var ma_url = importedConfig.archives[ ma_name ].data.url;
+            ma_url_obj[ ma_url ] = 1;
+
+            if ( "tasks" in importedConfig ) {
+                var num_ma_instances = 0;
+                _.each( importedConfig.tasks, function( task, taskName ) {
+                    if ( _.indexOf( task.archives, ma_name ) > -1 ) {
+                        num_ma_instances++;
+                    }
+                });
+                // If the MA appears in all task specs, we consider it a central MA
+                if ( num_ma_instances == Object.keys( importedConfig.tasks).length) {
+                    archives.central.push( ma_url );
+                } else {
+                    // Otherwise, it is a host MA
+                    archives.host.push( ma_url );
+
+                }
+            };
+            //console.log("IMPORTED", JSON.stringify(importedConfig, null, "\t"));
+            console.log("archives", JSON.stringify( archives, null, "\t"));
+            console.log("ma_url_obj", JSON.stringify( ma_url_obj, null, "\t"));
+            var ma_urls = Object.keys( ma_url_obj );
+
+        });
+
+    }
+
+    return archives;
 
 };
