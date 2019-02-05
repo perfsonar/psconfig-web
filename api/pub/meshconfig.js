@@ -719,15 +719,15 @@ exports.generate = function(_config, opts, cb) {
             org.sites.push(site);
         }
 
-        var ma_prefix = "test-archive";
-        var last_test_ma_number = 0;
+        var ma_prefix = "config-archive";
+        var last_config_ma_number = 0;
         var test_mas = [];
         if ( "ma_urls" in _config ) {
             for(var i in _config.ma_urls ) {
                 var url = _config.ma_urls[i];
                 if ( url == "" ) continue;
 
-                var maName = "test-archive" + last_test_ma_number;
+                var maName = "config-archive" + last_config_ma_number;
                 test_mas.push( maName );
                 var maInfo;
 
@@ -748,7 +748,7 @@ exports.generate = function(_config, opts, cb) {
 
                 psc_archives[ maName ] = maInfo;
 
-                last_test_ma_number++;
+                last_config_ma_number++;
             }
         }
         // Retrieve MA URLs from the _config object

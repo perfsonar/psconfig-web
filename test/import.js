@@ -10,18 +10,44 @@ var fs = require('fs');
 
 var save_output = false;
 
+// files for testing import
 var testfiles = [];
 testfiles.push( 'data/testbed.json' );
 testfiles.push( 'data/testbed2-noarchives.json' );
 testfiles.push( 'data/testbed3-nodescription.json' );
 testfiles.push( 'data/testbed4-no_endpoint_description.json' );
 
+// files for testing psconfig/meshconfig detection
+var formatFiles = [];
+formatFiles.push( 'data/latentput-meshconfig.json' );
+formatFiles.push( 'data/latentput-psconfig.json' );
 
 function formatlog( obj ) {
     var out = JSON.stringify( obj, null, 3 );
     return out;
 }
 
+describe('Detect psconfig/meshconfig format', function() {
+        formatFiles.forEach( function( formatFile ) {
+            it( formatFile + ' format', function(done) {
+                fs.readFile(formatFile, 'utf8', function (err,data) {
+                    if (err) {
+                        console.log("ERROR reading EXPECTED file", err);
+                        return;
+                    }
+                    var output = JSON.parse(data);
+                    var format = importer._detect_config_type( output );
+                    assert.equal(format, "meshconfig");
+                    done();
+
+                });
+
+            });
+
+    });
+
+
+});
 describe('import', function() {
     testfiles.forEach( function( testfile ) {
         //console.log("TESTFILE", testfile);

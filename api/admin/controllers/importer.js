@@ -223,12 +223,13 @@ exports._detect_config_type = function( config ) {
 };
 
 exports._process_imported_config = function ( importedConfig, sub, cb, disable_ensure_hosts) {
-    var config_desc = importedConfig.description;
+
+
 
     var config_format = exports._detect_config_type( importedConfig );
 
-    var out = importedConfig;
-    out = JSON.stringify( out, null, "\t" );
+    //var out = importedConfig;
+    //out = JSON.stringify( out, null, "\t" );
 
     //console.log("importedConfig", importedConfig);
     //console.log("OUT", out);
@@ -236,9 +237,44 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
 
     // config_params holds parameters to pass back to the callback
     var config_params = {};
+    var tests = [];
+
+    if ( config_format == "meshconfig" ) {
+        exports._process_meshconfig( importedConfig, sub, config_params, tests, cb );
+    } else if ( config_format == "psconfig" ) {
+        exports._process_psconfig( importedConfig, sub, config_params, tests, cb );
+
+    }
+
+
+
+    //now do update (TODO - should I let caller handle this?)
+    if (! disable_ensure_hosts ) {
+        ensure_hosts(hosts_info, tests, function(err) {
+            ensure_hostgroups(hostgroups, function(err) {
+                ensure_testspecs(testspecs, function(err) {
+                    //add correct db references
+                    tests.forEach(function(test) {
+                        test.agroup = test._agroup._id;
+                        test.testspec = test._testspec._id;
+                    });
+                    cb(null, tests, config_params);
+                });
+            });
+        });
+    } else {
+        cb(null, tests, config_params);
+
+    }
+
+};
+
+exports._process_meshconfig = function ( importedConfig, sub, config_params, tests, cb ) {
+    var config_desc = importedConfig.description;
     if ( config_desc ) {
         config_params.description = config_desc;
     }
+
 
     // process central MAs
     var ma_url_obj = {};
@@ -282,13 +318,13 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
 
                 var host_info = {
                     services: services,
-                    no_agent: false,
-                    hostname: host.addresses[0],
-                    sitename: host.description,
-                    addresses: addr_array,
-                    info: {},
-                    communities: [],
-                    admins: [sub.toString()]
+                no_agent: false,
+                hostname: host.addresses[0],
+                sitename: host.description,
+                addresses: addr_array,
+                info: {},
+                communities: [],
+                admins: [sub.toString()]
                 };
                 if(host.toolkit_url && host.toolkit_url != "auto") host_info.toolkit_url = host.toolkit_url;
                 hosts_info.push(host_info);
@@ -300,7 +336,7 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
     //process hostgroups / testspecs
     var hostgroups = [];
     var testspecs = [];
-    var tests = [];
+    //var tests = [];
 
 
     var hosts_service_types = {};
@@ -311,11 +347,11 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
         var type = get_service_type(test.parameters.type);
         var hostgroup = {
             name: test.description+" Group",
-            desc: "Imported by PWA importer",
-            type: "static",
-            service_type: type,
-            admins: [sub.toString()],
-            _hosts: test.members.members, //hostnames that needs to be converted to host id
+        desc: "Imported by PWA importer",
+        type: "static",
+        service_type: type,
+        admins: [sub.toString()],
+        _hosts: test.members.members, //hostnames that needs to be converted to host id
         };
         hostgroups.push(hostgroup);
 
@@ -323,10 +359,10 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
 
         var testspec = {
             name: test.description+" Testspecs",
-            desc: "Imported by PWA importer",
-            service_type: type,
-            admins: [sub.toString()],
-            specs: test.parameters,
+        desc: "Imported by PWA importer",
+        service_type: type,
+        admins: [sub.toString()],
+        specs: test.parameters,
         };
         testspecs.push(testspec);
 
@@ -362,24 +398,8 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
 
     });
 
+};
 
-    //now do update (TODO - should I let caller handle this?)
-    if (! disable_ensure_hosts ) {
-        ensure_hosts(hosts_info, tests, function(err) {
-            ensure_hostgroups(hostgroups, function(err) {
-                ensure_testspecs(testspecs, function(err) {
-                    //add correct db references
-                    tests.forEach(function(test) {
-                        test.agroup = test._agroup._id;
-                        test.testspec = test._testspec._id;
-                    });
-                    cb(null, tests, config_params);
-                });
-            });
-        });
-    } else {
-        cb(null, tests, config_params);
+exports._process_psconfig = function ( importedConfig, sub, cb, disable_ensure_hosts) {
 
-    }
-
-}
+};
