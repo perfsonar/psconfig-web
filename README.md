@@ -1,6 +1,6 @@
-# psConfig Web Administrator (PWA)
+# pSConfig Web Administrator (PWA)
 
-psConfig Web-based administration GUI and tools to publish generated meshconfig/psconfig output
+pSConfig Web-based administration GUI and tools to publish configs in pSConfig/MeshConfig formats.
 
 ![Alt text](images/pwa/pwa_install.png "pwa screenshot")
 
@@ -77,19 +77,22 @@ downloading and deploying PWA's default configuration files from git repo.
 wget https://github.com/perfsonar/psconfig-web/raw/master/deploy/docker/pwa.sample.tar.gz
 tar -xzf pwa.sample.tar.gz -C /etc
 ```
-1. For PWA
+1. To configure PWA:
 
-    `/etc/pwa/index.js` 
+    * Edit the main config file:
+    `/etc/pwa/index.js`
 
-    * Edit defaults `testspecs` if necessary (`meshconfig.defaults.testspecs`)
-    * Update pub.url with the hostname that your PWA instance will be exposed as. The easiest way to do this is to replace <pwa_hostname> with the FQDN of your Docker host (removing the brackets).
-    * Edit datasource section which determines which host you'd like to load from sLS to construct your host config, if applicable (if you are not running a private LS, this most likely does not apply to you)
+    * Update publisher URL with the hostname of your PWA instance. Most likely, this will be the full hostname of your Docker host
+    * Edit the datasource section - configure which LS(s) you want to search for hosts to test against. You can leave the default, which is just to use the Global LS, and/or you can tag hosts based on Global LS communities and other properties
+    * If you run a private LS (most don't), configure your private Lookup Service, following the example in the default config file
+    * Edit defaults `testspecs` if you want to change default parameters for testspecs you create. Most people don't need to change this.
 
-2. For Authentication Service
+2. To configure the Authentication Service:
 
+    * Edit the auth config file:
     `/etc/pwa/auth/index.js`
 
-    Update the hostname in the config by performing a search and replace in this file. Replace <pwa_hostname> with the hostname (FQDN) of the host that holds your docker containers (remove the brackets).
+    Update the hostname in the config by performing a search and replace in this file. Replace <pwa_hostname> with the hostname (FQDN) of your Docker host (remove the brackets).
 
     Update `from` address to administrator's email address used to send email to confirmation new user accounts. You can do this by doing a search and replace in the file, replacing <email_address> with the full e-mail address you want to use (remove the brackets).
 
@@ -100,11 +103,11 @@ exports.email_confirmation = {
     from: '<email_address>'  //most mail server will reject if this is not replyable address
 };
 ```
-    Now update the `mailer` section depending on whether you are using a separate docker container running postfix, or specifying an smtp server.
+    Now update the `mailer` section depending on whether you are using a separate docker container running postfix, or specifying an SMTP server.
 
 **Using a separate postfix docker container**
 
-Replace `postfix` with the actual name of the postfix container, if you have run it under a different name.
+Replace `postfix` with the actual name of the postfix container, if you are running it under a different name.
 ```javascript
 mailer: {
     host: 'postfix',
@@ -140,7 +143,7 @@ mailer: {
 
 You will need SSL certificates for https access.
 
-If you want to generate self-signed certs, you can do so like this, or use [this script](https://raw.githubusercontent.com/perfsonar/psconfig-web/master/deploy/generate_nginx_cert.sh):
+If you want to generate self-signed certs, you can do so like this **as root**, or use [this script](https://raw.githubusercontent.com/perfsonar/psconfig-web/master/deploy/generate_nginx_cert.sh):
 
 ```bash
 CERT_PATH="/etc/pwa/nginx/certs"
@@ -199,8 +202,8 @@ Now we have all configuration files necessary to start installing PWA services.
         -d perfsonar/sca-auth
     ```
 
-    > sca-auth container will generate a few files under /config directory when it's first started, so don't mount it with `ro`.
-    > I am persisting the user account DB on /usr/local/data/auth.
+    >  The sca-auth container will generate a few files under the /config directory when it's first started, so don't mount it with `ro`.
+    >  The user account DB is stored in `/usr/local/data/auth`.
 
 4. Create PWA's main UI/API container.
 
