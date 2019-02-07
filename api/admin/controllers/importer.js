@@ -232,6 +232,10 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
     mainConfig.testspecs = [];
     mainConfig.hostgroups = [];
 
+    var tests = mainConfig.tests;
+    var testspecs = mainConfig.testspecs;
+    var hostgroups = mainConfig.hostgroups;
+
     //var out = importedConfig;
     //out = JSON.stringify( out, null, "\t" );
 
