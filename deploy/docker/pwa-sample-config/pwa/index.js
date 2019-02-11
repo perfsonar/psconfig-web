@@ -4,12 +4,12 @@ const winston = require("winston");
 const os = require("os");
 
 // Publisher api (will run on a different container from admin container)
-// Note: you *must* update the "url" with your hostname in place of localhost
+// Note: you *must* update the "url" with your hostname in place of <hostname>
 
 exports.pub = {
     host: "0.0.0.0",
     port: 8080,
-    url: "http://localhost/pub/",
+    url: "http://<pwa_hostname>/pub/",
 };
 
 // Mongo DB to use (the default should work fine, unless you specifically need a different db)
