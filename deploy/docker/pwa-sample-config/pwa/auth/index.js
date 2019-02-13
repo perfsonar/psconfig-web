@@ -76,6 +76,7 @@ exports.iucas = { };
 //openid connect (cilogon)
 //http://www.cilogon.org/oidc
 //most info can be downloaded from https://cilogon.org/.well-known/openid-configuration
+/*
 exports.oidc = {
     issuer: "https://cilogon.org",
     authorization_url: "https://cilogon.org/authorize",
@@ -90,6 +91,7 @@ exports.oidc = {
 
     idplist: "https://cilogon.org/include/idplist.xml",
 };
+*/
 
 //for x509
 exports.x509 = {
