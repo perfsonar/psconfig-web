@@ -11,32 +11,33 @@
     <br>
     <br>
 
-    <div class="menu" ng-class="{'active':  active_menu == 'configs'}" >
-        <a ng-href="{{getpageurl('/configs')}}">
-            <h3><i class="fa fa-globe" aria-hidden="true"></i></h3> 
-            <span class="label">Configs</span>
-        </a>
-    </div>
+    <a ng-href="{{getpageurl('/configs')}}">
+        <div class="menu" ng-class="{'active':  active_menu == 'configs'}">
+                <h3><i class="fa fa-globe" aria-hidden="true"></i></h3> 
+                <span class="label">Configs</span>
+        </div>
+    </a>
     <hr>
 
-    <div class="menu" ng-class="{'active':  active_menu == 'hosts'}">
-        <a ng-href="{{getpageurl('/hosts')}}">
-            <h3><i class="fa fa-laptop" aria-hidden="true"></i></h3> 
-            <span class="label">Hosts</span>
-        </a>
-    </div>
-    <div class="menu" ng-class="{'active':  active_menu == 'hostgroups'}" >
-        <a ng-href="{{getpageurl('/hostgroups')}}">
-            <h3><i class="fa fa-server" aria-hidden="true"></i></h3> 
-            <span class="label">Host Groups</span>
-        </a>
-    </div>
-    <div class="menu" ng-class="{'active':  active_menu == 'testspecs'}" >
-        <a ng-href="{{getpageurl('/testspecs')}}">
-            <h3><i class="fa fa-flask" aria-hidden="true"></i></h3> 
-            <span class="label">Testspecs</span>
-        </a>
-    </div>
+    <a ng-href="{{getpageurl('/hosts')}}">
+        <div class="menu" ng-class="{'active':  active_menu == 'hosts'}">
+                <h3><i class="fa fa-laptop" aria-hidden="true"></i></h3> 
+                <span class="label">Hosts</span>
+        </div>
+    </a>
+
+    <a ng-href="{{getpageurl('/hostgroups')}}">
+        <div class="menu" ng-class="{'active':  active_menu == 'hostgroups'}" >
+                <h3><i class="fa fa-server" aria-hidden="true"></i></h3> 
+                <span class="label">Host Groups</span>
+        </div>
+    </a>
+    <a ng-href="{{getpageurl('/testspecs')}}">
+        <div class="menu" ng-class="{'active':  active_menu == 'testspecs'}" >
+                <h3><i class="fa fa-flask" aria-hidden="true"></i></h3> 
+                <span class="label">Testspecs</span>
+        </div>
+    </a>
 
     <div class="bottom">
         <div class="menu" ng-click="relocate('https://github.com/perfsonar/psconfig-web/issues')">
