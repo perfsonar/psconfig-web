@@ -440,10 +440,14 @@ function generate_group_members( test, group, test_service_types, type, host_gro
         next();
     });
 
-}
+};
 
-//synchronous function to construct meshconfig from admin config
+exports._process_published_config = function( _config, opts, cb) {
+
+};
+
 exports.generate = function(_config, opts, cb) {
+
     //catalog of all hosts referenced in member groups keyed by _id
     var host_catalog = {};
     var host_groups = {};
@@ -458,7 +462,6 @@ exports.generate = function(_config, opts, cb) {
         service_type_obj[ tmptest.service_type ] = get_test_service_type( tmptest );
 
     });
-
 
     var test_service_types = Object.keys(service_type_obj).map(e => service_type_obj[e]);
     
@@ -532,6 +535,7 @@ exports.generate = function(_config, opts, cb) {
             },
 
         }
+        console.log("initial _config", JSON.stringify(_config, null, 4));
 
 
         if(_config.desc) mc.description += ": " + _config.desc;
