@@ -469,8 +469,6 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
             },
 
         }
-        console.log("initial _config", JSON.stringify(_config)); //, null, 4));
-
 
         if(_config.desc) mc.description += ": " + _config.desc;
         if(_config._host_version) mc.description += " (v"+_config._host_version+")";
@@ -554,15 +552,11 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
 
 
             if ( "ma_urls" in _host && _host.ma_urls.length > 0  ) {
-                console.log("Host MA URLs", _host.ma_urls);
                 for(var i in _host.ma_urls ) {
                     var extra_url = _host.ma_urls[i];
-                    console.log("extra_url", extra_url);
-                    console.log("last_host_ma_number", last_host_ma_number);
                     //if ( typeof extra_url == "undefined" ) continue;
                     var maInfo = generate_mainfo_url(extra_url, format, service);
                     var maName = "host-additional-archive" + last_host_ma_number;
-                    console.log("maName", maName);
                     if ( ! ( extra_url in maHash ) ) {
                         //maHash[extra_url] = maName;
                         extra_mas[maName] = extra_url;
@@ -570,7 +564,6 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
 
                     } else {
                         var maType = maHash[extra_url];
-                        console.log("maType", maType);
                         if ( ( typeof maType ) != "undefined" ) {
                          //   maHash[extra_url] = maType;
                             extra_mas[maType] = extra_url;
@@ -580,9 +573,6 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
 
                 }
             }
-
-            console.log("_host.hostname", _host.hostname);
-            console.log("extra_mas", extra_mas);
 
             //create ma entry for each service
             test_service_types.forEach(function(service) {
@@ -616,13 +606,10 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
                     }
                 }
 
-                console.log("HOST URL", url);
-
                 // Handle host main MA 
                 if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
                 if ( ! ( "_archive" in _host ) ) _host._archive = [];
 
-                // TODO: review this
                 if ( ! ( url in maHash )  ) {
                     if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
                         psc_archives[ maName ] = maInfo;
@@ -644,10 +631,6 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
                 }
 
                 // Handle extra host MAs
-
-                // TODO: Add a way of handling the case where an additional MA is already defined
-                // as a host MA and use the host ma name rather than creating a duplicate entry
-                // in extra MAs
 
                 for(var key in extra_mas ) {
                     var maName = key;
@@ -748,7 +731,6 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
                 last_test_ma_number++;
             }
         }
-        console.log("maHash after", maHash);
         // Retrieve MA URLs from the _config object
 
         psconfig.archives = psc_archives;
