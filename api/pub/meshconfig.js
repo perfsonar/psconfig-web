@@ -23,9 +23,13 @@ const bwctl_tool_lookup = { // TODO: Remove bwctl hack
     tracepath: "bwctltracepath"
 };
 
+//catalog of all hosts referenced in member groups keyed by _id
+var host_catalog = {};
+var host_groups = {};
 
 var profile_cache = null;
 var profile_cache_date = null;
+
 function load_profile(cb) {
     logger.info("reloading profiles");
     common.profile.getall(function(err, profiles) {
@@ -440,76 +444,9 @@ function generate_group_members( test, group, test_service_types, type, host_gro
         next();
     });
 
-}
+};
 
-//synchronous function to construct meshconfig from admin config
-exports.generate = function(_config, opts, cb) {
-    //catalog of all hosts referenced in member groups keyed by _id
-    var host_catalog = {};
-    var host_groups = {};
-
-    var format = opts.format;
-
-    //resolve all db entries first
-    if(_config.admins) _config.admins = resolve_users(_config.admins);
-
-    var service_type_obj = {};
-    _config.tests.forEach( function( tmptest ) {
-        service_type_obj[ tmptest.service_type ] = get_test_service_type( tmptest );
-
-    });
-
-
-    var test_service_types = Object.keys(service_type_obj).map(e => service_type_obj[e]);
-    
-
-    async.eachSeries(_config.tests, function(test, next_test) {
-        var type = test.mesh_type;
-
-        if(!test.enabled) return next_test();
-        async.parallel([
-            function(next) {
-                //a group
-                if(!test.agroup) return next();
-                generate_group_members( test, test.agroup, test_service_types, type, host_groups, host_catalog, next, "a-" );
-            },
-            function(next) {
-                //b group
-                if(!test.bgroup) return next();
-                generate_group_members( test, test.bgroup, test_service_types, type, host_groups, host_catalog, next, "b-" );
-            },
-            function(next) {
-                if(!test.nahosts) return next();
-                resolve_hosts(test.nahosts, function(err, hosts) {
-                    if(err) return next(err);
-                    test.nahosts = hosts;
-                    hosts.forEach(function(host) { host_catalog[host._id] = host; });
-                    next();
-                });
-            },
-            function(next) {
-                //testspec
-                if(!test.testspec) return next();
-                resolve_testspec(test.testspec, function(err, testspec) {
-                    if(err) return next(err);
-                    test.testspec = testspec;
-
-                    //suppress testspecs that does't meet min host version
-                    if(!_config._host_version) return next();
-                    var hostv = parseInt(_config._host_version[0]);
-                    var minver = config.meshconfig.minver[test.service_type];
-                    for(var k in test.testspec.specs) {
-                        //if minver is set for this testspec, make sure host version meets it
-                        if(minver[k]) {
-                            if(hostv < minver[k]) delete test.testspec.specs[k]; 
-                        }
-                    }
-                    next();
-                });
-            },
-        ], next_test);
-    }, function(err) {
-        if(err) return logger.error(err);
+exports._process_published_config = function( _config, opts, cb, format, test_service_types ) {
 
         //meshconfig root template
         var mc = {
@@ -532,7 +469,6 @@ exports.generate = function(_config, opts, cb) {
             },
 
         }
-
 
         if(_config.desc) mc.description += ": " + _config.desc;
         if(_config._host_version) mc.description += " (v"+_config._host_version+")";
@@ -576,8 +512,11 @@ exports.generate = function(_config, opts, cb) {
         });
 
 
+        var last_host_ma_number = 0;
+
         //register sites(hosts)
         for(var id in host_catalog) {
+        var extra_mas = {};
             var _host = host_catalog[id];
             var toolkit_url = _host.toolkit_url || "auto";
             var host = {
@@ -612,15 +551,26 @@ exports.generate = function(_config, opts, cb) {
             if ( ! ( _host.hostname in psc_hosts) ) psc_hosts[ _host.hostname ]  = {};
 
 
-            var last_host_ma_number = 0;
-            var extra_mas = {};
-            if ( "ma_urls" in _host &&  _host.ma_urls.length > 0  ) {
+            if ( "ma_urls" in _host && _host.ma_urls.length > 0  ) {
                 for(var i in _host.ma_urls ) {
                     var extra_url = _host.ma_urls[i];
+                    //if ( typeof extra_url == "undefined" ) continue;
                     var maInfo = generate_mainfo_url(extra_url, format, service);
                     var maName = "host-additional-archive" + last_host_ma_number;
-                    extra_mas[maName] = extra_url;
-                    last_host_ma_number++;
+                    if ( ! ( extra_url in maHash ) ) {
+                        //maHash[extra_url] = maName;
+                        extra_mas[maName] = extra_url;
+                        last_host_ma_number++;
+
+                    } else {
+                        var maType = maHash[extra_url];
+                        if ( ( typeof maType ) != "undefined" ) {
+                         //   maHash[extra_url] = maType;
+                            extra_mas[maType] = extra_url;
+                            last_host_ma_number++;
+                       }
+                    }
+
                 }
             }
 
@@ -660,15 +610,24 @@ exports.generate = function(_config, opts, cb) {
                 if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
                 if ( ! ( "_archive" in _host ) ) _host._archive = [];
 
-                if ( ( ! ( url in maHash ) ) && ( _host.local_ma || _config.force_endpoint_mas   ) ) {
-                    psc_archives[ maName ] = maInfo;
-                    _host._archive.push(maName);
-                    psc_hosts[ _host.hostname ].archives.push( maName );
+                if ( ! ( url in maHash )  ) {
+                    if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
+                        psc_archives[ maName ] = maInfo;
+                        _host._archive.push(maName);
+                        psc_hosts[ _host.hostname ].archives.push( maName );
 
+                        last_ma_number++;
+                        maHash[url] = maName;
+                    } else if ( url in extra_mas ) {
 
-                    last_ma_number++;
-                    maHash[url] = 1;
+                    }
+
                 } else {
+                    if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
+                    var maType = maHash[url];
+                        psc_archives[ maType ] = maInfo;
+                    }
+
                 }
 
                 // Handle extra host MAs
@@ -678,17 +637,26 @@ exports.generate = function(_config, opts, cb) {
                     var url = extra_mas[key];
                     var maInfo =  generate_mainfo_url( url, format, service.type);
 
+                    var maType = maHash[url];
+                    if ( psc_hosts[ _host.hostname ].archives.indexOf( maName ) == -1 ) {
+                        psc_hosts[ _host.hostname ].archives.push( maName );
+                    }
                     if ( ! ( url in maHash ) ) {
                         psc_archives[ maName ] = maInfo;
-                        psc_hosts[ _host.hostname ].archives.push( maName );
-                        maHash[url] = 1;
+                        maHash[url] = maName;
+                    } else {
+                        maName = maType;
+                        psc_archives[ maName ] = maInfo;
+                        maHash[url] = maName;
+
                     }
-                    if(config_service_types.indexOf(service.type) != -1) {
+                    if(config_service_types.indexOf(service.type) != -1 && _host._archive.indexOf( maName) == -1) {
                         _host._archive.push(maName);
                         host.measurement_archives.push( maInfo );
                     }
 
                 }
+
 
             });
             if (  host.measurement_archives.length == 0 ) {
@@ -719,7 +687,7 @@ exports.generate = function(_config, opts, cb) {
             org.sites.push(site);
         }
 
-        var ma_prefix = "test-archive";
+        var ma_prefix = "config-archive";
         var last_test_ma_number = 0;
         var test_mas = [];
         if ( "ma_urls" in _config ) {
@@ -727,12 +695,24 @@ exports.generate = function(_config, opts, cb) {
                 var url = _config.ma_urls[i];
                 if ( url == "" ) continue;
 
-                var maName = "test-archive" + last_test_ma_number;
+                var maName = "config-archive" + last_test_ma_number;
                 test_mas.push( maName );
                 var maInfo;
+                var maType = maHash[url];
 
                 for(var type in mc_test_types ) {
                     maInfo = generate_mainfo_url(url, format, type);
+                    if ( ! ( url in maHash ) ) { 
+                        psc_archives[ maName ] = maInfo;
+                        maHash[url] = maName;
+
+                } else if ( ( typeof maType ) != "undefined" ) {
+                    maName = maType;
+                    //psc_archives[ maName ] = maInfo;
+                    maHash[url] = maName;
+
+
+                }
                     if ( typeof maInfo.type == "undefined" ) continue;
 
 
@@ -887,6 +867,76 @@ exports.generate = function(_config, opts, cb) {
         } else {
             cb(null, mc);
         }
+
+};
+
+exports.generate = function(_config, opts, cb) {
+
+
+    var format = opts.format;
+
+    //resolve all db entries first
+    if(_config.admins) _config.admins = resolve_users(_config.admins);
+
+    var service_type_obj = {};
+    _config.tests.forEach( function( tmptest ) {
+        service_type_obj[ tmptest.service_type ] = get_test_service_type( tmptest );
+
+    });
+
+    var test_service_types = Object.keys(service_type_obj).map(e => service_type_obj[e]);
+    
+
+    async.eachSeries(_config.tests, function(test, next_test) {
+        var type = test.mesh_type;
+
+        if(!test.enabled) return next_test();
+        async.parallel([
+            function(next) {
+                //a group
+                if(!test.agroup) return next();
+                generate_group_members( test, test.agroup, test_service_types, type, host_groups, host_catalog, next, "a-" );
+            },
+            function(next) {
+                //b group
+                if(!test.bgroup) return next();
+                generate_group_members( test, test.bgroup, test_service_types, type, host_groups, host_catalog, next, "b-" );
+            },
+            function(next) {
+                if(!test.nahosts) return next();
+                resolve_hosts(test.nahosts, function(err, hosts) {
+                    if(err) return next(err);
+                    test.nahosts = hosts;
+                    hosts.forEach(function(host) { host_catalog[host._id] = host; });
+                    next();
+                });
+            },
+            function(next) {
+                //testspec
+                if(!test.testspec) return next();
+                resolve_testspec(test.testspec, function(err, testspec) {
+                    if(err) return next(err);
+                    test.testspec = testspec;
+
+                    //suppress testspecs that does't meet min host version
+                    if(!_config._host_version) return next();
+                    var hostv = parseInt(_config._host_version[0]);
+                    var minver = config.meshconfig.minver[test.service_type];
+                    for(var k in test.testspec.specs) {
+                        //if minver is set for this testspec, make sure host version meets it
+                        if(minver[k]) {
+                            if(hostv < minver[k]) delete test.testspec.specs[k]; 
+                        }
+                    }
+                    next();
+                });
+            },
+        ], next_test);
+    }, function(err) {
+        if(err) return logger.error(err);
+
+        return exports._process_published_config( _config, opts, cb, format, test_service_types );
+
     });
 }
 
