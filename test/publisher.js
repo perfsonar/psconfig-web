@@ -8,11 +8,10 @@ var config = require('../api/config');
 var publisher = require('../api/pub/meshconfig');
 fs = require('fs');
 
+var interimfiles = [];
+interimfiles.push( 'data/publisher1-multi-mas.json-interim' );
 var testfiles = [];
-testfiles.push( 'data/testbed.json' );
-testfiles.push( 'data/testbed2-noarchives.json' );
-testfiles.push( 'data/testbed3-nodescription.json' );
-testfiles.push( 'data/testbed4-no_endpoint_description.json' );
+testfiles.push( 'data/publisher1-multi-mas.json' );
 
 
 function formatlog( obj ) {
