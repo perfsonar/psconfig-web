@@ -254,11 +254,13 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
     }
 
     //if ( config_format == "psconfig" ) {
+        //console.log("IMPORTED CONFIG!!!!\n");
+        //console.log( JSON.stringify( importedConfig));
 
-        console.log("MAINCONFIG INTERMEDIATE\n");
+        console.log("MAINCONFIG INTERMEDIATE", config_format, "\n");
         console.log( JSON.stringify( mainConfig, null, 3 ));
 
-        console.log("CONFIG_PARAMS INTERMEDIATE\n");
+        console.log("CONFIG_PARAMS INTERMEDIATE", config_format, "\n");
         console.log( JSON.stringify( config_params, null, 3 ));
 
     //}
@@ -339,13 +341,13 @@ exports._process_meshconfig = function ( importedConfig, sub, config_params, mai
 
                 var host_info = {
                     services: services,
-                no_agent: false,
-                hostname: host.addresses[0],
-                sitename: host.description,
-                addresses: addr_array,
-                info: {},
-                communities: [],
-                admins: [sub.toString()]
+                    no_agent: false,
+                    hostname: host.addresses[0],
+                    sitename: host.description,
+                    addresses: addr_array,
+                    info: {},
+                    communities: [],
+                    admins: [sub.toString()]
                 };
                 if(host.toolkit_url && host.toolkit_url != "auto") host_info.toolkit_url = host.toolkit_url;
                 hosts_info.push(host_info);
@@ -407,6 +409,8 @@ exports._process_meshconfig = function ( importedConfig, sub, config_params, mai
         });
     });
 
+    console.log("MESHCONFIG hosts_service_types", hosts_service_types);
+
 
     hosts_info.forEach( function( host ) {
         var hostname = host.hostname;        
@@ -418,6 +422,9 @@ exports._process_meshconfig = function ( importedConfig, sub, config_params, mai
         });
 
     });
+
+    console.log("MESHCONFIG INTERIM CONFIG", mainConfig);
+    //console.log("MESHCONFIG INTERM CONFIG PARAMS", config_params);
 
 };
 
@@ -433,17 +440,17 @@ exports._process_psconfig = function ( importedConfig, sub, config_params, mainC
 
     var archive_obj = exports._extract_psconfig_mas( importedConfig , config_params );
 
-    console.log("archive_obj", archive_obj);
+    //console.log("archive_obj", archive_obj);
 
     config_params.archives = archive_obj.central;
 
+
+    var hosts_info = [];
+    hosts_info = exports._extract_psconfig_hosts( importedConfig, config_params );
+    //config_params.hosts = hosts_obj.hosts;
+    config_params.addresses = hosts_info.addresses;
+
     console.log("config_params", config_params);
-
-    var hosts_obj = {};
-    hosts_obj = exports._extract_psconfig_hosts( importedConfig, config_params );
-    config_params.hosts = hosts_obj.hosts;
-    config_params.addresses = hosts_obj.addresses;
-
 
 
 
@@ -453,8 +460,61 @@ exports._extract_psconfig_hosts = function( importedConfig, config_params ) {
     var hosts_obj = {};
 
     // Retrieve host info from importedConfig
+    /*
+     *   "name": "iperf3 TCP Test Between Testbeds Group",
+         "desc": "Imported by PWA importer",
+         "type": "static",
+         "service_type": "bwctl",
+         "admins": [
+            "1"
+         ],
+         "_hosts": [
+     * */
     var hosts_info = [];
+    var addrs = importedConfig.addresses;
+    _.each( addrs, function(hostInfo, hostname) {
+        console.log("hostname ", hostname);
+        console.log("hostInfo", hostInfo);
+        var desc = hostInfo._meta["display-name"];
+        var toolkitURL = hostInfo._meta["display-url"];
+        var address = hostInfo.address;
 
+        /*var row = {};
+        row.desc = desc;
+        row.toolkit_url = toolkitURL;
+        row.address = address;
+        */
+
+        hosts_obj[ hostname ] = {};
+        hosts_obj[ hostname ].desc = desc;
+        hosts_obj[ hostname ].toolkit_url = toolkitURL;
+        hosts_obj[ hostname ].address = hostInfo.address;
+
+
+                var host_info = {
+                    services: services,
+                    no_agent: false,
+                    hostname: host.addresses[0],
+                    sitename: host.description,
+                    addresses: addr_array,
+                    info: {},
+                    communities: [],
+                    admins: [sub.toString()]
+                };
+       
+       /* hosts_service_types example from meshconfig format
+        *
+        * hosts_service_types { 'perfsonar-dev5.grnoc.iu.edu': { bwctl: 1, traceroute: 1, owamp: 1 },
+  'ps-dev-deb8-1.es.net': { bwctl: 1, traceroute: 1, owamp: 1 },
+  'ps-dev-el6-1.es.net': { bwctl: 1, traceroute: 1, owamp: 1, ping: 1 },
+        *
+        * */. 
+
+
+    });
+
+    //config_params.hosts = hosts_info;
+    //hosts_obj.addresses = hosts_obj;
 
 
     return hosts_info;
@@ -471,7 +531,7 @@ exports._extract_psconfig_mas = function( importedConfig, config_params ) {
     // process central MAs
     var ma_url_obj = {};
     if ( "archives" in importedConfig ) {
-        console.log("ARCHIVES");
+        //console.log("ARCHIVES");
         Object.keys( importedConfig.archives ).forEach(function(ma_name) {
             var ma = importedConfig.archives[ ma_name ];
             if ( ! ( "archives" in config_params ) ) config_params.archives = [];
@@ -495,8 +555,8 @@ exports._extract_psconfig_mas = function( importedConfig, config_params ) {
                 }
             };
             //console.log("IMPORTED", JSON.stringify(importedConfig, null, "\t"));
-            console.log("archives", JSON.stringify( archives, null, "\t"));
-            console.log("ma_url_obj", JSON.stringify( ma_url_obj, null, "\t"));
+            //console.log("archives", JSON.stringify( archives, null, "\t"));
+            //console.log("ma_url_obj", JSON.stringify( ma_url_obj, null, "\t"));
             var ma_urls = Object.keys( ma_url_obj );
 
         });
