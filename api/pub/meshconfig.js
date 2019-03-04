@@ -427,15 +427,24 @@ function generate_group_members( test, group, test_service_types, type, host_gro
         test[ group_field ] = hosts;
         hosts.forEach(function(host) {
             host_catalog[host._id] = host;
+            var host_addr;
             if ( host.hostname ) {
-                host_groups[ test.name ][ addr ].push( 
-                    { "name": host.hostname }
-                    );
+                host_addr = host.hostname;
+
+                if ( ! host_groups[ test.name ][ addr ].find(o => o.name == host_addr) ) {
+                    host_groups[ test.name ][ addr ].push(
+                        { "name": host.hostname }
+                        );
+
+                }
             } else {
                 host.addresses.forEach( function( address ) {
+                    host_addr = address.address;
+                if ( ! host_groups[ test.name ][ addr ].find(o => o.name == host_addr) ) {
                     host_groups[ test.name ][ addr ].push(
-                        { "name": address.address }
+                        { "name": host_addr }
                         );
+                }
                 });
             }
 
