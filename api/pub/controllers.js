@@ -6,12 +6,12 @@ const router = express.Router();
 const winston = require('winston');
 
 //mine
-const config = require('../config');
-const logger = new winston.Logger(config.logger.winston);
+const globalConfig = require('../config');
+const logger = new winston.Logger(globalConfig.logger.winston);
 const db = require('../models');
 const meshconfig = require('./meshconfig');
 const url = require('url');
-
+var config = {};
 
 /**
  * @apiGroup            Publisher
@@ -81,7 +81,7 @@ router.get('/config', function(req, res, next) {
 
         var proto = "http";
         if(req.headers['x-forwarded-proto']) proto = req.headers['x-forwarded-proto'];
-        var urlObj = url.parse(config.pub.url);
+        var urlObj = url.parse(globalConfig.pub.url);
 
         var base_url = proto + "://" + urlObj.host;
         /* may want to add port later
@@ -111,7 +111,7 @@ router.get('/config', function(req, res, next) {
  *
  */
 router.get('/config/:url', function(req, res, next) {
-    var format = req.query.format || "psconfig";
+    var format = req.query.format || globalConfig.pub.default_config_format  || "psconfig";
     config.format = format;
     logger.debug("format", format);
     var opts = {};
@@ -120,14 +120,10 @@ router.get('/config/:url', function(req, res, next) {
     db.Config.findOne({url: req.params.url}).lean().exec(function(err, config) {
         if(err) return next(err);
 
-        //if( ! ("status" in res ) ) return next();
-        //if ( ! ( "text" in res.status ) ) return next();
-
-        if(!config) { 
+        if(!config) {
             return res.status(404).json({error: "404 error: Couldn't find config with URL:"+req.params.url});
         }
         config._host_version = req.query.host_version;
-        //log_json( config, opts );
         meshconfig.generate(config, opts, function(err, m) {
             if(err) return next(err);
             res.json(m);
@@ -146,7 +142,6 @@ router.get('/config/:url', function(req, res, next) {
  */
 router.get('/auto/:address', function(req, res, next) {
     var address = req.params.address;
-    //logger.debug(req.query.host_version);
     //find host from hostname or ip
     db.Host.findOne({ hostname: address }, '_id  info.pshost-toolkitversion', function(err, host) {
         if(err) return next(err);

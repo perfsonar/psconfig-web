@@ -5,11 +5,14 @@ const os = require("os");
 
 // Publisher api (will run on a different container from admin container)
 // Note: you *must* update the "url" with your hostname in place of <hostname>
+// default_config_format specifies the default config for when you retrieve a config
+// with no format specified. 'psconfig' is recommended
 
 exports.pub = {
     host: "0.0.0.0",
     port: 8080,
     url: "http://<pwa_hostname>/pub/",
+    default_config_format: "meshconfig"
 };
 
 // Mongo DB to use (the default should work fine, unless you specifically need a different db)
