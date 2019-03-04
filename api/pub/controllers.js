@@ -111,7 +111,7 @@ router.get('/config', function(req, res, next) {
  *
  */
 router.get('/config/:url', function(req, res, next) {
-    var format = req.query.format || "meshconfig";
+    var format = req.query.format || "psconfig";
     config.format = format;
     logger.debug("format", format);
     var opts = {};
