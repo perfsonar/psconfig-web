@@ -24,11 +24,12 @@ const bwctl_tool_lookup = { // TODO: Remove bwctl hack
 };
 
 //catalog of all hosts referenced in member groups keyed by _id
-var host_catalog = {};
-var host_groups = {};
 
 var profile_cache = null;
 var profile_cache_date = null;
+
+var host_catalog = {};   
+var host_groups = {};
 
 function load_profile(cb) {
     logger.info("reloading profiles");
@@ -455,7 +456,78 @@ function generate_group_members( test, group, test_service_types, type, host_gro
 
 };
 
-exports._process_published_config = function( _config, opts, cb, format, test_service_types ) {
+
+exports._process_published_config = function( _config, opts, cb, format ) {
+    var format = opts.format;
+    //host_catalog = {};
+    //host_groups = {};
+
+
+    //resolve all db entries first
+    if(_config.admins) _config.admins = resolve_users(_config.admins);
+
+    var service_type_obj = {};
+    _config.tests.forEach( function( tmptest ) {
+        service_type_obj[ tmptest.service_type ] = get_test_service_type( tmptest );
+
+    });
+
+    var test_service_types = Object.keys(service_type_obj).map(e => service_type_obj[e]);
+    
+
+    async.eachSeries(_config.tests, function(test, next_test) {
+        var type = test.mesh_type;
+
+
+        if(!test.enabled) return next_test();
+        async.parallel([
+            function(next) {
+                //a group
+                if(!test.agroup) return next();
+                generate_group_members( test, test.agroup, test_service_types, type, host_groups, host_catalog, next, "a-" );
+            },
+            function(next) {
+                //b group
+                if(!test.bgroup) return next();
+                generate_group_members( test, test.bgroup, test_service_types, type, host_groups, host_catalog, next, "b-" );
+            },
+            function(next) {
+                if(!test.nahosts) return next();
+                resolve_hosts(test.nahosts, function(err, hosts) {
+                    if(err) return next(err);
+                    test.nahosts = hosts;
+                    hosts.forEach(function(host) { host_catalog[host._id] = host; });
+                console.log("host_catalog", host_catalog);
+                    next();
+                });
+            },
+            function(next) {
+                //testspec
+                if(!test.testspec) return next();
+                resolve_testspec(test.testspec, function(err, testspec) {
+                    if(err) return next(err);
+                    test.testspec = testspec;
+
+                    //suppress testspecs that does't meet min host version
+                    if(!_config._host_version) return next();
+                    var hostv = parseInt(_config._host_version[0]);
+                    var minver = config.meshconfig.minver[test.service_type];
+                    for(var k in test.testspec.specs) {
+                        //if minver is set for this testspec, make sure host version meets it
+                        if(minver[k]) {
+                            if(hostv < minver[k]) delete test.testspec.specs[k]; 
+                        }
+                    }
+                    next();
+                });
+            },
+        ], next_test);
+    }, function(err) {
+        if(err) return logger.error(err);
+
+        return exports._process_published_config( _config, opts, cb, format, test_service_types );
+
+    });
 
         //meshconfig root template
         var mc = {
@@ -525,7 +597,7 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
 
         //register sites(hosts)
         for(var id in host_catalog) {
-        var extra_mas = {};
+            var extra_mas = {};
             var _host = host_catalog[id];
             var toolkit_url = _host.toolkit_url || "auto";
             var host = {
@@ -550,7 +622,7 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
                 "address":  _host.hostname,
                 "host": _host.hostname,
                 "_meta": {
-                    "display-name": _host.desc||_host.sitename,
+                    "display-name": _host.desc || _host.sitename,
                     "display-url": toolkit_url
                     // TODO: add org?
                     //"organization": _host.org
@@ -845,7 +917,7 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
             if ( parameters.type == "perfsonarbuoy/owamp" ) {
                 if ( "tool" in parameters ) {
                     // if tool is not owping, drop this test
-                    if (  parameters.tool != "owping" ) {                        
+                    if (  parameters.tool != "owping" ) {
                         return;
                     } else {
                         // delete the tool parameter because meshconfig doesn't support it
@@ -881,72 +953,10 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
 
 exports.generate = function(_config, opts, cb) {
 
+    host_groups = {};
+    host_catalog = {};
 
-    var format = opts.format;
-
-    //resolve all db entries first
-    if(_config.admins) _config.admins = resolve_users(_config.admins);
-
-    var service_type_obj = {};
-    _config.tests.forEach( function( tmptest ) {
-        service_type_obj[ tmptest.service_type ] = get_test_service_type( tmptest );
-
-    });
-
-    var test_service_types = Object.keys(service_type_obj).map(e => service_type_obj[e]);
-    
-
-    async.eachSeries(_config.tests, function(test, next_test) {
-        var type = test.mesh_type;
-
-        if(!test.enabled) return next_test();
-        async.parallel([
-            function(next) {
-                //a group
-                if(!test.agroup) return next();
-                generate_group_members( test, test.agroup, test_service_types, type, host_groups, host_catalog, next, "a-" );
-            },
-            function(next) {
-                //b group
-                if(!test.bgroup) return next();
-                generate_group_members( test, test.bgroup, test_service_types, type, host_groups, host_catalog, next, "b-" );
-            },
-            function(next) {
-                if(!test.nahosts) return next();
-                resolve_hosts(test.nahosts, function(err, hosts) {
-                    if(err) return next(err);
-                    test.nahosts = hosts;
-                    hosts.forEach(function(host) { host_catalog[host._id] = host; });
-                    next();
-                });
-            },
-            function(next) {
-                //testspec
-                if(!test.testspec) return next();
-                resolve_testspec(test.testspec, function(err, testspec) {
-                    if(err) return next(err);
-                    test.testspec = testspec;
-
-                    //suppress testspecs that does't meet min host version
-                    if(!_config._host_version) return next();
-                    var hostv = parseInt(_config._host_version[0]);
-                    var minver = config.meshconfig.minver[test.service_type];
-                    for(var k in test.testspec.specs) {
-                        //if minver is set for this testspec, make sure host version meets it
-                        if(minver[k]) {
-                            if(hostv < minver[k]) delete test.testspec.specs[k]; 
-                        }
-                    }
-                    next();
-                });
-            },
-        ], next_test);
-    }, function(err) {
-        if(err) return logger.error(err);
-
-        return exports._process_published_config( _config, opts, cb, format, test_service_types );
-
-    });
+    return exports._process_published_config( _config, opts, cb );
 }
 
 // TODO: Remove bwctl hack
