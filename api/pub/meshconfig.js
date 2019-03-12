@@ -28,7 +28,7 @@ const bwctl_tool_lookup = { // TODO: Remove bwctl hack
 var profile_cache = null;
 var profile_cache_date = null;
 
-var host_catalog = {};   
+var host_catalog = {};
 var host_groups = {};
 
 function load_profile(cb) {
@@ -89,9 +89,12 @@ function convert_tool( tool ) {
 }
 
 function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules ) {
-    var spec = testspec.specs;
+    //var spec = testspec.specs;
     var test = psc_tests[ name ];
-    var testspec = psc_tests[ name ].spec;
+    console.log("testspec", testspec);
+    var ps_spec = psc_tests[ name ].spec;
+    console.log("ps_spec", ps_spec);
+    var spec = ps_spec;
     var service_types = {
         "bwctl": "throughput",
         "owamp": "latencybg",
@@ -110,6 +113,9 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
     if ( "test-interval" in testspec ) {
         interval_seconds = testspec["test-interval"];
     }
+
+    console.log("testspec", testspec);
+    console.log("ps_spec", ps_spec);
 
     // this array is a list of fields we will convert from seconds to iso8601
     var iso_fields = [
@@ -130,8 +136,11 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
     }
 
-    rename_field( spec, "interval", "test-interval" );
-    delete spec.interval;
+        console.log("interval spec before deleting spec", spec);
+    if ( spec && "interval" in spec ) { 
+        rename_field( spec, "interval", "test-interval" );
+        delete spec.interval;
+    }
     rename_field( spec, "sample-count", "packet-count" );
     rename_field( spec, "udp-bandwidth", "bandwidth" ); // TODO: remove backwards compat hack
     rename_field( spec, "waittime", "sendwait" );
@@ -231,6 +240,9 @@ function rename_underscores_to_dashes( obj ) {
 }
 
 function rename_field( obj, oldname, newname ) {
+    if ( typeof obj == "undefined" ) {
+        return;
+    }
     if ( oldname in obj ) {
         obj[ newname ] = obj[ oldname ];
         delete obj[ oldname ];
@@ -302,6 +314,7 @@ function resolve_hosts(hostgroup, cb) {
 function resolve_hostgroup(id, test_service_types, cb) {
     db.Hostgroup.findById(id).exec(function(err, hostgroup) {
         if(err) return cb(err);
+        console.log("hostgroup id", id);
         if(!hostgroup) return cb("can't find hostgroup:"+id);
         //hosts will contain hostid for both static and dynamic (cached by pwacache)
         hostgroup.test_service_types = test_service_types;
@@ -314,9 +327,12 @@ function resolve_hostgroup(id, test_service_types, cb) {
 
 function generate_members(hosts) {
     var members = [];
-    hosts.forEach(function(host) {
-        members.push(host.hostname);
-    });
+    if ( Array.isArray( hosts ) ) {
+    console.log("hosts", hosts);
+        hosts.forEach(function(host) {
+            members.push(host.hostname);
+        });
+    }
     return members;
 }
 
@@ -345,7 +361,7 @@ function generate_mainfo(service, format) {
             case "bwctl": type = "perfsonarbuoy/bwctl"; break;
             case "owamp": type = "perfsonarbuoy/owamp"; break;
             default:
-                          type = service.type;
+                type = service.type;
         }
     } else {
         type = service.type;
@@ -396,6 +412,8 @@ function get_test_service_type( test ) {
 
 function generate_group_members( test, group, test_service_types, type, host_groups, host_catalog, next, addr_prefix ) {
 
+    console.log("GROUP", group);
+
     var test_service_type = get_test_service_type( test );
     //test_service_types.push( test_service_type );
 
@@ -418,7 +436,8 @@ function generate_group_members( test, group, test_service_types, type, host_gro
 
 
         set_test_meta( test, "_hostgroup", test.name );
-        set_test_meta( test, "_test", test.name );
+        //set_test_meta( test, "_hostgroup", host_groups[ test.name ] );
+        set_test_meta( test, "_test",  test.name );
 
         if ( ( "testspec" in test ) && ("specs" in test.testspec ) && ( "tool" in test.testspec.specs ) ) {
             set_test_meta( test, "_tool", convert_tool( test.testspec.specs.tool ));
@@ -427,6 +446,7 @@ function generate_group_members( test, group, test_service_types, type, host_gro
         if(err) return next(err);
         test[ group_field ] = hosts;
         hosts.forEach(function(host) {
+            console.log("SETTING HOST", host);
             host_catalog[host._id] = host;
             var host_addr;
             if ( host.hostname ) {
@@ -459,9 +479,9 @@ function generate_group_members( test, group, test_service_types, type, host_gro
 
 exports._process_published_config = function( _config, opts, cb, format ) {
     var format = opts.format;
-    //host_catalog = {};
-    //host_groups = {};
 
+
+    console.log("!!!!CONFIG", _config);
 
     //resolve all db entries first
     if(_config.admins) _config.admins = resolve_users(_config.admins);
@@ -496,17 +516,20 @@ exports._process_published_config = function( _config, opts, cb, format ) {
                 resolve_hosts(test.nahosts, function(err, hosts) {
                     if(err) return next(err);
                     test.nahosts = hosts;
-                    hosts.forEach(function(host) { host_catalog[host._id] = host; });
-                console.log("host_catalog", host_catalog);
+                    hosts.forEach(function(host) { 
+                        //console.log("SETTING CATALOG ONE HOST", host);
+                        host_catalog[host._id] = host; 
+                    });
                     next();
                 });
             },
             function(next) {
                 //testspec
                 if(!test.testspec) return next();
-                resolve_testspec(test.testspec, function(err, testspec) {
+                resolve_testspec(test.testspec, function(err, row) {
+                    console.log("UPDATEING TETSPEDC", row);
                     if(err) return next(err);
-                    test.testspec = testspec;
+                    test.testspec = row;
 
                     //suppress testspecs that does't meet min host version
                     if(!_config._host_version) return next();
@@ -825,6 +848,8 @@ exports._process_published_config = function( _config, opts, cb, format ) {
             delete mc.measurement_archives;
         }
 
+            
+//console.log("TESTS", _config.tests);
 
 
         //now the most interesting part..
@@ -850,6 +875,8 @@ exports._process_published_config = function( _config, opts, cb, format ) {
                 });
             }
 
+            //console.log("TEST", test);
+
             var name = test.name;
             var testspec = test.testspec;
 
@@ -863,11 +890,12 @@ exports._process_published_config = function( _config, opts, cb, format ) {
                 "spec": {},
             };
 
-            psc_tests[ name ].spec = testspec.specs;
-            psc_tests[ name ].schedule_type = testspec.schedule_type;
+            psc_tests[ name ].spec = testspec.specs || {};
+            psc_tests[ name ].schedule_type = testspec.schedule_type || test.service_type;
 
 
             if ( format == "psconfig" ) {
+                console.log("psc_tests", psc_tests);
                 psc_tests[ name ].spec.source = "{% address[0] %}";
                 psc_tests[ name ].spec.dest = "{% address[1] %}";
                 meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules );
