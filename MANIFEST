@@ -1,7 +1,8 @@
 LICENSE
+MANIFEST
 Makefile
-perfsonar-graphs.spec
 perfsonar-psconfig-web-admin.spec
+etc/apache-pwa-toolkit_web_gui.conf
 apidoc.json
 package.json
 api/admin

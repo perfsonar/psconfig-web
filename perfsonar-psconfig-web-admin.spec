@@ -2,7 +2,7 @@
 %define config_base %{install_base}/etc
 
 # cron/apache entries are located in the 'etc' directory
-%define apacheconf apache-perfsonar-psconfig-web-admin.conf
+%define apacheconf apache-pwa-toolkit_web_gui.conf
 
 %define perfsonar_auto_version 4.1.6
 %define perfsonar_auto_relnum 1
@@ -17,10 +17,10 @@ URL:			http://www.perfsonar.net
 Source0:		perfsonar-psconfig-web-admin-%{version}.%{perfsonar_auto_relnum}.tar.gz
 BuildRoot:		%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:		noarch
-Requires:       nodejs
+Requires:       	nodejs
 Requires:		httpd
-Requires:       mongodb-server
-Requires:       sqlite
+Requires:       	mongodb-server
+Requires:       	sqlite
 
 %description
 The perfSONAR pSConfig Web Administrator package provides an authenticated, multi-user,
@@ -60,9 +60,9 @@ service httpd restart &> /dev/null || :
 %defattr(-,perfsonar,perfsonar,-)
 %license LICENSE
 %config %{install_base}/etc/*
-%{install_base}/cgi-bin/*
-%{install_base}/html/*
-%{install_base}/lib/perfSONAR_PS/*
+#%{install_base}/cgi-bin/*
+%{install_base}/ui/*
+#%{install_base}/lib/perfSONAR_PS/*
 /etc/httpd/conf.d/*
 
 %changelog

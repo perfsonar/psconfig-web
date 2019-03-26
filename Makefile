@@ -16,19 +16,21 @@ dist:
 	tar ch -T MANIFEST | tar x -C /tmp/$(PACKAGE)-$(VERSION).$(RELEASE)
 	tar czf $(PACKAGE)-$(VERSION).$(RELEASE).tar.gz -C /tmp $(PACKAGE)-$(VERSION).$(RELEASE)
 	rm -rf /tmp/$(PACKAGE)-$(VERSION).$(RELEASE)
+	cp $(PACKAGE)-$(VERSION).$(RELEASE).tar.gz ~/rpmbuild/SOURCES/
 
 install:
 	mkdir -p ${ROOTPATH}
 	tar ch --exclude=etc/* --exclude=*spec --exclude=dependencies --exclude=MANIFEST --exclude=LICENSE --exclude=Makefile -T MANIFEST | tar x -C ${ROOTPATH}
 	for i in `cat MANIFEST | grep ^etc/ | sed "s/^etc\///"`; do  mkdir -p `dirname $(CONFIGPATH)/$${i}`; if [ -e $(CONFIGPATH)/$${i} ]; then install -m 640 -c etc/$${i} $(CONFIGPATH)/$${i}.new; else install -m 640 -c etc/$${i} $(CONFIGPATH)/$${i}; fi; done
-	sed -i 's:.RealBin/\.\./lib:${LIBPATH}:g' ${ROOTPATH}/cgi-bin/*
-	sed -i 's:.RealBin/lib:${GRAPHLIBPATH}:g' ${ROOTPATH}/cgi-bin/*
+	#sed -i 's:.RealBin/\.\./lib:${LIBPATH}:g' ${ROOTPATH}/cgi-bin/*
+	#sed -i 's:.RealBin/lib:${GRAPHLIBPATH}:g' ${ROOTPATH}/cgi-bin/*
 
 rpm:
 	admin pub
 
 admin:
 	rpmbuild -bs perfsonar-psconfig-web-admin.spec
+	rpmbuild -ba perfsonar-psconfig-web-admin.spec
 
 pub:
 	rpmbuild -bs perfsonar-psconfig-web-pub.spec
