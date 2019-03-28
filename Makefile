@@ -34,7 +34,11 @@ admin:
 
 pub:
 	rpmbuild -bs perfsonar-psconfig-web-pub.spec
+	rpmbuild -ba perfsonar-psconfig-web-pub.spec
 
+clean:
+	rm -f perfsonar-psconfig*.tar.gz
+	rm -rf ~/rpmbuild/RPMS/* ~/rpmbuild/BUILD/* ~/rpmbuild/BUILDROOT/* ~/rpmbuild/SOURCES/* ~/rpmbuild/SRPMS ~/rpmbuild/SPECS
 
 # These tests will have to be done differently, since this project uses nodejs instead of perl
 
