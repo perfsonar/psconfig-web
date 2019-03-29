@@ -1,4 +1,4 @@
-%define install_base /usr/lib/perfsonar/psconfig-web-admin
+%define install_base /usr/lib/perfsonar/psconfig-web-admin-ui
 %define config_base %{install_base}/etc/pwa
 #%define config_base /etc/pwa
 
@@ -8,14 +8,14 @@
 %define perfsonar_auto_version 4.1.6
 %define perfsonar_auto_relnum 1
 
-Name:			perfsonar-psconfig-web-admin
+Name:			perfsonar-psconfig-web-admin-ui
 Version:		%{perfsonar_auto_version}
 Release:		%{perfsonar_auto_relnum}%{?dist}
 Summary:		perfSONAR pSConfig Web Administrator: UI and API
 License:		ASL 2.0
 Group:			Applications/Communications
 URL:			http://www.perfsonar.net
-Source0:		perfsonar-psconfig-web-admin-%{version}.%{perfsonar_auto_relnum}.tar.gz
+Source0:		perfsonar-psconfig-web-admin-ui-%{version}.%{perfsonar_auto_relnum}.tar.gz
 BuildRoot:		%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:		noarch
 Requires:       	nodejs
@@ -33,7 +33,7 @@ web-based interface for managing perfSONAR meshes, using pSConfig or MeshConfig 
 /usr/sbin/useradd -g perfsonar -r -s /sbin/nologin -c "perfSONAR User" -d /tmp perfsonar 2> /dev/null || :
 
 %prep
-%setup -q -n perfsonar-psconfig-web-admin-%{version}.%{perfsonar_auto_relnum}
+%setup -q -n perfsonar-psconfig-web-admin-ui-%{version}.%{perfsonar_auto_relnum}
 
 %build
 

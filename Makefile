@@ -1,5 +1,5 @@
-PACKAGE=perfsonar-psconfig-web-admin
-ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin
+PACKAGE=perfsonar-psconfig-web-admin-ui
+ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin-ui
 CONFIGPATH=${ROOTPATH}/etc
 #LIBPATH=/usr/lib/perfsonar/lib
 #GRAPHLIBPATH=/usr/lib/perfsonar/psconfig-web/lib
@@ -29,8 +29,8 @@ rpm:
 	admin pub
 
 admin:
-	rpmbuild -bs perfsonar-psconfig-web-admin.spec
-	rpmbuild -ba perfsonar-psconfig-web-admin.spec
+	rpmbuild -bs perfsonar-psconfig-web-admin-ui.spec
+	rpmbuild -ba perfsonar-psconfig-web-admin-ui.spec
 
 pub:
 	rpmbuild -bs perfsonar-psconfig-web-pub.spec

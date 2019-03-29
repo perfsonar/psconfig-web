@@ -1,7 +1,7 @@
 LICENSE
 MANIFEST
 Makefile
-perfsonar-psconfig-web-admin.spec
+perfsonar-psconfig-web-admin-ui.spec
 ui/README.md
 ui/apidoc/api_data.js
 ui/apidoc/api_data.json
