@@ -1,8 +1,9 @@
-%define install_base /usr/lib/perfsonar/psconfig-web-admin-ui
+%define install_base /usr/lib/perfsonar/psconfig-web-admin
 %define config_base %{install_base}/etc/pwa
 #%define config_base /etc/pwa
 
 # cron/apache entries are located in the 'etc' directory
+%define apache_base /etc/httpd/conf.d
 %define apacheconf pwa-admin.conf
 
 %define perfsonar_auto_version 4.1.6
@@ -17,12 +18,14 @@ Group:			Applications/Communications
 URL:			http://www.perfsonar.net
 Source0:		perfsonar-psconfig-web-admin-ui-%{version}.%{perfsonar_auto_relnum}.tar.gz
 BuildRoot:		%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildArch:		noarch
-Requires:       	nodejs
+#BuildArch:		noarch
+BuildArch:		x86_64
+Requires:       nodejs
 Requires:		httpd
+Requires:       mod_ssl
 # TODO: Make mongodb optional?
-Requires:       	mongodb-server 
-Requires:       	sqlite
+Requires:       mongodb-server 
+Requires:       sqlite
 
 %description
 The perfSONAR pSConfig Web Administrator package provides an authenticated, multi-user,
@@ -63,11 +66,15 @@ make ROOTPATH=%{buildroot}/%{install_base} CONFIGPATH=%{buildroot}/%{config_base
 #mkdir -p %{buildroot}/etc/shared
 mkdir -p %{buildroot}/etc/pwa/apache
 mkdir -p %{buildroot}/etc/pwa/shared
+mkdir -p %{buildroot}/%{install_base}/shared
 
+install -D -m 0644 etc/shared/*.js %{buildroot}/%{install_base}/shared
 
 install -D -m 0644 etc/index.js %{buildroot}/etc/pwa/index.js
 
-install -D -m 0644  etc/apache/pwa-admin.conf %{buildroot}/etc/pwa/apache
+install -D -m 0644  etc/apache/pwa-admin.conf %{buildroot}/%{apache_base}/pwa-admin.conf
+#install -D -m 0644  etc/apache/pwa-admin.conf %{buildroot}/etc/pwa/apache
+
 #install -D -m 0644 etc/apache/%{apacheconf} %{buildroot}/etc/apache/%{apacheconf}
 #install -D -m 0644 deploy/docker/pwa-sample-config/pwa/apache/%{apacheconf} %{buildroot}/etc/httpd/conf.d/%{apacheconf}
 
@@ -76,7 +83,8 @@ install -D -m 0644  etc/apache/pwa-admin.conf %{buildroot}/etc/pwa/apache
 install -D -m 0644 etc/shared/* %{buildroot}/etc/pwa/shared
 #install -D -m 0644 etc/shared/* %{buildroot}/etc
 
-rm -f %{buildroot}/%{install_base}/etc/pwa/%{apacheconf}
+rm -f %{buildroot}/etc/pwa/apache/%{apacheconf}
+#rm -f %{buildroot}/%{install_base}/etc/pwa/%{apacheconf}
 
 %clean
 rm -rf %{buildroot}
@@ -85,7 +93,8 @@ rm -rf %{buildroot}
 mkdir -p /var/log/perfsonar
 chown perfsonar:perfsonar /var/log/perfsonar
 chown -R perfsonar:perfsonar %{install_base}
-chown -R apache:apache %{install_base}/etc/apache
+#chown -R apache:apache %{install_base}/etc/apache
+chown -R apache:apache %{apache_base}
 
 service httpd restart &> /dev/null || :
 
@@ -94,10 +103,11 @@ service httpd restart &> /dev/null || :
 %license LICENSE
 %config /etc/pwa/index.js
 %config /etc/pwa/shared/*
-%config /etc/pwa/apache/pwa-admin.conf
+%config %{apache_base}/pwa-admin.conf
 #%config %{install_base}/deploy/*
 #%{install_base}/cgi-bin/*
 %{install_base}/ui/*
+%{install_base}/shared/*
 #%{install_base}/lib/perfSONAR_PS/*
 #/etc/httpd/conf.d/*
 #%config /etc/pwa/index.js
