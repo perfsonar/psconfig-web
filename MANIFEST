@@ -16538,3 +16538,4 @@ ui/node_modules/ui-select/src/common.css
 ui/node_modules/ui-select/src/.jshintrc
 ui/node_modules/ui-select/test/helpers.js
 ui/node_modules/ui-select/test/select.spec.js
+ui/dist/pwa-admin-ui-bundle.js

@@ -67,6 +67,7 @@ make ROOTPATH=%{buildroot}/%{install_base} CONFIGPATH=%{buildroot}/%{config_base
 mkdir -p %{buildroot}/etc/pwa/apache
 mkdir -p %{buildroot}/etc/pwa/shared
 mkdir -p %{buildroot}/%{install_base}/shared
+mkdir -p %{buildroot}/%{install_base}/dist
 
 install -D -m 0644 etc/shared/*.js %{buildroot}/%{install_base}/shared
 
@@ -107,6 +108,7 @@ service httpd restart &> /dev/null || :
 #%config %{install_base}/deploy/*
 #%{install_base}/cgi-bin/*
 %{install_base}/ui/*
+%{install_base}/ui/dist/*
 %{install_base}/shared/*
 #%{install_base}/lib/perfSONAR_PS/*
 #/etc/httpd/conf.d/*
