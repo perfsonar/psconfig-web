@@ -18,6 +18,13 @@ dist:
 	rm -rf /tmp/$(PACKAGE)-$(VERSION).$(RELEASE)
 	cp $(PACKAGE)-$(VERSION).$(RELEASE).tar.gz ~/rpmbuild/SOURCES/
 
+npm:
+	#cd ui; npm install --production
+	pushd ui; npm install --only=prod; popd
+
+webpack:
+	./ui/node_modules/webpack/bin/webpack.js ui/js/app.js -o ui/dist/pwa-admin-ui-bundle.js
+
 install:
 	mkdir -p ${ROOTPATH}
 	tar ch --exclude=etc/* --exclude=*spec --exclude=dependencies --exclude=MANIFEST --exclude=LICENSE --exclude=Makefile -T MANIFEST | tar x -C ${ROOTPATH}
@@ -39,6 +46,8 @@ pub:
 clean:
 	rm -f perfsonar-psconfig*.tar.gz
 	rm -rf ~/rpmbuild/RPMS/* ~/rpmbuild/BUILD/* ~/rpmbuild/BUILDROOT/* ~/rpmbuild/SOURCES/* ~/rpmbuild/SRPMS ~/rpmbuild/SPECS
+	rm -rf ui/node_modules
+	rm -f ui/dist/pwa-admin-ui-bundle.js
 
 # These tests will have to be done differently, since this project uses nodejs instead of perl
 
