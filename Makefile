@@ -20,6 +20,7 @@ dist:
 
 npm:
 	#cd ui; npm install --production
+	npm install --only=prod
 	pushd ui; npm install --only=prod; popd
 
 webpack:
@@ -46,6 +47,7 @@ pub:
 clean:
 	rm -f perfsonar-psconfig*.tar.gz
 	rm -rf ~/rpmbuild/RPMS/* ~/rpmbuild/BUILD/* ~/rpmbuild/BUILDROOT/* ~/rpmbuild/SOURCES/* ~/rpmbuild/SRPMS ~/rpmbuild/SPECS
+	#rm -rf node_modules
 	#rm -rf ui/node_modules
 	#rm -f ui/dist/pwa-admin-ui-bundle.js
 
