@@ -46,8 +46,8 @@ pub:
 clean:
 	rm -f perfsonar-psconfig*.tar.gz
 	rm -rf ~/rpmbuild/RPMS/* ~/rpmbuild/BUILD/* ~/rpmbuild/BUILDROOT/* ~/rpmbuild/SOURCES/* ~/rpmbuild/SRPMS ~/rpmbuild/SPECS
-	rm -rf ui/node_modules
-	rm -f ui/dist/pwa-admin-ui-bundle.js
+	#rm -rf ui/node_modules
+	#rm -f ui/dist/pwa-admin-ui-bundle.js
 
 # These tests will have to be done differently, since this project uses nodejs instead of perl
 

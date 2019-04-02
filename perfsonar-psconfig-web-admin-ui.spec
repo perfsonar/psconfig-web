@@ -68,6 +68,7 @@ mkdir -p %{buildroot}/etc/pwa/apache
 mkdir -p %{buildroot}/etc/pwa/shared
 mkdir -p %{buildroot}/%{install_base}/shared
 mkdir -p %{buildroot}/%{install_base}/dist
+mkdir -p %{buildroot}/%{install_base}/node_modules
 
 install -D -m 0644 etc/shared/*.js %{buildroot}/%{install_base}/shared
 
@@ -107,9 +108,22 @@ service httpd restart &> /dev/null || :
 %config %{apache_base}/pwa-admin.conf
 #%config %{install_base}/deploy/*
 #%{install_base}/cgi-bin/*
+%{install_base}/node_modules/*
 %{install_base}/ui/*
 %{install_base}/ui/dist/*
 %{install_base}/shared/*
+%{install_base}/api/*.js
+%{install_base}/api/admin/server.js
+%{install_base}/api/admin/controllers/*.js
+%{install_base}/api/models/*.js
+#%{install_base}/api/pub/*.js
+
+
+# TODO: temporarily moved from MANIFEST
+#api/pub/server.js
+#api/pub/controllers.js
+#api/pub/meshconfig.js
+
 #%{install_base}/lib/perfSONAR_PS/*
 #/etc/httpd/conf.d/*
 #%config /etc/pwa/index.js
