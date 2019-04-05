@@ -1,4 +1,5 @@
 PACKAGE=perfsonar-psconfig-web-admin-ui
+PUB_PACKAGE=perfsonar-psconfig-web-admin-publisher
 ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin-ui
 CONFIGPATH=${ROOTPATH}/etc
 #LIBPATH=/usr/lib/perfsonar/lib
@@ -12,11 +13,25 @@ default:
 	@echo No need to build the package. Just run \"make install\"
 
 dist:
+	make manifest
 	mkdir /tmp/$(PACKAGE)-$(VERSION).$(RELEASE)
-	tar ch -T MANIFEST | tar x -C /tmp/$(PACKAGE)-$(VERSION).$(RELEASE)
+	tar ch -T MANIFEST -T MANIFEST-node_modules | tar x -C /tmp/$(PACKAGE)-$(VERSION).$(RELEASE)
 	tar czf $(PACKAGE)-$(VERSION).$(RELEASE).tar.gz -C /tmp $(PACKAGE)-$(VERSION).$(RELEASE)
 	rm -rf /tmp/$(PACKAGE)-$(VERSION).$(RELEASE)
 	cp $(PACKAGE)-$(VERSION).$(RELEASE).tar.gz ~/rpmbuild/SOURCES/
+	## PUB PACKAGE
+	#mkdir /tmp/$(PUB_PACKAGE)-$(VERSION).$(RELEASE)
+	#tar ch -T MANIFEST_PUB | tar x -C /tmp/$(PUB_PACKAGE)-$(VERSION).$(RELEASE)
+	#tar czf $(PUB_PACKAGE)-$(VERSION).$(RELEASE).tar.gz -C /tmp $(PUB_PACKAGE)-$(VERSION).$(RELEASE)
+	#rm -rf /tmp/$(PUB_PACKAGE)-$(VERSION).$(RELEASE)
+	#cp $(PUB_PACKAGE)-$(VERSION).$(RELEASE).tar.gz ~/rpmbuild/SOURCES/
+
+manifest:
+	find node_modules -type f > MANIFEST-node_modules
+	# add UI node modules, ignoring a few large folders. optimize this later
+	find ui/node_modules -type f | grep -v bootswatch/docs | grep -v ace-builds >> MANIFEST-node_modules
+	# specifically include the minimized "ace" build
+	echo "node_modules/ace-builds/src-min-noconflict/ace.js" >> MANIFEST-node_modules
 
 npm:
 	#cd ui; npm install --production
@@ -33,6 +48,10 @@ install:
 	#sed -i 's:.RealBin/\.\./lib:${LIBPATH}:g' ${ROOTPATH}/cgi-bin/*
 	#sed -i 's:.RealBin/lib:${GRAPHLIBPATH}:g' ${ROOTPATH}/cgi-bin/*
 
+#	# PUB PACKAGE
+#	tar ch --exclude=etc/* --exclude=*spec --exclude=dependencies --exclude=MANIFEST_PUB --exclude=LICENSE --exclude=Makefile -T MANIFEST_PUB | tar x -C ${ROOTPATH}
+#	for i in `cat MANIFEST_PUB | grep ^etc/ | sed "s/^etc\///"`; do  mkdir -p `dirname $(CONFIGPATH)/$${i}`; if [ -e $(CONFIGPATH)/$${i} ]; then install -m 640 -c etc/$${i} $(CONFIGPATH)/$${i}.new; else install -m 640 -c etc/$${i} $(CONFIGPATH)/$${i}; fi; done
+#
 rpm:
 	admin pub
 
@@ -47,6 +66,7 @@ pub:
 clean:
 	rm -f perfsonar-psconfig*.tar.gz
 	rm -rf ~/rpmbuild/RPMS/* ~/rpmbuild/BUILD/* ~/rpmbuild/BUILDROOT/* ~/rpmbuild/SOURCES/* ~/rpmbuild/SRPMS ~/rpmbuild/SPECS
+	rm -f MANIFEST-node_modules
 	#rm -rf node_modules
 	#rm -rf ui/node_modules
 	#rm -f ui/dist/pwa-admin-ui-bundle.js
