@@ -1,5 +1,5 @@
 [Unit]
-Description=perfSONAR PWA API daemon
+Description=perfSONAR PWA LS Cache daemon
 After=network.target
 Wants=mongod.service
 
@@ -7,7 +7,7 @@ Wants=mongod.service
 User=perfsonar
 Environment=NODE_PATH=/usr/lib/perfsonar/psconfig-web-admin/shared/node_modules
 WorkingDirectory=/usr/lib/perfsonar/psconfig-web-admin
-ExecStart=/usr/bin/node api/pwaadmin.js
+ExecStart=/usr/bin/node api/pwacache.js
 Restart=on-failure
 
 
