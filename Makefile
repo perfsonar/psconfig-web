@@ -1,6 +1,8 @@
-PACKAGE=perfsonar-psconfig-web-admin-ui
+PACKAGE=perfsonar-psconfig-web-admin-shared
+UI_PACKAGE=perfsonar-psconfig-web-admin-ui
 PUB_PACKAGE=perfsonar-psconfig-web-admin-publisher
 ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin-ui
+UI_ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin-ui
 CONFIGPATH=${ROOTPATH}/etc
 #LIBPATH=/usr/lib/perfsonar/lib
 #GRAPHLIBPATH=/usr/lib/perfsonar/psconfig-web/lib
@@ -29,9 +31,9 @@ dist:
 manifest:
 	find node_modules -type f > MANIFEST-node_modules
 	# add UI node modules, ignoring a few large folders. optimize this later
-	find ui/node_modules -type f | grep -v bootswatch/docs | grep -v ace-builds >> MANIFEST-node_modules
+	find ui/node_modules -type f | grep -v bootswatch/docs | grep -v ace-builds > MANIFEST-ui-node_modules
 	# specifically include the minimized "ace" build
-	echo "node_modules/ace-builds/src-min-noconflict/ace.js" >> MANIFEST-node_modules
+	echo "ui/node_modules/ace-builds/src-min-noconflict/ace.js" >> MANIFEST-ui-node_modules
 
 npm:
 	#cd ui; npm install --production
@@ -53,20 +55,24 @@ install:
 #	for i in `cat MANIFEST_PUB | grep ^etc/ | sed "s/^etc\///"`; do  mkdir -p `dirname $(CONFIGPATH)/$${i}`; if [ -e $(CONFIGPATH)/$${i} ]; then install -m 640 -c etc/$${i} $(CONFIGPATH)/$${i}.new; else install -m 640 -c etc/$${i} $(CONFIGPATH)/$${i}; fi; done
 #
 rpm:
-	admin pub
+	shared admin pub
+
+shared:
+	rpmbuild -bs perfsonar-psconfig-web-admin-shared.spec
+	rpmbuild -ba perfsonar-psconfig-web-admin-shared.spec
 
 admin:
 	rpmbuild -bs perfsonar-psconfig-web-admin-ui.spec
 	rpmbuild -ba perfsonar-psconfig-web-admin-ui.spec
 
 pub:
-	rpmbuild -bs perfsonar-psconfig-web-pub.spec
-	rpmbuild -ba perfsonar-psconfig-web-pub.spec
+	rpmbuild -bs perfsonar-psconfig-web-admin-publisher.spec
+	rpmbuild -ba perfsonar-psconfig-web-admin-publisher.spec
 
 clean:
 	rm -f perfsonar-psconfig*.tar.gz
 	rm -rf ~/rpmbuild/RPMS/* ~/rpmbuild/BUILD/* ~/rpmbuild/BUILDROOT/* ~/rpmbuild/SOURCES/* ~/rpmbuild/SRPMS ~/rpmbuild/SPECS
-	rm -f MANIFEST-node_modules
+	#rm -f MANIFEST-node_modules
 	#rm -rf node_modules
 	#rm -rf ui/node_modules
 	#rm -f ui/dist/pwa-admin-ui-bundle.js

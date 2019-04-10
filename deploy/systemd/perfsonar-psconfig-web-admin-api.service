@@ -1,0 +1,16 @@
+[Unit]
+Description=perfSONAR PWA API daemon
+After=network.target
+#Wants=mongod.service
+
+[Service]
+User=perfsonar
+#Environment=REDIS_HOST=localhost
+Environment=NODE_PATH=/usr/lib/perfsonar/psconfig-web-admin/shared/node_modules
+WorkingDirectory=/usr/lib/perfsonar/psconfig-web-admin
+ExecStart=/usr/bin/node api/pwaadmin.js
+Restart=on-failure
+
+
+[Install]
+WantedBy=multi-user.target
