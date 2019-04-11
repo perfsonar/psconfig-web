@@ -498,18 +498,19 @@ exports._process_published_config = function( _config, opts, cb, format ) {
     async.eachSeries(_config.tests, function(test, next_test) {
         var type = test.mesh_type;
 
+        console.log("TEST\n\n" + JSON.stringify(test)) + "\n\n";
 
         if(!test.enabled) return next_test();
         async.parallel([
             function(next) {
                 //a group
                 if(!test.agroup) return next();
-                generate_group_members( test, test.agroup, test_service_types, type, host_groups, host_catalog, next, "a-" );
+                generate_group_members( test, test.agroup, test_service_types, type, {}, host_catalog, next, "a-" );
             },
             function(next) {
                 //b group
                 if(!test.bgroup) return next();
-                generate_group_members( test, test.bgroup, test_service_types, type, host_groups, host_catalog, next, "b-" );
+                generate_group_members( test, test.bgroup, test_service_types, type, {}, host_catalog, next, "b-" );
             },
             function(next) {
                 if(!test.nahosts) return next();

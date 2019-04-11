@@ -9,9 +9,10 @@ var publisher = require('../api/pub/meshconfig');
 fs = require('fs');
 
 var interimfiles = [];
-interimfiles.push( 'data/publisher1-multi-mas.json-interim' );
+//interimfiles.push( 'data/publisher1-multi-mas.json-expected' );
+interimfiles.push( 'publisher1-multi-mas.json-expected' );
 var testfiles = [];
-testfiles.push( 'data/publisher1-multi-mas.json' );
+testfiles.push( 'data/publisher1-multi-mas.json-interim' );
 
 
 function formatlog( obj ) {
@@ -21,7 +22,7 @@ function formatlog( obj ) {
 
 describe('publisher', function() {
     testfiles.forEach( function( testfile ) {
-        //console.log("TESTFILE", testfile);
+        console.log("TESTFILE", testfile);
 
         it( testfile + ' publish', function(done) {
             var sub = 1;
@@ -37,6 +38,8 @@ describe('publisher', function() {
                     tests: tests,
                     config_params: config_params
                 };
+
+                console.log("RESULTS !!!!\n", formatlog( results ) );
 
                 fs.writeFile(testfile_out, JSON.stringify( results ), function (err) {
                       if (err) {
@@ -74,8 +77,11 @@ describe('publisher', function() {
                 //console.log(data);
                 meshconfig = JSON.parse(data);
                 //console.error("meshconfig before\n", JSON.stringify( meshconfig, null, 3 ) );
-                publisher._process_published_config ( meshconfig, sub, cb, true );
-                //console.log("meshconfig after\n", JSON.stringify( meshconfig, null, 3 ) );
+                let opts = { 
+                    "format": "psconfig"
+                };
+                publisher._process_published_config ( meshconfig, opts, cb, "psconfig" );
+                console.log("meshconfig after\n", JSON.stringify( meshconfig, null, 3 ) );
             });
 
 
