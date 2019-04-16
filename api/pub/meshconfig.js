@@ -505,12 +505,12 @@ exports._process_published_config = function( _config, opts, cb, format ) {
             function(next) {
                 //a group
                 if(!test.agroup) return next();
-                generate_group_members( test, test.agroup, test_service_types, type, {}, host_catalog, next, "a-" );
+                generate_group_members( test, test.agroup, test_service_types, type, host_groups, host_catalog, next, "a-" );
             },
             function(next) {
                 //b group
                 if(!test.bgroup) return next();
-                generate_group_members( test, test.bgroup, test_service_types, type, {}, host_catalog, next, "b-" );
+                generate_group_members( test, test.bgroup, test_service_types, type, host_groups, host_catalog, next, "b-" );
             },
             function(next) {
                 if(!test.nahosts) return next();
@@ -982,8 +982,8 @@ exports._process_published_config = function( _config, opts, cb, format ) {
 
 exports.generate = function(_config, opts, cb) {
 
-    host_groups = {};
-    host_catalog = {};
+    //host_groups = {};
+    //host_catalog = {};
 
     return exports._process_published_config( _config, opts, cb );
 }
