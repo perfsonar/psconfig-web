@@ -65,7 +65,8 @@ install_pub:
 	for i in `cat MANIFEST-pub | grep ^etc/ | sed "s/^etc\///"`; do  mkdir -p `dirname $(PUB_CONFIGPATH)/$${i}`; if [ -e $(PUB_CONFIGPATH)/$${i} ]; then install -m 640 -c etc/$${i} $(PUB_CONFIGPATH)/$${i}.new; else install -m 640 -c etc/$${i} $(PUB_CONFIGPATH)/$${i}; fi; done
 	
 rpm:
-	admin pub
+	make admin
+	make pub
 
 shared:
 	rpmbuild -bs perfsonar-psconfig-web-admin-shared.spec
