@@ -1,4 +1,4 @@
-%define install_base /usr/lib/perfsonar/psconfig-web-admin
+%define install_base /usr/lib/perfsonar/psconfig-web-admin/pub
 %define config_base %{install_base}/etc/pwa
 #%define config_base /etc/pwa
 
@@ -16,7 +16,7 @@ Summary:		perfSONAR pSConfig Web Administrator: Publisher
 License:		ASL 2.0
 Group:			Applications/Communications
 URL:			http://www.perfsonar.net
-Source0:	    perfsonar-psconfig-web-admin-ui-%{version}.%{perfsonar_auto_relnum}.tar.gz
+Source0:	    perfsonar-psconfig-web-admin-publisher-%{version}.%{perfsonar_auto_relnum}.tar.gz
 #Source0:		perfsonar-psconfig-web-admin-publisher-%{version}.%{perfsonar_auto_relnum}.tar.gz
 BuildRoot:		%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 #BuildArch:		noarch
@@ -36,7 +36,7 @@ publishing Configs and host autoconfigs in pSConfig or MeshConfig formats
 /usr/sbin/useradd -g perfsonar -r -s /sbin/nologin -c "perfSONAR User" -d /tmp perfsonar 2> /dev/null || :
 
 %prep
-%setup -q -n perfsonar-psconfig-web-admin-ui-%{version}.%{perfsonar_auto_relnum}
+%setup -q -n perfsonar-psconfig-web-admin-publisher-%{version}.%{perfsonar_auto_relnum}
 #%setup -q -n perfsonar-psconfig-web-admin-publisher-%{version}.%{perfsonar_auto_relnum}
 
 %build
@@ -60,20 +60,24 @@ rm -rf %{buildroot}
 #deploy/docker/pwa-sample-config/scripts
 
 
-make ROOTPATH=%{buildroot}/%{install_base} CONFIGPATH=%{buildroot}/%{config_base} install
+mkdir -p %{buildroot}/%{install_base}/api/pub
 
-#mkdir -p %{buildroot}/etc/httpd/conf.d
+make PUB_ROOTPATH=%{buildroot}/%{install_base} PUB_CONFIGPATH=%{buildroot}/%{config_base} install_pub
+
+mkdir -p %{buildroot}/etc/httpd/conf.d
 #mkdir -p %{buildroot}/etc/apache
 #mkdir -p %{buildroot}/etc/shared
 mkdir -p %{buildroot}/etc/pwa/apache
-mkdir -p %{buildroot}/etc/pwa/shared
-mkdir -p %{buildroot}/%{install_base}/shared
-mkdir -p %{buildroot}/%{install_base}/dist
-mkdir -p %{buildroot}/%{install_base}/node_modules
+#mkdir -p %{buildroot}/etc/pwa/shared
+#mkdir -p %{buildroot}/%{install_base}/shared
+#mkdir -p %{buildroot}/%{install_base}/dist
+#mkdir -p %{buildroot}/%{install_base}/node_modules
 
-install -D -m 0644 etc/shared/*.js %{buildroot}/%{install_base}/shared
+#install -D -m 0644 etc/shared/*.js %{buildroot}/%{install_base}/shared
 
-install -D -m 0644 etc/index.js %{buildroot}/etc/pwa/index.js
+#install -D -m 0644 etc/index.js %{buildroot}/etc/pwa/index.js
+
+install -D -m 0644 api/pub/*.js %{buildroot}/%{install_base}/api/pub
 
 install -D -m 0644  etc/apache/pwa-pub.conf %{buildroot}/%{apache_base}/pwa-pub.conf
 #install -D -m 0644  etc/apache/pwa-admin.conf %{buildroot}/etc/pwa/apache
@@ -83,7 +87,7 @@ install -D -m 0644  etc/apache/pwa-pub.conf %{buildroot}/%{apache_base}/pwa-pub.
 
 #install -D -m 0644 deploy/docker/pwa-sample-config/pwa/apache/* %{buildroot}/etc
 #install -D -m 0644 deploy/docker/pwa-sample-config/pwa/auth/* %{buildroot}/etc
-install -D -m 0644 etc/shared/* %{buildroot}/etc/pwa/shared
+#install -D -m 0644 etc/shared/* %{buildroot}/etc/pwa/shared
 #install -D -m 0644 etc/shared/* %{buildroot}/etc
 
 rm -f %{buildroot}/etc/pwa/apache/%{apacheconf}
@@ -109,9 +113,9 @@ service httpd restart &> /dev/null || :
 %config %{apache_base}/pwa-pub.conf
 #%config %{install_base}/deploy/*
 #%{install_base}/cgi-bin/*
-%{install_base}/node_modules/*
+#%{install_base}/node_modules/*
 %{install_base}/api/*.js
-%{install_base}/api/models/*.js
+%{install_base}/api/models/index.js
 %{install_base}/api/pub/*.js
 
 

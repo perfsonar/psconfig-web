@@ -1,4 +1,4 @@
-%define install_base /usr/lib/perfsonar/psconfig-web-admin
+%define install_base /usr/lib/perfsonar/psconfig-web-admin/ui
 %define config_base %{install_base}/etc/pwa
 #%define config_base /etc/pwa
 
@@ -78,6 +78,9 @@ install -D -m 0644 etc/shared/*.js %{buildroot}/%{install_base}/shared
 install -D -m 0644 etc/index.js %{buildroot}/etc/pwa/index.js
 
 install -D -m 0644  etc/apache/pwa-admin.conf %{buildroot}/%{apache_base}/pwa-admin.conf
+
+install -D -m 0644  ui/dist/pwa-admin-ui-bundle.js %{buildroot}/%{install_base}/ui/dist/pwa-admin-ui-bundle.js
+
 #install -D -m 0644  etc/apache/pwa-admin.conf %{buildroot}/etc/pwa/apache
 
 #install -D -m 0644 etc/apache/%{apacheconf} %{buildroot}/etc/apache/%{apacheconf}
@@ -111,14 +114,14 @@ service httpd restart &> /dev/null || :
 %config %{apache_base}/pwa-admin.conf
 #%config %{install_base}/deploy/*
 #%{install_base}/cgi-bin/*
-%{install_base}/node_modules/*
-%{install_base}/ui/*
-%{install_base}/ui/dist/*
-%{install_base}/shared/*
-%{install_base}/api/*.js
-%{install_base}/api/admin/server.js
-%{install_base}/api/admin/controllers/*.js
-%{install_base}/api/models/*.js
+#%{install_base}/node_modules/*
+%{install_base}/*
+#%{install_base}/dist/pwa-admin-ui-bundle.js
+#%{install_base}/shared/*
+#%{install_base}/api/*.js
+#%{install_base}/api/admin/server.js
+#%{install_base}/api/admin/controllers/*.js
+#%{install_base}/api/models/*.js
 #%{install_base}/api/pub/*.js
 
 

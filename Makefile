@@ -3,7 +3,9 @@ UI_PACKAGE=perfsonar-psconfig-web-admin-ui
 PUB_PACKAGE=perfsonar-psconfig-web-admin-publisher
 ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin-ui
 UI_ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin-ui
+PUB_ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin/pub
 CONFIGPATH=${ROOTPATH}/etc
+PUB_CONFIGPATH=${PUB_ROOTPATH}/etc
 #LIBPATH=/usr/lib/perfsonar/lib
 #GRAPHLIBPATH=/usr/lib/perfsonar/psconfig-web/lib
 PERFSONAR_AUTO_VERSION=4.1.6
@@ -15,18 +17,24 @@ default:
 	@echo No need to build the package. Just run \"make install\"
 
 dist:
-	make manifest
+	#make manifest
 	mkdir /tmp/$(PACKAGE)-$(VERSION).$(RELEASE)
 	tar ch -T MANIFEST -T MANIFEST-node_modules | tar x -C /tmp/$(PACKAGE)-$(VERSION).$(RELEASE)
 	tar czf $(PACKAGE)-$(VERSION).$(RELEASE).tar.gz -C /tmp $(PACKAGE)-$(VERSION).$(RELEASE)
 	rm -rf /tmp/$(PACKAGE)-$(VERSION).$(RELEASE)
 	cp $(PACKAGE)-$(VERSION).$(RELEASE).tar.gz ~/rpmbuild/SOURCES/
+	## UI Package
+	mkdir /tmp/$(UI_PACKAGE)-$(VERSION).$(RELEASE)
+	tar ch -T MANIFEST-ui -T MANIFEST-ui-node_modules | tar x -C /tmp/$(UI_PACKAGE)-$(VERSION).$(RELEASE)
+	tar czf $(UI_PACKAGE)-$(VERSION).$(RELEASE).tar.gz -C /tmp $(UI_PACKAGE)-$(VERSION).$(RELEASE)
+	rm -rf /tmp/$(UI_PACKAGE)-$(VERSION).$(RELEASE)
+	cp $(UI_PACKAGE)-$(VERSION).$(RELEASE).tar.gz ~/rpmbuild/SOURCES/
 	## PUB PACKAGE
-	#mkdir /tmp/$(PUB_PACKAGE)-$(VERSION).$(RELEASE)
-	#tar ch -T MANIFEST_PUB | tar x -C /tmp/$(PUB_PACKAGE)-$(VERSION).$(RELEASE)
-	#tar czf $(PUB_PACKAGE)-$(VERSION).$(RELEASE).tar.gz -C /tmp $(PUB_PACKAGE)-$(VERSION).$(RELEASE)
-	#rm -rf /tmp/$(PUB_PACKAGE)-$(VERSION).$(RELEASE)
-	#cp $(PUB_PACKAGE)-$(VERSION).$(RELEASE).tar.gz ~/rpmbuild/SOURCES/
+	mkdir /tmp/$(PUB_PACKAGE)-$(VERSION).$(RELEASE)
+	tar ch -T MANIFEST-pub | tar x -C /tmp/$(PUB_PACKAGE)-$(VERSION).$(RELEASE)
+	tar czf $(PUB_PACKAGE)-$(VERSION).$(RELEASE).tar.gz -C /tmp $(PUB_PACKAGE)-$(VERSION).$(RELEASE)
+	rm -rf /tmp/$(PUB_PACKAGE)-$(VERSION).$(RELEASE)
+	cp $(PUB_PACKAGE)-$(VERSION).$(RELEASE).tar.gz ~/rpmbuild/SOURCES/
 
 manifest:
 	find node_modules -type f > MANIFEST-node_modules
@@ -51,11 +59,13 @@ install:
 	#sed -i 's:.RealBin/lib:${GRAPHLIBPATH}:g' ${ROOTPATH}/cgi-bin/*
 
 #	# PUB PACKAGE
-#	tar ch --exclude=etc/* --exclude=*spec --exclude=dependencies --exclude=MANIFEST_PUB --exclude=LICENSE --exclude=Makefile -T MANIFEST_PUB | tar x -C ${ROOTPATH}
-#	for i in `cat MANIFEST_PUB | grep ^etc/ | sed "s/^etc\///"`; do  mkdir -p `dirname $(CONFIGPATH)/$${i}`; if [ -e $(CONFIGPATH)/$${i} ]; then install -m 640 -c etc/$${i} $(CONFIGPATH)/$${i}.new; else install -m 640 -c etc/$${i} $(CONFIGPATH)/$${i}; fi; done
-#
+install_pub:
+	#mkdir -p ${PUB_ROOTPATH}
+	tar ch --exclude=etc/* --exclude=*spec --exclude=dependencies --exclude=MANIFEST-pub --exclude=LICENSE --exclude=Makefile -T MANIFEST-pub | tar x -C ${PUB_ROOTPATH}
+	for i in `cat MANIFEST-pub | grep ^etc/ | sed "s/^etc\///"`; do  mkdir -p `dirname $(PUB_CONFIGPATH)/$${i}`; if [ -e $(PUB_CONFIGPATH)/$${i} ]; then install -m 640 -c etc/$${i} $(PUB_CONFIGPATH)/$${i}.new; else install -m 640 -c etc/$${i} $(PUB_CONFIGPATH)/$${i}; fi; done
+	
 rpm:
-	shared admin pub
+	admin pub
 
 shared:
 	rpmbuild -bs perfsonar-psconfig-web-admin-shared.spec
