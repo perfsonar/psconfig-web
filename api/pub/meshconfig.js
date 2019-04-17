@@ -410,7 +410,7 @@ function get_test_service_type( test ) {
 
 }
 
-function generate_group_members( test, group, test_service_types, type, host_groups, host_catalog, next, addr_prefix ) {
+function generate_group_members( test, group, test_service_types, type, next, addr_prefix ) {
 
     console.log("GROUP", group);
 
@@ -423,6 +423,7 @@ function generate_group_members( test, group, test_service_types, type, host_gro
     var group_prefix = addr_prefix.replace("-", "");
     if ( group_prefix == "" ) group_prefix = "a";
     var group_field = group_prefix + "group";
+
     resolve_hostgroup(group, test_service_types, function(err, hosts) {
         var addr = addr_prefix + "addresses";
         if ( ! ( test.name in host_groups ) ) {
@@ -477,7 +478,7 @@ function generate_group_members( test, group, test_service_types, type, host_gro
 };
 
 
-exports._process_published_config = function( _config, opts, cb, format ) {
+exports._process_published_config = function( _config, opts, cb ) {
     var format = opts.format;
 
 
@@ -493,7 +494,7 @@ exports._process_published_config = function( _config, opts, cb, format ) {
     });
 
     var test_service_types = Object.keys(service_type_obj).map(e => service_type_obj[e]);
-    
+
 
     async.eachSeries(_config.tests, function(test, next_test) {
         var type = test.mesh_type;
@@ -505,12 +506,12 @@ exports._process_published_config = function( _config, opts, cb, format ) {
             function(next) {
                 //a group
                 if(!test.agroup) return next();
-                generate_group_members( test, test.agroup, test_service_types, type, host_groups, host_catalog, next, "a-" );
+                generate_group_members( test, test.agroup, test_service_types, type, next, "a-" );
             },
             function(next) {
                 //b group
                 if(!test.bgroup) return next();
-                generate_group_members( test, test.bgroup, test_service_types, type, host_groups, host_catalog, next, "b-" );
+                generate_group_members( test, test.bgroup, test_service_types, type, next, "b-" );
             },
             function(next) {
                 if(!test.nahosts) return next();
