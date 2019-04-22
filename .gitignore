@@ -3,9 +3,11 @@ barn
 api/config
 api/debug
 **/*.log
+npm-debug.*
 deploy/docker/config
 ui/config.js
 ui/node_modules
+.*.swn
 .*.swo
 .*.swp
 api/config.js

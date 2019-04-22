@@ -938,7 +938,7 @@ exports._process_published_config = function( _config, opts, cb ) {
 
             }
 
-           add_bwctl_tools( psc_tasks[ name ] ); 
+            add_bwctl_tools( psc_tasks[ name ] );
 
             var parameters = test.testspec.specs;
 
@@ -983,8 +983,8 @@ exports._process_published_config = function( _config, opts, cb ) {
 
 exports.generate = function(_config, opts, cb) {
 
-    //host_groups = {};
-    //host_catalog = {};
+    host_groups = {};
+    host_catalog = {};
 
     return exports._process_published_config( _config, opts, cb );
 }
