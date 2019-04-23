@@ -30,6 +30,7 @@ var profile_cache_date = null;
 
 var host_catalog = {};
 var host_groups = {};
+var host_groups_details = {};
 
 function load_profile(cb) {
     logger.info("reloading profiles");
@@ -91,9 +92,7 @@ function convert_tool( tool ) {
 function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules ) {
     //var spec = testspec.specs;
     var test = psc_tests[ name ];
-    console.log("testspec", testspec);
     var ps_spec = psc_tests[ name ].spec;
-    console.log("ps_spec", ps_spec);
     var spec = ps_spec;
     var service_types = {
         "bwctl": "throughput",
@@ -114,9 +113,6 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
         interval_seconds = testspec["test-interval"];
     }
 
-    console.log("testspec", testspec);
-    console.log("ps_spec", ps_spec);
-
     // this array is a list of fields we will convert from seconds to iso8601
     var iso_fields = [
         "duration",
@@ -136,7 +132,6 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
     }
 
-        console.log("interval spec before deleting spec", spec);
     if ( spec && "interval" in spec ) { 
         rename_field( spec, "interval", "test-interval" );
         delete spec.interval;
@@ -312,9 +307,16 @@ function resolve_hosts(hostgroup, cb) {
 }
 
 function resolve_hostgroup(id, test_service_types, cb) {
+    console.log(" GROUP 'ID' ", id);
+    console.log(" TYPEOF GROUP ID ", id.length);
+    console.log(" GROUP LENGTH", id.length);
+    // check for object id id ( skip if so)
+    var id_is_object = (typeof id.length != "undefined");
+    console.log("id_is_object", id_is_object);
+    if ( id_is_object ) return cb("Invalid id" , id);
+    // TODO: fix empty schedules!!
     db.Hostgroup.findById(id).exec(function(err, hostgroup) {
         if(err) return cb(err);
-        console.log("hostgroup id", id);
         if(!hostgroup) return cb("can't find hostgroup:"+id);
         //hosts will contain hostid for both static and dynamic (cached by pwacache)
         hostgroup.test_service_types = test_service_types;
@@ -328,7 +330,6 @@ function resolve_hostgroup(id, test_service_types, cb) {
 function generate_members(hosts) {
     var members = [];
     if ( Array.isArray( hosts ) ) {
-    console.log("hosts", hosts);
         hosts.forEach(function(host) {
             members.push(host.hostname);
         });
@@ -412,8 +413,6 @@ function get_test_service_type( test ) {
 
 function generate_group_members( test, group, test_service_types, type, next, addr_prefix ) {
 
-    console.log("GROUP", group);
-
     var test_service_type = get_test_service_type( test );
     //test_service_types.push( test_service_type );
 
@@ -426,13 +425,13 @@ function generate_group_members( test, group, test_service_types, type, next, ad
 
     resolve_hostgroup(group, test_service_types, function(err, hosts) {
         var addr = addr_prefix + "addresses";
-        if ( ! ( test.name in host_groups ) ) {
-            host_groups[ test.name ] = {
+        if ( ! ( test.name in host_groups_details ) ) {
+            host_groups_details[ test.name ] = {
                 "type": type
             };
         }
-        if ( ! ( addr in host_groups[ test.name ] ) ) {
-            host_groups[ test.name ][ addr ] = [];
+        if ( ! ( addr in host_groups_details[ test.name ] ) ) {
+            host_groups_details[ test.name ][ addr ] = [];
         }
 
 
@@ -447,14 +446,13 @@ function generate_group_members( test, group, test_service_types, type, next, ad
         if(err) return next(err);
         test[ group_field ] = hosts;
         hosts.forEach(function(host) {
-            console.log("SETTING HOST", host);
             host_catalog[host._id] = host;
             var host_addr;
             if ( host.hostname ) {
                 host_addr = host.hostname;
 
-                if ( ! host_groups[ test.name ][ addr ].find(o => o.name == host_addr) ) {
-                    host_groups[ test.name ][ addr ].push(
+                if ( ! host_groups_details[ test.name ][ addr ].find(o => o.name == host_addr) ) {
+                    host_groups_details[ test.name ][ addr ].push(
                         { "name": host.hostname }
                         );
 
@@ -462,8 +460,8 @@ function generate_group_members( test, group, test_service_types, type, next, ad
             } else {
                 host.addresses.forEach( function( address ) {
                     host_addr = address.address;
-                if ( ! host_groups[ test.name ][ addr ].find(o => o.name == host_addr) ) {
-                    host_groups[ test.name ][ addr ].push(
+                if ( ! host_groups_details[ test.name ][ addr ].find(o => o.name == host_addr) ) {
+                    host_groups_details[ test.name ][ addr ].push(
                         { "name": host_addr }
                         );
                 }
@@ -482,8 +480,6 @@ exports._process_published_config = function( _config, opts, cb ) {
     var format = opts.format;
 
 
-    console.log("!!!!CONFIG", _config);
-
     //resolve all db entries first
     if(_config.admins) _config.admins = resolve_users(_config.admins);
 
@@ -497,9 +493,10 @@ exports._process_published_config = function( _config, opts, cb ) {
 
 
     async.eachSeries(_config.tests, function(test, next_test) {
-        var type = test.mesh_type;
 
-        console.log("TEST\n\n" + JSON.stringify(test)) + "\n\n";
+
+        console.log("TEST BEFORE ", test);
+        var type = test.mesh_type;
 
         if(!test.enabled) return next_test();
         async.parallel([
@@ -519,7 +516,6 @@ exports._process_published_config = function( _config, opts, cb ) {
                     if(err) return next(err);
                     test.nahosts = hosts;
                     hosts.forEach(function(host) { 
-                        //console.log("SETTING CATALOG ONE HOST", host);
                         host_catalog[host._id] = host; 
                     });
                     next();
@@ -529,7 +525,6 @@ exports._process_published_config = function( _config, opts, cb ) {
                 //testspec
                 if(!test.testspec) return next();
                 resolve_testspec(test.testspec, function(err, row) {
-                    console.log("UPDATEING TETSPEDC", row);
                     if(err) return next(err);
                     test.testspec = row;
 
@@ -608,6 +603,11 @@ exports._process_published_config = function( _config, opts, cb ) {
         var psc_schedules = {};
         var psc_tasks = {};
         var psc_hosts = {};
+
+        // TODO: figure out why we have extraneous/missing hostgroups (_config.host_group)
+        console.log("_config.tests", _config.tests);
+        //console.log("host_groups", host_groups);
+        console.log("host_groups_details", host_groups_details);
 
         _config.tests.forEach(function(test) {
             var service = test.service_type;
@@ -841,7 +841,7 @@ exports._process_published_config = function( _config, opts, cb ) {
 
         psconfig.archives = psc_archives;
         psconfig.addresses = psc_addresses;
-        psconfig.groups = host_groups;
+        psconfig.groups = host_groups_details;
         //psconfig.groups = psc_groups;
         mc.organizations.push(org);
         if ( config_mas.length > 0 ) {
@@ -849,9 +849,6 @@ exports._process_published_config = function( _config, opts, cb ) {
         } else {
             delete mc.measurement_archives;
         }
-
-            
-//console.log("TESTS", _config.tests);
 
 
         //now the most interesting part..
@@ -877,7 +874,6 @@ exports._process_published_config = function( _config, opts, cb ) {
                 });
             }
 
-            //console.log("TEST", test);
 
             var name = test.name;
             var testspec = test.testspec;
@@ -897,7 +893,6 @@ exports._process_published_config = function( _config, opts, cb ) {
 
 
             if ( format == "psconfig" ) {
-                console.log("psc_tests", psc_tests);
                 psc_tests[ name ].spec.source = "{% address[0] %}";
                 psc_tests[ name ].spec.dest = "{% address[1] %}";
                 meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules );
@@ -915,6 +910,8 @@ exports._process_published_config = function( _config, opts, cb ) {
 
             delete current_test.schedule_type;
             delete current_test.spec["test-interval"];
+
+            console.log("TEST!!!", test);
 
             psc_tasks[ name ] = {
                 "group": test._meta._hostgroup,
@@ -984,6 +981,7 @@ exports._process_published_config = function( _config, opts, cb ) {
 exports.generate = function(_config, opts, cb) {
 
     host_groups = {};
+    host_groups_details = {};
     host_catalog = {};
 
     return exports._process_published_config( _config, opts, cb );
