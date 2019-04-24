@@ -24,11 +24,13 @@ const bwctl_tool_lookup = { // TODO: Remove bwctl hack
 };
 
 //catalog of all hosts referenced in member groups keyed by _id
-var host_catalog = {};
-var host_groups = {};
 
 var profile_cache = null;
 var profile_cache_date = null;
+
+var host_catalog = {};
+var host_groups = {};
+var host_groups_details = {};
 
 function load_profile(cb) {
     logger.info("reloading profiles");
@@ -87,10 +89,11 @@ function convert_tool( tool ) {
 
 }
 
-function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules ) {
-    var spec = testspec.specs;
+function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules ) {
+    //var spec = testspec.specs;
     var test = psc_tests[ name ];
-    var testspec = psc_tests[ name ].spec;
+    var ps_spec = psc_tests[ name ].spec;
+    var spec = ps_spec;
     var service_types = {
         "bwctl": "throughput",
         "owamp": "latencybg",
@@ -129,8 +132,10 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
     }
 
-    rename_field( spec, "interval", "test-interval" );
-    delete spec.interval;
+    if ( spec && "interval" in spec ) { 
+        rename_field( spec, "interval", "test-interval" );
+        delete spec.interval;
+    }
     rename_field( spec, "sample-count", "packet-count" );
     rename_field( spec, "udp-bandwidth", "bandwidth" ); // TODO: remove backwards compat hack
     rename_field( spec, "waittime", "sendwait" );
@@ -165,21 +170,20 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
     }
 
 
-
-    if ( "test-interval" in testspec ) {
-        var interval = testspec[ "test-interval" ];
+    if ( "test-interval" in spec ) {
+        var interval = spec[ "test-interval" ];
         var interval_name = "repeat-" + interval;
-        psc_schedules[ interval_name ] = {
+        schedules[ interval_name ] = {
             "repeat": interval,
             "sliprand": true
         };
 
         // "slip"
         // convert slip from random_start_percentage
-        if ( "random-start-percentage" in testspec && interval_seconds) {
-            var slip = testspec["random-start-percentage"] * interval_seconds / 100;
+        if ( "random-start-percentage" in spec && interval_seconds) {
+            var slip = spec["random-start-percentage"] * interval_seconds / 100;
             slip = seconds_to_iso8601( slip );
-            psc_schedules[ interval_name ].slip = slip;
+            schedules[ interval_name ].slip = slip;
 
         }
 
@@ -191,27 +195,27 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
 
     // rename protocol: udp to udp: true
-    if ( ( "protocol" in testspec ) && testspec.protocol == "udp" ) {
-        testspec.udp = true;
+    if ( ( "protocol" in spec ) && spec.protocol == "udp" ) {
+        spec.udp = true;
     }
-    delete testspec.protocol;
+    delete spec.protocol;
 
 
     // handle newer "ipversion" format
     // old: ipv4-only, ipv6-only
     // new: ip-version: 4, 6
-    if ("ipv4-only" in testspec ) {
-        testspec["ip-version"] = 4;
-        delete testspec["ipv4-only"];
+    if ("ipv4-only" in spec ) {
+        spec["ip-version"] = 4;
+        delete spec["ipv4-only"];
     }
-    if ("ipv6-only" in testspec ) {
-        testspec["ip-version"] = 6;
+    if ("ipv6-only" in spec ) {
+        spec["ip-version"] = 6;
         delete testspec["ipv6-only"];
     }
 
-    if ( "report-interval" in testspec ) {
-        rename_field( testspec, "report-interval", "interval" );
-        delete testspec["report-interval"];
+    if ( "report-interval" in spec ) {
+        rename_field( spec, "report-interval", "interval" );
+        delete spec["report-interval"];
 
     }
 
@@ -230,6 +234,9 @@ function rename_underscores_to_dashes( obj ) {
 }
 
 function rename_field( obj, oldname, newname ) {
+    if ( typeof obj == "undefined" ) {
+        return;
+    }
     if ( oldname in obj ) {
         obj[ newname ] = obj[ oldname ];
         delete obj[ oldname ];
@@ -313,9 +320,11 @@ function resolve_hostgroup(id, test_service_types, cb) {
 
 function generate_members(hosts) {
     var members = [];
-    hosts.forEach(function(host) {
-        members.push(host.hostname);
-    });
+    if ( Array.isArray( hosts ) ) {
+        hosts.forEach(function(host) {
+            members.push(host.hostname);
+        });
+    }
     return members;
 }
 
@@ -344,7 +353,7 @@ function generate_mainfo(service, format) {
             case "bwctl": type = "perfsonarbuoy/bwctl"; break;
             case "owamp": type = "perfsonarbuoy/owamp"; break;
             default:
-                          type = service.type;
+                type = service.type;
         }
     } else {
         type = service.type;
@@ -393,7 +402,7 @@ function get_test_service_type( test ) {
 
 }
 
-function generate_group_members( test, group, test_service_types, type, host_groups, host_catalog, next, addr_prefix ) {
+function generate_group_members( test, group, test_service_types, type, next, addr_prefix ) {
 
     var test_service_type = get_test_service_type( test );
     //test_service_types.push( test_service_type );
@@ -404,20 +413,22 @@ function generate_group_members( test, group, test_service_types, type, host_gro
     var group_prefix = addr_prefix.replace("-", "");
     if ( group_prefix == "" ) group_prefix = "a";
     var group_field = group_prefix + "group";
+
     resolve_hostgroup(group, test_service_types, function(err, hosts) {
         var addr = addr_prefix + "addresses";
-        if ( ! ( test.name in host_groups ) ) {
-            host_groups[ test.name ] = {
+        if ( ! ( test.name in host_groups_details ) ) {
+            host_groups_details[ test.name ] = {
                 "type": type
             };
         }
-        if ( ! ( addr in host_groups[ test.name ] ) ) {
-            host_groups[ test.name ][ addr ] = [];
+        if ( ! ( addr in host_groups_details[ test.name ] ) ) {
+            host_groups_details[ test.name ][ addr ] = [];
         }
 
 
         set_test_meta( test, "_hostgroup", test.name );
-        set_test_meta( test, "_test", test.name );
+        //set_test_meta( test, "_hostgroup", host_groups[ test.name ] );
+        set_test_meta( test, "_test",  test.name );
 
         if ( ( "testspec" in test ) && ("specs" in test.testspec ) && ( "tool" in test.testspec.specs ) ) {
             set_test_meta( test, "_tool", convert_tool( test.testspec.specs.tool ));
@@ -431,8 +442,8 @@ function generate_group_members( test, group, test_service_types, type, host_gro
             if ( host.hostname ) {
                 host_addr = host.hostname;
 
-                if ( ! host_groups[ test.name ][ addr ].find(o => o.name == host_addr) ) {
-                    host_groups[ test.name ][ addr ].push(
+                if ( ! host_groups_details[ test.name ][ addr ].find(o => o.name == host_addr) ) {
+                    host_groups_details[ test.name ][ addr ].push(
                         { "name": host.hostname }
                         );
 
@@ -440,8 +451,8 @@ function generate_group_members( test, group, test_service_types, type, host_gro
             } else {
                 host.addresses.forEach( function( address ) {
                     host_addr = address.address;
-                if ( ! host_groups[ test.name ][ addr ].find(o => o.name == host_addr) ) {
-                    host_groups[ test.name ][ addr ].push(
+                if ( ! host_groups_details[ test.name ][ addr ].find(o => o.name == host_addr) ) {
+                    host_groups_details[ test.name ][ addr ].push(
                         { "name": host_addr }
                         );
                 }
@@ -455,7 +466,78 @@ function generate_group_members( test, group, test_service_types, type, host_gro
 
 };
 
-exports._process_published_config = function( _config, opts, cb, format, test_service_types ) {
+
+exports._process_published_config = function( _config, opts, cb ) {
+    var format = opts.format;
+
+
+    //resolve all db entries first
+    if(_config.admins) _config.admins = resolve_users(_config.admins);
+
+    var service_type_obj = {};
+    _config.tests.forEach( function( tmptest ) {
+        service_type_obj[ tmptest.service_type ] = get_test_service_type( tmptest );
+
+    });
+
+    var test_service_types = Object.keys(service_type_obj).map(e => service_type_obj[e]);
+
+
+    async.eachSeries(_config.tests, function(test, next_test) {
+
+
+        var type = test.mesh_type;
+
+        if(!test.enabled) return next_test();
+        async.parallel([
+            function(next) {
+                //a group
+                if(!test.agroup) return next();
+                generate_group_members( test, test.agroup, test_service_types, type, next, "a-" );
+            },
+            function(next) {
+                //b group
+                if(!test.bgroup) return next();
+                generate_group_members( test, test.bgroup, test_service_types, type, next, "b-" );
+            },
+            function(next) {
+                if(!test.nahosts) return next();
+                resolve_hosts(test.nahosts, function(err, hosts) {
+                    if(err) return next(err);
+                    test.nahosts = hosts;
+                    hosts.forEach(function(host) { 
+                        host_catalog[host._id] = host; 
+                    });
+                    next();
+                });
+            },
+            function(next) {
+                //testspec
+                if(!test.testspec) return next();
+                resolve_testspec(test.testspec, function(err, row) {
+                    if(err) return next(err);
+                    test.testspec = row;
+
+                    //suppress testspecs that does't meet min host version
+                    if(!_config._host_version) return next();
+                    var hostv = parseInt(_config._host_version[0]);
+                    var minver = config.meshconfig.minver[test.service_type];
+                    for(var k in test.testspec.specs) {
+                        //if minver is set for this testspec, make sure host version meets it
+                        if(minver[k]) {
+                            if(hostv < minver[k]) delete test.testspec.specs[k]; 
+                        }
+                    }
+                    next();
+                });
+            },
+        ], next_test);
+    }, function(err) {
+        if(err) return logger.error(err);
+
+        //return exports._process_published_config( _config, opts, cb, format, test_service_types );
+        //return exports._process_published_config( _config, opts, cb );
+
 
         //meshconfig root template
         var mc = {
@@ -512,6 +594,7 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
         var psc_tasks = {};
         var psc_hosts = {};
 
+
         _config.tests.forEach(function(test) {
             var service = test.service_type;
             //var maInfo = generate_mainfo(service, format);
@@ -525,7 +608,7 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
 
         //register sites(hosts)
         for(var id in host_catalog) {
-        var extra_mas = {};
+            var extra_mas = {};
             var _host = host_catalog[id];
             var toolkit_url = _host.toolkit_url || "auto";
             var host = {
@@ -550,7 +633,7 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
                 "address":  _host.hostname,
                 "host": _host.hostname,
                 "_meta": {
-                    "display-name": _host.desc||_host.sitename,
+                    "display-name": _host.desc || _host.sitename,
                     "display-url": toolkit_url
                     // TODO: add org?
                     //"organization": _host.org
@@ -558,7 +641,6 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
                 }
             };
             if ( ! ( _host.hostname in psc_hosts) ) psc_hosts[ _host.hostname ]  = {};
-
 
             if ( "ma_urls" in _host && _host.ma_urls.length > 0  ) {
                 for(var i in _host.ma_urls ) {
@@ -744,7 +826,7 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
 
         psconfig.archives = psc_archives;
         psconfig.addresses = psc_addresses;
-        psconfig.groups = host_groups;
+        psconfig.groups = host_groups_details;
         //psconfig.groups = psc_groups;
         mc.organizations.push(org);
         if ( config_mas.length > 0 ) {
@@ -752,7 +834,6 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
         } else {
             delete mc.measurement_archives;
         }
-
 
 
         //now the most interesting part..
@@ -778,6 +859,7 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
                 });
             }
 
+
             var name = test.name;
             var testspec = test.testspec;
 
@@ -791,8 +873,8 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
                 "spec": {},
             };
 
-            psc_tests[ name ].spec = testspec.specs;
-            psc_tests[ name ].schedule_type = testspec.schedule_type;
+            psc_tests[ name ].spec = testspec.specs || {};
+            psc_tests[ name ].schedule_type = testspec.schedule_type || test.service_type;
 
 
             if ( format == "psconfig" ) {
@@ -814,15 +896,19 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
             delete current_test.schedule_type;
             delete current_test.spec["test-interval"];
 
-            psc_tasks[ name ] = {
-                "group": test._meta._hostgroup,
-                "test": test._meta._test,
-                "archives": test_mas,
-                "_meta": {
-                    "display-name": name
+            if ( typeof (test._meta)  != "undefined" &&   ("_meta" in test ) ) {
 
-                }
-            };
+                psc_tasks[ name ] = {
+                    "group": test._meta._hostgroup,
+                    "test": test._meta._test,
+                    "archives": test_mas,
+                    "_meta": {
+                        "display-name": name
+
+                    }
+                };
+
+            }
 
             if ( interval ) {
                 psc_tasks[ name ].schedule = "repeat-" +  interval;
@@ -831,21 +917,21 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
 
             delete psc_tests[ name ].spec["test-interval"];
 
-            if ( ( "_tool" in test._meta ) &&  typeof test._meta._tool != "undefined" ) {
+            if ( ( "_meta" in test ) &&  ( "_tool" in test._meta ) &&  typeof test._meta._tool != "undefined" ) {
                 psc_tasks[ name ].tools = [ test._meta._tool ];
+                add_bwctl_tools( psc_tasks[ name ] );
 
             }
 
-           add_bwctl_tools( psc_tasks[ name ] ); 
 
             var parameters = test.testspec.specs;
 
             if ( format != "psconfig" ) parameters.type = get_type(test.service_type);
 
-            if ( parameters.type == "perfsonarbuoy/owamp" ) {
-                if ( "tool" in parameters ) {
+            if ( "type" in parameters &&  parameters.type == "perfsonarbuoy/owamp" ) {
+                if ( parameters && "tool" in parameters ) {
                     // if tool is not owping, drop this test
-                    if (  parameters.tool != "owping" ) {                        
+                    if ( parameters.tool != "owping" ) {
                         return;
                     } else {
                         // delete the tool parameter because meshconfig doesn't support it
@@ -876,77 +962,17 @@ exports._process_published_config = function( _config, opts, cb, format, test_se
         } else {
             cb(null, mc);
         }
+    });
 
 };
 
 exports.generate = function(_config, opts, cb) {
 
+    host_groups = {};
+    host_groups_details = {};
+    host_catalog = {};
 
-    var format = opts.format;
-
-    //resolve all db entries first
-    if(_config.admins) _config.admins = resolve_users(_config.admins);
-
-    var service_type_obj = {};
-    _config.tests.forEach( function( tmptest ) {
-        service_type_obj[ tmptest.service_type ] = get_test_service_type( tmptest );
-
-    });
-
-    var test_service_types = Object.keys(service_type_obj).map(e => service_type_obj[e]);
-    
-
-    async.eachSeries(_config.tests, function(test, next_test) {
-        var type = test.mesh_type;
-
-        if(!test.enabled) return next_test();
-        async.parallel([
-            function(next) {
-                //a group
-                if(!test.agroup) return next();
-                generate_group_members( test, test.agroup, test_service_types, type, host_groups, host_catalog, next, "a-" );
-            },
-            function(next) {
-                //b group
-                if(!test.bgroup) return next();
-                generate_group_members( test, test.bgroup, test_service_types, type, host_groups, host_catalog, next, "b-" );
-            },
-            function(next) {
-                if(!test.nahosts) return next();
-                resolve_hosts(test.nahosts, function(err, hosts) {
-                    if(err) return next(err);
-                    test.nahosts = hosts;
-                    hosts.forEach(function(host) { host_catalog[host._id] = host; });
-                    next();
-                });
-            },
-            function(next) {
-                //testspec
-                if(!test.testspec) return next();
-                resolve_testspec(test.testspec, function(err, testspec) {
-                    if(err) return next(err);
-                    test.testspec = testspec;
-
-                    //suppress testspecs that does't meet min host version
-                    if(!_config._host_version) return next();
-                    var hostv = parseInt(_config._host_version[0]);
-                    var minver = config.meshconfig.minver[test.service_type];
-                    for(var k in test.testspec.specs) {
-                        //if minver is set for this testspec, make sure host version meets it
-                        if(minver[k]) {
-                            if(hostv < minver[k]) delete test.testspec.specs[k]; 
-                        }
-                    }
-                    next();
-                });
-            },
-        ], next_test);
-    }, function(err) {
-        if(err) return logger.error(err);
-
-        return exports._process_published_config( _config, opts, cb, format, test_service_types );
-
-    });
+    return exports._process_published_config( _config, opts, cb );
 }
 
 // TODO: Remove bwctl hack
