@@ -89,7 +89,7 @@ function convert_tool( tool ) {
 
 }
 
-function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules ) {
+function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules ) {
     //var spec = testspec.specs;
     var test = psc_tests[ name ];
     var ps_spec = psc_tests[ name ].spec;
@@ -170,21 +170,20 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
     }
 
 
-
-    if ( "test-interval" in testspec ) {
-        var interval = testspec[ "test-interval" ];
+    if ( "test-interval" in spec ) {
+        var interval = spec[ "test-interval" ];
         var interval_name = "repeat-" + interval;
-        psc_schedules[ interval_name ] = {
+        schedules[ interval_name ] = {
             "repeat": interval,
             "sliprand": true
         };
 
         // "slip"
         // convert slip from random_start_percentage
-        if ( "random-start-percentage" in testspec && interval_seconds) {
-            var slip = testspec["random-start-percentage"] * interval_seconds / 100;
+        if ( "random-start-percentage" in spec && interval_seconds) {
+            var slip = spec["random-start-percentage"] * interval_seconds / 100;
             slip = seconds_to_iso8601( slip );
-            psc_schedules[ interval_name ].slip = slip;
+            schedules[ interval_name ].slip = slip;
 
         }
 
@@ -196,27 +195,27 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedul
 
 
     // rename protocol: udp to udp: true
-    if ( ( "protocol" in testspec ) && testspec.protocol == "udp" ) {
-        testspec.udp = true;
+    if ( ( "protocol" in spec ) && spec.protocol == "udp" ) {
+        spec.udp = true;
     }
-    delete testspec.protocol;
+    delete spec.protocol;
 
 
     // handle newer "ipversion" format
     // old: ipv4-only, ipv6-only
     // new: ip-version: 4, 6
-    if ("ipv4-only" in testspec ) {
-        testspec["ip-version"] = 4;
-        delete testspec["ipv4-only"];
+    if ("ipv4-only" in spec ) {
+        spec["ip-version"] = 4;
+        delete spec["ipv4-only"];
     }
-    if ("ipv6-only" in testspec ) {
-        testspec["ip-version"] = 6;
+    if ("ipv6-only" in spec ) {
+        spec["ip-version"] = 6;
         delete testspec["ipv6-only"];
     }
 
-    if ( "report-interval" in testspec ) {
-        rename_field( testspec, "report-interval", "interval" );
-        delete testspec["report-interval"];
+    if ( "report-interval" in spec ) {
+        rename_field( spec, "report-interval", "interval" );
+        delete spec["report-interval"];
 
     }
 
@@ -307,14 +306,6 @@ function resolve_hosts(hostgroup, cb) {
 }
 
 function resolve_hostgroup(id, test_service_types, cb) {
-    console.log(" GROUP 'ID' ", id);
-    console.log(" TYPEOF GROUP ID ", id.length);
-    console.log(" GROUP LENGTH", id.length);
-    // check for object id id ( skip if so)
-    var id_is_object = (typeof id.length != "undefined");
-    console.log("id_is_object", id_is_object);
-    if ( id_is_object ) return cb("Invalid id" , id);
-    // TODO: fix empty schedules!!
     db.Hostgroup.findById(id).exec(function(err, hostgroup) {
         if(err) return cb(err);
         if(!hostgroup) return cb("can't find hostgroup:"+id);
@@ -495,7 +486,6 @@ exports._process_published_config = function( _config, opts, cb ) {
     async.eachSeries(_config.tests, function(test, next_test) {
 
 
-        console.log("TEST BEFORE ", test);
         var type = test.mesh_type;
 
         if(!test.enabled) return next_test();
@@ -545,9 +535,9 @@ exports._process_published_config = function( _config, opts, cb ) {
     }, function(err) {
         if(err) return logger.error(err);
 
-        return exports._process_published_config( _config, opts, cb, format, test_service_types );
+        //return exports._process_published_config( _config, opts, cb, format, test_service_types );
+        //return exports._process_published_config( _config, opts, cb );
 
-    });
 
         //meshconfig root template
         var mc = {
@@ -604,10 +594,6 @@ exports._process_published_config = function( _config, opts, cb ) {
         var psc_tasks = {};
         var psc_hosts = {};
 
-        // TODO: figure out why we have extraneous/missing hostgroups (_config.host_group)
-        console.log("_config.tests", _config.tests);
-        //console.log("host_groups", host_groups);
-        console.log("host_groups_details", host_groups_details);
 
         _config.tests.forEach(function(test) {
             var service = test.service_type;
@@ -655,7 +641,6 @@ exports._process_published_config = function( _config, opts, cb ) {
                 }
             };
             if ( ! ( _host.hostname in psc_hosts) ) psc_hosts[ _host.hostname ]  = {};
-
 
             if ( "ma_urls" in _host && _host.ma_urls.length > 0  ) {
                 for(var i in _host.ma_urls ) {
@@ -911,17 +896,19 @@ exports._process_published_config = function( _config, opts, cb ) {
             delete current_test.schedule_type;
             delete current_test.spec["test-interval"];
 
-            console.log("TEST!!!", test);
+            if ( typeof (test._meta)  != "undefined" &&   ("_meta" in test ) ) {
 
-            psc_tasks[ name ] = {
-                "group": test._meta._hostgroup,
-                "test": test._meta._test,
-                "archives": test_mas,
-                "_meta": {
-                    "display-name": name
+                psc_tasks[ name ] = {
+                    "group": test._meta._hostgroup,
+                    "test": test._meta._test,
+                    "archives": test_mas,
+                    "_meta": {
+                        "display-name": name
 
-                }
-            };
+                    }
+                };
+
+            }
 
             if ( interval ) {
                 psc_tasks[ name ].schedule = "repeat-" +  interval;
@@ -930,21 +917,21 @@ exports._process_published_config = function( _config, opts, cb ) {
 
             delete psc_tests[ name ].spec["test-interval"];
 
-            if ( ( "_tool" in test._meta ) &&  typeof test._meta._tool != "undefined" ) {
+            if ( ( "_meta" in test ) &&  ( "_tool" in test._meta ) &&  typeof test._meta._tool != "undefined" ) {
                 psc_tasks[ name ].tools = [ test._meta._tool ];
+                add_bwctl_tools( psc_tasks[ name ] );
 
             }
 
-            add_bwctl_tools( psc_tasks[ name ] );
 
             var parameters = test.testspec.specs;
 
             if ( format != "psconfig" ) parameters.type = get_type(test.service_type);
 
-            if ( parameters.type == "perfsonarbuoy/owamp" ) {
-                if ( "tool" in parameters ) {
+            if ( "type" in parameters &&  parameters.type == "perfsonarbuoy/owamp" ) {
+                if ( parameters && "tool" in parameters ) {
                     // if tool is not owping, drop this test
-                    if (  parameters.tool != "owping" ) {
+                    if ( parameters.tool != "owping" ) {
                         return;
                     } else {
                         // delete the tool parameter because meshconfig doesn't support it
@@ -975,6 +962,7 @@ exports._process_published_config = function( _config, opts, cb ) {
         } else {
             cb(null, mc);
         }
+    });
 
 };
 
