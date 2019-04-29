@@ -130,13 +130,13 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         $scope.addresses = host.addresses;
 
         $scope.closesubbar();
-        $location.update_path("/hosts/"+host._id);
+        $location.update_path("/pwa/hosts/"+host._id);
         window.scrollTo(0,0);
     }
     $scope.add = function() {
         $scope.selected = hosts.add();
         $scope.closesubbar();
-        $location.update_path("/hosts");
+        $location.update_path("/pwa/hosts");
         find_missing_services();
         clear_addresses();
     }
@@ -256,7 +256,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
             hosts.create($scope.selected).then(function(host) {
                 toaster.success("Host created successfully!");
                 $scope.form.$setPristine();
-                $location.update_path("/hosts/"+host._id);
+                $location.update_path("/pwa/hosts/"+host._id);
             }).catch($scope.toast_error);
         } else {
             hosts.update($scope.selected).then(function(host) {
@@ -305,10 +305,10 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
     }
 
     $scope.click_hostgroup = function(hostgroup) {
-        $location.path("/hostgroups/"+hostgroup._id);
+        $location.path("/pwa/hostgroups/"+hostgroup._id);
     }
     $scope.click_config = function(config) {
-        $location.path("/configs/"+config._id);
+        $location.path("/pwa/configs/"+config._id);
     }
 });
 

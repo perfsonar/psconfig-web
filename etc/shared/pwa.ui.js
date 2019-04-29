@@ -3,11 +3,12 @@ angular.module('app.config', []).constant('appconf', {
     //title to display
     title: 'psConfig Web Admin',
 
-    //url base for meshconfig api
-    api: '../api/pwa',
+    //url base for pwa api
+    api: '../pwa/api/pwa',
 
-    //url base for meshconfig publisher
-    pub_url: 'http://'+location.hostname+location.pathname+'pub/',
+    //url base for pwa publisher
+    //TODO: make this more configurable #97
+    pub_url: 'http://'+location.hostname+location.pathname+'pwa/pub/',
 
     //authentcation service API / UI
     auth_api: '../api/auth',

@@ -9,7 +9,7 @@ const os = require("os");
 exports.pub = {
     host: "0.0.0.0",
     port: 8080,
-    url: "http://<pwa_hostname>/pub/",
+    url: "http://<pwa_hostname>/pwa/pub/",
 };
 
 // Mongo DB to use (the default should work fine, unless you specifically need a different db)
@@ -19,7 +19,7 @@ exports.mongodb = "mongodb://mongo/pwa";
 // PWA general settings
 
 exports.meshconfig = {
-    login_url: "/auth",
+    login_url: "/pwa/auth",
 
     // service-types to support
     service_types: {

@@ -45,7 +45,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
             reset_map(test);
         });
 
-        $location.update_path("/configs/"+config._id);
+        $location.update_path("/pwa/configs/"+config._id);
         window.scrollTo(0,0);
     }
 
@@ -80,7 +80,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     $scope.add = function() {
         $scope.selected = configs.add();
         $scope.closesubbar();
-        $location.update_path("/configs");
+        $location.update_path("/pwa/configs");
     }
     $scope.addtest = function() {
         var test = {
@@ -193,7 +193,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
             configs.create($scope.selected).then(function(config) {
                 toaster.success("config created successfully!");
                 $scope.form.$setPristine();
-                $location.update_path("/configs/"+config._id);
+                $location.update_path("/pwa/configs/"+config._id);
             }).catch($scope.toast_error);
         } else {
             configs.update($scope.selected).then(function(config) {

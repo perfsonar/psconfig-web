@@ -27,7 +27,7 @@ app.controller('HeaderController', function($scope, appconf, $route, serverconf,
 
     }
     $scope.getpageurl = function(page) {
-        var pageURL = "/#!" + page;
+        var pageURL = "/pwa/#!" + page;
         return pageURL;
 
     }
