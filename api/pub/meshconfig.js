@@ -141,6 +141,10 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
     rename_field( spec, "waittime", "sendwait" );
     rename_field( spec, "timeout", "wait" );
     rename_field( spec, "tos-bits", "ip-tos" );
+    rename_field( spec, "omit-interval", "omit" );
+    if ( "omit" in spec ) {
+        spec["omit"] = seconds_to_iso8601 ( spec["omit"] );
+    }
 
     if ( test.type == "rtt" ) { // TODO: figure out a better way to support different field names for different test types
         if ( "packet-interval" in spec ) {
