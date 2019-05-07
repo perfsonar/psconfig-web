@@ -178,7 +178,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
         var interval = spec[ "test-interval" ];
         var interval_name = "repeat-" + interval;
         schedules[ interval_name ] = {
-            "repeat": interval,
+            "repeat": seconds_to_iso8601( interval ),
             "sliprand": true
         };
 
