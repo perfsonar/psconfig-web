@@ -6,9 +6,12 @@ angular.module('app.config', []).constant('appconf', {
     //url base for pwa api
     api: '../pwa/api/pwa',
 
+    base_url: '/pwa/';
+
     //url base for pwa publisher
     //TODO: make this more configurable #97
-    pub_url: 'http://'+location.hostname+location.pathname+'pwa/pub/',
+    //pub_url: 'http://'+location.hostname+location.pathname+'pwa/pub/',
+    pub_url: base_url + 'pub/',
 
     //authentcation service API / UI
     auth_api: '../api/auth',

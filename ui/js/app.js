@@ -109,35 +109,35 @@ app.config(['cfpLoadingBarProvider', '$logProvider', function(cfpLoadingBarProvi
 app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
     $routeProvider.
     /*
-    when('/pwa/about', {
+    when('/about', {
         templateUrl: 't/about.html',
         controller: 'AboutController',
         requiresLogin: true,
     })
     .*/
-    when('/pwa/testspecs/:id?', {
+    when('/testspecs/:id?', {
         templateUrl: 't/testspecs.html',
         controller: 'TestspecsController',
         requiresLogin: true,
     })
-    .when('/pwa/hostgroups/:id?', {
+    .when('/hostgroups/:id?', {
         templateUrl: 't/hostgroups.html',
         controller: 'HostgroupsController',
         requiresLogin: true,
     })
 
-    .when('/pwa/configs/:id?', {
+    .when('/configs/:id?', {
         templateUrl: 't/configs.html',
         controller: 'ConfigsController',
         requiresLogin: true,
     })
-    .when('/pwa/hosts/:id?', {
+    .when('/hosts/:id?', {
         templateUrl: 't/hosts.html',
         controller: 'HostsController',
         requiresLogin: true,
     })
     .otherwise({
-        redirectTo: '/pwa/configs'
+        redirectTo: '/configs'
     });
 }]).run(['$rootScope', '$location', 'jwtHelper', 'appconf', 'scaMessage',
 function($rootScope, $location, jwtHelper, appconf, scaMessage) {

@@ -1,19 +1,23 @@
 
 
-const base_url = "/pwa";
+const base_url = "/pwa/";
 
 angular.module('app.config', []).constant('appconf', {
     //title to display
     title: 'pSConfig Web Admin',
 
+    // Base URL
+    base_url: base_url,
+
     // url base for pwa ui
     ui_url: base_url,
 
     //url base for pwa api
-    api: base_url + '/api/pwa',
+    api: base_url + 'api/pwa/',
 
     //url base for meshconfig publisher
-    pub_url: 'http://'+location.hostname+location.pathname+'pwa/pub/',
+    //pub_url: 'http://'+location.hostname+location.pathname+'pwa/pub/',
+    pub_url: base_url + 'pub/',
 
     profile_api: '../api/profile',
     profile_url: '../profile',
