@@ -11,14 +11,14 @@ angular.module('app.config', [])
     oidc_logo: 'images/cilogon.png',
 
     //URL for auth service API
-    api: '../api/auth',
+    api: '/pwa/api/auth',
 
     //URL for x509 validation API
     x509api: 'https://'+location.hostname+':9443',
 
     //default location to redirect after successful login
     //default_redirect_url: '../profile', 
-    default_redirect_url: '/',
+    default_redirect_url: '/pwa',
 
     jwt_id: 'jwt',
     iucas_url: 'https://cas.iu.edu/cas/login',
