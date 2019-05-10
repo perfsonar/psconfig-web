@@ -15,7 +15,7 @@ angular.module('app.config', []).constant('appconf', {
 
     //authentcation service API / UI
     auth_api: '/pwa/api/auth',
-    auth_url: '/pwa/auth',
+    auth_url: '/pwa/auth/',
 
     google_map_api: 'AIzaSyBhCVWYLcFh8NSpy4bRSuJpdE962x4KUpE',
 

@@ -1,8 +1,8 @@
 PACKAGE=perfsonar-psconfig-web-admin-shared
 UI_PACKAGE=perfsonar-psconfig-web-admin-ui
 PUB_PACKAGE=perfsonar-psconfig-web-admin-publisher
-ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin-ui
-UI_ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin-ui
+ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin/ui
+UI_ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin/ui
 PUB_ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin/pub
 CONFIGPATH=${ROOTPATH}/etc
 PUB_CONFIGPATH=${PUB_ROOTPATH}/etc
@@ -58,6 +58,14 @@ install:
 	#sed -i 's:.RealBin/\.\./lib:${LIBPATH}:g' ${ROOTPATH}/cgi-bin/*
 	#sed -i 's:.RealBin/lib:${GRAPHLIBPATH}:g' ${ROOTPATH}/cgi-bin/*
 
+install_ui:
+	mkdir -p ${UI_ROOTPATH}
+	tar ch --exclude=etc/* --exclude=*spec --exclude=dependencies --exclude=MANIFEST-ui --exclude=LICENSE --exclude=Makefile -T MANIFEST-ui | tar x -C ${UI_ROOTPATH}
+	for i in `cat MANIFEST-ui | grep ^etc/ | sed "s/^etc\///"`; do  mkdir -p `dirname $(CONFIGPATH)/$${i}`; if [ -e $(CONFIGPATH)/$${i} ]; then install -m 640 -c etc/$${i} $(CONFIGPATH)/$${i}.new; else install -m 640 -c etc/$${i} $(CONFIGPATH)/$${i}; fi; done
+	#sed -i 's:.RealBin/\.\./lib:${LIBPATH}:g' ${ROOTPATH}/cgi-bin/*
+	#sed -i 's:.RealBin/lib:${GRAPHLIBPATH}:g' ${ROOTPATH}/cgi-bin/*
+
+
 #	# PUB PACKAGE
 install_pub:
 	#mkdir -p ${PUB_ROOTPATH}
@@ -65,6 +73,7 @@ install_pub:
 	for i in `cat MANIFEST-pub | grep ^etc/ | sed "s/^etc\///"`; do  mkdir -p `dirname $(PUB_CONFIGPATH)/$${i}`; if [ -e $(PUB_CONFIGPATH)/$${i} ]; then install -m 640 -c etc/$${i} $(PUB_CONFIGPATH)/$${i}.new; else install -m 640 -c etc/$${i} $(PUB_CONFIGPATH)/$${i}; fi; done
 	
 rpm:
+	make shared
 	make admin
 	make pub
 

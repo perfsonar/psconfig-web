@@ -19,7 +19,7 @@ exports.mongodb = "mongodb://mongo/pwa";
 // PWA general settings
 
 exports.meshconfig = {
-    login_url: "/pwa/auth",
+    login_url: "/pwa/auth/",
 
     // service-types to support
     service_types: {

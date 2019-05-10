@@ -1,9 +1,10 @@
 LICENSE
-MANIFEST
+MANIFEST-ui
 Makefile
 perfsonar-psconfig-web-admin-ui.spec
 deploy/systemd/perfsonar-psconfig-web-admin-api.service
 ui/README.md
+ui/index.html
 ui/apidoc/api_data.js
 ui/apidoc/api_data.json
 ui/apidoc/api_project.js
@@ -155,12 +156,7 @@ ui/t/testspec-owamp.html
 ui/t/testspec-ping.html
 ui/t/testspec-traceroute.html
 ui/t/testspecs.html
-etc/index.js
 etc/apache/pwa-admin.conf
-etc/apache/pwa-pub.conf
-etc/shared/auth.ui.js
-etc/shared/config.js
-etc/shared/pwa.ui.js
 ui/dist/pwa-admin-ui-bundle.js
 api/admin/controllers/configs.js
 api/admin/controllers/hostgroups.js

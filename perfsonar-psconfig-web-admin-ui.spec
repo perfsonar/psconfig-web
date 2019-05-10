@@ -58,7 +58,7 @@ rm -rf %{buildroot}
 #deploy/docker/pwa-sample-config/scripts
 
 
-make ROOTPATH=%{buildroot}/%{install_base} CONFIGPATH=%{buildroot}/%{config_base} install
+make UI_ROOTPATH=%{buildroot}/%{install_base} CONFIGPATH=%{buildroot}/%{config_base} install_ui
 
 rm -rf %{buildroot}/etc/pwa/apache/%{apacheconf}
 
@@ -68,18 +68,26 @@ rm -rf %{buildroot}/%{install_base}/api/pub
 #mkdir -p %{buildroot}/etc/apache
 #mkdir -p %{buildroot}/etc/shared
 mkdir -p %{buildroot}/etc/pwa/apache
-mkdir -p %{buildroot}/etc/pwa/shared
-mkdir -p %{buildroot}/%{install_base}/shared
-mkdir -p %{buildroot}/%{install_base}/dist
-mkdir -p %{buildroot}/%{install_base}/node_modules
+#mkdir -p %{buildroot}/etc/pwa/shared
+mkdir -p %{buildroot}/%{install_base}/ui/shared
+mkdir -p %{buildroot}/%{install_base}/ui/js
+mkdir -p %{buildroot}/%{install_base}/ui/css
+mkdir -p %{buildroot}/%{install_base}/ui/dist
+mkdir -p %{buildroot}/%{install_base}/ui/node_modules
 
-install -D -m 0644 etc/shared/*.js %{buildroot}/%{install_base}/shared
+#install -D -m 0644 etc/shared/*.js %{buildroot}/%{install_base}/shared
 
-install -D -m 0644 etc/index.js %{buildroot}/etc/pwa/index.js
+#install -D -m 0644 etc/index.js %{buildroot}/etc/pwa/index.js
 
 install -D -m 0644  etc/apache/pwa-admin.conf %{buildroot}/%{apache_base}/pwa-admin.conf
 
+install -D -m 0644  ui/index.html %{buildroot}/%{install_base}/ui/index.html
 install -D -m 0644  ui/dist/pwa-admin-ui-bundle.js %{buildroot}/%{install_base}/ui/dist/pwa-admin-ui-bundle.js
+
+install -D -m 0644 ui/css/*.css %{buildroot}/%{install_base}/ui/css/
+install -D -m 0644 ui/css/*.css.map %{buildroot}/%{install_base}/ui/css/
+
+install -D -m 0644 ui/js/*.js %{buildroot}/%{install_base}/ui/js/
 
 #install -D -m 0644  etc/apache/pwa-admin.conf %{buildroot}/etc/pwa/apache
 
@@ -88,8 +96,10 @@ install -D -m 0644  ui/dist/pwa-admin-ui-bundle.js %{buildroot}/%{install_base}/
 
 #install -D -m 0644 deploy/docker/pwa-sample-config/pwa/apache/* %{buildroot}/etc
 #install -D -m 0644 deploy/docker/pwa-sample-config/pwa/auth/* %{buildroot}/etc
-install -D -m 0644 etc/shared/* %{buildroot}/etc/pwa/shared
+#install -D -m 0644 etc/shared/* %{buildroot}/etc/pwa/shared
 #install -D -m 0644 etc/shared/* %{buildroot}/etc
+
+cp -R ui/node_modules/*  %{buildroot}/%{install_base}/ui/node_modules
 
 rm -f %{buildroot}/etc/pwa/apache/%{apacheconf}
 #rm -f %{buildroot}/%{install_base}/etc/pwa/%{apacheconf}
@@ -109,8 +119,8 @@ service httpd restart &> /dev/null || :
 %files
 %defattr(-,perfsonar,perfsonar,-)
 %license LICENSE
-%config /etc/pwa/index.js
-%config /etc/pwa/shared/*
+#%config /etc/pwa/index.js
+#%config /etc/pwa/shared/*
 %config %{apache_base}/pwa-admin.conf
 #%config %{install_base}/deploy/*
 #%{install_base}/cgi-bin/*
