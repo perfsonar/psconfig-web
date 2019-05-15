@@ -124,12 +124,15 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
         //"packet-interval"
     ];
 
+    var specifics = testspec.specs; //getting the specs object from testspec
+    //console.log(specifics);
     for(var i in iso_fields) {
         var field = iso_fields[i];
-        if ( testspec[ field ] ) {
-            testspec[ field ] = seconds_to_iso8601(testspec[ field ] );
+	if ( specifics[ field ] ) {
+	        //testspec[ field ] = seconds_to_iso8601( specifics[ field ] );	
+		psc_tests[ name ].spec[field] = seconds_to_iso8601(specifics[field]);
         }
-
+	
     }
 
     if ( spec && "interval" in spec ) { 
@@ -178,7 +181,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
         var interval = spec[ "test-interval" ];
         var interval_name = "repeat-" + interval;
         schedules[ interval_name ] = {
-            "repeat": seconds_to_iso8601( interval ),
+            "repeat": interval,
             "sliprand": true
         };
 
