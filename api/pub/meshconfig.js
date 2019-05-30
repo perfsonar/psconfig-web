@@ -217,7 +217,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
     }
     if ("ipv6-only" in spec ) {
         spec["ip-version"] = 6;
-        delete testspec["ipv6-only"];
+        delete spec["ipv6-only"];
     }
 
     if ( "report-interval" in spec ) {
