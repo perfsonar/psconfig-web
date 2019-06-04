@@ -4,8 +4,8 @@ PUB_PACKAGE=perfsonar-psconfig-web-admin-publisher
 ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin/ui
 UI_ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin/ui
 PUB_ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin/pub
-CONFIGPATH=${ROOTPATH}/etc
-PUB_CONFIGPATH=${PUB_ROOTPATH}/etc
+CONFIGPATH=/etc/perfsonar/psconfig-web
+PUB_CONFIGPATH=/etc/perfsonar/psconfig-web
 #LIBPATH=/usr/lib/perfsonar/lib
 #GRAPHLIBPATH=/usr/lib/perfsonar/psconfig-web/lib
 PERFSONAR_AUTO_VERSION=4.1.6
@@ -96,6 +96,11 @@ clean:
 	#rm -rf node_modules
 	#rm -rf ui/node_modules
 	#rm -f ui/dist/pwa-admin-ui-bundle.js
+
+npm_clean:
+	rm -f MANIFEST-node_modules
+	rm -rf node_modules
+	rm -rf ui/node_modules
 
 # These tests will have to be done differently, since this project uses nodejs instead of perl
 
