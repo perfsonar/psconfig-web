@@ -1,6 +1,5 @@
 %define install_base /usr/lib/perfsonar/psconfig-web-admin/pub
-%define config_base %{install_base}/etc/perfsonar/psconfig-web
-#%define config_base /etc/perfsonar/psconfig-web
+%define config_base /etc/perfsonar/psconfig-web
 
 # cron/apache entries are located in the 'etc' directory
 %define apache_base /etc/httpd/conf.d
@@ -67,7 +66,7 @@ make PUB_ROOTPATH=%{buildroot}/%{install_base} PUB_CONFIGPATH=%{buildroot}/%{con
 mkdir -p %{buildroot}/etc/httpd/conf.d
 #mkdir -p %{buildroot}/etc/apache
 #mkdir -p %{buildroot}/etc/shared
-mkdir -p %{buildroot}/etc/perfsonar/psconfig-web/apache
+#mkdir -p %{buildroot}/etc/perfsonar/psconfig-web/apache
 #mkdir -p %{buildroot}/etc/perfsonar/psconfig-web/shared
 #mkdir -p %{buildroot}/%{install_base}/shared
 #mkdir -p %{buildroot}/%{install_base}/dist

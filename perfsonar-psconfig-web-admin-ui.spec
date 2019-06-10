@@ -65,10 +65,10 @@ rm -rf %{buildroot}/etc/perfsonar/psconfig-web
 
 rm -rf %{buildroot}/%{install_base}/api/pub
 
-#mkdir -p %{buildroot}/etc/httpd/conf.d
+mkdir -p %{buildroot}/etc/httpd/conf.d
 #mkdir -p %{buildroot}/etc/apache
 #mkdir -p %{buildroot}/etc/shared
-mkdir -p %{buildroot}/etc/perfsonar/psconfig-web/apache
+#mkdir -p %{buildroot}/etc/perfsonar/psconfig-web/apache
 #mkdir -p %{buildroot}/etc/perfsonar/psconfig-web/shared
 mkdir -p %{buildroot}/%{install_base}/ui/shared
 mkdir -p %{buildroot}/%{install_base}/ui/js
@@ -102,7 +102,7 @@ install -D -m 0644 ui/js/*.js %{buildroot}/%{install_base}/ui/js/
 
 cp -R ui/node_modules/*  %{buildroot}/%{install_base}/ui/node_modules
 
-rm -f %{buildroot}/etc/perfsonar/psconfig-web/apache/%{apacheconf}
+rm -f %{buildroot}/%{apache_base}/%{apacheconf}
 #rm -f %{buildroot}/%{install_base}/etc/perfsonar/psconfig-web/%{apacheconf}
 
 %clean
