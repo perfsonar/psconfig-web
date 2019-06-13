@@ -92,7 +92,7 @@ install -D -m 0644 deploy/systemd/perfsonar-psconfig-web-admin-publisher.service
 #echo 'rm -f  %{install_base}/deploy/systemd/perfsonar-psconfig-web-admin-publisher.service'
 rm  -f  %{buildroot}%{install_base}/deploy/systemd/perfsonar-psconfig-web-admin-publisher.service
 
-ln -s /etc/perfsonar/psconfig-web/index.js  %{buildroot}/%{install_base}/api/config.js
+ln -sf /etc/perfsonar/psconfig-web/index.js  %{buildroot}/%{install_base}/api/config.js
 
 #install -D -m 0644 etc/apache/%{apacheconf} %{buildroot}/etc/apache/%{apacheconf}
 #install -D -m 0644 deploy/docker/pwa-sample-config/pwa/apache/%{apacheconf} %{buildroot}/etc/httpd/conf.d/%{apacheconf}

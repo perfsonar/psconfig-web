@@ -8,7 +8,7 @@ const os = require("os");
 
 exports.pub = {
     host: "0.0.0.0",
-    port: 8080,
+    port: 8082,
     url: "http://<pwa_hostname>/pwa/pub/",
 };
 
