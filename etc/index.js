@@ -180,7 +180,7 @@ exports.admin = {
 
 exports.common = {
     //needed to access auth service to pull profile
-    auth_api: "http://sca-auth:8080",
+    auth_api: "http://localhost:12000",
     auth_jwt: fs.readFileSync(__dirname+"/auth/user.jwt").toString().trim()
 }
 
