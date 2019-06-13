@@ -91,7 +91,7 @@ pub:
 
 clean:
 	rm -f perfsonar-psconfig*.tar.gz
-	rm -rf ~/rpmbuild/RPMS/* ~/rpmbuild/BUILD/* ~/rpmbuild/BUILDROOT/* ~/rpmbuild/SOURCES/* ~/rpmbuild/SRPMS ~/rpmbuild/SPECS
+	rm -rf ~/rpmbuild/RPMS/perfsonar-psconfig-web-admin-shared* ~/rpmbuild/RPMS/perfsonar-psconfig-web-admin-ui* ~/rpmbuild/RPMS/perfsonar-psconfig-web-admin-publisher* ~/rpmbuild/BUILD/* ~/rpmbuild/BUILDROOT/* ~/rpmbuild/SOURCES/* ~/rpmbuild/SRPMS ~/rpmbuild/SPECS
 	#rm -f MANIFEST-node_modules
 	#rm -rf node_modules
 	#rm -rf ui/node_modules

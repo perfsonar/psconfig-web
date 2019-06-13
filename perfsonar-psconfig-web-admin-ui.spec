@@ -1,6 +1,6 @@
 %define install_base /usr/lib/perfsonar/psconfig-web-admin/ui
 %define config_base /etc/perfsonar/psconfig-web
-#%define config_base /etc/perfsonar/psconfig-web
+%define systemd_base /usr/lib/systemd/system
 
 # cron/apache entries are located in the 'etc' directory
 %define apache_base /etc/httpd/conf.d
@@ -82,6 +82,8 @@ mkdir -p %{buildroot}/%{install_base}/ui/node_modules
 
 install -D -m 0644  etc/apache/pwa-admin.conf %{buildroot}/%{apache_base}/pwa-admin.conf
 
+install -D -m 0644 deploy/systemd/perfsonar-psconfig-web-admin-auth.service %{buildroot}/%{systemd_base}
+
 install -D -m 0644  ui/index.html %{buildroot}/%{install_base}/ui/index.html
 install -D -m 0644  ui/dist/pwa-admin-ui-bundle.js %{buildroot}/%{install_base}/ui/dist/pwa-admin-ui-bundle.js
 
@@ -124,6 +126,7 @@ service httpd restart &> /dev/null || :
 #%config /etc/perfsonar/psconfig-web/index.js
 #%config /etc/perfsonar/psconfig-web/shared/*
 %config %{apache_base}/pwa-admin.conf
+%config %{systemd_base}/perfsonar-psconfig-web-admin-auth.service
 #%config %{install_base}/deploy/*
 #%{install_base}/cgi-bin/*
 #%{install_base}/node_modules/*

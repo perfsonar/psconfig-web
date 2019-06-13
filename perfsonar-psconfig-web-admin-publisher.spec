@@ -1,5 +1,6 @@
 %define install_base /usr/lib/perfsonar/psconfig-web-admin/pub
 %define config_base /etc/perfsonar/psconfig-web
+%define systemd_base /usr/lib/systemd/system
 
 # cron/apache entries are located in the 'etc' directory
 %define apache_base /etc/httpd/conf.d
@@ -60,10 +61,12 @@ rm -rf %{buildroot}
 
 
 mkdir -p %{buildroot}/%{install_base}/api/pub
+mkdir -p %{buildroot}/%{systemd_base}
 
 make PUB_ROOTPATH=%{buildroot}/%{install_base} PUB_CONFIGPATH=%{buildroot}/%{config_base} install_pub
 
 mkdir -p %{buildroot}/etc/httpd/conf.d
+
 #mkdir -p %{buildroot}/etc/apache
 #mkdir -p %{buildroot}/etc/shared
 #mkdir -p %{buildroot}/etc/perfsonar/psconfig-web/apache
@@ -80,6 +83,14 @@ install -D -m 0644 api/pub/*.js %{buildroot}/%{install_base}/api/pub
 
 install -D -m 0644  etc/apache/pwa-pub.conf %{buildroot}/%{apache_base}/pwa-pub.conf
 #install -D -m 0644  etc/apache/pwa-admin.conf %{buildroot}/etc/perfsonar/psconfig-web/apache
+
+install -D -m 0644 -v deploy/systemd/perfsonar-psconfig-web-admin-publisher.service %{buildroot}/%{systemd_base}/perfsonar-psconfig-web-admin-publisher.service
+
+#rm -f  deploy/systemd/perfsonar-psconfig-web-admin-publisher.service
+#echo "Service!!"
+#ls -l %{buildroot}%{install_base}/deploy/systemd/
+#echo 'rm -f  %{install_base}/deploy/systemd/perfsonar-psconfig-web-admin-publisher.service'
+rm  -f  %{buildroot}%{install_base}/deploy/systemd/perfsonar-psconfig-web-admin-publisher.service
 
 #install -D -m 0644 etc/apache/%{apacheconf} %{buildroot}/etc/apache/%{apacheconf}
 #install -D -m 0644 deploy/docker/pwa-sample-config/pwa/apache/%{apacheconf} %{buildroot}/etc/httpd/conf.d/%{apacheconf}
@@ -110,6 +121,7 @@ service httpd restart &> /dev/null || :
 #%config /etc/perfsonar/psconfig-web/index.js
 #%config /etc/perfsonar/psconfig-web/shared/*
 %config %{apache_base}/pwa-pub.conf
+%config %{systemd_base}/perfsonar-psconfig-web-admin-publisher.service
 #%config %{install_base}/deploy/*
 #%{install_base}/cgi-bin/*
 #%{install_base}/node_modules/*
