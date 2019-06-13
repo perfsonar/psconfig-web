@@ -84,7 +84,7 @@ install -D -m 0644 api/pub/*.js %{buildroot}/%{install_base}/api/pub
 install -D -m 0644  etc/apache/pwa-pub.conf %{buildroot}/%{apache_base}/pwa-pub.conf
 #install -D -m 0644  etc/apache/pwa-admin.conf %{buildroot}/etc/perfsonar/psconfig-web/apache
 
-install -D -m 0644 -v deploy/systemd/perfsonar-psconfig-web-admin-publisher.service %{buildroot}/%{systemd_base}/perfsonar-psconfig-web-admin-publisher.service
+install -D -m 0644 deploy/systemd/perfsonar-psconfig-web-admin-publisher.service %{buildroot}/%{systemd_base}/perfsonar-psconfig-web-admin-publisher.service
 
 #rm -f  deploy/systemd/perfsonar-psconfig-web-admin-publisher.service
 #echo "Service!!"

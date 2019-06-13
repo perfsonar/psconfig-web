@@ -65,8 +65,8 @@ rm -rf %{buildroot}/etc/perfsonar/psconfig-web
 
 rm -rf %{buildroot}/%{install_base}/api/pub
 
-mkdir -p %{buildroot}/etc/httpd/conf.d
-#mkdir -p %{buildroot}/etc/apache
+mkdir -p %{buildroot}/%{apache_base}
+mkdir -p %{buildroot}/%{systemd_base}
 #mkdir -p %{buildroot}/etc/shared
 #mkdir -p %{buildroot}/etc/perfsonar/psconfig-web/apache
 #mkdir -p %{buildroot}/etc/perfsonar/psconfig-web/shared
@@ -80,9 +80,9 @@ mkdir -p %{buildroot}/%{install_base}/ui/node_modules
 
 #install -D -m 0644 etc/index.js %{buildroot}/etc/perfsonar/psconfig-web/index.js
 
-install -D -m 0644  etc/apache/pwa-admin.conf %{buildroot}/%{apache_base}/pwa-admin.conf
+install -D -m 0644 etc/apache/pwa-admin.conf %{buildroot}/%{apache_base}/pwa-admin.conf
 
-install -D -m 0644 deploy/systemd/perfsonar-psconfig-web-admin-auth.service %{buildroot}/%{systemd_base}
+install -D -m 0644 deploy/systemd/perfsonar-psconfig-web-admin-api.service %{buildroot}/%{systemd_base}/perfsonar-psconfig-web-admin-api.service
 
 install -D -m 0644  ui/index.html %{buildroot}/%{install_base}/ui/index.html
 install -D -m 0644  ui/dist/pwa-admin-ui-bundle.js %{buildroot}/%{install_base}/ui/dist/pwa-admin-ui-bundle.js
@@ -104,7 +104,7 @@ install -D -m 0644 ui/js/*.js %{buildroot}/%{install_base}/ui/js/
 
 cp -R ui/node_modules/*  %{buildroot}/%{install_base}/ui/node_modules
 
-rm -f %{buildroot}/%{apache_base}/%{apacheconf}
+#rm -f %{buildroot}/%{apache_base}/%{apacheconf}
 #rm -f %{buildroot}/%{install_base}/etc/perfsonar/psconfig-web/%{apacheconf}
 
 %clean
@@ -126,7 +126,7 @@ service httpd restart &> /dev/null || :
 #%config /etc/perfsonar/psconfig-web/index.js
 #%config /etc/perfsonar/psconfig-web/shared/*
 %config %{apache_base}/pwa-admin.conf
-%config %{systemd_base}/perfsonar-psconfig-web-admin-auth.service
+%config %{systemd_base}/perfsonar-psconfig-web-admin-api.service
 #%config %{install_base}/deploy/*
 #%{install_base}/cgi-bin/*
 #%{install_base}/node_modules/*
