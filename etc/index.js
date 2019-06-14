@@ -9,7 +9,8 @@ const os = require("os");
 exports.pub = {
     host: "0.0.0.0",
     port: 8082,
-    url: "http://<hostname>/pwa/pub/",
+    //url: "http://<hostname>/pwa/pub/",
+    url: "/pwa/pub/",
     default_config_format: "psconfig"
 };
 
