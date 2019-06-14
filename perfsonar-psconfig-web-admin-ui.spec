@@ -116,7 +116,12 @@ chown perfsonar:perfsonar /var/log/perfsonar
 chown -R perfsonar:perfsonar %{install_base}
 #chown -R apache:apache %{install_base}/etc/apache
 chown -R apache:apache %{apache_base}
+# create UI config symlink
 ln -sf /etc/perfsonar/psconfig-web/shared/pwa.ui.js /usr/lib/perfsonar/psconfig-web-admin/ui/ui/config.js
+# create API service config symlink
+ln -sf /etc/perfsonar/psconfig-web/index.js /usr/lib/perfsonar/psconfig-web-admin/ui/api/config.js
+
+########## TODO: create auth keys and jwt ########
 
 service httpd restart &> /dev/null || :
 

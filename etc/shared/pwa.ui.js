@@ -1,3 +1,4 @@
+const base_url = "/pwa";
 
 angular.module('app.config', []).constant('appconf', {
     //title to display
@@ -6,7 +7,7 @@ angular.module('app.config', []).constant('appconf', {
     //url base for pwa api
     api: '/pwa/api/pwa',
 
-    base_url: '/pwa';
+    base_url: base_url,
 
     //url base for pwa publisher
     //TODO: make this more configurable #97
