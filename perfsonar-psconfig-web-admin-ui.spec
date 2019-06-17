@@ -24,7 +24,8 @@ Requires:       nodejs
 Requires:		httpd
 Requires:       mod_ssl
 # TODO: Make mongodb optional?
-Requires:       mongodb-server 
+Requires:       mongodb
+Requires:       mongodb-server
 
 %description
 The perfSONAR pSConfig Web Administrator package provides an authenticated, multi-user,
@@ -83,6 +84,7 @@ mkdir -p %{buildroot}/%{install_base}/ui/node_modules
 install -D -m 0644 etc/apache/pwa-admin.conf %{buildroot}/%{apache_base}/pwa-admin.conf
 
 install -D -m 0644 deploy/systemd/perfsonar-psconfig-web-admin-api.service %{buildroot}/%{systemd_base}/perfsonar-psconfig-web-admin-api.service
+install -D -m 0644 deploy/systemd/perfsonar-psconfig-web-admin-cache.service %{buildroot}/%{systemd_base}/perfsonar-psconfig-web-admin-cache.service
 
 install -D -m 0644  ui/index.html %{buildroot}/%{install_base}/ui/index.html
 install -D -m 0644  ui/dist/pwa-admin-ui-bundle.js %{buildroot}/%{install_base}/ui/dist/pwa-admin-ui-bundle.js
@@ -122,6 +124,29 @@ ln -sf /etc/perfsonar/psconfig-web/shared/pwa.ui.js /usr/lib/perfsonar/psconfig-
 ln -sf /etc/perfsonar/psconfig-web/index.js /usr/lib/perfsonar/psconfig-web-admin/ui/api/config.js
 
 ########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+
+
+
+
+
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+
+
+
 
 service httpd restart &> /dev/null || :
 
@@ -132,6 +157,7 @@ service httpd restart &> /dev/null || :
 #%config /etc/perfsonar/psconfig-web/shared/*
 %config %{apache_base}/pwa-admin.conf
 %config %{systemd_base}/perfsonar-psconfig-web-admin-api.service
+%config %{systemd_base}/perfsonar-psconfig-web-admin-cache.service
 #%config %{install_base}/deploy/*
 #%{install_base}/cgi-bin/*
 #%{install_base}/node_modules/*

@@ -3,6 +3,7 @@ MANIFEST-ui
 Makefile
 perfsonar-psconfig-web-admin-ui.spec
 deploy/systemd/perfsonar-psconfig-web-admin-api.service
+deploy/systemd/perfsonar-psconfig-web-admin-cache.service
 etc/apache/pwa-admin.conf
 ui/README.md
 ui/index.html
