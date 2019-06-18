@@ -12,3 +12,4 @@ ui/node_modules
 .*.swp
 api/config.js
 *.jwt
+perfsonar-psconfig-web-*.tar.gz

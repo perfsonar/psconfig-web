@@ -1,25 +1,35 @@
 
+
+const base_url = "/pwa";
+
 angular.module('app.config', []).constant('appconf', {
     //title to display
     title: 'pSConfig Web Admin',
 
+    // Base URL
+    base_url: base_url,
+
+    // url base for pwa ui
+    ui_url: base_url,
+
     //url base for pwa api
-    api: '../api/pwa',
+    api: base_url + '/api/pwa',
 
     //url base for meshconfig publisher
-    pub_url: 'http://'+location.hostname+location.pathname+'pub/',
+    //pub_url: 'http://'+location.hostname+location.pathname+'pwa/pub/',
+    pub_url: base_url + '/pub/',
 
-    profile_api: '../api/profile',
-    profile_url: '../profile',
+    profile_api: base_url + '/api/profile',
+    profile_url: base_url + '/profile',
 
     //shared servive api and ui urls (for menus and stuff)
-    shared_api: '../api/shared',
-    shared_url: '../shared',
+    shared_api: base_url + '/api/shared',
+    shared_url: base_url + '/shared',
 
-    //authentcation service API to refresh token, etc.
-    auth_api: '../api/auth',
+    //authentication service API to refresh token, etc.
+    auth_api: base_url + '/api/auth',
     //authentication service URL to jump if user needs to login
-    auth_url: '../auth',
+    auth_url: base_url + '/auth',
 
     google_map_api: 'AIzaSyBhCVWYLcFh8NSpy4bRSuJpdE962x4KUpE',
 
