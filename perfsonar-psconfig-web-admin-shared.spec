@@ -8,6 +8,7 @@
 
 %define perfsonar_auto_version 4.1.6
 %define perfsonar_auto_relnum 1
+%define debug_package %{nil}
 
 Name:			perfsonar-psconfig-web-admin-shared
 Version:		%{perfsonar_auto_version}
@@ -23,8 +24,6 @@ BuildArch:		x86_64
 Requires:       nodejs
 Requires:		httpd
 Requires:       mod_ssl
-# TODO: Make mongodb optional?
-Requires:       mongodb-server 
 
 %description
 Shared libraries and configs for pSConfig Web Administrator (PWA).

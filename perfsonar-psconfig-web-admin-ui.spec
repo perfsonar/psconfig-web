@@ -8,6 +8,7 @@
 
 %define perfsonar_auto_version 4.1.6
 %define perfsonar_auto_relnum 1
+%define debug_package %{nil}
 
 Name:			perfsonar-psconfig-web-admin-ui
 Version:		%{perfsonar_auto_version}
@@ -144,7 +145,6 @@ ln -sf /etc/perfsonar/psconfig-web/index.js /usr/lib/perfsonar/psconfig-web-admi
 ########## TODO: create auth keys and jwt ########
 ########## TODO: create auth keys and jwt ########
 ########## TODO: create auth keys and jwt ########
-
 
 
 
