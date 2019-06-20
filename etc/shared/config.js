@@ -2,15 +2,17 @@
     'use strict';
     var sca = angular.module('sca-shared.menu', []);
 
+    const base_url = '/pwa';
+
     sca.constant('scaSharedConfig', {
-        shared_url: '/pwa/shared',  //path to shared ui resources (defaults to "../shared")
+        shared_url: base_url + '/shared',  //path to shared ui resources (defaults to "../shared")
     });
 
     sca.constant('scaSettingsMenu', [
         {
             id: "account",
             label: "Account",
-            url: "/pwa/auth/#!/settings/account",
+            url: base_url + "/auth/#!/settings/account",
             show: function(scope) {
                 if(~scope.sca.indexOf('user')) return true;
                 return false;
@@ -19,12 +21,12 @@
         {
             id: "groups",
             label: "Groups",
-            url: "/pwa/auth/#!/groups",
+            url: base_url + "/auth/#!/groups",
         },
         {
             id: "users",
             label: "Users",
-            url: "/pwa/auth/#!/admin/users",
+            url: base_url + "/auth/#!/admin/users",
             show: function(scope) {
                 if(~scope.sca.indexOf('admin')) return true;
                 return false;
@@ -34,7 +36,7 @@
             id: "signout",
             label: "Signout",
             pullright: true,
-            url: "/pwa/auth/#!/signout",
+            url: base_url + "/auth/#!/signout",
         },
     ]);
 
@@ -42,7 +44,7 @@
         {
             id: "adminusers",
             label: "Users",
-            url: "/pwa/auth/#!/admin/users",
+            url: base_url + "/auth/#!/admin/users",
             show: function(scope) {
                 if(~scope.sca.indexOf('admin')) return true;
                 return false;
