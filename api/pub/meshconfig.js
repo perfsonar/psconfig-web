@@ -121,7 +121,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
         "report-interval",
         "waittime",
         "slip",
-	"timeout",
+        "timeout",
         //"packet-interval"
     ];
 
@@ -133,10 +133,10 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
 	        //testspec[ field ] = seconds_to_iso8601( specifics[ field ] );	
 		psc_tests[ name ].spec[field] = seconds_to_iso8601(specifics[field]);
         }
-	
+
     }
 
-    if ( spec && "interval" in spec ) { 
+    if ( spec && "interval" in spec ) {
         rename_field( spec, "interval", "test-interval" );
         delete spec.interval;
     }
@@ -177,34 +177,68 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
 
     }
 
+console.log("schedules", schedules);
 
-    if ( "test-interval" in spec ) {
+var index = Object.keys(schedules).length;
+var key = "sched-" + index;
+console.log("current schedule index", index);
+
+    if ( spec[ "test-interval" ] ) {
         var interval = spec[ "test-interval" ];
         var interval_name = "repeat-" + interval;
-        schedules[ interval_name ] = {
-            "repeat": interval,
-            "sliprand": true
-        };
+        if ( ! schedules[ key ] ) {
+            schedules[ key ] = {};
+        } 
+        //if ( Object.keys( schedules[ index ] ).length == 0  ) {
+console.log("keys", Object.keys( schedules[ key ]));
+console.log("initializing schedules interval_name", schedules, interval_name);
+            schedules[ key ] = {
+                "repeat": interval,
+                "sliprand": true
+            };
+console.log("initialized schedules interval_name", schedules, interval_name);
+        }
 
+
+test._schedule = key;
+
+//delete test.spec.slip;
+
+//delete spec[ "slip" ];
+
+console.log("testspec", testspec);
         // "slip"
+        if(("slip" in spec) && (spec.slip != 0)) {
+        console.log("SETTING SLIP IN TESTSPEC");
+console.log("schedules", schedules[key]);
+console.log("interval_name", interval_name);
+console.log("slip", spec.slip);
+              schedules[ key ].slip = spec.slip;
+delete spec[ "slip" ];
+console.log("AFTER SLIP!! schedules", schedules[ key ]);
+console.log("AFTER SLIP TESTSZPEC!!", testspec);
+        } else if ( "random-start-percentage" in testspec && interval_seconds) {
+            var slip = spec["random-start-percentage"] * interval_seconds / 100;
+
+            //slip = seconds_to_iso8601( slip );
+            //schedules[ interval_name ].slip = slip;
+
+        
         // convert slip from random_start_percentage
-        if(("slip" in testspec) && (testspec[ "slip" ] != 0)){
-		      psc_schedules[ interval_name ].slip = testspec[ "slip" ];
-	      }
-
-	else if ( "random-start-percentage" in testspec && interval_seconds) {
-            var slip = testspec["random-start-percentage"] * interval_seconds / 100;
-
+/*
+        if ( "random-start-percentage" in spec && interval_seconds) {
+            var slip = spec["random-start-percentage"] * interval_seconds / 100;
             slip = seconds_to_iso8601( slip );
             schedules[ interval_name ].slip = slip;
 
         }
-
+*/
         delete spec["random-start-percentage"];
 
         //delete spec.interval;
 
     }
+        delete spec["random-start-percentage"];
 
 
     // rename protocol: udp to udp: true
@@ -272,7 +306,7 @@ function resolve_testspec(id, cb) {
 //doesn't check if the ma host actually provides ma service
 function resolve_ma(host, next, service_types) {
     //for each service, lookup ma host
-    
+
     async.eachSeries(service_types, function(service, next_service) {
 
         if(! service.ma ) {
@@ -894,6 +928,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                 psc_tests[ name ].spec.source = "{% address[0] %}";
                 psc_tests[ name ].spec.dest = "{% address[1] %}";
                 meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules );
+console.log("psc_schedules after", psc_schedules);
             }
 
             var interval = psc_tests[ name ].spec["test-interval"];
@@ -923,8 +958,12 @@ exports._process_published_config = function( _config, opts, cb ) {
 
             }
 
+console.log("TEST", test);
+console.log("psctests", psc_tests);
+                psc_tasks[ name ].schedule = psc_tests[ name ]._schedule;
+//delete psc_tests[ name ]._schedule;
             if ( interval ) {
-                psc_tasks[ name ].schedule = "repeat-" +  interval;
+                //psc_tasks[ name ].schedule = "repeat-" +  interval;
 
             }
 
