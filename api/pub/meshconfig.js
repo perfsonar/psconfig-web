@@ -120,7 +120,8 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
         "test-interval",
         "report-interval",
         "waittime",
-        "timeout",
+        "slip",
+	"timeout",
         //"packet-interval"
     ];
 
@@ -187,8 +188,13 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
 
         // "slip"
         // convert slip from random_start_percentage
-        if ( "random-start-percentage" in spec && interval_seconds) {
-            var slip = spec["random-start-percentage"] * interval_seconds / 100;
+        if(("slip" in testspec) && (testspec[ "slip" ] != 0)){
+		      psc_schedules[ interval_name ].slip = testspec[ "slip" ];
+	      }
+
+	else if ( "random-start-percentage" in testspec && interval_seconds) {
+            var slip = testspec["random-start-percentage"] * interval_seconds / 100;
+
             slip = seconds_to_iso8601( slip );
             schedules[ interval_name ].slip = slip;
 
