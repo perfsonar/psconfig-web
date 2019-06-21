@@ -8,12 +8,14 @@ const os = require("os");
 
 exports.pub = {
     host: "0.0.0.0",
-    port: 8080,
-    url: "http://<pwa_hostname>/pwa/pub/",
+    port: 8082,
+    //url: "http://<hostname>/pwa/pub/",
+    url: "/pwa/pub/",
+    default_config_format: "psconfig"
 };
 
 // Mongo DB to use (the default should work fine, unless you specifically need a different db)
-exports.mongodb = "mongodb://mongo/pwa";
+exports.mongodb = "mongodb://localhost/pwa";
 
 
 // PWA general settings
@@ -180,7 +182,8 @@ exports.admin = {
 
 exports.common = {
     //needed to access auth service to pull profile
-    auth_api: "http://sca-auth:8080",
+    auth_api: "http://localhost:12000",
+    //auth_api: "http://sca-auth:8080",
     auth_jwt: fs.readFileSync(__dirname+"/auth/user.jwt").toString().trim()
 }
 

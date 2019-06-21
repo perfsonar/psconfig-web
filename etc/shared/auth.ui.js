@@ -11,14 +11,14 @@ angular.module('app.config', [])
     oidc_logo: 'images/cilogon.png',
 
     //URL for auth service API
-    api: '/pwa/api/auth',
+    api: '../api/auth',
 
     //URL for x509 validation API
     x509api: 'https://'+location.hostname+':9443',
 
     //default location to redirect after successful login
     //default_redirect_url: '../profile', 
-    default_redirect_url: '/pwa',
+    default_redirect_url: '/pwa/',
 
     jwt_id: 'jwt',
     iucas_url: 'https://cas.iu.edu/cas/login',
@@ -41,7 +41,7 @@ angular.module('app.config', [])
         //oidc_selector: false, //show idp selector
 
         // to allow signup, set signup to true
-        signup: false,
+        signup: true,
     },
 });
 

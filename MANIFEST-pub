@@ -9,4 +9,4 @@ api/pub/meshconfig.js
 api/pub/server.js
 api/models/index.js
 etc/apache/pwa-pub.conf
-
+deploy/systemd/perfsonar-psconfig-web-admin-publisher.service

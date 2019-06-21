@@ -1,6 +1,6 @@
 %define install_base /usr/lib/perfsonar/psconfig-web-admin/ui
-%define config_base %{install_base}/etc/pwa
-#%define config_base /etc/pwa
+%define config_base /etc/perfsonar/psconfig-web
+%define systemd_base /usr/lib/systemd/system
 
 # cron/apache entries are located in the 'etc' directory
 %define apache_base /etc/httpd/conf.d
@@ -8,6 +8,7 @@
 
 %define perfsonar_auto_version 4.1.6
 %define perfsonar_auto_relnum 1
+%define debug_package %{nil}
 
 Name:			perfsonar-psconfig-web-admin-ui
 Version:		%{perfsonar_auto_version}
@@ -24,7 +25,8 @@ Requires:       nodejs
 Requires:		httpd
 Requires:       mod_ssl
 # TODO: Make mongodb optional?
-Requires:       mongodb-server 
+Requires:       mongodb
+Requires:       mongodb-server
 
 %description
 The perfSONAR pSConfig Web Administrator package provides an authenticated, multi-user,
@@ -60,15 +62,16 @@ rm -rf %{buildroot}
 
 make UI_ROOTPATH=%{buildroot}/%{install_base} CONFIGPATH=%{buildroot}/%{config_base} install_ui
 
-rm -rf %{buildroot}/etc/pwa/apache/%{apacheconf}
+#rm -rf %{buildroot}/etc/perfsonar/psconfig-web/apache/%{apacheconf}
+rm -rf %{buildroot}/etc/perfsonar/psconfig-web
 
 rm -rf %{buildroot}/%{install_base}/api/pub
 
-#mkdir -p %{buildroot}/etc/httpd/conf.d
-#mkdir -p %{buildroot}/etc/apache
+mkdir -p %{buildroot}/%{apache_base}
+mkdir -p %{buildroot}/%{systemd_base}
 #mkdir -p %{buildroot}/etc/shared
-mkdir -p %{buildroot}/etc/pwa/apache
-#mkdir -p %{buildroot}/etc/pwa/shared
+#mkdir -p %{buildroot}/etc/perfsonar/psconfig-web/apache
+#mkdir -p %{buildroot}/etc/perfsonar/psconfig-web/shared
 mkdir -p %{buildroot}/%{install_base}/ui/shared
 mkdir -p %{buildroot}/%{install_base}/ui/js
 mkdir -p %{buildroot}/%{install_base}/ui/css
@@ -77,9 +80,12 @@ mkdir -p %{buildroot}/%{install_base}/ui/node_modules
 
 #install -D -m 0644 etc/shared/*.js %{buildroot}/%{install_base}/shared
 
-#install -D -m 0644 etc/index.js %{buildroot}/etc/pwa/index.js
+#install -D -m 0644 etc/index.js %{buildroot}/etc/perfsonar/psconfig-web/index.js
 
-install -D -m 0644  etc/apache/pwa-admin.conf %{buildroot}/%{apache_base}/pwa-admin.conf
+install -D -m 0644 etc/apache/pwa-admin.conf %{buildroot}/%{apache_base}/pwa-admin.conf
+
+install -D -m 0644 deploy/systemd/perfsonar-psconfig-web-admin-api.service %{buildroot}/%{systemd_base}/perfsonar-psconfig-web-admin-api.service
+install -D -m 0644 deploy/systemd/perfsonar-psconfig-web-admin-cache.service %{buildroot}/%{systemd_base}/perfsonar-psconfig-web-admin-cache.service
 
 install -D -m 0644  ui/index.html %{buildroot}/%{install_base}/ui/index.html
 install -D -m 0644  ui/dist/pwa-admin-ui-bundle.js %{buildroot}/%{install_base}/ui/dist/pwa-admin-ui-bundle.js
@@ -89,20 +95,20 @@ install -D -m 0644 ui/css/*.css.map %{buildroot}/%{install_base}/ui/css/
 
 install -D -m 0644 ui/js/*.js %{buildroot}/%{install_base}/ui/js/
 
-#install -D -m 0644  etc/apache/pwa-admin.conf %{buildroot}/etc/pwa/apache
+#install -D -m 0644  etc/apache/pwa-admin.conf %{buildroot}/etc/perfsonar/psconfig-web/apache
 
 #install -D -m 0644 etc/apache/%{apacheconf} %{buildroot}/etc/apache/%{apacheconf}
 #install -D -m 0644 deploy/docker/pwa-sample-config/pwa/apache/%{apacheconf} %{buildroot}/etc/httpd/conf.d/%{apacheconf}
 
 #install -D -m 0644 deploy/docker/pwa-sample-config/pwa/apache/* %{buildroot}/etc
 #install -D -m 0644 deploy/docker/pwa-sample-config/pwa/auth/* %{buildroot}/etc
-#install -D -m 0644 etc/shared/* %{buildroot}/etc/pwa/shared
+#install -D -m 0644 etc/shared/* %{buildroot}/etc/perfsonar/psconfig-web/shared
 #install -D -m 0644 etc/shared/* %{buildroot}/etc
 
 cp -R ui/node_modules/*  %{buildroot}/%{install_base}/ui/node_modules
 
-rm -f %{buildroot}/etc/pwa/apache/%{apacheconf}
-#rm -f %{buildroot}/%{install_base}/etc/pwa/%{apacheconf}
+#rm -f %{buildroot}/%{apache_base}/%{apacheconf}
+#rm -f %{buildroot}/%{install_base}/etc/perfsonar/psconfig-web/%{apacheconf}
 
 %clean
 rm -rf %{buildroot}
@@ -113,15 +119,45 @@ chown perfsonar:perfsonar /var/log/perfsonar
 chown -R perfsonar:perfsonar %{install_base}
 #chown -R apache:apache %{install_base}/etc/apache
 chown -R apache:apache %{apache_base}
+# create UI config symlink
+ln -sf /etc/perfsonar/psconfig-web/shared/pwa.ui.js /usr/lib/perfsonar/psconfig-web-admin/ui/ui/config.js
+# create API service config symlink
+ln -sf /etc/perfsonar/psconfig-web/index.js /usr/lib/perfsonar/psconfig-web-admin/ui/api/config.js
+
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+
+
+
+
+
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+########## TODO: create auth keys and jwt ########
+
+
 
 service httpd restart &> /dev/null || :
 
 %files
 %defattr(-,perfsonar,perfsonar,-)
 %license LICENSE
-#%config /etc/pwa/index.js
-#%config /etc/pwa/shared/*
+#%config /etc/perfsonar/psconfig-web/index.js
+#%config /etc/perfsonar/psconfig-web/shared/*
 %config %{apache_base}/pwa-admin.conf
+%config %{systemd_base}/perfsonar-psconfig-web-admin-api.service
+%config %{systemd_base}/perfsonar-psconfig-web-admin-cache.service
 #%config %{install_base}/deploy/*
 #%{install_base}/cgi-bin/*
 #%{install_base}/node_modules/*
@@ -142,9 +178,9 @@ service httpd restart &> /dev/null || :
 
 #%{install_base}/lib/perfSONAR_PS/*
 #/etc/httpd/conf.d/*
-#%config /etc/pwa/index.js
-#%config /etc/pwa/shared/*
-#%config /etc/pwa/apache/pwa-admin.conf
+#%config /etc/perfsonar/psconfig-web/index.js
+#%config /etc/perfsonar/psconfig-web/shared/*
+#%config /etc/perfsonar/psconfig-web/apache/pwa-admin.conf
 
 %changelog
 * Fri Mar 1 2019 mj82@grnoc.iu.edu 4.2.0.1-1.a1

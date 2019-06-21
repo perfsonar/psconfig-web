@@ -7,7 +7,7 @@ Wants=mongod.service
 User=perfsonar
 Environment=NODE_PATH=/usr/lib/perfsonar/psconfig-web-admin/shared/node_modules
 WorkingDirectory=/usr/lib/perfsonar/psconfig-web-admin
-ExecStart=/usr/bin/node api/pwacache.js
+ExecStart=/usr/bin/node ui/api/pwacache.js
 Restart=on-failure
 
 
