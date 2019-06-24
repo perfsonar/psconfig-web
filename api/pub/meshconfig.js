@@ -103,10 +103,17 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
 
     if ( test.type in service_types ) {
         test.type = service_types[ test.type ];
-    } 
+    }
+
+    var schedule_type = test['schedule_type'];
+    var include_schedule = true;
+    if ( schedule_type == 'continuous' ) {
+        include_schedule = false;
+    }
 
     // change underscores to dashes in all field names in the "spec" stanza
     rename_underscores_to_dashes( spec );
+
 
     var interval_seconds = testspec.interval;
     if ( "test-interval" in testspec ) {
@@ -121,19 +128,15 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
         "report-interval",
         "waittime",
         "slip",
-        "timeout",
-        //"packet-interval"
+        "timeout"
     ];
 
     var specifics = testspec.specs; //getting the specs object from testspec
-    //console.log(specifics);
     for(var i in iso_fields) {
         var field = iso_fields[i];
-	if ( specifics[ field ] ) {
-	        //testspec[ field ] = seconds_to_iso8601( specifics[ field ] );	
-		psc_tests[ name ].spec[field] = seconds_to_iso8601(specifics[field]);
+        if ( specifics[ field ] ) {
+            psc_tests[ name ].spec[field] = seconds_to_iso8601(specifics[field]);
         }
-
     }
 
     if ( spec && "interval" in spec ) {
@@ -180,31 +183,35 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
     }
 
 
-    var index = Object.keys(schedules).length;
-    var key = "sched-" + index;
+    var sched_index = Object.keys(schedules).length;
+    var sched_key = "sched-" + sched_index;
 
     if ( spec[ "test-interval" ] ) {
+        schedule_type = "interval";
+        include_schedule = true;
         var interval = spec[ "test-interval" ];
         var interval_name = "repeat-" + interval;
-        if ( ! schedules[ key ] ) {
-            schedules[ key ] = {};
+        if ( ! schedules[ sched_key ] ) {
+            schedules[ sched_key ] = {};
         } 
-        //if ( Object.keys( schedules[ index ] ).length == 0  ) {
-        schedules[ key ] = {
+        schedules[ sched_key ] = {
             "repeat": interval,
             "sliprand": true
         };
     }
 
+    if ( include_schedule ) {
 
-test._schedule = key;
+
+    test._schedule = sched_key;
 
 
         // "slip"
         if(("slip" in spec) && (spec.slip != 0)) {
-            schedules[ key ].slip = spec.slip;
+            schedules[ sched_key ].slip = spec.slip;
             delete spec[ "slip" ];
         } 
+    }
         /*
         else if ( "random-start-percentage" in testspec && interval_seconds) {
             var slip = spec["random-start-percentage"] * interval_seconds / 100;
@@ -906,17 +913,25 @@ exports._process_published_config = function( _config, opts, cb ) {
             var interval = psc_tests[ name ].spec["test-interval"];
 
             var current_test = psc_tests[name];
+            
+            var include_schedule = true;
 
-            if ( current_test.type == "latencybg" && current_test.schedule_type == "interval" ) {
+            if ( current_test.type == "latencybg" ) {
+               if ( current_test.schedule_type == "interval" ) {
                 current_test.type = "latency";
                 //delete current_test.spec.interval;
                 delete current_test.spec.duration;
+               } else {
+                   include_schedule = false;
+
+
+               }
             }
 
             delete current_test.schedule_type;
             delete current_test.spec["test-interval"];
 
-            if ( typeof (test._meta)  != "undefined" &&   ("_meta" in test ) ) {
+            if ( typeof (test._meta)  != "undefined" && ("_meta" in test ) ) {
 
                 psc_tasks[ name ] = {
                     "group": test._meta._hostgroup,
@@ -930,8 +945,11 @@ exports._process_published_config = function( _config, opts, cb ) {
 
             }
 
+            if ( include_schedule ) {
                 psc_tasks[ name ].schedule = psc_tests[ name ]._schedule;
-delete psc_tests[ name ]._schedule;
+            }
+            delete psc_tests[ name ]._schedule;
+
             if ( interval ) {
                 //psc_tasks[ name ].schedule = "repeat-" +  interval;
 
