@@ -19,14 +19,13 @@ Group:			Applications/Communications
 URL:			http://www.perfsonar.net
 Source0:		perfsonar-psconfig-web-admin-ui-%{version}.%{perfsonar_auto_relnum}.tar.gz
 BuildRoot:		%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-#BuildArch:		noarch
 BuildArch:		x86_64
 Requires:       nodejs
 Requires:		httpd
 Requires:       mod_ssl
-# TODO: Make mongodb optional?
 Requires:       mongodb
 Requires:       mongodb-server
+Requires:		perfsonar-psconfig-web-admin-shared
 
 %description
 The perfSONAR pSConfig Web Administrator package provides an authenticated, multi-user,
@@ -44,43 +43,19 @@ web-based interface for managing perfSONAR meshes, using pSConfig or MeshConfig 
 %install
 rm -rf %{buildroot}
 
-# mkdirs
-#ui/dist
-#ui/images
-#ui/js
-#ui/scss
-#ui/t
-#ui/apidoc/css
-#ui/apidoc/img
-#ui/apidoc/locales
-##ui/apidoc/vendor/prettify
-#ui/apidoc/vendor
-
-# do we need this one?
-#deploy/docker/pwa-sample-config/scripts
-
-
 make UI_ROOTPATH=%{buildroot}/%{install_base} CONFIGPATH=%{buildroot}/%{config_base} install_ui
 
-#rm -rf %{buildroot}/etc/perfsonar/psconfig-web/apache/%{apacheconf}
 rm -rf %{buildroot}/etc/perfsonar/psconfig-web
 
 rm -rf %{buildroot}/%{install_base}/api/pub
 
 mkdir -p %{buildroot}/%{apache_base}
 mkdir -p %{buildroot}/%{systemd_base}
-#mkdir -p %{buildroot}/etc/shared
-#mkdir -p %{buildroot}/etc/perfsonar/psconfig-web/apache
-#mkdir -p %{buildroot}/etc/perfsonar/psconfig-web/shared
 mkdir -p %{buildroot}/%{install_base}/ui/shared
 mkdir -p %{buildroot}/%{install_base}/ui/js
 mkdir -p %{buildroot}/%{install_base}/ui/css
 mkdir -p %{buildroot}/%{install_base}/ui/dist
 mkdir -p %{buildroot}/%{install_base}/ui/node_modules
-
-#install -D -m 0644 etc/shared/*.js %{buildroot}/%{install_base}/shared
-
-#install -D -m 0644 etc/index.js %{buildroot}/etc/perfsonar/psconfig-web/index.js
 
 install -D -m 0644 etc/apache/pwa-admin.conf %{buildroot}/%{apache_base}/pwa-admin.conf
 
@@ -95,20 +70,7 @@ install -D -m 0644 ui/css/*.css.map %{buildroot}/%{install_base}/ui/css/
 
 install -D -m 0644 ui/js/*.js %{buildroot}/%{install_base}/ui/js/
 
-#install -D -m 0644  etc/apache/pwa-admin.conf %{buildroot}/etc/perfsonar/psconfig-web/apache
-
-#install -D -m 0644 etc/apache/%{apacheconf} %{buildroot}/etc/apache/%{apacheconf}
-#install -D -m 0644 deploy/docker/pwa-sample-config/pwa/apache/%{apacheconf} %{buildroot}/etc/httpd/conf.d/%{apacheconf}
-
-#install -D -m 0644 deploy/docker/pwa-sample-config/pwa/apache/* %{buildroot}/etc
-#install -D -m 0644 deploy/docker/pwa-sample-config/pwa/auth/* %{buildroot}/etc
-#install -D -m 0644 etc/shared/* %{buildroot}/etc/perfsonar/psconfig-web/shared
-#install -D -m 0644 etc/shared/* %{buildroot}/etc
-
 cp -R ui/node_modules/*  %{buildroot}/%{install_base}/ui/node_modules
-
-#rm -f %{buildroot}/%{apache_base}/%{apacheconf}
-#rm -f %{buildroot}/%{install_base}/etc/perfsonar/psconfig-web/%{apacheconf}
 
 %clean
 rm -rf %{buildroot}
@@ -117,70 +79,21 @@ rm -rf %{buildroot}
 mkdir -p /var/log/perfsonar
 chown perfsonar:perfsonar /var/log/perfsonar
 chown -R perfsonar:perfsonar %{install_base}
-#chown -R apache:apache %{install_base}/etc/apache
 chown -R apache:apache %{apache_base}
 # create UI config symlink
 ln -sf /etc/perfsonar/psconfig-web/shared/pwa.ui.js /usr/lib/perfsonar/psconfig-web-admin/ui/ui/config.js
 # create API service config symlink
 ln -sf /etc/perfsonar/psconfig-web/index.js /usr/lib/perfsonar/psconfig-web-admin/ui/api/config.js
 
-########## TODO: create auth keys and jwt ########
-########## TODO: create auth keys and jwt ########
-########## TODO: create auth keys and jwt ########
-########## TODO: create auth keys and jwt ########
-########## TODO: create auth keys and jwt ########
-########## TODO: create auth keys and jwt ########
-########## TODO: create auth keys and jwt ########
-########## TODO: create auth keys and jwt ########
-
-
-
-
-
-########## TODO: create auth keys and jwt ########
-########## TODO: create auth keys and jwt ########
-########## TODO: create auth keys and jwt ########
-########## TODO: create auth keys and jwt ########
-########## TODO: create auth keys and jwt ########
-########## TODO: create auth keys and jwt ########
-########## TODO: create auth keys and jwt ########
-########## TODO: create auth keys and jwt ########
-
-
-
 service httpd restart &> /dev/null || :
 
 %files
 %defattr(-,perfsonar,perfsonar,-)
 %license LICENSE
-#%config /etc/perfsonar/psconfig-web/index.js
-#%config /etc/perfsonar/psconfig-web/shared/*
-%config %{apache_base}/pwa-admin.conf
-%config %{systemd_base}/perfsonar-psconfig-web-admin-api.service
-%config %{systemd_base}/perfsonar-psconfig-web-admin-cache.service
-#%config %{install_base}/deploy/*
-#%{install_base}/cgi-bin/*
-#%{install_base}/node_modules/*
+%config(noreplace) %{apache_base}/pwa-admin.conf
+%config(noreplace) %{systemd_base}/perfsonar-psconfig-web-admin-api.service
+%config(noreplace) %{systemd_base}/perfsonar-psconfig-web-admin-cache.service
 %{install_base}/*
-#%{install_base}/dist/pwa-admin-ui-bundle.js
-#%{install_base}/shared/*
-#%{install_base}/api/*.js
-#%{install_base}/api/admin/server.js
-#%{install_base}/api/admin/controllers/*.js
-#%{install_base}/api/models/*.js
-#%{install_base}/api/pub/*.js
-
-
-# TODO: temporarily moved from MANIFEST
-#api/pub/server.js
-#api/pub/controllers.js
-#api/pub/meshconfig.js
-
-#%{install_base}/lib/perfSONAR_PS/*
-#/etc/httpd/conf.d/*
-#%config /etc/perfsonar/psconfig-web/index.js
-#%config /etc/perfsonar/psconfig-web/shared/*
-#%config /etc/perfsonar/psconfig-web/apache/pwa-admin.conf
 
 %changelog
 * Fri Mar 1 2019 mj82@grnoc.iu.edu 4.2.0.1-1.a1
