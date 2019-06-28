@@ -54,7 +54,7 @@ mkdir -p %{buildroot}/%{systemd_base}
 mkdir -p %{buildroot}/%{install_base}/ui/shared
 mkdir -p %{buildroot}/%{install_base}/ui/js
 mkdir -p %{buildroot}/%{install_base}/ui/css
-mkdir -p %{buildroot}/%{install_base}/ui/dist
+#mkdir -p %{buildroot}/%{install_base}/ui/dist
 mkdir -p %{buildroot}/%{install_base}/ui/node_modules
 
 install -D -m 0644 etc/apache/pwa-admin.conf %{buildroot}/%{apache_base}/pwa-admin.conf
@@ -63,7 +63,7 @@ install -D -m 0644 deploy/systemd/perfsonar-psconfig-web-admin-api.service %{bui
 install -D -m 0644 deploy/systemd/perfsonar-psconfig-web-admin-cache.service %{buildroot}/%{systemd_base}/perfsonar-psconfig-web-admin-cache.service
 
 install -D -m 0644  ui/index.html %{buildroot}/%{install_base}/ui/index.html
-install -D -m 0644  ui/dist/pwa-admin-ui-bundle.js %{buildroot}/%{install_base}/ui/dist/pwa-admin-ui-bundle.js
+#install -D -m 0644  ui/dist/pwa-admin-ui-bundle.js %{buildroot}/%{install_base}/ui/dist/pwa-admin-ui-bundle.js
 
 install -D -m 0644 ui/css/*.css %{buildroot}/%{install_base}/ui/css/
 install -D -m 0644 ui/css/*.css.map %{buildroot}/%{install_base}/ui/css/
