@@ -27,7 +27,12 @@ app.controller('HeaderController', function($scope, appconf, $route, serverconf,
 
     }
     $scope.getpageurl = function(page) {
-        var pageURL = appconf.base_url + "/#!" + page;
+        var base_url = appconf.base_url;
+        if ( !base_url ) {
+            base_url = "";
+        }
+        var pageURL = base_url + "/#!" + page;
+        console.log("pageURL", pageURL);
         return pageURL;
 
     }
