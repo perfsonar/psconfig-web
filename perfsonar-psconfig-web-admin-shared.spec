@@ -1,5 +1,5 @@
 %define install_base /usr/lib/perfsonar/psconfig-web-admin/shared
-%define config_base %{install_base}/etc/perfsonar/psconfig-web
+%define config_base /etc/perfsonar/psconfig-web
 
 # cron/apache entries are located in the 'etc' directory
 %define apache_base /etc/httpd/conf.d
@@ -40,6 +40,8 @@ rm -rf %{buildroot}
 
 make ROOTPATH=%{buildroot}/%{install_base} CONFIGPATH=%{buildroot}/%{config_base} install
 
+rm -rf %{buildroot}/etc/perfsonar/psconfig-web
+
 rm -rf %{buildroot}/%{apache_base}/%{apacheconf}
 
 rm -rf %{buildroot}/%{install_base}/api/pub
@@ -49,11 +51,11 @@ mkdir -p %{buildroot}/%{install_base}/dist
 mkdir -p %{buildroot}/%{install_base}/node_modules
 
 install -D -m 0644 etc/index.js %{buildroot}/etc/perfsonar/psconfig-web/index.js
-
 install -D -m 0644 etc/shared/pwa.ui.js %{buildroot}/etc/perfsonar/psconfig-web/shared/pwa.ui.js
 install -D -m 0644 etc/shared/config.js %{buildroot}/etc/perfsonar/psconfig-web/shared/config.js
 
 cp -R node_modules/* %{buildroot}/%{install_base}/node_modules/
+
 
 rm -f %{buildroot}/%{apache}/%{apacheconf}
 
