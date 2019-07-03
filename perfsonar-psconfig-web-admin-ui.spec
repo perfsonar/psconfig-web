@@ -26,6 +26,7 @@ Requires:       mod_ssl
 Requires:       mongodb
 Requires:       mongodb-server
 Requires:		perfsonar-psconfig-web-admin-shared
+Requires:		perfsonar-psconfig-web-admin-auth
 
 %description
 The perfSONAR pSConfig Web Administrator package provides an authenticated, multi-user,
