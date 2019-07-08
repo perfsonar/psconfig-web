@@ -209,8 +209,8 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
         // "slip"
         if(("slip" in spec) && (spec.slip != 0)) {
             schedules[ sched_key ].slip = spec.slip;
-            delete spec[ "slip" ];
-        } 
+        }
+        delete spec[ "slip" ];
     }
         /*
         else if ( "random-start-percentage" in testspec && interval_seconds) {
