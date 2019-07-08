@@ -86,7 +86,11 @@ ln -sf /etc/perfsonar/psconfig-web/shared/pwa.ui.js /usr/lib/perfsonar/psconfig-
 # create API service config symlink
 ln -sf /etc/perfsonar/psconfig-web/index.js /usr/lib/perfsonar/psconfig-web-admin/ui/api/config.js
 
-service httpd restart &> /dev/null || :
+systemctl restart httpd  &> /dev/null || :
+
+systemctl enable perfsonar-psconfig-web-admin-api.service perfsonar-psconfig-web-admin-cache.service
+
+systemctl restart perfsonar-psconfig-web-admin-api.service perfsonar-psconfig-web-admin-cache.service
 
 %files
 %defattr(-,perfsonar,perfsonar,-)

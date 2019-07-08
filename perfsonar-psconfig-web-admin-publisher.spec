@@ -70,7 +70,11 @@ chown perfsonar:perfsonar /var/log/perfsonar
 chown -R perfsonar:perfsonar %{install_base}
 chown -R apache:apache %{apache_base}
 
-service httpd restart &> /dev/null || :
+systemctl restart httpd &> /dev/null || :
+
+systemctl enable perfsonar-psconfig-web-admin-publisher.service
+
+systemctl restart perfsonar-psconfig-web-admin-publisher.service
 
 %files
 %defattr(-,perfsonar,perfsonar,-)
