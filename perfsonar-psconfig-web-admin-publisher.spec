@@ -72,9 +72,9 @@ chown -R apache:apache %{apache_base}
 
 systemctl restart httpd &> /dev/null || :
 
-systemctl enable perfsonar-psconfig-web-admin-api.service perfsonar-psconfig-web-admin-cache.service
+systemctl enable perfsonar-psconfig-web-admin-publisher.service
 
-systemctl restart perfsonar-psconfig-web-admin-api.service perfsonar-psconfig-web-admin-cache.service
+systemctl restart perfsonar-psconfig-web-admin-publisher.service
 
 %files
 %defattr(-,perfsonar,perfsonar,-)
