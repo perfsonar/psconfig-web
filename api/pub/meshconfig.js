@@ -203,22 +203,16 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
     if ( include_schedule ) {
 
 
-    test._schedule = sched_key;
+        test._schedule = sched_key;
 
 
         // "slip"
         if(("slip" in spec) && (spec.slip != 0)) {
             schedules[ sched_key ].slip = spec.slip;
         }
-        delete spec[ "slip" ];
     }
-        /*
-        else if ( "random-start-percentage" in testspec && interval_seconds) {
-            var slip = spec["random-start-percentage"] * interval_seconds / 100;
-
-        }
-        */
-        delete spec["random-start-percentage"];
+    delete spec[ "slip" ];
+    delete spec["random-start-percentage"];
 
 
     // rename protocol: udp to udp: true
