@@ -8,8 +8,8 @@ CONFIGPATH=/etc/perfsonar/psconfig-web
 PUB_CONFIGPATH=/etc/perfsonar/psconfig-web
 #LIBPATH=/usr/lib/perfsonar/lib
 #GRAPHLIBPATH=/usr/lib/perfsonar/psconfig-web/lib
-PERFSONAR_AUTO_VERSION=4.1.6
-PERFSONAR_AUTO_RELNUM=1
+PERFSONAR_AUTO_VERSION=4.2.0
+PERFSONAR_AUTO_RELNUM=0.1.b1
 VERSION=${PERFSONAR_AUTO_VERSION}
 RELEASE=${PERFSONAR_AUTO_RELNUM}
 
@@ -88,6 +88,8 @@ admin:
 pub:
 	rpmbuild -bs perfsonar-psconfig-web-admin-publisher.spec
 	rpmbuild -ba perfsonar-psconfig-web-admin-publisher.spec
+
+clean_all: clean npm_clean
 
 clean:
 	rm -f perfsonar-psconfig*.tar.gz
