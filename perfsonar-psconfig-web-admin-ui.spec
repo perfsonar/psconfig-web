@@ -6,8 +6,8 @@
 %define apache_base /etc/httpd/conf.d
 %define apacheconf pwa-admin.conf
 
-%define perfsonar_auto_version 4.1.6
-%define perfsonar_auto_relnum 1
+%define perfsonar_auto_version 4.2.0
+%define perfsonar_auto_relnum 0.1.b1
 %define debug_package %{nil}
 
 Name:			perfsonar-psconfig-web-admin-ui
