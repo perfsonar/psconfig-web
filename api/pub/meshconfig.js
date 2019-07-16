@@ -207,7 +207,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
 
 
         // "slip"
-        if(("slip" in spec) && (spec.slip != 0)) {
+        if(("slip" in spec) && (spec.slip != 0) && (schedule_type != 'continuous')) {
             schedules[ sched_key ].slip = spec.slip;
         }
     }
