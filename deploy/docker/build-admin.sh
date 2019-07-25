@@ -25,6 +25,5 @@ if [ ! $? -eq 0 ]; then
 fi
 
 docker tag perfsonar/pwa-admin perfsonar/pwa-admin:$VERSION
-docker push perfsonar/pwa-admin:latest
 docker push perfsonar/pwa-admin:$VERSION
 
