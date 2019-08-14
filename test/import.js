@@ -95,14 +95,14 @@ describe('import', function() {
                 }
                 //console.log("EXPECTED DATA", data);
                 expected_output = JSON.parse(data);
-                getData();
+                getData(cb);
                 //console.log("AFTER JSON PARSE", data);
                 //console.error("expected output\n", JSON.stringify( expected_output, null, 3 ) );
 
             });
 
 
-            function getData( ) {
+            function getData( cb ) {
 
                 fs.readFile(testfile, 'utf8', function (err,data) {
                     if (err) {

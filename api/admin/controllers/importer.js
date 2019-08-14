@@ -203,8 +203,10 @@ exports._detect_config_type = function( config ) {
        var keys = _.keys( config );
        /*(
        console.log("KEYS", keys);
+       */
        console.log("pSConfigKeys", pSConfigKeys);
        console.log("meshConfigKeys", meshConfigKeys);
+       /*
        console.log("intersection meshconfig",  _.intersection( keys, meshConfigKeys ));
        console.log("intersection meshconfig LENGTH",  _.intersection( keys, meshConfigKeys ).length);
        */
@@ -246,10 +248,11 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
     // config_params holds parameters to pass back to the callback
     var config_params = {};
 
+    var hosts_info;
     if ( config_format == "meshconfig" ) {
-        exports._process_meshconfig( importedConfig, sub, config_params, mainConfig, cb );
+        hosts_info = exports._process_meshconfig( importedConfig, sub, config_params, mainConfig, cb );
     } else if ( config_format == "psconfig" ) {
-        exports._process_psconfig( importedConfig, sub, config_params, mainConfig, cb );
+        hosts_info = exports._process_psconfig( importedConfig, sub, config_params, mainConfig, cb );
 
     }
 
@@ -424,7 +427,7 @@ exports._process_meshconfig = function ( importedConfig, sub, config_params, mai
     });
 
     console.log("MESHCONFIG INTERIM CONFIG", mainConfig);
-    //console.log("MESHCONFIG INTERM CONFIG PARAMS", config_params);
+    console.log("MESHCONFIG INTERM CONFIG PARAMS", config_params);
 
 };
 
@@ -445,18 +448,20 @@ exports._process_psconfig = function ( importedConfig, sub, config_params, mainC
     config_params.archives = archive_obj.central;
 
 
-    var hosts_info = [];
-    hosts_info = exports._extract_psconfig_hosts( importedConfig, config_params );
+    var hosts_info = exports._extract_psconfig_hosts( importedConfig, config_params, sub );
     //config_params.hosts = hosts_obj.hosts;
+    console.log("hosts_info", hosts_info);
     config_params.addresses = hosts_info.addresses;
 
-    console.log("config_params", config_params);
+    
+
+    console.log("config_params psconfig", config_params);
 
 
-
+    return hosts_info;
 };
 
-exports._extract_psconfig_hosts = function( importedConfig, config_params ) {
+exports._extract_psconfig_hosts = function( importedConfig, config_params, sub ) {
     var hosts_obj = {};
 
     // Retrieve host info from importedConfig
@@ -492,23 +497,33 @@ exports._extract_psconfig_hosts = function( importedConfig, config_params ) {
 
 
                 var host_info = {
-                    services: services,
+                    //services: services,
                     no_agent: false,
-                    hostname: host.addresses[0],
-                    sitename: host.description,
-                    addresses: addr_array,
+                    hostname: hostname,
+                    sitename: desc,
+                    //addresses: addr_array, // TODO: ADD MULTIPLE ADDRESSES
                     info: {},
                     communities: [],
-                    admins: [sub.toString()]
+                    admins: [sub],
+                    _meta: {
+                        "display-name": desc,
+                        "display-url": toolkitURL
+                    }
                 };
+
+
+                //console.log("host_info", host_info);
+                if(host_info.toolkit_url && host_info.toolkit_url != "auto") host_info.toolkit_url = host_info.toolkit_url;
+                hosts_info.push(host_info);
        
        /* hosts_service_types example from meshconfig format
         *
-        * hosts_service_types { 'perfsonar-dev5.grnoc.iu.edu': { bwctl: 1, traceroute: 1, owamp: 1 },
+        * hosts_service_types { 'perfsonar-dev5.grnoc.iu.edu': { bwctl: 1, traceroute: 1, owamp: 1 }},
   'ps-dev-deb8-1.es.net': { bwctl: 1, traceroute: 1, owamp: 1 },
   'ps-dev-el6-1.es.net': { bwctl: 1, traceroute: 1, owamp: 1, ping: 1 },
         *
-        * */. 
+        * 
+       */ 
 
 
     });
@@ -517,6 +532,7 @@ exports._extract_psconfig_hosts = function( importedConfig, config_params ) {
     //hosts_obj.addresses = hosts_obj;
 
 
+    console.log("hosts_info before returning", hosts_info);
     return hosts_info;
 };
 
