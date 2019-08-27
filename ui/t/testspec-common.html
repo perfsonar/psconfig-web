@@ -9,4 +9,14 @@
             <p class="help-block">Forces each side to use IPv4/IPv6. Test will fail if no IPv4/IPv6 address can be determined for either endpoint <code>ipv4_only/ipv6_only</code></p>
         </div>
     </div>
+    <label for="slip" class="col-sm-2 control-label">Slip</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="number" string-to-number step="1" class="form-control" name="slip"
+                   ng-disabled="!selected._canedit"
+                   ng-model="selected.specs.slip">
+            <div class="input-group-addon">seconds</div>
+        </div>
+        <p class="help-block"> Start of each run to be as much as SLIP later than their ideal scheduled time<code>slip</code></p>
+     </div>
 </div>

@@ -1,4 +1,5 @@
 #!/bin/bash
 pushd pwa-sample-config 
-tar cfz ../pwa.sample.tar.gz pwa
+#chown -R root:root *
+tar --owner=root --group=root -czf ../pwa.sample.tar.gz *
 popd

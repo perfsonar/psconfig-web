@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST
+Makefile
+perfsonar-psconfig-web-admin-shared.spec
+etc/index.js
+etc/shared/config.js
+etc/shared/pwa.ui.js
+api/common.js
+api/models/index.js
+api/pwaadmin.js
+api/pwacache-expire-dedupe.js
+api/pwacache.js

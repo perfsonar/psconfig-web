@@ -1,0 +1,15 @@
+[Unit]
+Description=perfSONAR PWA Publisher daemon
+After=network.target
+Wants=mongod.service
+
+[Service]
+User=perfsonar
+Environment=NODE_PATH=/usr/lib/perfsonar/psconfig-web-admin/shared/node_modules
+WorkingDirectory=/usr/lib/perfsonar/psconfig-web-admin
+ExecStart=/usr/bin/node pub/api/pwapub.js
+Restart=on-failure
+
+
+[Install]
+WantedBy=multi-user.target

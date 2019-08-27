@@ -41,6 +41,7 @@
             </div>
             <div class="list-addbutton animated" ng-class="{bounceInLeft: configs.length == 0}" ng-click="add()" title="Add new config" style="bottom: 180px">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> 
+                <div class="add-text">New config</div>
             </div>
         </div>
 
@@ -97,10 +98,16 @@
                                 placeholder="Enter path to expose this config" 
                                 ng-disabled="!selected._canedit" required>
                             <span class="input-group-btn" ng-if="selected._id">
-                                <button class="btn btn-primary" type="button" 
+                                <button class="btn btn-info btn-compact" type="button" 
                                     ng-disabled="form.$dirty"
-                                    ng-click="relocate(appconf.pub_url+'config/'+selected.url, true)">
-                                    <i class="fa fa-external-link" aria-hidden="true"></i> Open Config
+                                    ng-click="relocate(appconf.pub_url+'config/'+selected.url+'?format=psconfig', true)">
+                                    <i class="fa fa-external-link" aria-hidden="true"></i> pSConfig
+                                </button> 
+                                <button class="btn btn-info btn-compact" type="button"
+                                   style="margin:0px;" 
+                                    ng-disabled="form.$dirty"
+                                    ng-click="relocate(appconf.pub_url+'config/'+selected.url+'?format=meshconfig', true)">
+                                    <i class="fa fa-external-link" aria-hidden="true"></i> MeshConfig
                                 </button>
                             </span>
                         </div>
@@ -175,15 +182,16 @@
                                 <ng-include src="'t/testeditor.html'"></ng-include>
                             </li>
                         </ul>
-                        <button type="button" ng-click="addtest()" ng-show="selected._canedit" class="btn btn-sm">Add New Test</button>
-                        <span ng-if="!showimporter">or <a href="" ng-click="$parent.showimporter = true">Import from existing meshconfig</a></span>
+                        <button type="button" ng-click="addtest()" ng-show="selected._canedit" class="btn btn-primary">Add New Test</button>
+                        <span>or </span>
+                        <button type="button" ng-if="!showimporter" ng-click="$parent.showimporter = true" class="btn btn-primary">Import from existing Config</button>
                         <br><br>
                         <div class="panel panel-default" ng-if="showimporter">
-                            <div class="panel-heading">Meshconfig Importer</div>
+                            <div class="panel-heading">Config Importer</div>
                             <div class="panel-body">
-                                <p>Enter Meshconfig URL to Import. </p>
-                                <p>This tool will register all missing hosts as adhoc hosts and register hostgroup, testspecs (if the same name doesn't exist already). Finally, it will create new meshconfig tests and populate here.</p>
-                                <p>Meshconfig tests themselves won't be registered automatically - until you click Update on this pageIIf you import the same meshconfig twice, already imported test won't be overriden - you need to remove old tests manually</p>
+                                <p>Enter pSConfig or MeshConfig URL to Import. </p>
+                                <p>This tool will register all missing hosts as adhoc hosts and register hostgroup, testspecs (if the same name doesn't exist already). Finally, it will create new config tests and populate here.</p>
+                                <p>Tests from the Config won't be registered automatically - until you click Update on this page. If you import the same Config twice, already imported Tests won't be overriden - you need to remove old tests manually.</p>
                                 <div class="input-group">
                                     <span class="input-group-addon" id="sizing-addon2">URL</span>
                                     <input type="text" class="form-control" ng-model="$parent.importer_url" 

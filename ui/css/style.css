@@ -126,6 +126,10 @@ ul.hosts li {
   background-color: inherit;
   color: #333;
 }
+.btn-compact {
+    padding: 8px 6px;
+    margin:0 4px;
+}
 .host {
   background-color: #f0f0f0;
   padding: 4px 6px;
@@ -161,19 +165,32 @@ div.well-detail {
   font-size: 50px;
   position: fixed;
   bottom: 10px;
-  left: 350px;
+  left: 125px;
   cursor: pointer;
-  color: #999;
+  color: #17a2b8;
   background-color: white;
   border-radius: 25px;
   line-height: 100%;
   transition: 0.2s ease all;
 }
 .list-addbutton:hover {
-  bottom: 0px;
-  font-size: 70px;
-  left: 340px;
+  bottom: 10px;
+  font-size: 50px;
+  left: 125px;
   color: #008cba;
+}
+.list-addbutton .add-text {
+  font-size: 30px;
+  float: left;
+  margin-right:10px;
+  width:225px;
+  text-align:right;
+
+}
+.list-addbutton .add-text:hover {
+  font-size: 30px;
+  width:225px;
+
 }
 .autoconfig {
   position: fixed;
@@ -266,4 +283,11 @@ div.well-detail {
 }
 .form-group.schedule {
   margin-bottom: 1em;
+}
+.input-group-addon {
+    padding: 8px 6px;
+    padding-left: 4px;
+}
+.input-group-btn {
+    padding-left:4px;
 }

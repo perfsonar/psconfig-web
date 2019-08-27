@@ -12,7 +12,7 @@ const expressWinston = require('express-winston');
 const compression = require('compression');
 
 //mine
-const config = require('../config');
+const config = require('../config'); // TODO: FIX!!!
 const logger = new winston.Logger(config.logger.winston);
 const db = require('../models');
 const common = require('../common');
