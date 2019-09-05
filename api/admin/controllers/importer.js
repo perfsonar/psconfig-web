@@ -66,6 +66,9 @@ function ensure_hosts(hosts_info, tests, cb) {
     });
     */
 
+
+    //console.log("HOSTS_INFO", hosts_info, "HOSTS_INFO");
+
     async.eachSeries(hosts_info, function(host, next_host) {
         db.Host.findOne({hostname: host.hostname}, function(err, _host) {
             if(err) return next_host(err);
@@ -83,22 +86,24 @@ function ensure_hosts(hosts_info, tests, cb) {
                     return next_host();
                 } else {
                     //for adhoc host, make sure we have all services listed
-                    host.services.forEach(function(service) {
-                        //look for the service
-                        var found = false;
-                        _host.services.forEach(function(_service) {
-                            if(_service.type == service.type) found = true;
+                    if ( "services" in host ) {
+                        host.services.forEach(function(service) {
+                            //look for the service
+                            var found = false;
+                            _host.services.forEach(function(_service) {
+                                if(_service.type == service.type) found = true;
+                            });
+                            if(!found) {
+                                logger.debug("adding service", service);
+                                _host.services.push(service);
+                            }
                         });
-                        if(!found) {
-                            logger.debug("adding service", service);
-                            _host.services.push(service);
-                        }
-                    });
-                    logger.debug("updating services");
-                    _host.save(next_host);
+                        logger.debug("updating services");
+                    }
+                        _host.save(next_host);
                 }
             } else {
-                logger.debug("missing host found - inserting " + host.hostname);
+                logger.debug("missing host found - inserting " + host.hostname, _host);
                 //var types = {};
                 service_types.forEach(function(service) {
                     host.services.push({ "type": service });
@@ -443,7 +448,7 @@ exports._process_psconfig = function ( importedConfig, sub, config_params, mainC
 
     var archive_obj = exports._extract_psconfig_mas( importedConfig , config_params );
 
-    //console.log("archive_obj", archive_obj);
+    console.log("archive_obj", archive_obj);
 
     config_params.archives = archive_obj.central;
 
@@ -475,14 +480,35 @@ exports._extract_psconfig_hosts = function( importedConfig, config_params, sub )
          ],
          "_hosts": [
      * */
+    //console.log("config_params", config_params);
+    console.log("importedConfig", JSON.stringify(importedConfig, null, "\t"));
     var hosts_info = [];
     var addrs = importedConfig.addresses;
+    var hostsImported = importedConfig.hosts;
     _.each( addrs, function(hostInfo, hostname) {
         console.log("hostname ", hostname);
         console.log("hostInfo", hostInfo);
         var desc = hostInfo._meta["display-name"];
         var toolkitURL = hostInfo._meta["display-url"];
         var address = hostInfo.address;
+        var archives = hostsImported[address].archives;
+        var ma_urls = [];
+        var local_ma = false;
+
+        if ( archives ) {
+            _.each( archives, function( archiveName ) {
+                var currentURL = importedConfig.archives[ archiveName ].data.url;
+                if ( currentURL.includes( hostname ) ) {
+                    local_ma = true;
+                } else {
+                    // TODO: eventually add support for archivers other than Esmond
+                    ma_urls.push( currentURL );
+                }
+
+
+            });
+            //local_ma = ma_urls.length > 0;
+        }
 
         /*var row = {};
         row.desc = desc;
@@ -501,6 +527,9 @@ exports._extract_psconfig_hosts = function( importedConfig, config_params, sub )
                     no_agent: false,
                     hostname: hostname,
                     sitename: desc,
+                    local_ma: local_ma,
+                    ma_urls: ma_urls,
+
                     //addresses: addr_array, // TODO: ADD MULTIPLE ADDRESSES
                     info: {},
                     communities: [],
