@@ -13,6 +13,7 @@ const _ = require('underscore');
 const config = require('../../config');
 const logger = new winston.Logger(config.logger.winston);
 const db = require('../../models');
+const shared = require('../../sharedFunctions');
 
 const pSConfigKeys = [
     "archives",
@@ -74,7 +75,10 @@ function ensure_hosts(hosts_info, tests, cb) {
             if(err) return next_host(err);
 
             if(_host) {
+                //console.log("_HOST", _host);
+                console.log("_HOST._ID", _host._id);
                 logger.debug("host already exists", host.hostname);
+                host._id = _host._id;
                 if(_host.lsid) {
                     if ( "sitename" in host ) {
                         var sitename = host.sitename;
@@ -242,6 +246,8 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
     var tests = mainConfig.tests;
     var testspecs = mainConfig.testspecs;
     var hostgroups = mainConfig.hostgroups;
+
+    console.log("hostgroups", hostgroups);
 
     //var out = importedConfig;
     //out = JSON.stringify( out, null, "\t" );
@@ -458,12 +464,45 @@ exports._process_psconfig = function ( importedConfig, sub, config_params, mainC
     console.log("hosts_info", hosts_info);
     config_params.addresses = hosts_info.addresses;
 
+    testspecs = exports._extract_psconfig_tests( importedConfig, sub );
     
 
     console.log("config_params psconfig", config_params);
 
 
     return hosts_info;
+};
+
+exports._extract_psconfig_tests = function( importedConfig, sub ) {
+    var importedTests = importedConfig.tests;
+    var testspecs = [];
+    _.each( importedTests, function( testObj, testName ) {
+        testObj.name = testName;
+
+        delete testObj.spec.source;
+        delete testObj.spec.dest;
+
+        if ( testObj.type == "latencybg" ) {
+            testObj.schedule_type = "continuous";
+        } else {
+            testObj.schedule_type = "interval";
+        }
+        if ( importedConfig.tasks[ testName ].tools ) {
+            var tool = importedConfig.tasks[ testName ].tools[0];
+            tool = tool.replace("bwctl", "");
+            if ( tool ) {
+                testObj.tool= shared.convert_tool( tool, true );
+
+            }
+        }
+        shared.rename_dashes_to_underscores( testObj.spec );
+
+
+        console.log("testObj", testObj);
+    });
+
+    return testspecs;
+
 };
 
 exports._extract_psconfig_hosts = function( importedConfig, config_params, sub ) {
