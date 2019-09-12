@@ -396,10 +396,10 @@ exports._process_meshconfig = function ( importedConfig, sub, config_params, mai
 
         var testspec = {
             name: test.description+" Testspecs",
-        desc: "Imported by PWA importer",
-        service_type: type,
-        admins: [sub.toString()],
-        specs: test.parameters,
+            desc: "Imported by PWA importer",
+            service_type: type,
+            admins: [sub.toString()],
+            specs: test.parameters
         };
         testspecs.push(testspec);
 
@@ -475,6 +475,8 @@ exports._process_psconfig = function ( importedConfig, sub, config_params, mainC
 
 exports._extract_psconfig_tests = function( importedConfig, sub ) {
     var importedTests = importedConfig.tests;
+    var tests = importedConfig.tests;
+    var tests = [];
     var testspecs = [];
     _.each( importedTests, function( testObj, testName ) {
         testObj.name = testName;
@@ -487,6 +489,7 @@ exports._extract_psconfig_tests = function( importedConfig, sub ) {
         } else {
             testObj.schedule_type = "interval";
         }
+        var type = testObj.type;
         if ( importedConfig.tasks[ testName ].tools ) {
             var tool = importedConfig.tasks[ testName ].tools[0];
             tool = tool.replace("bwctl", "");
@@ -495,11 +498,43 @@ exports._extract_psconfig_tests = function( importedConfig, sub ) {
 
             }
         }
+        // TODO: review - hostgroups not required when creating testspecs
+        /*
+        var hostgroup = {
+            name: testObj.description+" Group",
+            desc: "Imported by PWA importer",
+            type: "static",
+            service_type: type,
+            admins: [sub.toString()],
+            _hosts: testObj.members.members, //hostnames that needs to be converted to host id
+        };
+        */
         shared.rename_dashes_to_underscores( testObj.spec );
+
+        var testspec = {
+            service_type: type,
+            admins: [sub.toString()],
+            specs: testObj.spec,
+        };
+
+        tests.push({
+            name: testName+" Testspec",
+            desc: "Imported by PWA pSConfig importer",
+            //desc: "imported", //I don't think this is used anymore
+            service_type: type ,
+            mesh_type: "mesh", // TODO: allow other mesh_types
+            enabled: true,
+            nahosts: [],
+            //_agroup: hostgroup, //
+            //specs: testspec //tmp
+            specs: testObj.spec
+          
+        });
 
 
         console.log("testObj", testObj);
     });
+    console.log("tests", tests);
 
     return testspecs;
 
