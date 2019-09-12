@@ -460,6 +460,8 @@ exports._process_psconfig = function ( importedConfig, sub, config_params, mainC
 
 
     var hosts_info = exports._extract_psconfig_hosts( importedConfig, config_params, sub );
+    
+    var hostGroups = exports._extract_psconfig_hostgroups( importedConfig, config_params, sub );
     //config_params.hosts = hosts_obj.hosts;
     console.log("hosts_info", hosts_info);
     config_params.addresses = hosts_info.addresses;
@@ -528,7 +530,7 @@ exports._extract_psconfig_tests = function( importedConfig, sub ) {
             //_agroup: hostgroup, //
             //specs: testspec //tmp
             specs: testObj.spec
-          
+
         });
 
 
@@ -537,6 +539,31 @@ exports._extract_psconfig_tests = function( importedConfig, sub ) {
     console.log("tests", tests);
 
     return testspecs;
+
+};
+
+exports._extract_psconfig_hostgroups = function( importedConfig, sub ) {
+    var groups = importedConfig.groups;
+
+    console.log("groups", JSON.stringify(groups, null, 4) );
+    var hostgroups = [];
+
+    _.each( groups, function( groupObj, groupName ) {
+        //var serviceType = 
+
+        var group = {
+            name: groupName,
+            type: "static",
+            //service_type: serviceType,
+            admins: [sub.toString()],
+            desc: "Imported by PWA pSConfig importer",
+            _hosts: _.map(groupObj.addresses, function(obj, index) {return obj.name;}),
+        };
+        hostgroups.push( group );
+
+    });
+
+    console.log("HOSTgroups array", JSON.stringify(hostgroups, null, 4) );
 
 };
 
