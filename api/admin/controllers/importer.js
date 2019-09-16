@@ -500,9 +500,12 @@ exports._extract_psconfig_tests = function( importedConfig, sub, mainConfig ) {
             var tool = importedConfig.tasks[ testName ].tools[0];
             tool = tool.replace("bwctl", "");
             if ( tool ) {
-                testObj.tool= shared.convert_tool( tool, true );
+                testObj.spec.tool= shared.convert_tool( tool, true );
 
             }
+        }
+        if ("duration" in testObj.spec && isNaN(testObj.spec.duration)) {
+            testObj.spec.duration = shared.iso8601_to_seconds( testObj.spec.duration );
         }
         // TODO: review - hostgroups not required when creating testspecs
         console.log("BEFORE ADDING HOSTGROUPS testObj", testObj);
@@ -510,12 +513,22 @@ exports._extract_psconfig_tests = function( importedConfig, sub, mainConfig ) {
         var tasksObj = importedConfig.tasks;
 
 
+
         var hosts = [];
         _.each( tasksObj, function( taskObj, taskName ) {
             if ( taskObj.test == testName ) {
-                var groupName = taskObj.group;
-                //hosts = importedConfig.tests[ taskObj.test ].type; 
+                var thisTask = taskObj;
+                var groupName = thisTask.group;
+                //var tools = thisTask.tools;
+                //testObj.spec.tool = tools;
+                //hosts = importedConfig.tests[ thisTask.test ].type; 
                 hosts = _.map(groups[ groupName ].addresses, function(obj, index) {return obj.name;});
+                var scheduleName = thisTask.schedule;
+                if ( scheduleName in importedConfig.schedules ) {
+                    var scheduleObj = importedConfig.schedules[ scheduleName ];
+                    var interval = shared.iso8601_to_seconds( scheduleObj.repeat );
+                    testObj.spec.interval = interval;
+                }
             }
 
         });

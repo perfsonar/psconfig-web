@@ -1,3 +1,4 @@
+const moment = require('moment');
 
 exports.convert_tool = function( tool, reverse ) {
     var tool_conversions = {
@@ -77,3 +78,21 @@ exports.rename_field = function( obj, oldname, newname ) {
     return obj;
 
 };
+
+exports.seconds_to_iso8601 = function( dur ) {
+    var isoOut = moment.duration(dur * 1000); // moment.duration expects milliseconds
+    isoOut = isoOut.toISOString();
+    return isoOut;
+};
+
+
+exports.iso8601_to_seconds = function( iso ) {
+    console.log("iso duration", iso);
+    var mom = moment.duration(iso);
+    //console.log("ms", ms);
+    var seconds = mom.asSeconds();
+    console.log("seconds", seconds);
+    return seconds;
+};
+
+
