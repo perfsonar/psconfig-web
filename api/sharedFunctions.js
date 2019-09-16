@@ -19,6 +19,27 @@ exports.convert_tool = function( tool, reverse ) {
 
 };
 
+exports.convert_service_type = function( service_type, reverse ) {
+    var service_type_conversions = {
+        throughput: "bwctl",
+        latency: "owamp",
+        latencybg: "owamp",
+        ping: "rtt",
+        traceroute: "traceroute"
+    };
+
+    if ( reverse ) {
+        service_type_conversions = exports.swap( service_type_conversions );
+    }
+
+    if ( service_type in service_type_conversions ) {
+        console.log("changing service_type ", service_type, " to ", service_type_conversions[service_type]);
+        service_type = service_type_conversions[ service_type ];
+    }
+    return service_type;
+
+};
+
 exports.swap = function (json){
   var ret = {};
   for(var key in json){

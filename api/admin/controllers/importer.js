@@ -155,6 +155,7 @@ function ensure_hostgroups(hostgroups, cb) {
 //make sure all testspecs exist
 function ensure_testspecs(testspecs, cb) {
     async.eachSeries(testspecs, function(testspec, next_testspec) {
+        console.log("testspec in ensure_testspec", testspec);
         //crude, but let's key by name for now..
         db.Testspec.findOne({name: testspec.name}, function(err, _testspec) {
             if(err) return next_testspec(err);
@@ -264,7 +265,9 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
         hosts_info = exports._process_meshconfig( importedConfig, sub, config_params, mainConfig, cb );
     } else if ( config_format == "psconfig" ) {
         hosts_info = exports._process_psconfig( importedConfig, sub, config_params, mainConfig, cb );
-
+        hostgroups = exports._extract_psconfig_hostgroups( importedConfig, sub, mainConfig );
+        testspecs = exports._extract_psconfig_tests( importedConfig, sub, mainConfig );
+        console.log("testspecs", testspecs);
     }
 
     //if ( config_format == "psconfig" ) {
@@ -287,8 +290,9 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
                 ensure_testspecs(testspecs, function(err) {
                     //add correct db references
                     tests.forEach(function(test) {
+                        console.log("TEST", test);
                         test.agroup = test._agroup._id;
-                        test.testspec = test._testspec._id;
+                        //test.testspec = test._testspec._id;
                     });
                     cb(null, tests, config_params);
                 });
@@ -384,11 +388,11 @@ exports._process_meshconfig = function ( importedConfig, sub, config_params, mai
         var type = get_service_type(test.parameters.type);
         var hostgroup = {
             name: test.description+" Group",
-        desc: "Imported by PWA importer",
-        type: "static",
-        service_type: type,
-        admins: [sub.toString()],
-        _hosts: test.members.members, //hostnames that needs to be converted to host id
+            desc: "Imported by PWA importer",
+            type: "static",
+            service_type: type,
+            admins: [sub.toString()],
+            _hosts: test.members.members, //hostnames that needs to be converted to host id
         };
         hostgroups.push(hostgroup);
 
@@ -461,12 +465,12 @@ exports._process_psconfig = function ( importedConfig, sub, config_params, mainC
 
     var hosts_info = exports._extract_psconfig_hosts( importedConfig, config_params, sub );
     
-    var hostGroups = exports._extract_psconfig_hostgroups( importedConfig, config_params, sub );
+    hostGroups = exports._extract_psconfig_hostgroups( importedConfig, sub, mainConfig );
     //config_params.hosts = hosts_obj.hosts;
     console.log("hosts_info", hosts_info);
     config_params.addresses = hosts_info.addresses;
 
-    testspecs = exports._extract_psconfig_tests( importedConfig, sub );
+    testspecs = exports._extract_psconfig_tests( importedConfig, sub, mainConfig );
     
 
     console.log("config_params psconfig", config_params);
@@ -475,10 +479,10 @@ exports._process_psconfig = function ( importedConfig, sub, config_params, mainC
     return hosts_info;
 };
 
-exports._extract_psconfig_tests = function( importedConfig, sub ) {
+exports._extract_psconfig_tests = function( importedConfig, sub, mainConfig ) {
+    var hostgroups = mainConfig.hostgroups;
     var importedTests = importedConfig.tests;
-    var tests = importedConfig.tests;
-    var tests = [];
+    var tests = mainConfig.tests;
     var testspecs = [];
     _.each( importedTests, function( testObj, testName ) {
         testObj.name = testName;
@@ -491,7 +495,7 @@ exports._extract_psconfig_tests = function( importedConfig, sub ) {
         } else {
             testObj.schedule_type = "interval";
         }
-        var type = testObj.type;
+        var type = shared.convert_service_type( testObj.type );
         if ( importedConfig.tasks[ testName ].tools ) {
             var tool = importedConfig.tasks[ testName ].tools[0];
             tool = tool.replace("bwctl", "");
@@ -501,16 +505,30 @@ exports._extract_psconfig_tests = function( importedConfig, sub ) {
             }
         }
         // TODO: review - hostgroups not required when creating testspecs
-        /*
+        console.log("BEFORE ADDING HOSTGROUPS testObj", testObj);
+        var groups = importedConfig.groups;
+        var tasksObj = importedConfig.tasks;
+
+
+        var hosts = [];
+        _.each( tasksObj, function( taskObj, taskName ) {
+            if ( taskObj.test == testName ) {
+                var groupName = taskObj.group;
+                //hosts = importedConfig.tests[ taskObj.test ].type; 
+                hosts = _.map(groups[ groupName ].addresses, function(obj, index) {return obj.name;});
+            }
+
+        });
+       console.log("hosts", hosts); 
         var hostgroup = {
-            name: testObj.description+" Group",
+            name: testName+" Group",
             desc: "Imported by PWA importer",
             type: "static",
             service_type: type,
             admins: [sub.toString()],
-            _hosts: testObj.members.members, //hostnames that needs to be converted to host id
+            _hosts: hosts, //hostnames that needs to be converted to host id
         };
-        */
+        
         shared.rename_dashes_to_underscores( testObj.spec );
 
         var testspec = {
@@ -527,7 +545,7 @@ exports._extract_psconfig_tests = function( importedConfig, sub ) {
             mesh_type: "mesh", // TODO: allow other mesh_types
             enabled: true,
             nahosts: [],
-            //_agroup: hostgroup, //
+            _agroup: hostgroup, 
             //specs: testspec //tmp
             specs: testObj.spec
 
@@ -538,18 +556,30 @@ exports._extract_psconfig_tests = function( importedConfig, sub ) {
     });
     console.log("tests", tests);
 
-    return testspecs;
+    return tests;
 
 };
 
-exports._extract_psconfig_hostgroups = function( importedConfig, sub ) {
+exports._extract_psconfig_hostgroups = function( importedConfig, sub, mainConfig ) {
     var groups = importedConfig.groups;
+    var hostgroups = mainConfig.hostgroups;
+    var testspecs = mainConfig.testspecs;
 
     console.log("groups", JSON.stringify(groups, null, 4) );
-    var hostgroups = [];
+    //var hostgroups = [];
 
     _.each( groups, function( groupObj, groupName ) {
         //var serviceType = 
+        var tasks = importedConfig.tasks;
+        console.log("tasks", JSON.stringify(tasks, null, 4) );
+
+        var serviceType;
+        _.each( tasks, function( taskObj, taskName ) {
+            if ( taskObj.group == groupName ) {
+                serviceType = importedConfig.tests[ taskObj.test ].type; 
+            }
+
+        });
 
         var group = {
             name: groupName,
@@ -559,11 +589,16 @@ exports._extract_psconfig_hostgroups = function( importedConfig, sub ) {
             desc: "Imported by PWA pSConfig importer",
             _hosts: _.map(groupObj.addresses, function(obj, index) {return obj.name;}),
         };
+        if ( serviceType ) {
+            group.service_type = shared.convert_service_type( serviceType );
+
+        }
         hostgroups.push( group );
 
     });
 
     console.log("HOSTgroups array", JSON.stringify(hostgroups, null, 4) );
+    return hostgroups;
 
 };
 
