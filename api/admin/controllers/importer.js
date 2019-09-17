@@ -166,13 +166,16 @@ function ensure_testspecs(testspecs, cb) {
             if(_testspec) {
                 logger.debug("testspec seems to already exists");
                 testspec._id = _testspec._id;
+                    logger.debug("_testspec", JSON.stringify(_testspec, null, 4));
+                    logger.debug("testspec", JSON.stringify(testspec, null, 4));
                 return next_testspec(); 
             } else {
                 logger.debug("creating testspec");
                 db.Testspec.create(testspec, function(err, _testspec) {
                     if(err) return next_testspec(err);
                     testspec._id = _testspec._id;
-                    logger.debug(JSON.stringify(_testspec, null, 4));
+                    logger.debug("_testspec", JSON.stringify(_testspec, null, 4));
+                    logger.debug("testspec", JSON.stringify(testspec, null, 4));
                     next_testspec();
                 });
             }
@@ -306,17 +309,27 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
                 ensure_testspecs(testspecs, function(err) {
             console.log("testspecs ensured ...");
                     //add correct db references
-        tests = _.clone( testspecs );
-    _.each(tests, function( thisTest, thisTestName ) {
-        shared.rename_field( thisTest, "specs", "_testspec");
-    });
-                    console.log("TESTS", tests);
+        //tests = _.clone( testspecs );
+    //_.each(tests, function( thisTest, thisTestName ) {
+        //shared.rename_field( thisTest, "specs", "_testspec");
+    //});
                     tests.forEach(function(test) {
+                        _.each( testspecs, function(_testspec) {
+                            if ( test.name == _testspec.name ) {
+                                test._id = _testspec._id;
+                                test.testspec = _testspec._id;
+                                test._testspec._id = _testspec._id;
+
+                            } 
+
+                        });
                         test.agroup = test._agroup._id;
-                        test._testspec._id = test._id;
+                        //test._testspec._id = test._id;
                         console.log("TEST", test);
                         console.log("hostgroups", hostgroups);
                     });
+                    console.log("TESTS", tests);
+                    console.log("TESTSPECS", testspecs);
                     cb(null, tests, config_params);
                 });
             });
@@ -454,11 +467,11 @@ exports._process_meshconfig = function ( importedConfig, sub, config_params, mai
 
 
     hosts_info.forEach( function( host ) {
-        var hostname = host.hostname;        
+        var hostname = host.hostname;
         var host_types = hosts_service_types[ hostname ];
         if ( typeof host_types == "undefined" ) return;
         var types = Object.keys( host_types );
-        types.forEach( function( type ) {            
+        types.forEach( function( type ) {
             host.services.push( { "type": type } );
         });
 
@@ -487,13 +500,13 @@ exports._process_psconfig = function ( importedConfig, sub, config_params, mainC
 
 
     var hosts_info = exports._extract_psconfig_hosts( importedConfig, config_params, sub );
-    
+
     hostgroups = exports._extract_psconfig_hostgroups( importedConfig, sub, mainConfig );
     //config_params.hosts = hosts_obj.hosts;
     console.log("hosts_info", hosts_info);
     config_params.addresses = hosts_info.addresses;
 
-    testspecs = exports._extract_psconfig_tests( importedConfig, sub, mainConfig );
+    //testspecs = exports._extract_psconfig_tests( importedConfig, sub, mainConfig );
 
     
 
@@ -533,6 +546,7 @@ exports._extract_psconfig_tests = function( importedConfig, sub, mainConfig ) {
         }
         if ("duration" in testObj.spec && isNaN(testObj.spec.duration)) {
             testObj.spec.duration = shared.iso8601_to_seconds( testObj.spec.duration );
+            testObj.spec.omit = shared.iso8601_to_seconds( testObj.spec.omit );
         }
         // TODO: review - hostgroups not required when creating testspecs
         console.log("BEFORE ADDING HOSTGROUPS testObj", testObj);
@@ -572,6 +586,7 @@ exports._extract_psconfig_tests = function( importedConfig, sub, mainConfig ) {
         shared.rename_dashes_to_underscores( testObj.spec );
 
         var testspec = {
+            name: testName+" Testspec",
             service_type: type,
             admins: [sub.toString()],
             specs: testObj.spec,
@@ -593,8 +608,21 @@ exports._extract_psconfig_tests = function( importedConfig, sub, mainConfig ) {
 
 
         console.log("testObj", testObj);
-    });
     console.log("testspecs", testspecs);
+
+
+        tests.push({
+            name: testName+" Testspec",
+            desc: "Imported by PWA pSConfig importer",
+            service_type: type ,
+            mesh_type: "mesh", // TODO: allow other mesh_types
+            enabled: true,
+            nahosts: [],
+            _agroup: hostgroup, //
+            _testspec: testspec //tmp
+        });
+    });
+    /*
     var theseTests = _.clone( testspecs );
 
     _.each(theseTests, function( thisTest, thisTestName ) {
@@ -603,7 +631,7 @@ exports._extract_psconfig_tests = function( importedConfig, sub, mainConfig ) {
 
     });
     tests = theseTests;
-
+*/
     console.log("tests modified", JSON.stringify( tests, null, "\t") );
 
 
