@@ -13,7 +13,6 @@ exports.convert_tool = function( tool, reverse ) {
         tool_conversions = exports.swap( tool_conversions );
     }
     if ( tool in tool_conversions ) {
-        console.log("changing tool ", tool, " to ", tool_conversions[tool]);
         tool = tool_conversions[ tool ];
     }
     return tool;
@@ -34,7 +33,6 @@ exports.convert_service_type = function( service_type, reverse ) {
     }
 
     if ( service_type in service_type_conversions ) {
-        console.log("changing service_type ", service_type, " to ", service_type_conversions[service_type]);
         service_type = service_type_conversions[ service_type ];
     }
     return service_type;
@@ -87,11 +85,8 @@ exports.seconds_to_iso8601 = function( dur ) {
 
 
 exports.iso8601_to_seconds = function( iso ) {
-    console.log("iso duration", iso);
     var mom = moment.duration(iso);
-    //console.log("ms", ms);
     var seconds = mom.asSeconds();
-    console.log("seconds", seconds);
     return seconds;
 };
 

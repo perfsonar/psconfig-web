@@ -59,25 +59,12 @@ function resolve_hosts(hostnames, cb) {
 //make sure all hosts exist
 function ensure_hosts(hosts_info, tests, cb) {
     var service_types = [];
-    /*
-    tests.forEach( function( test ) {
-        service_types.push( test.service_type );
-        //service_types[ test.service_type ] = 1;
-
-    });
-    */
-
-
-    //console.log("HOSTS_INFO", hosts_info, "HOSTS_INFO");
 
     async.eachSeries(hosts_info, function(host, next_host) {
         db.Host.findOne({hostname: host.hostname}, function(err, _host) {
             if(err) return next_host(err);
 
             if(_host) {
-                //console.log("_HOST", _host);
-                console.log("_HOST._ID", _host._id);
-                logger.debug("host already exists", host.hostname);
                 host._id = _host._id;
                 if(_host.lsid) {
                     if ( "sitename" in host ) {
@@ -115,7 +102,6 @@ function ensure_hosts(hosts_info, tests, cb) {
                 db.Host.create(host, function(err, _host) {
                     if(err) return next_host(err);
                     logger.debug("created host");
-                    logger.debug(JSON.stringify(_host, null, 4));
                     return next_host()
                 });
             }
@@ -132,9 +118,7 @@ function ensure_hostgroups(hostgroups, cb) {
 
             if(_hostgroup) {
                 logger.debug("hostgroup seems to already exists");
-                logger.debug("_hostgroup", JSON.stringify(_hostgroup, null, 4));
                 hostgroup._id = _hostgroup._id;
-                logger.debug("hostgroup", JSON.stringify(hostgroup, null, 4));
                 return next_hostgroup();
             } else {
                 logger.debug("need to create hostgroup resolving hosts..", hostgroup._hosts);
@@ -145,8 +129,6 @@ function ensure_hostgroups(hostgroups, cb) {
                     db.Hostgroup.create(hostgroup, function(err, _hostgroup) {
                         if(err) return next_hostgroup(err);
                         hostgroup._id = _hostgroup._id;
-                        logger.debug(JSON.stringify(_hostgroup, null, 4));
-                        logger.debug(JSON.stringify(hostgroup, null, 4));
                         next_hostgroup();
                     });
                 });
@@ -158,7 +140,6 @@ function ensure_hostgroups(hostgroups, cb) {
 //make sure all testspecs exist
 function ensure_testspecs(testspecs, cb) {
     async.eachSeries(testspecs, function(testspec, next_testspec) {
-        console.log("testspec in ensure_testspec", testspec);
         //crude, but let's key by name for now..
         db.Testspec.findOne({name: testspec.name}, function(err, _testspec) {
             if(err) return next_testspec(err);
@@ -166,16 +147,12 @@ function ensure_testspecs(testspecs, cb) {
             if(_testspec) {
                 logger.debug("testspec seems to already exists");
                 testspec._id = _testspec._id;
-                    logger.debug("_testspec", JSON.stringify(_testspec, null, 4));
-                    logger.debug("testspec", JSON.stringify(testspec, null, 4));
                 return next_testspec(); 
             } else {
                 logger.debug("creating testspec");
                 db.Testspec.create(testspec, function(err, _testspec) {
                     if(err) return next_testspec(err);
                     testspec._id = _testspec._id;
-                    logger.debug("_testspec", JSON.stringify(_testspec, null, 4));
-                    logger.debug("testspec", JSON.stringify(testspec, null, 4));
                     next_testspec();
                 });
             }
@@ -217,15 +194,6 @@ exports._detect_config_type = function( config ) {
             && _.isObject( config ) ) {
 
        var keys = _.keys( config );
-       /*(
-       console.log("KEYS", keys);
-       */
-       console.log("pSConfigKeys", pSConfigKeys);
-       console.log("meshConfigKeys", meshConfigKeys);
-       /*
-       console.log("intersection meshconfig",  _.intersection( keys, meshConfigKeys ));
-       console.log("intersection meshconfig LENGTH",  _.intersection( keys, meshConfigKeys ).length);
-       */
        if ( _.intersection( keys, pSConfigKeys ).length > 0 ) {
            //console.log("format:", "psconfig");
            format = "psconfig";
@@ -254,13 +222,6 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
     var testspecs = mainConfig.testspecs;
     var hostgroups = mainConfig.hostgroups;
 
-    console.log("hostgroups", hostgroups);
-
-    //var out = importedConfig;
-    //out = JSON.stringify( out, null, "\t" );
-
-    //console.log("importedConfig", importedConfig);
-    //console.log("OUT", out);
     sub = sub.toString();
 
     // config_params holds parameters to pass back to the callback
@@ -273,41 +234,24 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
         hosts_info = exports._process_psconfig( importedConfig, sub, config_params, mainConfig, cb );
         //hostgroups = exports._extract_psconfig_hostgroups( importedConfig, sub, mainConfig );
         testspecs = exports._extract_psconfig_tests( importedConfig, sub, mainConfig );
-        console.log("testspecs PSCONFIG", testspecs);
     }
 
-    //if ( config_format == "psconfig" ) {
-        //console.log("IMPORTED CONFIG!!!!\n");
-        //console.log( JSON.stringify( importedConfig));
-
-        console.log("MAINCONFIG INTERMEDIATE", config_format, "\n");
-        console.log( JSON.stringify( mainConfig, null, 3 ));
-
-        console.log("CONFIG_PARAMS INTERMEDIATE", config_format, "\n");
-        console.log( JSON.stringify( config_params, null, 3 ));
-
-    //}
 
 
     //now do update (TODO - should I let caller handle this?)
     if (! disable_ensure_hosts ) {
         ensure_hosts(hosts_info, tests, function(err) {
-            console.log("hosts ensured ...");
             ensure_hostgroups(hostgroups, function(err) {
                 _.each( hostgroups, function(_group) {
                     _.each( testspecs, function( _testspec ) {
                         if ( _testspec._agroup.name == _group.name || _testspec._agroup.name == _group.name + " Group" ) {
                             _testspec._agroup._id = _group._id;
                         }
-                        console.log("_group", JSON.stringify( _group, null, 3 ));
-                        console.log("_testspec", JSON.stringify( _testspec, null, 3 ));
 
                     });
 
                 });
-            console.log("hostgroups ensured ...");
                 ensure_testspecs(testspecs, function(err) {
-            console.log("testspecs ensured ...");
                     //add correct db references
         //tests = _.clone( testspecs );
     //_.each(tests, function( thisTest, thisTestName ) {
@@ -325,11 +269,7 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
                         });
                         test.agroup = test._agroup._id;
                         //test._testspec._id = test._id;
-                        console.log("TEST", test);
-                        console.log("hostgroups", hostgroups);
                     });
-                    console.log("TESTS", tests);
-                    console.log("TESTSPECS", testspecs);
                     cb(null, tests, config_params);
                 });
             });
@@ -363,12 +303,6 @@ exports._process_meshconfig = function ( importedConfig, sub, config_params, mai
 
     var ma_urls = Object.keys( ma_url_obj );
     config_params.archives = ma_urls;
-    //importedConfig.ma_urls = ma_urls;
-    //importedConfig.config_params = config_params;
-
-    //console.log("IMPORTER ma_urls", ma_urls);
-    //console.log("config_params", config_params);
-
 
     //process hosts
     var hosts_info = [];
@@ -463,9 +397,6 @@ exports._process_meshconfig = function ( importedConfig, sub, config_params, mai
         });
     });
 
-    console.log("MESHCONFIG hosts_service_types", hosts_service_types);
-
-
     hosts_info.forEach( function( host ) {
         var hostname = host.hostname;
         var host_types = hosts_service_types[ hostname ];
@@ -477,8 +408,6 @@ exports._process_meshconfig = function ( importedConfig, sub, config_params, mai
 
     });
 
-    console.log("MESHCONFIG INTERIM CONFIG", mainConfig);
-    console.log("MESHCONFIG INTERM CONFIG PARAMS", config_params);
 
 };
 
@@ -494,7 +423,6 @@ exports._process_psconfig = function ( importedConfig, sub, config_params, mainC
 
     var archive_obj = exports._extract_psconfig_mas( importedConfig , config_params );
 
-    console.log("archive_obj", archive_obj);
 
     config_params.archives = archive_obj.central;
 
@@ -503,14 +431,9 @@ exports._process_psconfig = function ( importedConfig, sub, config_params, mainC
 
     hostgroups = exports._extract_psconfig_hostgroups( importedConfig, sub, mainConfig );
     //config_params.hosts = hosts_obj.hosts;
-    console.log("hosts_info", hosts_info);
     config_params.addresses = hosts_info.addresses;
 
     //testspecs = exports._extract_psconfig_tests( importedConfig, sub, mainConfig );
-
-    
-
-    console.log("config_params psconfig", config_params);
 
 
     // TODO: fill out tests object much how meshconfig works above
@@ -549,7 +472,6 @@ exports._extract_psconfig_tests = function( importedConfig, sub, mainConfig ) {
             testObj.spec.omit = shared.iso8601_to_seconds( testObj.spec.omit );
         }
         // TODO: review - hostgroups not required when creating testspecs
-        console.log("BEFORE ADDING HOSTGROUPS testObj", testObj);
         var groups = importedConfig.groups;
         var tasksObj = importedConfig.tasks;
 
@@ -573,7 +495,6 @@ exports._extract_psconfig_tests = function( importedConfig, sub, mainConfig ) {
             }
 
         });
-       console.log("hosts", hosts); 
         var hostgroup = {
             name: testName+" Group",
             desc: "Imported by PWA importer",
@@ -607,10 +528,6 @@ exports._extract_psconfig_tests = function( importedConfig, sub, mainConfig ) {
         });
 
 
-        console.log("testObj", testObj);
-    console.log("testspecs", testspecs);
-
-
         tests.push({
             name: testName+" Testspec",
             desc: "Imported by PWA pSConfig importer",
@@ -632,7 +549,6 @@ exports._extract_psconfig_tests = function( importedConfig, sub, mainConfig ) {
     });
     tests = theseTests;
 */
-    console.log("tests modified", JSON.stringify( tests, null, "\t") );
 
 
     return testspecs;
@@ -644,12 +560,10 @@ exports._extract_psconfig_hostgroups = function( importedConfig, sub, mainConfig
     var hostgroups = mainConfig.hostgroups;
     var testspecs = mainConfig.testspecs;
 
-    console.log("groups", JSON.stringify(groups, null, 4) );
 
     _.each( groups, function( groupObj, groupName ) {
         //var serviceType = 
         var tasks = importedConfig.tasks;
-        console.log("tasks", JSON.stringify(tasks, null, 4) );
 
         var serviceType;
         _.each( tasks, function( taskObj, taskName ) {
@@ -675,7 +589,6 @@ exports._extract_psconfig_hostgroups = function( importedConfig, sub, mainConfig
 
     });
 
-    console.log("HOSTgroups array", JSON.stringify(hostgroups, null, 4) );
     return hostgroups;
 
 };
@@ -694,14 +607,10 @@ exports._extract_psconfig_hosts = function( importedConfig, config_params, sub )
          ],
          "_hosts": [
      * */
-    //console.log("config_params", config_params);
-    console.log("importedConfig", JSON.stringify(importedConfig, null, "\t"));
     var hosts_info = [];
     var addrs = importedConfig.addresses;
     var hostsImported = importedConfig.hosts;
     _.each( addrs, function(hostInfo, hostname) {
-        console.log("hostname ", hostname);
-        console.log("hostInfo", hostInfo);
         var desc = hostInfo._meta["display-name"];
         var toolkitURL = hostInfo._meta["display-url"];
         var address = hostInfo.address;
@@ -755,27 +664,12 @@ exports._extract_psconfig_hosts = function( importedConfig, config_params, sub )
                 };
 
 
-                //console.log("host_info", host_info);
                 if(host_info.toolkit_url && host_info.toolkit_url != "auto") host_info.toolkit_url = host_info.toolkit_url;
                 hosts_info.push(host_info);
-       
-       /* hosts_service_types example from meshconfig format
-        *
-        * hosts_service_types { 'perfsonar-dev5.grnoc.iu.edu': { bwctl: 1, traceroute: 1, owamp: 1 }},
-  'ps-dev-deb8-1.es.net': { bwctl: 1, traceroute: 1, owamp: 1 },
-  'ps-dev-el6-1.es.net': { bwctl: 1, traceroute: 1, owamp: 1, ping: 1 },
-        *
-        * 
-       */ 
-
 
     });
 
-    //config_params.hosts = hosts_info;
-    //hosts_obj.addresses = hosts_obj;
 
-
-    console.log("hosts_info before returning", hosts_info);
     return hosts_info;
 };
 
