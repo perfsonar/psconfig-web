@@ -132,7 +132,9 @@ function ensure_hostgroups(hostgroups, cb) {
 
             if(_hostgroup) {
                 logger.debug("hostgroup seems to already exists");
+                logger.debug("_hostgroup", JSON.stringify(_hostgroup, null, 4));
                 hostgroup._id = _hostgroup._id;
+                logger.debug("hostgroup", JSON.stringify(hostgroup, null, 4));
                 return next_hostgroup();
             } else {
                 logger.debug("need to create hostgroup resolving hosts..", hostgroup._hosts);
@@ -144,6 +146,7 @@ function ensure_hostgroups(hostgroups, cb) {
                         if(err) return next_hostgroup(err);
                         hostgroup._id = _hostgroup._id;
                         logger.debug(JSON.stringify(_hostgroup, null, 4));
+                        logger.debug(JSON.stringify(hostgroup, null, 4));
                         next_hostgroup();
                     });
                 });
@@ -265,9 +268,9 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
         hosts_info = exports._process_meshconfig( importedConfig, sub, config_params, mainConfig, cb );
     } else if ( config_format == "psconfig" ) {
         hosts_info = exports._process_psconfig( importedConfig, sub, config_params, mainConfig, cb );
-        hostgroups = exports._extract_psconfig_hostgroups( importedConfig, sub, mainConfig );
+        //hostgroups = exports._extract_psconfig_hostgroups( importedConfig, sub, mainConfig );
         testspecs = exports._extract_psconfig_tests( importedConfig, sub, mainConfig );
-        console.log("testspecs", testspecs);
+        console.log("testspecs PSCONFIG", testspecs);
     }
 
     //if ( config_format == "psconfig" ) {
@@ -286,13 +289,33 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
     //now do update (TODO - should I let caller handle this?)
     if (! disable_ensure_hosts ) {
         ensure_hosts(hosts_info, tests, function(err) {
+            console.log("hosts ensured ...");
             ensure_hostgroups(hostgroups, function(err) {
+                _.each( hostgroups, function(_group) {
+                    _.each( testspecs, function( _testspec ) {
+                        if ( _testspec._agroup.name == _group.name || _testspec._agroup.name == _group.name + " Group" ) {
+                            _testspec._agroup._id = _group._id;
+                        }
+                        console.log("_group", JSON.stringify( _group, null, 3 ));
+                        console.log("_testspec", JSON.stringify( _testspec, null, 3 ));
+
+                    });
+
+                });
+            console.log("hostgroups ensured ...");
                 ensure_testspecs(testspecs, function(err) {
+            console.log("testspecs ensured ...");
                     //add correct db references
+        tests = _.clone( testspecs );
+    _.each(tests, function( thisTest, thisTestName ) {
+        shared.rename_field( thisTest, "specs", "_testspec");
+    });
+                    console.log("TESTS", tests);
                     tests.forEach(function(test) {
-                        console.log("TEST", test);
                         test.agroup = test._agroup._id;
-                        //test.testspec = test._testspec._id;
+                        test._testspec._id = test._id;
+                        console.log("TEST", test);
+                        console.log("hostgroups", hostgroups);
                     });
                     cb(null, tests, config_params);
                 });
@@ -448,7 +471,7 @@ exports._process_meshconfig = function ( importedConfig, sub, config_params, mai
 
 exports._process_psconfig = function ( importedConfig, sub, config_params, mainConfig, cb ) {
     var tests = mainConfig.tests;
-    var hostGroups = mainConfig.hostgroups;
+    var hostgroups = mainConfig.hostgroups;
     var testspecs = mainConfig.testspecs;
 
     var config_desc = importedConfig._meta["display-name"];
@@ -465,15 +488,19 @@ exports._process_psconfig = function ( importedConfig, sub, config_params, mainC
 
     var hosts_info = exports._extract_psconfig_hosts( importedConfig, config_params, sub );
     
-    hostGroups = exports._extract_psconfig_hostgroups( importedConfig, sub, mainConfig );
+    hostgroups = exports._extract_psconfig_hostgroups( importedConfig, sub, mainConfig );
     //config_params.hosts = hosts_obj.hosts;
     console.log("hosts_info", hosts_info);
     config_params.addresses = hosts_info.addresses;
 
     testspecs = exports._extract_psconfig_tests( importedConfig, sub, mainConfig );
+
     
 
     console.log("config_params psconfig", config_params);
+
+
+    // TODO: fill out tests object much how meshconfig works above
 
 
     return hosts_info;
@@ -483,7 +510,7 @@ exports._extract_psconfig_tests = function( importedConfig, sub, mainConfig ) {
     var hostgroups = mainConfig.hostgroups;
     var importedTests = importedConfig.tests;
     var tests = mainConfig.tests;
-    var testspecs = [];
+    var testspecs = mainConfig.testspecs;
     _.each( importedTests, function( testObj, testName ) {
         testObj.name = testName;
 
@@ -550,7 +577,7 @@ exports._extract_psconfig_tests = function( importedConfig, sub, mainConfig ) {
             specs: testObj.spec,
         };
 
-        tests.push({
+        testspecs.push({
             name: testName+" Testspec",
             desc: "Imported by PWA pSConfig importer",
             //desc: "imported", //I don't think this is used anymore
@@ -567,9 +594,20 @@ exports._extract_psconfig_tests = function( importedConfig, sub, mainConfig ) {
 
         console.log("testObj", testObj);
     });
-    console.log("tests", tests);
+    console.log("testspecs", testspecs);
+    var theseTests = _.clone( testspecs );
 
-    return tests;
+    _.each(theseTests, function( thisTest, thisTestName ) {
+        shared.rename_field( thisTest, "specs", "_testspec");
+        //tests.push( theseTests );
+
+    });
+    tests = theseTests;
+
+    console.log("tests modified", JSON.stringify( tests, null, "\t") );
+
+
+    return testspecs;
 
 };
 
@@ -579,7 +617,6 @@ exports._extract_psconfig_hostgroups = function( importedConfig, sub, mainConfig
     var testspecs = mainConfig.testspecs;
 
     console.log("groups", JSON.stringify(groups, null, 4) );
-    //var hostgroups = [];
 
     _.each( groups, function( groupObj, groupName ) {
         //var serviceType = 
