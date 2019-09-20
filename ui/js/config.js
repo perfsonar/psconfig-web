@@ -258,7 +258,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
             console.error(res);
             console.log("Oops. Failed to import specified URL.");
 
-            toaster.error("Oops. Failed to import specified URL.");
+            toaster.error("Oops. Failed to import specified URL.", res.data.message);
         });
     }
 });

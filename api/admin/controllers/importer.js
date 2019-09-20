@@ -63,6 +63,8 @@ function ensure_hosts(hosts_info, tests, cb) {
     async.eachSeries(hosts_info, function(host, next_host) {
         db.Host.findOne({hostname: host.hostname}, function(err, _host) {
             if(err) return next_host(err);
+            console.log("_host", _host);
+
 
             if(_host) {
                 host._id = _host._id;
@@ -91,6 +93,7 @@ function ensure_hosts(hosts_info, tests, cb) {
                         });
                         logger.debug("updating services");
                     }
+                    console.log("_host before saving", _host);
                         _host.save(next_host);
                 }
             } else {
@@ -237,15 +240,24 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
     }
 
 
+    console.log("hosts_info", hosts_info);
 
     //now do update (TODO - should I let caller handle this?)
     if (! disable_ensure_hosts ) {
+        //TODO: SOMETHING IS WRONG IN ensure_hosts WITH MESHCONFIG IMPORT
         ensure_hosts(hosts_info, tests, function(err) {
             ensure_hostgroups(hostgroups, function(err) {
                 _.each( hostgroups, function(_group) {
                     _.each( testspecs, function( _testspec ) {
-                        if ( _testspec._agroup.name == _group.name || _testspec._agroup.name == _group.name + " Group" ) {
-                            _testspec._agroup._id = _group._id;
+                        console.log("_group", _group);
+                        console.log("_testspec", _testspec);
+                        if ( "_agroup" in _testspec) {
+                            if (  _testspec._agroup.name == _group.name || _testspec._agroup.name == _group.name + " Group" ) {
+                                _testspec._agroup._id = _group._id;
+                            }
+                        }
+                        else { 
+                            console.log("_testspec does not contain _agroup", _testspec);
                         }
 
                     });
@@ -262,13 +274,14 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
                             if ( test.name == _testspec.name ) {
                                 test._id = _testspec._id;
                                 test.testspec = _testspec._id;
-                                test._testspec._id = _testspec._id;
+                                test._testspec._id = _testspec._id;                                
 
                             } 
 
                         });
                         test.agroup = test._agroup._id;
-                        //test._testspec._id = test._id;
+                        test.testspec = test._testspec._id;
+                        console.log("TEST AFTER CHANGES", test);
                     });
                     cb(null, tests, config_params);
                 });
@@ -353,12 +366,13 @@ exports._process_meshconfig = function ( importedConfig, sub, config_params, mai
     var hosts_service_types = {};
     importedConfig.tests.forEach(function(test) {
         var member_type = test.members.type;
-        if(member_type != "mesh") return cb("only mesh type is supported currently");
+        console.log("member_type", member_type);
+        if(member_type != "mesh") return cb("only mesh type is supported currently; type requested: "+ member_type);
 
         var type = get_service_type(test.parameters.type);
         var hostgroup = {
             name: test.description+" Group",
-            desc: "Imported by PWA importer",
+            //desc: "Imported by PWA importer",
             type: "static",
             service_type: type,
             admins: [sub.toString()],
@@ -408,6 +422,7 @@ exports._process_meshconfig = function ( importedConfig, sub, config_params, mai
 
     });
 
+    return hosts_info;
 
 };
 
@@ -515,7 +530,7 @@ exports._extract_psconfig_tests = function( importedConfig, sub, mainConfig ) {
 
         testspecs.push({
             name: testName+" Testspec",
-            desc: "Imported by PWA pSConfig importer",
+            //desc: "Imported by PWA pSConfig importer",
             //desc: "imported", //I don't think this is used anymore
             service_type: type ,
             mesh_type: "mesh", // TODO: allow other mesh_types
@@ -578,7 +593,7 @@ exports._extract_psconfig_hostgroups = function( importedConfig, sub, mainConfig
             type: "static",
             //service_type: serviceType,
             admins: [sub.toString()],
-            desc: "Imported by PWA pSConfig importer",
+            //desc: "Imported by PWA pSConfig importer",
             _hosts: _.map(groupObj.addresses, function(obj, index) {return obj.name;}),
         };
         if ( serviceType ) {
