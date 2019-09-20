@@ -49,7 +49,7 @@ function get_service_type(mc_type) {
 }
 
 function resolve_hosts(hostnames, cb) {
-    db.Host.find({hostname: {$in: hostnames}}, function(err, hosts) {
+    db.Host.find({'addresses.address': {$in: hostnames}}, function(err, hosts) {
         if(err) return cb(err);
         var ids = hosts.map(host=>host._id);
         cb(null, ids);
@@ -91,7 +91,7 @@ function ensure_hosts(hosts_info, tests, cb) {
                         });
                         logger.debug("updating services");
                     }
-                    //console.log("_host before saving", _host);
+                    logger.debug("_host before saving", _host);
                         _host.save(next_host);
                 }
             } else {
@@ -123,6 +123,7 @@ function ensure_hostgroups(hostgroups, cb) {
                 return next_hostgroup();
             } else {
                 logger.debug("need to create hostgroup resolving hosts..", hostgroup._hosts);
+                //console.log("hostgroup before resolving hosts", hostgroup);
                 resolve_hosts(hostgroup._hosts, function(err, hosts) {
                     if(err) return next_hostgroup(err);
                     hostgroup.hosts = hosts;
@@ -364,7 +365,7 @@ exports._process_meshconfig = function ( importedConfig, sub, config_params, mai
         var type = get_service_type(test.parameters.type);
         var hostgroup = {
             name: test.description+" Group",
-            //desc: "Imported by PWA importer",
+            desc: "Imported by PWA importer",
             type: "static",
             service_type: type,
             admins: [sub.toString()],
@@ -393,7 +394,7 @@ exports._process_meshconfig = function ( importedConfig, sub, config_params, mai
 
         tests.push({
             name: test.description,
-            //desc: "imported", //I don't think this is used anymore
+            desc: "imported", //I don't think this is used anymore
             service_type: type ,
             mesh_type: "mesh", // TODO: allow other mesh_types
             enabled: true,
@@ -522,8 +523,7 @@ exports._extract_psconfig_tests = function( importedConfig, sub, mainConfig ) {
 
         testspecs.push({
             name: testName+" Testspec",
-            //desc: "Imported by PWA pSConfig importer",
-            //desc: "imported", //I don't think this is used anymore
+            desc: "Imported by PWA pSConfig importer",
             service_type: type ,
             mesh_type: "mesh", // TODO: allow other mesh_types
             enabled: true,
@@ -604,16 +604,6 @@ exports._extract_psconfig_hosts = function( importedConfig, config_params, sub )
     var hosts_obj = {};
 
     // Retrieve host info from importedConfig
-    /*
-     *   "name": "iperf3 TCP Test Between Testbeds Group",
-         "desc": "Imported by PWA importer",
-         "type": "static",
-         "service_type": "bwctl",
-         "admins": [
-            "1"
-         ],
-         "_hosts": [
-     * */
     var hosts_info = [];
     var addrs = importedConfig.addresses;
     var hostsImported = importedConfig.hosts;
