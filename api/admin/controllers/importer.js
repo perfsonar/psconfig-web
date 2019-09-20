@@ -63,8 +63,6 @@ function ensure_hosts(hosts_info, tests, cb) {
     async.eachSeries(hosts_info, function(host, next_host) {
         db.Host.findOne({hostname: host.hostname}, function(err, _host) {
             if(err) return next_host(err);
-            console.log("_host", _host);
-
 
             if(_host) {
                 host._id = _host._id;
@@ -93,7 +91,7 @@ function ensure_hosts(hosts_info, tests, cb) {
                         });
                         logger.debug("updating services");
                     }
-                    console.log("_host before saving", _host);
+                    //console.log("_host before saving", _host);
                         _host.save(next_host);
                 }
             } else {
@@ -198,10 +196,8 @@ exports._detect_config_type = function( config ) {
 
        var keys = _.keys( config );
        if ( _.intersection( keys, pSConfigKeys ).length > 0 ) {
-           //console.log("format:", "psconfig");
            format = "psconfig";
        } else if ( _.intersection( keys, meshConfigKeys ).length > 0  ) {
-           //console.log("format:", "meshconfig");
            format = "meshconfig";
        }
 
@@ -240,8 +236,6 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
     }
 
 
-    console.log("hosts_info", hosts_info);
-
     //now do update (TODO - should I let caller handle this?)
     if (! disable_ensure_hosts ) {
         //TODO: SOMETHING IS WRONG IN ensure_hosts WITH MESHCONFIG IMPORT
@@ -249,15 +243,13 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
             ensure_hostgroups(hostgroups, function(err) {
                 _.each( hostgroups, function(_group) {
                     _.each( testspecs, function( _testspec ) {
-                        console.log("_group", _group);
-                        console.log("_testspec", _testspec);
                         if ( "_agroup" in _testspec) {
                             if (  _testspec._agroup.name == _group.name || _testspec._agroup.name == _group.name + " Group" ) {
                                 _testspec._agroup._id = _group._id;
                             }
                         }
                         else { 
-                            console.log("_testspec does not contain _agroup", _testspec);
+                            //console.log("_testspec does not contain _agroup", _testspec);
                         }
 
                     });
@@ -281,7 +273,7 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
                         });
                         test.agroup = test._agroup._id;
                         test.testspec = test._testspec._id;
-                        console.log("TEST AFTER CHANGES", test);
+                        logger.debug("TEST AFTER CHANGES", test);
                     });
                     cb(null, tests, config_params);
                 });
@@ -366,7 +358,7 @@ exports._process_meshconfig = function ( importedConfig, sub, config_params, mai
     var hosts_service_types = {};
     importedConfig.tests.forEach(function(test) {
         var member_type = test.members.type;
-        console.log("member_type", member_type);
+        logger.debug("mesh_type (member_type)", member_type);
         if(member_type != "mesh") return cb("only mesh type is supported currently; type requested: "+ member_type);
 
         var type = get_service_type(test.parameters.type);
