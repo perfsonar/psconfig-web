@@ -800,6 +800,7 @@ exports._process_published_config = function( _config, opts, cb ) {
         }
 
         var ma_prefix = "config-archive";
+        var last_config_ma_number = 0;
         var last_test_ma_number = 0;
         var test_mas = [];
         if ( "ma_urls" in _config ) {
@@ -807,6 +808,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                 var url = _config.ma_urls[i];
                 if ( url == "" ) continue;
 
+                var maName = "config-archive" + last_config_ma_number;
                 var maName = "config-archive" + last_test_ma_number;
                 test_mas.push( maName );
                 var maInfo;
@@ -840,7 +842,7 @@ exports._process_published_config = function( _config, opts, cb ) {
 
                 psc_archives[ maName ] = maInfo;
 
-                last_test_ma_number++;
+                last_config_ma_number++;
             }
         }
         // Retrieve MA URLs from the _config object
