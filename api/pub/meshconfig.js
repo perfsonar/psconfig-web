@@ -6,6 +6,7 @@ const router = express.Router();
 const winston = require('winston');
 const async = require('async');
 const moment = require('moment');
+const _ = require('underscore');
 
 //mine
 const config = require('../config');
@@ -800,6 +801,7 @@ exports._process_published_config = function( _config, opts, cb ) {
         }
 
         var ma_prefix = "config-archive";
+        var last_config_ma_number = 0;
         var last_test_ma_number = 0;
         var test_mas = [];
         if ( "ma_urls" in _config ) {
@@ -807,6 +809,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                 var url = _config.ma_urls[i];
                 if ( url == "" ) continue;
 
+                var maName = "config-archive" + last_config_ma_number;
                 var maName = "config-archive" + last_test_ma_number;
                 test_mas.push( maName );
                 var maInfo;
@@ -840,7 +843,24 @@ exports._process_published_config = function( _config, opts, cb ) {
 
                 psc_archives[ maName ] = maInfo;
 
-                last_test_ma_number++;
+                last_config_ma_number++;
+            }
+        }
+
+        // Get custom MAs (which are defined as raw JSON in a string in the db)
+        if ( "ma_custom_json" in _config ) {
+            var customString = _config.ma_custom_json;
+            var customArchiveConfig;
+            if ( customString ) {
+                try { 
+                    customArchiveConfig = JSON.parse( customString );
+                    console.log("customArchiveConfig", customArchiveConfig);
+                    //psc_archives["asdf"] = customArchiveConfig;
+                    psc_archives = _.extend( psc_archives, customArchiveConfig );
+                } catch(e) {
+                    logger.error("Custom JSON archive did not validate", e, customString);
+
+                }
             }
         }
         // Retrieve MA URLs from the _config object
