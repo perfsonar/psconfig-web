@@ -23,6 +23,16 @@ function canedit(user, config) {
     return false;
 }
 
+function isJSON(archive){
+    try{
+            JSON.parse(archive);
+    }
+    catch(err){
+            return false;
+    }
+    return true;
+}
+
 /**
  * @api {get} /configs          Query Configs
  * @apiGroup                    Configs
@@ -64,6 +74,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
                     config.ma_urls = config.ma_urls.join("\n");
 
                 }
+		//console.log("Custom json Getting from db", config);
             });
             res.json({configs: configs, count: count});
         });
@@ -139,7 +150,12 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             }
             config.tests = req.body.tests;
             config.admins = req.body.admins;
-            config.force_endpoint_mas = req.body.force_endpoint_mas;
+	    var custom_json = req.body.ma_custom_json;
+	    if(isJSON(req.body.ma_custom_json)){
+		config.ma_custom_json = custom_json;
+		//console.log("Here ma_custom is a valid json:",config.ma_custom_json);
+	    }
+	    config.force_endpoint_mas = req.body.force_endpoint_mas;
             config.update_date = new Date();
             if ( "ma_urls" in req.body ) {
                 config.ma_urls = req.body.ma_urls.split("\n");

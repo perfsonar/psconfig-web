@@ -192,6 +192,13 @@ define({ "api": [
             "field": "force_endpoint_mas",
             "description": "<p>Allows you to force writing to measurement archives on all endpoints for tests associated with this Config</p>"
           },
+	  {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "ma_custom_json",
+            "description": "<p>Allows you to enter raw custom archives on all endpoints for tests associated with this Config</p>"
+          },
           {
             "group": "Parameter",
             "type": "String[]",
