@@ -166,14 +166,14 @@
     			<accordion close-others="false">
         			<accordion-group is-open="status.open">
             				<accordion-heading>
-                			<h3> Custom Achiver
+                			<h3> Custom Archiver
                     			<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                 			</h3>
             				</accordion-heading>
 			                <label class="col-sm-2 control-label">Custom Archive</label>
                     			<div class="col-sm-6">
                         			<textarea class="form-control" name="ma_custom_json" id="ma_custom_json" ng-disabled="!selected._canedit" ng-model="selected.ma_custom_json" rows="5"></textarea>
-						<p class="help-block"> *You might break things if you don't know what you're doing</p>
+						<p class="help-block"> * RAW JSON -- be careful, you might break things if you don't know what you're doing</p>
                     			</div>
         			</accordion-group>
     			</accordion>
