@@ -197,17 +197,38 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
             }).catch($scope.toast_error);
         } else {
             configs.update($scope.selected).then(function(config) {
-                toaster.success("config updated successfully!");
-                if ( ( "ma_urls" in config ) && _.isArray( config.ma_urls ) ) {
+                //console.log("ma_custom before: ", config.ma_custom_json);
+		if ( ( "ma_urls" in config ) && _.isArray( config.ma_urls ) ) {
                     config.ma_urls = config.ma_urls.join("\n");
                 }
-                $scope.form.$setPristine();
+		var custom_json = config.ma_custom_json;
+		if(isJSON(config.ma_custom_json)){
+			config.ma_custom_json = custom_json;
+			//console.log("ma_custom after: ", config.ma_custom_json);
+			toaster.success("config updated successfully!");
+			$scope.form.$setPristine();
+		}
+		else{
+			throw "Invalid custom JSON";
+		}
             }).catch( function( err ) {
                 //console.log("err", err);
                 $scope.toast_error(err);
             });
         }
     }
+    
+    function isJSON(archive){
+	if(!archive) return true;
+	try{
+        	JSON.parse(archive);
+    	}
+    	catch(err){
+        	return false;
+    	}
+    	return true;
+    }
+
     $scope.cancel = function() {
         location.reload();
     }

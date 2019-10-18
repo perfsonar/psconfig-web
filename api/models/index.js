@@ -169,6 +169,7 @@ var configSchema = mongoose.Schema({
     create_date: {type: Date, default: Date.now},
     update_date: {type: Date, default: Date.now},
     ma_urls: [ String ], // an array of measurement archive URLs to archive test results to
+    ma_custom_json: String,
     force_endpoint_mas: {type: Boolean, default: false} // bool determining whether to force archiving to MAs on all hosts in the config
 
 });
