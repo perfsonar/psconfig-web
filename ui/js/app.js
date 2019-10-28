@@ -136,6 +136,11 @@ app.config(['$routeProvider', 'appconf', function($routeProvider, appconf) {
         controller: 'HostsController',
         requiresLogin: true,
     })
+    .when('/archives/:id?', {
+        templateUrl: 't/archives.html',
+        controller: 'ArchivesController',
+        requiresLogin: true,
+    })
     .otherwise({
         redirectTo: '/configs'
     });

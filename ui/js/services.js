@@ -124,6 +124,65 @@ app.factory('users', function(appconf, $http, jwtHelper) {
     }
 });
 
+app.factory('archives', function(appconf, $http, jwtHelper) {
+    var archives = null;
+    var all_promise = null;
+    return {
+        getAll: function() {
+            if(all_promise) return all_promise;
+            all_promise = $http.get(appconf.api+'/archives')
+            .then(function(res) {
+                archives = res.data.archives;
+                //console.dir(archives);
+                return res.data.archives;
+            });
+            return all_promise; 
+        },
+        clear: function() {
+            //invalidate
+            all_promise = null;
+        },
+        add: function() {
+            var archive = {
+                desc: "New Testspec",
+                admins: [],
+            };
+            var jwt = localStorage.getItem(appconf.jwt_id);
+            if(jwt) {
+                var user = jwtHelper.decodeToken(jwt);
+                archive.admins.push(user.sub.toString());
+                archive._canedit = true;
+            }
+            archives.unshift(archive);
+            return archive;
+        },
+        create: function(archive) {
+            return $http.post(appconf.api+'/archives/', archive)
+            .then(function(res) {
+                archive._id = res.data._id;
+                archive._canedit = res.data._canedit;
+                archive.create_date = res.data.create_date;
+                return archive;
+            });
+        },
+        update: function(archive) {
+            return $http.put(appconf.api+'/archives/'+archive._id, archive)
+            .then(function(res) {
+                archive._canedit = res.data._canedit;
+                return archive;
+            });
+        },
+        remove: function(archive) {
+            return $http.delete(appconf.api+'/archives/'+archive._id)
+            .then(function(res) {
+                archives.splice(archives.indexOf(archive), 1);
+            });
+        }
+    }
+}); // end archives factory
+
+
+
 app.factory('testspecs', function(appconf, $http, jwtHelper) {
     var testspecs = null;
     var all_promise = null;
