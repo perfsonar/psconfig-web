@@ -81,15 +81,29 @@ router.get('/config', function(req, res, next) {
 
         var proto = "http";
         if(req.headers['x-forwarded-proto']) proto = req.headers['x-forwarded-proto'];
-        var urlObj = url.parse(globalConfig.pub.url);
+        var path = "/pwa/pub/";
+        var hostname = req.headers.host;
+        var urlObj;
 
-        var base_url = proto + "://" + urlObj.host;
+        if ( "url" in globalConfig.pub ) {
+            urlObj = url.parse(globalConfig.pub.url);
+            if ( urlObj.path ) {
+                path = urlObj.path;
+            }
+            if ( urlObj.host ) {
+                hostname = urlObj.host;
+            }
+        }
+
+        var base_url = proto + "://" + hostname;
         /* may want to add port later
         if ( urlObj.port !== null ) {
             base_url += ":port";
         }
         */
-        base_url += urlObj.path + 'config/';
+       
+
+        base_url += path + 'config/';
 
         var urls = configs.map((_config)=>{
             return {include: [ base_url + _config.url + q ]};
