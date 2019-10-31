@@ -800,10 +800,38 @@ exports._process_published_config = function( _config, opts, cb ) {
             org.sites.push(site);
         }
 
-        var ma_prefix = "config-archive";
+        // init variables for config archives
         var last_config_ma_number = 0;
         var last_test_ma_number = 0;
         var test_mas = [];
+
+        // Get custom MAs (which are defined as raw JSON in a string in the db)
+        if ( "ma_custom_json" in _config ) {
+            var customString = _config.ma_custom_json;
+            var customArchiveConfig;
+            if ( customString ) {
+                try { 
+                    customArchiveConfig = JSON.parse( customString );
+                    console.log("customArchiveConfig", customArchiveConfig);
+                    // add custom archiver to testspec.
+                    var maNames = Object.keys( customArchiveConfig );
+                    maNames.forEach( function( maName ) {
+                        var archiveDetails = customArchiveConfig[ maName ];
+                        test_mas.push(maName);
+
+                    });
+                    //psc_archives["asdf"] = customArchiveConfig;
+                    psc_archives = _.extend( psc_archives, customArchiveConfig );
+                } catch(e) {
+                    logger.error("Custom JSON archive did not validate", e, customString);
+
+                }
+            }
+        }
+
+    
+
+        var ma_prefix = "config-archive";
         if ( "ma_urls" in _config ) {
             for(var i in _config.ma_urls ) {
                 var url = _config.ma_urls[i];
@@ -847,22 +875,6 @@ exports._process_published_config = function( _config, opts, cb ) {
             }
         }
 
-        // Get custom MAs (which are defined as raw JSON in a string in the db)
-        if ( "ma_custom_json" in _config ) {
-            var customString = _config.ma_custom_json;
-            var customArchiveConfig;
-            if ( customString ) {
-                try { 
-                    customArchiveConfig = JSON.parse( customString );
-                    console.log("customArchiveConfig", customArchiveConfig);
-                    //psc_archives["asdf"] = customArchiveConfig;
-                    psc_archives = _.extend( psc_archives, customArchiveConfig );
-                } catch(e) {
-                    logger.error("Custom JSON archive did not validate", e, customString);
-
-                }
-            }
-        }
         // Retrieve MA URLs from the _config object
 
         psconfig.archives = psc_archives;
