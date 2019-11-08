@@ -128,7 +128,6 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             archive.desc = req.body.desc;
             archive.archiver = req.body.archiver;
             archive.data = req.body.data;
-            //archive.schedule_type = req.body.schedule_type;
             archive.admins = req.body.admins;
             archive.update_date = new Date();
             archive.save(function(err) {
