@@ -140,6 +140,20 @@ exports.Testspec = mongoose.model('Testspec', testspecSchema);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+var archiverSchema = mongoose.Schema({
+    name: String,
+    desc: String,
+    archiver: String,
+    data: mongoose.Schema.Types.Mixed,
+
+    admins: [ String ], //array of user ids (sub string in auth service)
+    create_date: {type: Date, default: Date.now},
+    update_date: {type: Date, default: Date.now},
+});
+exports.Archiver = mongoose.model('Archiver', archiverSchema);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 //test is now part of config
 var testSchema = mongoose.Schema({
     service_type: String,

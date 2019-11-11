@@ -82,7 +82,7 @@ router.get('/config', function(req, res, next) {
         var proto = "http";
         if(req.headers['x-forwarded-proto']) proto = req.headers['x-forwarded-proto'];
         var path = "/pwa/pub/";
-        var hostname = req.headers.host;
+        var hostname = req.headers["x-forwarded-host"] || req.headers.host;
         var urlObj;
 
         if ( "url" in globalConfig.pub ) {
