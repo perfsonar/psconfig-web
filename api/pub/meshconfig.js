@@ -949,6 +949,8 @@ exports._process_published_config = function( _config, opts, cb ) {
                 delete current_test.spec.duration;
                } else {
                    include_schedule = false;
+                   //delete psc_tasks[ name ].tools; (see below tools section)
+
 
 
                }
@@ -983,7 +985,7 @@ exports._process_published_config = function( _config, opts, cb ) {
 
             delete psc_tests[ name ].spec["test-interval"];
 
-            if ( ( "_meta" in test ) &&  ( "_tool" in test._meta ) &&  typeof test._meta._tool != "undefined" ) {
+            if ( include_schedule && ( "_meta" in test ) &&  ( "_tool" in test._meta ) &&  typeof test._meta._tool != "undefined" ) {
                 psc_tasks[ name ].tools = [ test._meta._tool ];
                 add_bwctl_tools( psc_tasks[ name ] );
 
