@@ -25,6 +25,273 @@
   },
   {
     "type": "delete",
+    "url": "/archives/:id",
+    "title": "Remove archive",
+    "group": "Archives",
+    "description": "<p>Remove archive URL</p>",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>A valid JWT token &quot;Bearer: xxxxx&quot;</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n    \"status\": \"ok\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "api/admin/controllers/archives.js",
+    "groupTitle": "Archives",
+    "name": "DeleteArchivesId"
+  },
+  {
+    "type": "get",
+    "url": "/archives",
+    "title": "Query Archives",
+    "group": "Archives",
+    "description": "<p>Query archives registered by users</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": true,
+            "field": "find",
+            "description": "<p>Mongo find query JSON.stringify &amp; encodeURIComponent-ed - defaults to {} To pass regex, you need to use {$regex: &quot;....&quot;} format instead of js: /.../</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": true,
+            "field": "sort",
+            "description": "<p>Mongo sort object - defaults to _id. Enter in string format like &quot;-name%20desc&quot;</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "select",
+            "description": "<p>Fields to return (admins will always be added). Multiple fields can be entered with %20 as delimiter</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": true,
+            "field": "limit",
+            "description": "<p>Maximum number of records to return - defaults to 100</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Number",
+            "optional": true,
+            "field": "skip",
+            "description": "<p>Record offset for pagination (default to 0)</p>"
+          }
+        ]
+      }
+    },
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "Authorization",
+            "description": "<p>A valid JWT token &quot;Bearer: xxxxx&quot;</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "hosts:",
+            "description": "<p>List of archives objects(archives:), count: total number of archives (for paging)</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "api/admin/controllers/archives.js",
+    "groupTitle": "Archives",
+    "name": "GetArchives"
+  },
+  {
+    "type": "post",
+    "url": "/archives",
+    "title": "New archive",
+    "group": "Archives",
+    "description": "<p>Register new archive</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Name</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "desc",
+            "description": "<p>Description</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "archiver",
+            "description": "<p>Archiver URL (https://example.com)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "data",
+            "description": "<p>Archiver details (key/value pairs)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String[]",
+            "optional": true,
+            "field": "admins",
+            "description": "<p>Array of admin IDs</p>"
+          }
+        ]
+      }
+    },
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>A valid JWT token &quot;Bearer: xxxxx&quot;</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "Archive",
+            "description": "<p>registered</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "api/admin/controllers/archives.js",
+    "groupTitle": "Archives",
+    "name": "PostArchives"
+  },
+  {
+    "type": "put",
+    "url": "/archives/:id",
+    "title": "Update archive",
+    "group": "Archives",
+    "description": "<p>Update archive information (archiver can be change)</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "name",
+            "description": "<p>Name</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "desc",
+            "description": "<p>Description</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": true,
+            "field": "archiver",
+            "description": "<p>Archiver URL (https://example.com)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": true,
+            "field": "data",
+            "description": "<p>Archiver details (key/value pairs)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String[]",
+            "optional": true,
+            "field": "admins",
+            "description": "<p>Array of admin IDs</p>"
+          }
+        ]
+      }
+    },
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>A valid JWT token &quot;Bearer: xxxxx&quot;</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "Archive",
+            "description": "<p>updated</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "api/admin/controllers/archives.js",
+    "groupTitle": "Archives",
+    "name": "PutArchivesId"
+  },
+  {
+    "type": "delete",
     "url": "/configs/:id",
     "title": "Remove Config",
     "group": "Configs",
