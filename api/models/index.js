@@ -140,7 +140,7 @@ exports.Testspec = mongoose.model('Testspec', testspecSchema);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-var archiverSchema = mongoose.Schema({
+var archiveSchema = mongoose.Schema({
     name: String,
     desc: String,
     archiver: String,
@@ -150,7 +150,7 @@ var archiverSchema = mongoose.Schema({
     create_date: {type: Date, default: Date.now},
     update_date: {type: Date, default: Date.now},
 });
-exports.Archiver = mongoose.model('Archiver', archiverSchema);
+exports.Archive = mongoose.model('Archive', archiveSchema);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
