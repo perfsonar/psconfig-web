@@ -35,7 +35,7 @@ function canedit(user, archive) {
  *
  * @apiSuccess {Object}         hosts: List of archives objects(archives:), count: total number of archives (for paging)
  */
-router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
+router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var find = {};
     if(req.query.find) find = JSON.parse(req.query.find);
     
