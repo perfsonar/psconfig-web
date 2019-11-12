@@ -35,7 +35,7 @@ function canedit(user, testspec) {
  *
  * @apiSuccess {Object}         hosts: List of testspecs objects(testspecs:), count: total number of testspecs (for paging)
  */
-router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
+router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var find = {};
     if(req.query.find) find = JSON.parse(req.query.find);
     
