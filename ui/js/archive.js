@@ -8,6 +8,14 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
     users.getAll().then(function(_users) {
         $scope.users = _users;
         archives.getAll().then(function(_archives) {
+
+            const archiversObj = {
+                "esmond": {"aid": "esmond", "label":"Esmond"},
+                "rabbitmq": {"aid":"rabbitmq", "label":"RabbitMQ"},
+                "rawjson": {"aid":"rawjson", label:"Raw JSON"}
+            };
+            const archiversArr = Object.keys( archiversObj );
+            $scope.serverconf.archivers = archiversObj;
             $scope.archives = _archives;
             //find task specified
             if($routeParams.id) {
@@ -26,6 +34,7 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
     $scope.select = function(archive) {
         console.log("archives", archives);
         console.log("$scope.archives", $scope.archives);
+        console.log("$scope.serverconf", $scope.serverconf);
         //TODO - maybe I should catch $dirty flag here.. but what about page nagivation?
         //archive.schedule_type = archive.schedule_type || 'continuous';
         $scope.selected = archive;

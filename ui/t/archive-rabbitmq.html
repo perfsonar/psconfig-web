@@ -1,0 +1,359 @@
+<div ng-controller="paramsAccordion">
+
+    <accordion close-others="false">
+
+        <accordion-group is-open="status.basicOpen">
+            <accordion-heading>
+                <h3>RabbitMQ Archive Parameters
+                <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.basicOpen, 'glyphicon-chevron-right': !status.basicOpen}"></i>
+            </h3>
+            </accordion-heading>
+
+
+            <div class="form-section">
+
+
+<div class="form-group">
+    <label for="test_interval" class="col-sm-2 control-label">URL *</label>
+    <div class="col-sm-10">
+        <div class="input-group">
+            <input type="text" string-to-number class="form-control" name="test_interval" ng-disabled="!selected._canedit" ng-model="selected.specs.test_interval" required>
+            <!-- <div class="input-group-addon">URL</div> -->
+        </div>
+        <p class="help-block">
+            URL of RabbitMQ instance
+            <code>data._url</code>
+        </p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="exchange_key" class="col-sm-2 control-label">Exchange key</label>
+    <div class="col-sm-10">
+        <div class="input-group">
+            <input type="text" string-to-number class="form-control" name="exchange_key" ng-disabled="!selected._canedit" ng-model="selected.specs.exchange_key" required>
+            <!-- <div class="input-group-addon">URL</div> -->
+        </div>
+        <p class="help-block">
+           Exchange key to which to archive 
+            <code>data.exchange_key</code>
+        </p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="routing_key" class="col-sm-2 control-label">Routing key</label>
+    <div class="col-sm-10">
+        <div class="input-group">
+            <input type="number" string-to-number class="form-control" name="routing_key" ng-disabled="!selected._canedit" ng-model="selected.specs.routing_key" required>
+            <!-- <div class="input-group-addon">URL</div> -->
+        </div>
+        <p class="help-block">
+            URL of RabbitMQ instance
+            <code>data.routing_key</code>
+        </p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="connection_lifetime" class="col-sm-2 control-label">Connection Lifetime</label>
+    <div class="col-sm-10">
+        <div class="input-group">
+            <input type="number" string-to-number class="form-control" name="connection_lifetime" ng-disabled="!selected._canedit" ng-model="selected.specs.connection_lifetime">
+            <!-- <div class="input-group-addon">URL</div> -->
+        </div>
+        <p class="help-block">
+            RabbitMQ connection lifetime 
+            <code>data.connection_lifetime</code>
+        </p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="username" class="col-sm-2 control-label">Username</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" string class="form-control" name="username" ng-disabled="!selected._canedit" ng-model="selected.data._username">
+            <!-- <div class="input-group-addon">URL</div> -->
+        </div>
+        <p class="help-block">
+            RabbitMQ connection lifetime 
+            <code>data._username</code>
+        </p>
+    </div>
+
+    <label for="password" class="col-sm-2 control-label">Password</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" string class="form-control" name="password" ng-disabled="!selected._canedit" ng-model="selected.data._password">
+            <!-- <div class="input-group-addon">URL</div> -->
+        </div>
+        <p class="help-block">
+            RabbitMQ connection lifetime 
+            <code>data._password</code>
+        </p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="random_start_percentage" class="col-sm-2 control-label">Random Start Percentage</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="number" string-to-number class="form-control" name="random_start_percentage" ng-disabled="!selected._canedit" ng-model="selected.specs.random_start_percentage" placeholder="10">
+            <div class="input-group-addon">%</div>
+        </div>
+        <p class="help-block">
+            The percentage to randomize the start time of test. Valid values are between 0 and 50 (inclusive). Example: interval of 7200 (2 hours) and random_start_percentage 50 means that a test can start anywhere between 1 hour and 3 hours after the previous test completes
+            <code>random_start_percentage</code>
+        </p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="tool" class="col-sm-2 control-label">Tool</label>
+    <div class="col-sm-4">
+        <select class="form-control" ng-disabled="!selected._canedit" ng-model="selected.specs.tool" name="tool">
+            <option value="traceroute">traceroute (default)</option>
+            <option value="tracepath">tracepath</option>
+            <option value="paris-traceroute">paris-traceroute</option>
+        </select>
+        <p class="help-block">
+            The tool to use to perform the traceroute 
+            <code>tool</code>
+        </p>
+        <a href="" ng-click="show_tool_info = true;">More Info</a>
+        <ul ng-if="show_tool_info" class="slide-down help-block">
+            <li><b>traceroute</b> This is the default and generally the more reliable of the tools. It also includes more options in terms of setting the TTL and properly binding to interfaces.</li>
+            <li><b>tracepath</b> The main advantage of this tool is it reports MTU by default. It has fewer options than standard traceroute for setting TTLs and binding to local interfaces. It also is UDP-only and may be blocked by firewalls. It’s also been reported to have a harder time with MTU mismatches on the destination host.</li>
+            <li><b>paris-traceroute</b> This is another approach to running traceroute that tries to identify load balanced routes and similar. It requires the client to grant the paris-traceroute command the CAP_NET_RAW privilege on the system in order to run as a non-root user.</li>
+        </ul>
+    </div>
+    <label for="timeout" class="col-sm-2 control-label">Timeout</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="number" string-to-number class="form-control" name="timeout" 
+                ng-disabled="!selected._canedit" 
+                ng-model="selected.specs.timeout">
+            <div class="input-group-addon">Seconds</div>
+        </div>
+        <p class="help-block">
+            The maximum amount of time to wait in seconds for the traceroute to complete
+            <code>timeout</code>
+        </p>
+    </div>
+</div>
+
+<div class="form-group" ng-if="selected.specs.tool == 'traceroute'">
+    <label for="first_ttl" class="col-sm-2 control-label">First TTL</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="number" string-to-number class="form-control" name="first_ttl" ng-disabled="!selected._canedit" ng-model="selected.specs.first_ttl" placeholder="1">
+            <div class="input-group-addon">hops</div>
+        </div>
+        <p class="help-block">
+            The first hop to look at starting at 1. This can be used to hide local routers
+            <code>first_ttl</code>
+        </p>
+    </div>
+    <label for="max_ttl" class="col-sm-2 control-label">Max TTL</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="number" string-to-number class="form-control" name="max_ttl" ng-disabled="!selected._canedit" ng-model="selected.specs.max_ttl" placeholder="30">
+            <div class="input-group-addon">hops</div>
+        </div>
+        <p class="help-block">
+            The maximum number of hops before a traceroute fails
+            <code>max_ttl</code>
+        </p>
+    </div>
+</div>
+
+<div class="form-group" ng-if="selected.specs.tool == 'traceroute'">
+    <label for="protocol" class="col-sm-2 control-label">Protocol</label>
+    <div class="col-sm-4">
+        <select class="form-control" ng-disabled="!selected._canedit" ng-model="selected.specs.protocol" name="protocol">
+            <option value="icmp">ICMP (Default)</option>
+            <option value="udp">UDP</option>
+        </select>
+        <p class="help-block">
+            Indicates whether to use ICMP or UDP for the traceroute
+            <code>protocol</code>
+        </p>
+    </div>
+    <label for="packet_size" class="col-sm-2 control-label">Packet Size</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="number" string-to-number class="form-control" name="packet_size" ng-disabled="!selected._canedit" ng-model="selected.specs.packet_size" placeholder="(Tool Default)">
+            <div class="input-group-addon">bytes</div>
+        </div>
+        <p class="help-block">
+            The size of packets to send in bytes when performing the traceroute
+            <code>packet_size</code>
+        </p>
+    </div>
+</div>
+
+
+<!--v4-->
+
+<div class="form-group" ng-if="selected.specs.tool == 'paris-traceroute'">
+    <label for="algorithm" class="col-sm-2 control-label">Algorithm</label>
+    <div class="col-sm-4">
+        <select class="form-control" ng-disabled="!selected._canedit" ng-model="selected.specs.algorithm" name="tool">
+            <option value=""></option>
+            <option value="hopbyhop">hopbyhop</option>
+            <option value="packetbypacket">packetbypacket</option>
+            <option value="concurrent">concurrent</option>
+            <option value="scout">scout</option>
+            <option value="exhaustive">exhaustive</option>
+        </select>
+        <p class="help-block">
+            Sets the algorithm used by paris-traceroute
+            <code>algorithm / paris-traceroute -a</code>
+            <minver min="minver.tool"></minver>
+        </p>
+    </div>
+</div>
+
+<!-- Common parameters -->
+<ng-include src="'t/testspec-common.html'"></ng-include>
+
+                </div> <!-- end form-section -->             
+
+
+        </accordion-group>
+
+
+        <accordion-group is-open="status.open">
+            <accordion-heading>
+                <h3>Advanced Test Parameters
+                    <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                </h3>
+            </accordion-heading>
+            
+            
+            <div class="form-section">
+
+<div class="form-group" ng-if="selected.specs.tool == 'traceroute'">
+    <div class="col-sm-offset-2 col-sm-4">
+        <div class="checkbox">
+            <label> 
+                <input type="checkbox" name="as" 
+                    ng-disabled="!selected._canedit" ng-model="selected.specs.as"> 
+                    Perform AS path lookups
+            </label>
+            <p class="help-block">
+                Perform Autonomous System(AS) path lookups in routing registries and print results directly after the corresponding addresses.
+                <code>as / traceroute -A</code>
+                <minver min="minver.as"></minver>
+            </p>
+        </div>
+        <div class="checkbox">
+            <label> 
+                <input type="checkbox" name="fragment" 
+                    ng-disabled="!selected._canedit" ng-model="selected.specs.fragment"> Do not fragment
+            </label>
+            <p class="help-block">
+                <code>fragment / traceroute -F</code>
+                <minver min="minver.fragment"></minver>
+            </p>
+        </div>
+        <div class="checkbox">
+            <label> 
+                <input type="checkbox" name="hostnames" 
+                    ng-disabled="!selected._canedit"
+                    ng-model="selected.specs.hostnames"> Do not try to map IP addresses to host names when displaying them
+            </label>
+            <p class="help-block">
+                <code>hostnames / traceroute -n</code>
+                <minver min="minver.hostnames"></minver>
+            </p>
+        </div>
+    </div>
+
+    <label for="queries" class="col-sm-2 control-label">Queries</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="number" string-to-number class="form-control" name="queries" 
+                ng-disabled="!selected._canedit" ng-model="selected.specs.queries">
+            <div class="input-group-addon">Packets/Hop</div>
+        </div>
+        <p class="help-block">
+            Set the number of probe packets to send per hop
+            <code>queries / traceroute -p</code>
+            <minver min="minver.queries"></minver>
+        </p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="probe_type" class="col-sm-2 control-label">Probe Type</label>
+    <div class="col-sm-4">
+        <select class="form-control" ng-disabled="!selected._canedit" 
+            ng-model="selected.specs.probe_type" name="probe_type">
+            <option value=""></option>
+            <option value="udp">UDP</option>
+            <option value="icmp">ICMP</option>
+            <option value="tcp">TCP SYN</option>
+        </select>
+        <p class="help-block">
+            Protocol to use to send probes
+            <code>probe_type</code>
+            <minver min="minver.probe_type"></minver>
+        </p>
+    </div>
+
+    <label for="tos_bits" class="col-sm-2 control-label">TOS Bits</label>
+    <div class="col-sm-4">
+        <input type="number" string-to-number step="1" min="0" max="255" class="form-control" name="tos_bits" 
+            ng-disabled="!selected._canedit" 
+            ng-model="selected.specs.tos_bits">
+        <p class="help-block">
+            The type of service to set in the IP header of outgoing packets as an integer from 0-255
+            <code>tos_bits</code>
+            <minver min="minver.tos_bits"></minver>
+        </p>
+    </div>
+
+</div>
+
+<div class="form-group" ng-if="selected.specs.tool == 'traceroute'">
+    <label for="sendwait" class="col-sm-2 control-label">Send Wait Time</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="number" string-to-number class="form-control" name="sendwait" 
+                ng-disabled="!selected._canedit" ng-model="selected.specs.sendwait">
+            <div class="input-group-addon">Seconds</div>
+        </div>
+        <p class="help-block">
+            Minimal time interval between probes
+            <code>sendwait / traceroute -z</code>
+            <minver min="minver.sendwait"></minver>
+        </p>
+    </div>
+
+    <label for="wait" class="col-sm-2 control-label">Wait Time</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="number" string-to-number class="form-control" name="wait" 
+                ng-disabled="!selected._canedit" ng-model="selected.specs.wait">
+            <div class="input-group-addon">Seconds</div>
+        </div>
+        <p class="help-block">
+            Time to wait for a response to a probe
+            <code>wait / traceroute -w</code>
+            <minver min="minver.wait"></minver>
+        </p>
+    </div>
+</div>
+
+        </div> <!-- end form-section -->
+
+
+    </accordion-group>
+
+
+    </accordion>
+</div><!-- end paramsAccordion -->
+
+
