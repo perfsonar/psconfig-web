@@ -78,4 +78,33 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
         });
     };
 
+
+    $scope.submit = function() {
+        //remove parameter set to empty, null, or false
+        for(var k in $scope.selected.archives) {
+            if(!$scope.selected.archives[k]) delete $scope.selected.archives[k];
+        }
+
+        //remove parameters that aren't shown on the UI
+        for(var k in $scope.selected.archives) {
+            if($scope.form[k] === undefined) {
+                console.log("no such field:"+k+" removing (maybe from bad default?)");
+                delete $scope.selected.archives[k];
+            }
+        }
+
+        if(!$scope.selected._id) {
+            archives.create($scope.selected).then(function(archive) {
+                toaster.success("Testspec created successfully!");
+                $scope.form.$setPristine();
+                $location.update_path("/archives/"+archive._id);
+            }).catch($scope.toast_error);
+        } else {
+            archives.update($scope.selected).then(function(archive) {
+                toaster.success("Archive updated successfully!");
+                $scope.form.$setPristine();
+            }).catch($scope.toast_error);
+        }
+    }
+
 });
