@@ -3,7 +3,7 @@ app.controller('ArchivesController',
 function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMessage, users, archives, $modal, $routeParams, $cookies) {
     scaMessage.show(toaster);
     $scope.active_menu = "archives";
-    $scope.filter = $cookies.get('testspecs_filter');
+    $scope.filter = $cookies.get('archives_filter');
 
     users.getAll().then(function(_users) {
         $scope.users = _users;
@@ -110,5 +110,18 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
             }).catch($scope.toast_error);
         }
     }
+
+    $scope.add = function() {
+        $scope.selected = archives.add();
+        $scope.closesubbar();
+        $location.update_path("/archives");
+    };
+
+    $scope.remove = function() {
+        archives.remove($scope.selected).then(function() {
+            toaster.success("Removed successfully");
+            $scope.selected = null;
+        }).catch($scope.toast_error);
+    };
 
 });
