@@ -87,6 +87,12 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
             if(!$scope.selected.data[k]) delete $scope.selected.data[k];
         }
 
+        // ** //
+        // TODO: ensure connection lifetime format is correct~!~~ //
+        // ** //
+        //
+        //
+
         //remove parameters that aren't shown on the UI
         /*
         for(var k in $scope.selected.data) {
