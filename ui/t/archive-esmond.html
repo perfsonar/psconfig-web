@@ -69,43 +69,17 @@
     </div>
 </div>
 
-<div class="form-group">
-    <label for="username" class="col-sm-2 control-label">Username</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="text" string class="form-control" name="username" ng-disabled="!selected._canedit" ng-model="selected.data._username">
-            <!-- <div class="input-group-addon">URL</div> -->
-        </div>
-        <p class="help-block">
-            RabbitMQ connection lifetime 
-            <code>data._username</code>
-        </p>
-    </div>
-
-    <label for="password" class="col-sm-2 control-label">Password</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="text" string class="form-control" name="password" ng-disabled="!selected._canedit" ng-model="selected.data._password">
-            <!-- <div class="input-group-addon">URL</div> -->
-        </div>
-        <p class="help-block">
-            RabbitMQ connection lifetime 
-            <code>data._password</code>
-        </p>
-    </div>
-</div>
-
-<div class="form-group">
-    <label for="connection_lifetime" class="col-sm-2 control-label">Connection Lifetime</label>
-    <div class="col-sm-10">
-        <div class="input-group">
-            <input type="number" string-to-number class="form-control" name="connection_lifetime" ng-disabled="!selected._canedit" ng-model="selected.data.connection_lifetime">
-            <!-- <div class="input-group-addon">URL</div> -->
-        </div>
-        <p class="help-block">
-            RabbitMQ connection lifetime 
-            <code>data.connection_lifetime</code>
-        </p>
-    </div>
-</div>
+                <div class="form-group">
+                    <label for="type" class="col-sm-2 control-label">Data Formatting Policy</label>
+                    <div class="col-sm-10">
+                        <select class="form-control"
+                            ng-disabled="!selected._canedit"
+                            ng-model="selected.data.data_formatting_policy"
+                            ng-change="setdefault(selected.data.data_formatting_policy)" required>
+                            <option ng-repeat="(aid, item) in serverconf.dataFormattingPolicies" value="{{aid}}">{{item}}</option>
+                        </select>
+                    </div>
+                </div>
+                <br>{{selected.data.data_formatting_policy}}<br>
+            </div>
 

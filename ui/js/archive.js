@@ -16,6 +16,14 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
             };
             const archiversArr = Object.keys( archiversObj );
             $scope.serverconf.archivers = archiversObj;
+            const dataFormattingPolicyObj = {
+                "prefer-mapped": "Store mapped records, if possible (default)",
+                "mapped-and-raw": "Store both mapped and raw records",
+                "mapped-only": "Only store mapped records for known types",
+                "raw-only": "Only store a pscheduler-raw record, regardless of type"
+            };
+            $scope.serverconf.dataFormattingPolicies = dataFormattingPolicyObj;
+
             $scope.archives = _archives;
             //find task specified
             if($routeParams.id) {
