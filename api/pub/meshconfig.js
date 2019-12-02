@@ -800,6 +800,7 @@ exports._process_published_config = function( _config, opts, cb ) {
             org.sites.push(site);
         }
 
+        var ma_prefix = "config-archive";
         // init variables for config archives
         var last_config_ma_number = 0;
         var last_test_ma_number = 0;
