@@ -18,7 +18,6 @@
     <div class="col-sm-10">
         <div class="input-group">
             <input type="text" string class="form-control" name="url" ng-disabled="!selected._canedit" ng-model="selected.data._url" required>
-            Url: {{selected.data._url}}
             <!-- <div class="input-group-addon">URL</div> -->
         </div>
         <p class="help-block">
@@ -48,11 +47,26 @@
             <!-- <div class="input-group-addon">URL</div> -->
         </div>
         <p class="help-block">
-            URL of RabbitMQ instance
+           Routing key to which to archive 
             <code>data.routing_key</code>
         </p>
     </div>
 </div>
+
+<div class="form-group">
+    <label for="connection_lifetime" class="col-sm-2 control-label">Connection Lifetime</label>
+    <div class="col-sm-10">
+        <div class="input-group">
+            <input type="number" string-to-number class="form-control" name="connection_lifetime" ng-disabled="!selected._canedit" ng-model="selected.data.connection_lifetime">
+            <!-- <div class="input-group-addon">URL</div> -->
+        </div>
+        <p class="help-block">
+            RabbitMQ connection lifetime 
+            <code>data.connection_lifetime</code>
+        </p>
+    </div>
+</div>
+
 
 <div class="form-group">
     <label for="username" class="col-sm-2 control-label">Username</label>
@@ -76,20 +90,6 @@
         <p class="help-block">
             RabbitMQ connection lifetime 
             <code>data._password</code>
-        </p>
-    </div>
-</div>
-
-<div class="form-group">
-    <label for="connection_lifetime" class="col-sm-2 control-label">Connection Lifetime</label>
-    <div class="col-sm-10">
-        <div class="input-group">
-            <input type="number" string-to-number class="form-control" name="connection_lifetime" ng-disabled="!selected._canedit" ng-model="selected.data.connection_lifetime">
-            <!-- <div class="input-group-addon">URL</div> -->
-        </div>
-        <p class="help-block">
-            RabbitMQ connection lifetime 
-            <code>data.connection_lifetime</code>
         </p>
     </div>
 </div>
