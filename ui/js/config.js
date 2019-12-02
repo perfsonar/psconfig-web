@@ -196,18 +196,58 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
                 $location.update_path("/configs/"+config._id);
             }).catch($scope.toast_error);
         } else {
+            /*
+            console.log("updating $scope.selected", $scope.selected);
+            if ( ( !( "ma_custom_json" in $scope.selected ) ) 
+                    || ( typeof $scope.selected.ma_custom_json == "undefined" )
+                    || $scope.selected.ma_custom_json == "" ) {
+                delete $scope.selected.ma_custom_json;
+                        console.log("deleting custom json as it's empty; $scope.selected", $scope.selected);
+            }
+            */
             configs.update($scope.selected).then(function(config) {
-                toaster.success("config updated successfully!");
+                //console.log("ma_custom before: ", config.ma_custom_json);
                 if ( ( "ma_urls" in config ) && _.isArray( config.ma_urls ) ) {
                     config.ma_urls = config.ma_urls.join("\n");
                 }
-                $scope.form.$setPristine();
+                var custom_json = config.ma_custom_json;
+/*
+            if ( ( !( "ma_custom_json" in config ) ) 
+                    || ( typeof config.ma_custom_json == "undefined" )
+                    || config.ma_custom_json == "" ) {
+                        console.log("deleting custom json as it's empty");
+                delete config.ma_custom_json;
+            }
+            */
+                console.log("config", config);
+                console.log("custom_json", custom_json);
+                if(isJSON(config.ma_custom_json)){
+                    config.ma_custom_json = custom_json;
+                    //console.log("ma_custom after: ", config.ma_custom_json);
+                    toaster.success("config updated successfully!");
+                    $scope.form.$setPristine();
+                }
+                else{
+                    throw "Invalid custom JSON";
+                }
             }).catch( function( err ) {
                 //console.log("err", err);
                 $scope.toast_error(err);
             });
         }
     }
+    
+    function isJSON(archive){
+	if(!archive) return true;
+	try{
+        	JSON.parse(archive);
+    	}
+    	catch(err){
+        	return false;
+    	}
+    	return true;
+    }
+
     $scope.cancel = function() {
         location.reload();
     }

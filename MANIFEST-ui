@@ -158,6 +158,7 @@ ui/t/testspec-owamp.html
 ui/t/testspec-ping.html
 ui/t/testspec-traceroute.html
 ui/t/testspecs.html
+api/admin/controllers/archives.js
 api/admin/controllers/configs.js
 api/admin/controllers/hostgroups.js
 api/admin/controllers/hosts.js
