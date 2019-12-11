@@ -98,9 +98,11 @@
 </div>
 
 <div class="form-group" ng-if="selected.specs.tool == 'traceroute'">
+    <!--
     <label for="protocol" class="col-sm-2 control-label">Protocol</label>
     <div class="col-sm-4">
         <select class="form-control" ng-disabled="!selected._canedit" ng-model="selected.specs.protocol" name="protocol">
+            <option value=""></option>
             <option value="icmp">ICMP (Default)</option>
             <option value="udp">UDP</option>
         </select>
@@ -109,6 +111,7 @@
             <code>protocol</code>
         </p>
     </div>
+-->
     <label for="packet_size" class="col-sm-2 control-label">Packet Size</label>
     <div class="col-sm-4">
         <div class="input-group">
@@ -216,7 +219,7 @@
 </div>
 
 <div class="form-group">
-    <label for="probe_type" class="col-sm-2 control-label">Probe Type</label>
+    <label for="probe_type" class="col-sm-2 control-label">Probe protocol/type</label>
     <div class="col-sm-4">
         <select class="form-control" ng-disabled="!selected._canedit" 
             ng-model="selected.specs.probe_type" name="probe_type">
