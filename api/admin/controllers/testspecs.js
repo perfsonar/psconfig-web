@@ -138,7 +138,10 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
                 delete testspec.specs.protocol;
 
             } else {
-                testspec.specs.probe_type = testspec.specs.probe_type;
+                if ( req.body.specs.probe_type ) {
+                    testspec.specs.probe_type = req.body.specs.probe_type;
+                    delete testspec.specs.protocol;
+                }
 
             }
             testspec.save(function(err) {
