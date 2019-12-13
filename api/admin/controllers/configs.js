@@ -175,8 +175,6 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
                 config = JSON.parse(JSON.stringify(config));
                 config._canedit = canedit(req.user, config);
                 res.json(config);
-            }).catch(function(err) {
-                next(err);
             });
         } else return res.status(401).end("you are not administrator");
     }); 

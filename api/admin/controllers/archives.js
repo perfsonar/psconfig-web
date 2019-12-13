@@ -135,8 +135,6 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
                 archive = JSON.parse(JSON.stringify(archive));
                 archive._canedit = canedit(req.user, archive);
                 res.json(archive);
-            }).catch(function(err) {
-                next(err);
             });
         } 
     }); 
