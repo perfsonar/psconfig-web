@@ -149,8 +149,6 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
                 testspec = JSON.parse(JSON.stringify(testspec));
                 testspec._canedit = canedit(req.user, testspec);
                 res.json(testspec);
-            }).catch(function(err) {
-                next(err);
             });
         } 
     }); 

@@ -147,9 +147,10 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
                 hostgroup = JSON.parse(JSON.stringify(hostgroup));
                 hostgroup._canedit = canedit(req.user, hostgroup);
                 res.json(hostgroup);
-            }).catch(function(err) {
-                next(err);
             });
+            /*.catch(function(err) {
+                next(err);
+            });*/
         }
     }); 
 });
