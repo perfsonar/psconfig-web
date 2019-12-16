@@ -131,13 +131,24 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             testspec.schedule_type = req.body.schedule_type;
             testspec.admins = req.body.admins;
             testspec.update_date = new Date();
+
+            // Rename protocol to probe_type
+            if ( (! req.body.specs.probe_type ) && req.body.specs.protocol ) {
+                testspec.specs.probe_type = req.body.specs.protocol;
+                delete testspec.specs.protocol;
+
+            } else {
+                if ( req.body.specs.probe_type ) {
+                    testspec.specs.probe_type = req.body.specs.probe_type;
+                    delete testspec.specs.protocol;
+                }
+
+            }
             testspec.save(function(err) {
                 if(err) return next(err);
                 testspec = JSON.parse(JSON.stringify(testspec));
                 testspec._canedit = canedit(req.user, testspec);
                 res.json(testspec);
-            }).catch(function(err) {
-                next(err);
             });
         } 
     }); 

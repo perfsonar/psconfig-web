@@ -163,6 +163,8 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
         rename_field( spec, "packet-size", "length");
     } else if ( test.type == "trace" ) {
         rename_field( spec, "packet-size", "length" );
+        if ( ! spec["probe-type"] ) delete spec["probe-type"];
+        delete spec.protocol;
     }
 
     delete spec.tool;
@@ -800,6 +802,7 @@ exports._process_published_config = function( _config, opts, cb ) {
             org.sites.push(site);
         }
 
+        var ma_prefix = "config-archive";
         // init variables for config archives
         var last_config_ma_number = 0;
         var last_test_ma_number = 0;

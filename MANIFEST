@@ -10,3 +10,4 @@ api/models/index.js
 api/pwaadmin.js
 api/pwacache-expire-dedupe.js
 api/pwacache.js
+api/sharedFunctions.js
