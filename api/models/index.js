@@ -7,13 +7,14 @@ const winston = require('winston');
 //mine
 const config = require('../config');
 const logger = new winston.Logger(config.logger.winston);
+//var conn;
 
 //use native promise for mongoose
 //without this, I will get Mongoose: mpromise (mongoose's default promise library) is deprecated
 mongoose.Promise = global.Promise;
 
 exports.init = function(cb) {
-    mongoose.connect(config.mongodb, {
+    exports.conn = mongoose.createConnection(config.mongodb, {
         //reconnectTries: Number.MAX_VALUE
         useNewUrlParser: true
         , useUnifiedTopology: true
@@ -27,13 +28,28 @@ exports.init = function(cb) {
             }, 5000);
             return;
         }
+        //logger.info("connected to mongo");
+        //cb();
+    });
+    exports.conn.on('open', function () {
         logger.info("connected to mongo");
         cb();
+        /*
+        conn.db.listCollections().toArray(function (err, collectionNames) {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            console.log(collectionNames);
+            conn.close();
+        });
+        */
     });
 }
 exports.disconnect = function(cb) {
     mongoose.disconnect(cb);
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -190,4 +206,20 @@ var configSchema = mongoose.Schema({
 
 });
 exports.Config = mongoose.model('Config', configSchema);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+var schemaRevisionSchema = mongoose.Schema({
+    name: String,
+    //desc: String,
+    revision: Number,
+    collections:[ {type: mongoose.Schema.Types.ObjectId, ref: 'Collections'} ],
+    //data: mongoose.Schema.Types.Mixed,
+
+    //admins: [ String ], //array of user ids (sub string in auth service)
+    create_date: {type: Date, default: Date.now},
+    update_date: {type: Date, default: Date.now},
+
+});
+exports.SchemaRevision = mongoose.model('SchemaRevision', schemaRevisionSchema);
 
