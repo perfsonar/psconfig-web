@@ -20,6 +20,8 @@ const db = require('../api/models');
 //const common = require('../common');
 const upgrade =  require('../api/pwa-db-upgrade');
 
+//upgrade.get_current_schema_revision();
+
 //var collectionNames;
 //var collections = {};
 
