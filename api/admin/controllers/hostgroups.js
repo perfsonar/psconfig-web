@@ -36,7 +36,7 @@ function canedit(user, hostgroup) {
  * @apiHeader {String}          Authorization A valid JWT token "Bearer: xxxxx"
  *
  */
-router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
+router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var find = {};
     if(req.query.find) find = JSON.parse(req.query.find);
     
@@ -147,9 +147,10 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
                 hostgroup = JSON.parse(JSON.stringify(hostgroup));
                 hostgroup._canedit = canedit(req.user, hostgroup);
                 res.json(hostgroup);
-            }).catch(function(err) {
-                next(err);
             });
+            /*.catch(function(err) {
+                next(err);
+            });*/
         }
     }); 
 });

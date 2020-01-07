@@ -1,10 +1,11 @@
 <ng-include src="'t/sidebar.html'"></ng-include>
+
 <div class="sca-sidebar-page">
     <div class="subbar">
         <div style="padding-left: 20px; margin-bottom: 10px;">
-            <h2>Test specs</h2>
+            <h2>Archives</h2>
             <p class="help-block">List of defined test specifications</p>
-            <span class="text-muted">{{testspecs.length}} Testspecs</span>
+            <span class="text-muted">{{archives.length}} Archives</span>
         </div>
         <div class="filterbox" ng-class="{active: filter}">
             <i class="fa fa-times pull-right remove" ng-click="filter = ''"></i>
@@ -13,29 +14,29 @@
         </div>
 
         <div class="subbar-list" style="top: 159px">
-            <p class="alert alert-info" ng-if="testspecs.length == 0">Please register a testspec.</p>
+            <p class="alert alert-info" ng-if="archives.length == 0">Please register a archive.</p>
             <div class="subbar-list-item" 
-                id="{{testspec._id}}"
-                ng-repeat="testspec in filter_testspecs(testspecs)" 
-                ng-class="{active: selected == testspec}"
-                ng-click="select(testspec)">
-                <time class="help-block pull-right">{{testspec.create_date|date}}</time>
+                id="{{archive._id}}"
+                ng-repeat="archive in filter_archives(archives)" 
+                ng-class="{active: selected == archive}"
+                ng-click="select(archive)">
+                <time class="help-block pull-right">{{archive.create_date|date}}</time>
                 <div class="list-header">
                     <small>
-                        <span class="label label-default">{{friendly_type(testspec.service_type)}}</span> {{testspec.name}}
-                        <i ng-if="!testspec._canedit" class="fa fa-lock text-muted"></i>
+                        <span class="label label-default">{{friendly_type(archive.service_type)}}</span> {{archive.name}}
+                        <i ng-if="!archive._canedit" class="fa fa-lock text-muted"></i>
                     </small>
                 </div>
             </div>
-            <div class="list-addbutton animated" ng-class="{bounceInLeft: testspecs.length == 0}" ng-click="add()" title="Add new testspec">
+            <div class="list-addbutton animated" ng-class="{bounceInLeft: archives.length == 0}" ng-click="add()" title="Add new archive">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> 
-                <div class="add-text">New testspec</div>
+                <div class="add-text">New archive</div>
             </div>
         </div>
     </div><!--subbar-->
 
     <div class="subbar-content">
-        <p class="alert alert-info" ng-if="!selected">Please select testspec</p>
+        <p class="alert alert-info" ng-if="!selected">Please select archive</p>
         <form ng-submit="submit()" class="form-horizontal margin30" name="form" ng-show="selected" confirm-on-exit>
             <div class="fixed-top">
                 <h2>
@@ -43,7 +44,7 @@
                         ng-confirm-click="Are you sure you want to remove this test spec?"
                         confirmed-click="remove()"></i>
                         &nbsp;&nbsp;&nbsp;
-                        Edit Testspec
+                        Edit Archive
                     <!--
                     <i class="fa fa-info-circle" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
                     <i class="fa fa-star-o" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
@@ -65,7 +66,7 @@
                     <div class="col-sm-10">
                         <input type="text" class="form-control" id="name" ng-model="selected.name" 
                             ng-disabled="!selected._canedit"
-                            placeholder="Name for this test spec" required>
+                            placeholder="Name for this archive" required>
                     </div>
                 </div>
                 <hr style="margin-bottom: 0px;">
@@ -76,7 +77,7 @@
                     <label for="admins" class="col-sm-2 control-label">Admins</label>
                     <div class="col-sm-10">
                         <ui-select multiple ng-model="selected.admins" ng-disabled="!selected._canedit">
-                            <ui-select-match placeholder="Select admins who can update this test spec">
+                            <ui-select-match placeholder="Select admins who can update this archive">
                                 <img gravatar-src="$item.email" gravatar-size="17"/>
                                 <b>{{$item.fullname}}</b> <span class="email">&lt;{{$item.email}}&gt;</span>
                             </ui-select-match>
@@ -90,21 +91,18 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="type" class="col-sm-2 control-label">Service Type *</label>
+                    <label for="type" class="col-sm-2 control-label">Archiver Type *</label>
                     <div class="col-sm-10">
                         <select class="form-control"
                             ng-disabled="!selected._canedit"
-                            ng-model="selected.service_type"
-                            ng-change="setdefault(selected.service_type)" required>
-                            <option ng-repeat="(sid, item) in serverconf.service_types" value="{{sid}}">{{item.label}}</option>
+                            ng-model="selected.archiver"
+                            ng-change="setdefault(selected.archiver)" required>
+                            <option ng-repeat="(aid, item) in serverconf.archivers" value="{{aid}}">{{item.label}}</option>
                         </select>
                     </div>
                 </div>
-                <ng-include ng-if="selected.service_type"
-                    src="'t/testspec-'+selected.service_type+'.html'"></ng-include>
-                <p class="help-block pull-right">For more information on testspecs, please consult the <a target="_blank" href="https://docs.perfsonar.net/psconfig_templates_intro.html#tests">pSConfig Documentation</a></p>
-
-                <br><br>
+                <ng-include ng-if="selected.archiver"
+                    src="'t/archive-'+selected.archiver+'.html'"></ng-include>
 
                 <div ng-if="appconf.debug">
                     <h3>Debug</h3>

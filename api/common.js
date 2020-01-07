@@ -1,4 +1,3 @@
-
 const fs = require('fs'); //debug
 const request = require('request');
 const winston = require('winston');

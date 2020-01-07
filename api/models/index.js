@@ -14,8 +14,10 @@ mongoose.Promise = global.Promise;
 
 exports.init = function(cb) {
     mongoose.connect(config.mongodb, {
-        reconnectTries: Number.MAX_VALUE
-        , useMongoClient: true
+        //reconnectTries: Number.MAX_VALUE
+        useNewUrlParser: true
+        , useUnifiedTopology: true
+        , useCreateIndex: true
     }, function(err) {
         if(err) {
             logger.error(err);
@@ -140,6 +142,20 @@ exports.Testspec = mongoose.model('Testspec', testspecSchema);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+var archiveSchema = mongoose.Schema({
+    name: String,
+    desc: String,
+    archiver: String,
+    data: mongoose.Schema.Types.Mixed,
+
+    admins: [ String ], //array of user ids (sub string in auth service)
+    create_date: {type: Date, default: Date.now},
+    update_date: {type: Date, default: Date.now},
+});
+exports.Archive = mongoose.model('Archive', archiveSchema);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 //test is now part of config
 var testSchema = mongoose.Schema({
     service_type: String,
@@ -169,6 +185,7 @@ var configSchema = mongoose.Schema({
     create_date: {type: Date, default: Date.now},
     update_date: {type: Date, default: Date.now},
     ma_urls: [ String ], // an array of measurement archive URLs to archive test results to
+    ma_custom_json: String,
     force_endpoint_mas: {type: Boolean, default: false} // bool determining whether to force archiving to MAs on all hosts in the config
 
 });

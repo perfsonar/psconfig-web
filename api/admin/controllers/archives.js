@@ -12,18 +12,18 @@ const config = require('../../config');
 const logger = new winston.Logger(config.logger.winston);
 const db = require('../../models');
 
-function canedit(user, testspec) {
+function canedit(user, archive) {
     if(user) {
         if(user.scopes.pwa && ~user.scopes.pwa.indexOf('admin')) return true; 
-        if(~testspec.admins.indexOf(user.sub.toString())) return true;
+        if(~archive.admins.indexOf(user.sub.toString())) return true;
     }
     return false;
 }
 
 /**
- * @api {get} /testspecs        Query Testspecs
- * @apiGroup                    Testspecs
- * @apiDescription              Query testspecs registered by users
+ * @api {get} /archives         Query Archives
+ * @apiGroup                    Archives
+ * @apiDescription              Query archives registered by users
  
  * @apiParam {Object} [find]    Mongo find query JSON.stringify & encodeURIComponent-ed - defaults to {}
  *                              To pass regex, you need to use {$regex: "...."} format instead of js: /.../ 
@@ -33,7 +33,7 @@ function canedit(user, testspec) {
  * @apiParam {Number} [skip]    Record offset for pagination (default to 0)
  * @apiHeader {String}          Authorization A valid JWT token "Bearer: xxxxx"
  *
- * @apiSuccess {Object}         hosts: List of testspecs objects(testspecs:), count: total number of testspecs (for paging)
+ * @apiSuccess {Object}         hosts: List of archives objects(archives:), count: total number of archives (for paging)
  */
 router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var find = {};
@@ -43,121 +43,107 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var select = req.query.select;
     if(select && !~select.indexOf("admins")) select += " admins";
 
-    db.Testspec.find(find)
+    db.Archive.find(find)
     .select(select)
     .limit(parseInt(req.query.limit) || 100)
     .skip(parseInt(req.query.skip) || 0)
     .sort(req.query.sort || '_id')
     .lean() //so that I can add _canedit later
-    .exec(function(err, testspecs) {
+    .exec(function(err, archives) {
         if(err) return next(err);
-        db.Testspec.count(find).exec(function(err, count) { 
+        db.Archive.count(find).exec(function(err, count) { 
             if(err) return next(err);
             //set _canedit flag for each specs
-            testspecs.forEach(function(testspec) {
-                testspec._canedit = canedit(req.user, testspec);
+            archives.forEach(function(archive) {
+                archive._canedit = canedit(req.user, archive);
             });
-            res.json({testspecs: testspecs, count: count});
+            res.json({archives: archives, count: count});
         });
     }); 
 });
 
 /**
- * @api {post} /testspecs       New testspec
- * @apiGroup                    Testspecs
- * @apiDescription              Register new testspec
+ * @api {post} /archives        New archive
+ * @apiGroup                    Archives
+ * @apiDescription              Register new archive
  *
- * @apiParam {String} service_type Service Type (bwctl, owamp, traceroute, ping, etc..)
  * @apiParam {String} name      Name
  * @apiParam {String} [desc]    Description
- * @apiParam {Object} specs     Spec details (key/value pairs)
+ * @apiParam {String} archiver  Archiver URL (https://example.com)
+ * @apiParam {Object} data      Archiver details (key/value pairs)
  * @apiParam {String[]} [admins] Array of admin IDs
  *
  * @apiHeader {String} authorization 
  *                              A valid JWT token "Bearer: xxxxx"
- * @apiSuccess {Object}         Testspec registered
+ * @apiSuccess {Object}         Archive registered
  */
 router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     if(!req.user.scopes.pwa || !~req.user.scopes.pwa.indexOf('user')) return res.status(401).end();
-    db.Testspec.create(req.body, function(err, testspec) {
+    db.Archive.create(req.body, function(err, archive) {
         if(err) return next(err);
-        testspec = JSON.parse(JSON.stringify(testspec));
-        testspec._canedit = canedit(req.user, testspec);
-        res.json(testspec);
+        archive = JSON.parse(JSON.stringify(archive));
+        archive._canedit = canedit(req.user, archive);
+        res.json(archive);
     });
 });
 
 /**
- * @api {put} /testspecs/:id    Update testspec
- * @apiGroup                    Testspecs
- * @apiDescription              Update testspec information (service_type can be changed if it's not used by any test)
+ * @api {put} /archives/:id     Update archive
+ * @apiGroup                    Archives
+ * @apiDescription              Update archive information (archiver can be change)
  *
- * @apiParam {String} [service_type] Service Type (bwctl, owamp, traceroute, ping, etc..)
  * @apiParam {String} [name]      Name
- * @apiParam {String} [desc]    Description
- * @apiParam {Object} [specs]     Spec details (key/value pairs)
- * @apiParam {String[]} [admins] Array of admin IDs
+ * @apiParam {String} [desc]      Description
+ * @apiParam {String} [archiver]  Archiver URL (https://example.com)
+ * @apiParam {Object} [data]      Archiver details (key/value pairs)
+ * @apiParam {String[]} [admins]  Array of admin IDs
 *
  * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"
  *
- * @apiSuccess {Object}         Testspec updated
+ * @apiSuccess {Object}         Archive updated
  */
 router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    db.Testspec.findById(req.params.id, function(err, testspec) {
+    db.Archive.findById(req.params.id, function(err, archive) {
         if(err) return next(err);
-        if(!testspec) return next(new Error("can't find a testspec with id:"+req.params.id));
-        if(!canedit(req.user, testspec)) return res.status(401).end();
+        if(!archive) return next(new Error("can't find a archive with id:"+req.params.id));
+        if(!canedit(req.user, archive)) return res.status(401).end();
 
-        if(req.body.service_type == testspec.service_type) update();
+        if(req.body.archiver == archive.archiver) update();
         else {
             //check to make sure if it's not used by a test
-            db.Config.find({"tests.testspec": testspec._id}, function(err, tests) {
+            db.Config.find({"tests.archive": archive._id}, function(err, tests) {
                 if(err) return next(err);
                 if(tests.length == 0) update();
                 else {
                     var names = "";
                     tests.forEach(function(test) { names+=test.name+", "; });
-                    next("You can not change service_type for this testspec. It is currently used by "+names);
+                    next("You can not change service_type for this archive. It is currently used by "+names);
                 }
             }); 
         } 
 
         function update() {
             //not used by anyone .. update (field no set won't be updated - unless it's set to undefined explicitly)
-            testspec.service_type = req.body.service_type;
-            testspec.name = req.body.name;
-            testspec.desc = req.body.desc;
-            testspec.specs = req.body.specs;
-            testspec.schedule_type = req.body.schedule_type;
-            testspec.admins = req.body.admins;
-            testspec.update_date = new Date();
-
-            // Rename protocol to probe_type
-            if ( (! req.body.specs.probe_type ) && req.body.specs.protocol ) {
-                testspec.specs.probe_type = req.body.specs.protocol;
-                delete testspec.specs.protocol;
-
-            } else {
-                if ( req.body.specs.probe_type ) {
-                    testspec.specs.probe_type = req.body.specs.probe_type;
-                    delete testspec.specs.protocol;
-                }
-
-            }
-            testspec.save(function(err) {
+            archive.name = req.body.name;
+            archive.desc = req.body.desc;
+            archive.archiver = req.body.archiver;
+            archive.data = req.body.data;
+            archive.admins = req.body.admins;
+            archive.update_date = new Date();
+            archive.save(function(err) {
                 if(err) return next(err);
-                testspec = JSON.parse(JSON.stringify(testspec));
-                testspec._canedit = canedit(req.user, testspec);
-                res.json(testspec);
+                archive = JSON.parse(JSON.stringify(archive));
+                archive._canedit = canedit(req.user, archive);
+                res.json(archive);
             });
         } 
     }); 
 });
 
 /**
- * @api {delete} /testspecs/:id   Remove testspec
- * @apiGroup                    Testspecs
- * @apiDescription              Remove testspec registration - if it's not used by any test
+ * @api {delete} /archives/:id  Remove archive
+ * @apiGroup                    Archives
+ * @apiDescription              Remove archive URL
  * @apiHeader {String} authorization 
  *                              A valid JWT token "Bearer: xxxxx"
  * @apiSuccessExample {json} Success-Response:
@@ -167,23 +153,23 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
  *     }
  */
 router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    db.Testspec.findById(req.params.id, function(err, testspec) {
+    db.Archive.findById(req.params.id, function(err, archive) {
         if(err) return next(err);
-        if(!testspec) return next(new Error("can't find a testspec with id:"+req.params.id));
+        if(!archive) return next(new Error("can't find a archive with id:"+req.params.id));
 
         async.series([
             //check access 
             function(cb) {
-                if(canedit(req.user, testspec)) {
+                if(canedit(req.user, archive)) {
                     cb();
                 } else {
-                    cb("You don't have access to remove this testspec");
+                    cb("You don't have access to remove this archive");
                 }
             },
             
             //check foreign key dependencies on test
             function(cb) {
-                db.Config.find({"tests.testspec": testspec._id}, function(err, tests) {
+                db.Config.find({"tests.archive": archive._id}, function(err, tests) {
                     if(err) return cb(err);
                     var names = "";
                     tests.forEach(function(test) {
@@ -192,7 +178,7 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
                     if(names == "") {
                         cb();
                     } else {
-                        cb("You can not remove this testspec. It is currently used by "+names);
+                        cb("You can not remove this archive. It is currently used by "+names);
                     }
                 }); 
             }
@@ -200,7 +186,7 @@ router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
         ], function(err) {
             if(err) return next(err);
             //all good.. remove
-            testspec.remove().then(function() {
+            archive.remove().then(function() {
                 res.json({status: "ok"});
             }); 
         });

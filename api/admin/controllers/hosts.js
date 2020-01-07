@@ -177,8 +177,6 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             host = JSON.parse(JSON.stringify(host));
             host._canedit = canedit(req.user, host);
             res.json(host);
-        }).catch(function(err) {
-            next(err);
         });
     });
 });
