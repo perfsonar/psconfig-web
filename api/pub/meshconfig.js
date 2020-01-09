@@ -494,6 +494,8 @@ function generate_group_members( test, group, test_service_types, type, next, ad
 exports._process_published_config = function( _config, opts, cb ) {
     var format = opts.format;
 
+    console.log("_config", _config);
+
 
     //resolve all db entries first
     if(_config.admins) _config.admins = resolve_users(_config.admins);
@@ -505,6 +507,27 @@ exports._process_published_config = function( _config, opts, cb ) {
     });
 
     var test_service_types = Object.keys(service_type_obj).map(e => service_type_obj[e]);
+
+    async.eachSeries( _config.archives, function(arch, next_arch) {
+        var arch_obj = {};
+        console.log("ARCHIVES ...");
+        db.Archive.find().exec(function(err, archs) {
+            if(err) return cb(err);
+            archs.forEach( function( arch ) {
+                console.log("inside exec");
+                console.log("arch", arch);
+                arch_obj[ arch._id ] = arch;
+                //console.log("arch_obj", arch_obj);
+            });
+            console.log("arch_obj", arch_obj);
+            next_arch();
+        }, function(err) {
+            if(err) return cb(err);
+
+
+        });
+
+    });
 
 
     async.eachSeries(_config.tests, function(test, next_test) {
@@ -538,6 +561,7 @@ exports._process_published_config = function( _config, opts, cb ) {
             function(next) {
                 //testspec
                 if(!test.testspec) return next();
+
                 resolve_testspec(test.testspec, function(err, row) {
                     if(err) return next(err);
                     test.testspec = row;
@@ -937,6 +961,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                 psc_tests[ name ].spec.source = "{% address[0] %}";
                 psc_tests[ name ].spec.dest = "{% address[1] %}";
                 meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules );
+                logger.debug( "testspec", JSON.stringify( testspec, null, "  " ));
             }
 
             var interval = psc_tests[ name ].spec["test-interval"];
