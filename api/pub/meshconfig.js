@@ -13,6 +13,7 @@ const config = require('../config');
 const logger = new winston.Logger(config.logger.winston);
 const db = require('../models');
 const common = require('../common');
+const pub_shared = require('./pub_shared');
 
 // TODO: Remove bwctl hack
 // This is a ps 3.5/bwctl backwards-compatibility hack
@@ -32,6 +33,8 @@ var profile_cache_date = null;
 var host_catalog = {};
 var host_groups = {};
 var host_groups_details = {};
+
+var archives_obj = {};
 
 function load_profile(cb) {
     logger.info("reloading profiles");
@@ -494,7 +497,6 @@ function generate_group_members( test, group, test_service_types, type, next, ad
 exports._process_published_config = function( _config, opts, cb ) {
     var format = opts.format;
 
-    console.log("_config", _config);
 
 
     //resolve all db entries first
@@ -508,24 +510,22 @@ exports._process_published_config = function( _config, opts, cb ) {
 
     var test_service_types = Object.keys(service_type_obj).map(e => service_type_obj[e]);
 
-    async.eachSeries( _config.archives, function(arch, next_arch) {
-        var arch_obj = {};
-        console.log("ARCHIVES ...");
-        db.Archive.find().exec(function(err, archs) {
+    db.Archive.find().exec(function(err, archs) {
             if(err) return cb(err);
             archs.forEach( function( arch ) {
-                console.log("inside exec");
-                console.log("arch", arch);
-                arch_obj[ arch._id ] = arch;
+                //console.log("inside exec");
+                //console.log("arch", arch);
+                //archives_obj[ arch._id ] = pub_shared.format_archive( arch ); 
+                archives_obj[ arch._id ] = arch;
+                //_config.archives_obj = pub_shared.format_archive( arch ); 
                 //console.log("arch_obj", arch_obj);
             });
-            console.log("arch_obj", arch_obj);
-            next_arch();
+            console.log("archives_obj", archives_obj);
+            //next_arch();
         }, function(err) {
-            if(err) return cb(err);
+            if(err) return (err);
 
 
-        });
 
     });
 
@@ -856,7 +856,7 @@ exports._process_published_config = function( _config, opts, cb ) {
             }
         }
 
-    
+   
 
         var ma_prefix = "config-archive";
         if ( "ma_urls" in _config ) {
@@ -907,6 +907,21 @@ exports._process_published_config = function( _config, opts, cb ) {
         psconfig.archives = psc_archives;
         psconfig.addresses = psc_addresses;
         psconfig.groups = host_groups_details;
+
+    console.log("_config", _config);
+    var psarch_obj = {};
+    async.eachSeries( _config.archives, function(arch, next_arch) {
+        console.log("ARCHIVES ...");
+        console.log("arch", arch);
+        var name = archives_obj[ arch._id ].name;
+        console.log("NAME", name);
+        psc_archives = _.extend( psc_archives, pub_shared.format_archive( archives_obj[ arch._id ] ) );
+        next_arch();
+        //psarch_obj = _.extend( psarch_obj, pub_shared.format_archive( archives_obj[ arch._id ] ) );
+    });
+
+    //psconfig.psarch_obj = psarch_obj;
+
         //psconfig.groups = psc_groups;
         mc.organizations.push(org);
         if ( config_mas.length > 0 ) {
