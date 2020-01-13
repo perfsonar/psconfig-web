@@ -150,6 +150,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             }
             config.tests = req.body.tests;
             config.admins = req.body.admins;
+            config.archives = req.body.archives;
 	    var custom_json = req.body.ma_custom_json;
         if( ( "ma_custom_json" in req.body ) 
             && ( ( typeof req.body.ma_custom_json ) != "undefined" )

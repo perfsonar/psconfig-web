@@ -155,20 +155,21 @@
                     <label class="col-sm-2 control-label">Central Archives (MAs)</label>
                     <div class="col-sm-10">
 
-                        <ui-select multiple ng-model="selected.all_archives" ng-disabled="!selected._canedit">
+                        <ui-select multiple ng-model="selected.archives" ng-disabled="!selected._canedit">
                             <ui-select-match placeholder="Select central measurement archives to which all test results will be submitted">
+                            {{$item.name}}
                             </ui-select-match>
-                            <ui-select-choices repeat="archive in all_archives">
-                            {{archive.name}}
+                            <ui-select-choices repeat="archive._id as archive in all_archives">
                             <b>{{archive.name}}</b> <small>{{archive.desc}}</small>
                             </ui-select-choices>
                         </ui-select>
                         <p class="help-block">Central archives</p>
-
+                        <!--
                         <textarea class="form-control" name="archives" id="archives" ng-model="selected.archives" ng-disabled="!selected._canedit" style="" rows="5"></textarea>
                         <span ng-show="form.archives.$error.archives" style="color:red">Archives validation error: {{form.archives.$error.archives}}.</span>
 
                         <p class="help-block">Providing Measurement Archive URLs (one per line) will allow you to send test results for all tests in the config to one or more central measurement archives.</p>
+                        -->
                     </div>
                 </div>
                 <div class="form-group">

@@ -21,6 +21,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
                     $scope.all_archives = _archives;
                     console.log("all_archives", _archives);
 
+
                     configs.getAll().then(function(_configs) {
                         $scope.configs = _configs;
                         if($routeParams.id) {
@@ -46,6 +47,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     $scope.selected = null;
     $scope.select = function(config) {
         $scope.selected = config;
+                    console.log("selected", $scope.selected);
         $scope.closesubbar();
 
         config.tests.forEach(function(test) {

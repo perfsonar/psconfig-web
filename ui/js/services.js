@@ -249,7 +249,7 @@ app.factory('configs', function(appconf, $http, jwtHelper) {
         //return basic (uuid, sitename, hostname, lsid) config info for all configs
         getAll: function(opts) { 
             //if(all_promise) return all_promise;
-            var select = "url name desc ma_urls ma_custom_json force_endpoint_mas admins tests create_date";
+            var select = "url name desc ma_urls archives ma_custom_json force_endpoint_mas admins tests create_date";
             if(opts && opts.select) select = opts.select;
             return $http.get(appconf.api+'/configs?select='+select+'&sort=desc&limit=100000')
             .then(function(res) {
@@ -262,6 +262,7 @@ app.factory('configs', function(appconf, $http, jwtHelper) {
                 desc: "New Config",
                 admins: [],
                 tests: [],
+                archives: []
             };
             var jwt = localStorage.getItem(appconf.jwt_id);
             if(jwt) {

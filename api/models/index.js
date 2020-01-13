@@ -180,6 +180,8 @@ var configSchema = mongoose.Schema({
     desc: String,
 
     tests: [ testSchema ],
+    
+    archives: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Archive'} ],
 
     admins: [ String ], //array of user ids (sub string in auth service)
     create_date: {type: Date, default: Date.now},
