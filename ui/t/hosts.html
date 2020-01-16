@@ -170,7 +170,7 @@
 
 
 
-                <!-- ma form group -->
+                <!-- local ma form group -->
                 <div class="form-group">
                     <label class="col-sm-2 control-label">Local Archives (MAs)</label>
                     <div class="col-sm-10">
@@ -186,7 +186,27 @@
                         <p class="help-block">Local archives</p>
                     </div>
                 </div>
-                <!-- end ma form group -->
+                <!-- end local ma form group -->
+
+
+
+                <!-- other ma form group -->
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">Additional measurement archives (MAs)</label>
+                    <div class="col-sm-10">
+
+                        <ui-select multiple ng-model="selected.additional_archives" ng-disabled="!selected._canedit">
+                            <ui-select-match placeholder="Select additional measurement archives to which all test results will be submitted">
+                            {{$item.name}}
+                            </ui-select-match>
+                            <ui-select-choices repeat="archive._id as archive in all_archives">
+                            <b>{{archive.name}}</b> <small>{{archive.desc}}</small>
+                            </ui-select-choices>
+                        </ui-select>
+                        <p class="help-block">Local archives</p>
+                    </div>
+                </div>
+                <!-- end other ma form group -->
 
 
 
