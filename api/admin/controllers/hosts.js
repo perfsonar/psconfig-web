@@ -139,6 +139,9 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             if(!service.ma) service.ma = undefined;
         });
 
+        // reusable archivers
+        host.local_archives = req.body.local_archives;
+
         //things always allowed to edit (TODO - shouldn't I have to mask fields not set?)
         host.no_agent = req.body.no_agent;
         host.local_ma = req.body.local_ma;

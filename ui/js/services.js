@@ -16,7 +16,7 @@ app.factory('hosts', function(appconf, $http, jwtHelper) {
         //return basic (uuid, sitename, hostname, lsid) host info for all hosts
         getAll: function(opts) { 
             //if(all_promise) return all_promise;
-            var select = "sitename hostname lsid url update_date";
+            var select = "sitename hostname lsid url update_date local_archives additional_archives";
             if(opts && opts.select) select = opts.select;
             return $http.get(appconf.api+'/hosts?select='+select+'&sort=sitename hostname&limit=3000')
             .then(function(res) {
@@ -70,6 +70,8 @@ app.factory('hosts', function(appconf, $http, jwtHelper) {
                 info: {},
                 location: {},
                 communities: [],
+                local_archives: [],
+                additional_archives: []
             };
             
             //add user to admin
