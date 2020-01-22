@@ -690,6 +690,7 @@ exports._process_published_config = function( _config, opts, cb ) {
             };
             if ( ! ( _host.hostname in psc_hosts) ) psc_hosts[ _host.hostname ]  = {};
 
+            /*
             if ( "ma_urls" in _host && _host.ma_urls.length > 0  ) {
                 for(var i in _host.ma_urls ) {
                     var extra_url = _host.ma_urls[i];
@@ -712,6 +713,7 @@ exports._process_published_config = function( _config, opts, cb ) {
 
                 }
             }
+*/
 
             //create ma entry for each service
             test_service_types.forEach(function(service) {
@@ -745,7 +747,48 @@ exports._process_published_config = function( _config, opts, cb ) {
                     }
                 }
 
-                // Handle host main MA 
+                // Handle NEW host main MA (REUSABLE STYLE) 
+                console.log("_host", _host);
+                console.log("maName", maName);
+                if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
+                if ( "local_archives" in _host ) {
+                   _host["local_archives"].forEach( function( _id ) {
+                       console.log("_id", _id);
+                        //psc_hosts[_host.hostname].archives.push(archives_obj[_id].name );
+                        psc_hosts[_host.hostname].archives.push(archives_obj[_id].name + "-" + _id);
+
+
+                   }); 
+                    //psc_hosts[_host.hostname].archives = psc_hosts[_host.hostname].local_archives.concat( _host.local_archives );
+                console.log("psc_hosts[_host.hostname]", psc_hosts[_host.hostname]);
+
+                }
+                //if ( ! ( "_archive" in _host ) ) _host._archive = [];
+
+                /* TODO: FIX!
+                if ( ! ( url in maHash )  ) {
+                    if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
+                        psc_archives[ maName ] = maInfo;
+                        _host._archive.push(maName);
+                        psc_hosts[ _host.hostname ].archives.push( maName );
+
+                        last_ma_number++;
+                        maHash[url] = maName;
+                    } else if ( url in extra_mas ) {
+
+                    }
+
+                } else {
+                    if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
+                    var maType = maHash[url];
+                        psc_archives[ maType ] = maInfo;
+                    }
+
+                }
+                */
+
+
+                // Handle host main MA (OLD URL STYLE) 
                 if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
                 if ( ! ( "_archive" in _host ) ) _host._archive = [];
 
@@ -856,8 +899,21 @@ exports._process_published_config = function( _config, opts, cb ) {
             }
         }
 
-   
 
+        if ( "archives" in _config ) {
+            _config.archives.forEach( function( _id ) {
+                var _arch = archives_obj[ _id ];
+                console.log("_config _arch", _arch);
+                console.log("archives_obj[ _arch ]", archives_obj[ _arch ]);
+                test_mas.push( pub_shared.archive_extract_name( _arch ) );
+
+            });
+
+
+        }
+
+
+        /*
         var ma_prefix = "config-archive";
         if ( "ma_urls" in _config ) {
             for(var i in _config.ma_urls ) {
@@ -866,7 +922,7 @@ exports._process_published_config = function( _config, opts, cb ) {
 
                 var maName = "config-archive" + last_config_ma_number;
                 var maName = "config-archive" + last_test_ma_number;
-                test_mas.push( maName );
+                test_mas.push( maName ); // TODO: ADAPT FOR NEW MA STYLE
                 var maInfo;
                 var maType = maHash[url];
 
@@ -901,7 +957,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                 last_config_ma_number++;
             }
         }
-
+*/
         // Retrieve MA URLs from the _config object
 
         psconfig.archives = psc_archives;
@@ -913,7 +969,7 @@ exports._process_published_config = function( _config, opts, cb ) {
     async.eachSeries( _config.archives, function(arch, next_arch) {
         console.log("ARCHIVES ...");
         console.log("arch", arch);
-        var name = archives_obj[ arch._id ].name;
+        var name = pub_shared.archive_extract_name( archives_obj[ arch._id ] );
         console.log("NAME", name);
         psc_archives = _.extend( psc_archives, pub_shared.format_archive( archives_obj[ arch._id ] ) );
         next_arch();
