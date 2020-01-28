@@ -51,7 +51,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
     .lean() //so that I can add _canedit later
     .exec(function(err, testspecs) {
         if(err) return next(err);
-        db.Testspec.count(find).exec(function(err, count) { 
+        db.Testspec.countDocuments(find).exec(function(err, count) { 
             if(err) return next(err);
             //set _canedit flag for each specs
             testspecs.forEach(function(testspec) {
@@ -136,8 +136,6 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
                 testspec = JSON.parse(JSON.stringify(testspec));
                 testspec._canedit = canedit(req.user, testspec);
                 res.json(testspec);
-            }).catch(function(err) {
-                next(err);
             });
         } 
     }); 
