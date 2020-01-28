@@ -813,7 +813,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                 }
 
                 // Handle extra host MAs
-
+                // TODO: remove this and have upgrade script fix
                 for(var key in extra_mas ) {
                     var maName = key;
                     var url = extra_mas[key];
