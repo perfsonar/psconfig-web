@@ -41,6 +41,7 @@ manifest:
 	find ui/node_modules -type f | grep -v bootswatch/docs | grep -v ace-builds > MANIFEST-ui-node_modules
 	# specifically include the minimized "ace" build
 	echo "ui/node_modules/ace-builds/src-min-noconflict/ace.js" >> MANIFEST-ui-node_modules
+	echo "ui/node_modules/ace-builds/src-min-noconflict/mode-javascript.js" >> MANIFEST-ui-node_modules
 
 npm:
 	#cd ui; npm install --production
