@@ -174,3 +174,4 @@ api/pwapub.js
 api/pub/controllers.js
 api/pub/meshconfig.js
 api/pub/server.js
+api/sharedFunctions.js

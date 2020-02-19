@@ -27,6 +27,6 @@ fi
 docker tag perfsonar/pwa-admin perfsonar/pwa-admin:$VERSION
 docker push perfsonar/pwa-admin:$VERSION
 
-docker tag perfsonar/pwa-admin perfsonar/pwa-admin:latest
-docker push perfsonar/pwa-admin:latest
+#docker tag perfsonar/pwa-admin perfsonar/pwa-admin:latest
+#docker push perfsonar/pwa-admin:latest
 

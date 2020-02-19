@@ -39,7 +39,7 @@ function canedit(user, hostgroup) {
 router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}), function(req, res, next) {
     var find = {};
     if(req.query.find) find = JSON.parse(req.query.find);
-    
+
     //we need to select admins , or can't get _canedit set
     var select = req.query.select;
     if(select && !~select.indexOf("admins")) select += " admins";
@@ -52,7 +52,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub, credentialsRequired: false}),
     .lean() //so that I can add _canedit later
     .exec(function(err, hostgroups) {
         if(err) return next(err);
-        db.Hostgroup.count(find).exec(function(err, count) { 
+        db.Hostgroup.countDocuments(find).exec(function(err, count) { 
             if(err) return next(err);
             hostgroups.forEach(function(hostgroup) {
                 hostgroup._canedit = canedit(req.user, hostgroup);
@@ -147,8 +147,6 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
                 hostgroup = JSON.parse(JSON.stringify(hostgroup));
                 hostgroup._canedit = canedit(req.user, hostgroup);
                 res.json(hostgroup);
-            }).catch(function(err) {
-                next(err);
             });
         }
     }); 

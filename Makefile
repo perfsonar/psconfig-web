@@ -7,8 +7,7 @@ PUB_ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin/pub
 CONFIGPATH=/etc/perfsonar/psconfig-web
 PUB_CONFIGPATH=/etc/perfsonar/psconfig-web
 #LIBPATH=/usr/lib/perfsonar/lib
-#GRAPHLIBPATH=/usr/lib/perfsonar/psconfig-web/lib
-PERFSONAR_AUTO_VERSION=4.2.1
+PERFSONAR_AUTO_VERSION=4.2.3
 PERFSONAR_AUTO_RELNUM=1
 VERSION=${PERFSONAR_AUTO_VERSION}
 RELEASE=${PERFSONAR_AUTO_RELNUM}
@@ -42,6 +41,7 @@ manifest:
 	find ui/node_modules -type f | grep -v bootswatch/docs | grep -v ace-builds > MANIFEST-ui-node_modules
 	# specifically include the minimized "ace" build
 	echo "ui/node_modules/ace-builds/src-min-noconflict/ace.js" >> MANIFEST-ui-node_modules
+	echo "ui/node_modules/ace-builds/src-min-noconflict/mode-javascript.js" >> MANIFEST-ui-node_modules
 
 npm:
 	#cd ui; npm install --production
