@@ -66,7 +66,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     .lean() //so that I can add _canedit later
     .exec(function(err, configs) {
         if(err) return next(err);
-        db.Config.count(find).exec(function(err, count) { 
+        db.Config.countDocuments(find).exec(function(err, count) { 
             if(err) return next(err);
             configs.forEach(function(config) {
                 config._canedit = canedit(req.user, config);

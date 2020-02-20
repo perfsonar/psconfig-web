@@ -14,7 +14,6 @@ mongoose.Promise = global.Promise;
 
 exports.init = function(cb) {
     mongoose.connect(config.mongodb, {
-        //reconnectTries: Number.MAX_VALUE
         useNewUrlParser: true
         , useUnifiedTopology: true
         , useCreateIndex: true

@@ -51,7 +51,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     .lean() //so that I can add _canedit later
     .exec(function(err, hosts) {
         if(err) return next(err);
-        db.Host.count(find).exec(function(err, count) {
+        db.Host.countDocuments(find).exec(function(err, count) {
             if(err) return next(err);
 
             hosts.forEach(function(host) {
