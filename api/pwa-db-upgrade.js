@@ -1,9 +1,9 @@
 #!/usr/bin/node
 'use strict';
 
-const fs = require('fs');
+//const fs = require('fs');
 const winston = require('winston');
-const mongoose = require('mongoose');
+//const mongoose = require('mongoose');
 const async = require('async');
 const request = require('request');
 const assert = require('assert');
@@ -37,7 +37,7 @@ const conn = mongoose.createConnection(config.mongodb, {useNewUrlParser: true
 db.init(function(err) {
     if(err) throw err;
     logger.info("connected to db IN UPGS");
-    //startProcessing(); //this start loop
+    startProcessing(); //this start loop
 //console.log("db", JSON.stringify( db.conn, null, 2 ));
         // test
         var rev = {
@@ -45,6 +45,7 @@ db.init(function(err) {
             description: "desc",
             collection_name: "asdf"
         };
+
 /*
             var rec = new db.Schemarevision(rev);
             rec.save().then(function(err) {
@@ -52,8 +53,6 @@ db.init(function(err) {
                 console.log("err", err);
 
             });
-            */
-        /*
             db.Schemarevision.create(rev, function( err, record ) {
                 console.log("created", record);
                 console.log("created err", record);
@@ -65,35 +64,37 @@ db.init(function(err) {
         // end test
 });
 
-/*
+
 function startProcessing() {
-    exports.run();
+    run();
 }
-*/
 
-var conn = db.conn;
 
-conn.on('open', function () {
-    exports.run();
+//var conn = db.conn;
 
-});
 
-exports.run = function() {
+
+//conn.on('open', function () {
+
+//startProcessing();
+
+//});
+
+function run() {
 
     //console.log("conn INSPECT", util.inspect( conn ) );
     console.log("db INSPECT", util.inspect( db ) );
-    try {
-    db.Host.findOne({'hostname': 'perfsonar-dev.grnoc.iu.edu'}).then(function( host ) {
+
+    /*
+    db.Host.find({'hostname': 'perfsonar-dev.grnoc.iu.edu'}, function( err, host ) {
+        if ( err ) console.log("ERR", err);
         console.log("HOST", host);
+    console.log("afterwards hmm");
 
     });
-    } catch (ex ) {
-        console.log("EX", ex);
+    */
 
-    }
-    console.log("afterwards hmm");
    
-  //  function(err, host) {
   /*
     async.each( [ 
             function (cb) {
@@ -123,10 +124,29 @@ exports.run = function() {
             */
     //return; // TODO: REMOVE AFTER TESTING
 
+        //get_current_schema_revision();
+        async.series([ getCollections, get_current_schema_revision ], function(err, results) {
+            if (err) {
+                logger.error("ERROR: FAILED GETTING SCHEMA REVS", err);
+                return err;
+            }
+            console.log("end of async series!");
+            logger.debug("now in async series getting revision");
+            schemasObj.push(schemas);
+            logger.debug("schemas", JSON.stringify(schemas));
+            //if (err) return err;
+            //next();
+
+
+        });
+        //console.log("AFTER ASYNC SERIES");
+};
+
+function getCollections( cb ) {
     db.conn.db.listCollections().toArray(function (err, collectionArr) {
         if (err) {
             console.error("ERROR!!!", err);
-            return;
+            return cb(err);
         }
 
         collections = arrayToObject(collectionArr, "name");
@@ -136,6 +156,10 @@ exports.run = function() {
         checkCollections(collections);
         var colNames = Object.keys( collections );
         console.log("colNames", colNames);
+        cb();
+
+
+        if ( false ) {
 
         async.eachSeries( colNames, function( colName, next ) {
             var rev = {
@@ -182,47 +206,12 @@ exports.run = function() {
             if ( err ) console.log("error logging: ", err);
             
         });
+        } // end IF false
 
-        //get_current_schema_revision(cb);
-        /*
-        var options = {};
-    var res = db.Config.find( options ).exec(function (err, schemaArr) {
-        console.log("configERR", err);
     });
-    */
-/*
-        async.series([ get_current_schema_revision ], function(err) {
-            if (err) {
-                logger.error("ERROR: FAILED GETTING SCHEMA REVS", err);
-                return err;
-            }
-            logger.debug("now in async series getting revision");
-            schemasObj.push(schemas);
-            logger.debug("schemas", JSON.stringify(schemas));
-            //if (err) return err;
-            //next();
 
 
-        });
-        */
-        //get_current_schema_revision();
-        //conn.close();
-    });
-        //get_current_schema_revision();
-        async.series([ get_current_schema_revision ], function(err) {
-            if (err) {
-                logger.error("ERROR: FAILED GETTING SCHEMA REVS", err);
-                return err;
-            }
-            logger.debug("now in async series getting revision");
-            schemasObj.push(schemas);
-            logger.debug("schemas", JSON.stringify(schemas));
-            //if (err) return err;
-            //next();
-
-
-        });
-};
+}
 
 function checkCollections( collections ) {
     if ( "archives" in collections ) {
@@ -244,21 +233,19 @@ function checkCollections( collections ) {
 }
 
 
-exports.runMongoose = function( cb ) {
-    //get_current_schema_revision( cb );
-};
 function get_current_schema_revision( cb ) {
     var currentRev;
     var options = {};
     console.log("in get schema rev");
-    console.log("db", db);
-    console.log("cb", cb);
+    //console.log("db", db);
+   // console.log("cb", cb);
     //console.log("db.SchemaRevision", db.SchemaRevision.find());
     //db.Config.find( options ).exec( function (err, schemaArr) {
     
     //TODO: figure out why this isn't happening
-    console.log("options", options);
-    db.Schemarevision.find( options ).exec( function (err, schemaArr) {
+    //console.log("options", options);
+    return cb("error TODO: remove this!  get schema rev not working!");
+    db.Schemarevision.find( options, function (err, schemaArr) {
         console.log("in find");
         logger.debug("ERR\n\nERR", err);
         console.log("schemaArr", schemaArr);
@@ -285,7 +272,7 @@ function get_current_schema_revision( cb ) {
     */
     //console.log("res", res);
     //console.log("res2", res2);
-        console.log("after find");
+    console.log("after find schema rev");
 }
 
 exports.get_min_schema_revision = function() {

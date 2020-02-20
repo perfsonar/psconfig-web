@@ -20,6 +20,7 @@ exports.init = function(cb) {
         , useUnifiedTopology: true
         , useCreateIndex: true
         , autoCreate: true
+        //, bufferCommands: false
     }, function(err) {
         if(err) {
             logger.error(err);
