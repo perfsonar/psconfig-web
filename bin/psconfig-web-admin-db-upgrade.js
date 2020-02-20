@@ -16,7 +16,7 @@ const mongoose = require('mongoose');
 //mine
 const config = require('../api/config'); // TODO: FIX!!!
 const logger = new winston.Logger(config.logger.winston);
-const db = require('../api/models');
+//const db = require('../api/models');
 //const common = require('../common');
 const upgrade =  require('../api/pwa-db-upgrade');
 

@@ -19,6 +19,7 @@ exports.init = function(cb) {
         useNewUrlParser: true
         , useUnifiedTopology: true
         , useCreateIndex: true
+        , autoCreate: true
     }, function(err) {
         if(err) {
             logger.error(err);
@@ -33,6 +34,7 @@ exports.init = function(cb) {
     });
     exports.conn.on('open', function () {
         logger.info("connected to mongo");
+        //console.log("exports.conn", exports.conn);
         cb();
         /*
         conn.db.listCollections().toArray(function (err, collectionNames) {
@@ -208,18 +210,19 @@ var configSchema = mongoose.Schema({
 exports.Config = mongoose.model('Config', configSchema);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-var schemaRevisionSchema = mongoose.Schema({
-    name: String,
+var schemarevisionSchema = mongoose.Schema({
+    collection_name: {type: String, index: { unique: true }, required: true },
+    description: String,
     //desc: String,
-    revision: Number,
-    collections:[ {type: mongoose.Schema.Types.ObjectId, ref: 'Collections'} ],
+    revision: Number
+    //collection: {type: mongoose.Schema.Types.ObjectId, ref: 'Collections'} ,
+    //collection_name: {type: String, unique: true},
     //data: mongoose.Schema.Types.Mixed,
 
     //admins: [ String ], //array of user ids (sub string in auth service)
-    create_date: {type: Date, default: Date.now},
-    update_date: {type: Date, default: Date.now},
+    //create_date: {type: Date, default: Date.now},
+    //update_date: {type: Date, default: Date.now},
 
 });
-exports.SchemaRevision = mongoose.model('SchemaRevision', schemaRevisionSchema);
+exports.Schemarevision = mongoose.model('Schemarevision', schemarevisionSchema);
 

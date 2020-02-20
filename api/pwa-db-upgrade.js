@@ -8,11 +8,12 @@ const async = require('async');
 const request = require('request');
 const assert = require('assert');
 const urlLib = require('url');
+const util = require('util');
 
 //mine
-const config = require('./config');
+const config = require('../api/config');
 const logger = new winston.Logger(config.logger.winston);
-const db = require('./models');
+const db = require('../api/models');
 //const common = require('./common');
 var collections = {};
 var schemasObj = [];
@@ -20,33 +21,167 @@ var schemasObj = [];
 
 logger.debug("CONFIG", JSON.stringify(config.datasource));
 
-const minRevision = 1;
-/*
-db.init(function(err) {
-    if(err) throw err;
-    logger.info("connected to mongoose!");
-    startProcessing(); //this starts the loop
-});
-*/
-function startProcessing() {
-    exports.runMongoose();
-}
+const minRevision = 10;
+var newRev;
+var curRev;
+var revDesc;
 
 // connect to mongo and check collections
+/*
 const conn = mongoose.createConnection(config.mongodb, {useNewUrlParser: true
         , useUnifiedTopology: true
         , useCreateIndex: true});
+*
+*/
+
+db.init(function(err) {
+    if(err) throw err;
+    logger.info("connected to db IN UPGS");
+    //startProcessing(); //this start loop
+//console.log("db", JSON.stringify( db.conn, null, 2 ));
+        // test
+        var rev = {
+            revision: 314,
+            description: "desc",
+            collection_name: "asdf"
+        };
+/*
+            var rec = new db.Schemarevision(rev);
+            rec.save().then(function(err) {
+                console.log("saved?");
+                console.log("err", err);
+
+            });
+            */
+        /*
+            db.Schemarevision.create(rev, function( err, record ) {
+                console.log("created", record);
+                console.log("created err", record);
+                next();
+
+            });
+            */
+       //return; 
+        // end test
+});
+
+/*
+function startProcessing() {
+    exports.run();
+}
+*/
+
+var conn = db.conn;
 
 conn.on('open', function () {
-    conn.db.listCollections().toArray(function (err, collectionArr) {
+    exports.run();
+
+});
+
+exports.run = function() {
+
+    //console.log("conn INSPECT", util.inspect( conn ) );
+    console.log("db INSPECT", util.inspect( db ) );
+    try {
+    db.Host.findOne({'hostname': 'perfsonar-dev.grnoc.iu.edu'}).then(function( host ) {
+        console.log("HOST", host);
+
+    });
+    } catch (ex ) {
+        console.log("EX", ex);
+
+    }
+    console.log("afterwards hmm");
+   
+  //  function(err, host) {
+  /*
+    async.each( [ 
+            function (cb) {
+                console.log("TRYING FINDONE HOST");
+                //console.log("db.Host.findOne", db.Host.findOne);
+                db.Host.findOne({'hostname': 'perfsonar-dev.grnoc.iu.edu'}, function(err, host) {
+                    console.log("err", err);
+                    console.log("host", host);
+
+                    if ( err ) {
+                        console.log("Error retrieving hosts: ", err);
+                        return cb(err);
+
+                    }
+
+                    cb();
+
+
+                });
+
+            }
+        ], function(err) {
+                console.log("ERRRRRRRRR", err);
+                if ( err ) return err;
+
+            });
+            */
+    //return; // TODO: REMOVE AFTER TESTING
+
+    db.conn.db.listCollections().toArray(function (err, collectionArr) {
         if (err) {
             console.error("ERROR!!!", err);
             return;
         }
+
         collections = arrayToObject(collectionArr, "name");
-        logger.debug("Connection open\n" + JSON.stringify(collections));
+        //logger.debug("Connection open\n" + JSON.stringify(collections));
+        console.log("COLLECTIONS: ");
         console.log(collections);
         checkCollections(collections);
+        var colNames = Object.keys( collections );
+        console.log("colNames", colNames);
+
+        async.eachSeries( colNames, function( colName, next ) {
+            var rev = {
+                revision: newRev,
+                description: revDesc,
+                collection_name: colName
+
+            // Something like this
+            //var rec = new db.Host(host);
+            //            rec.save(next);
+
+            };
+
+            console.log("rev", rev);
+            //conn.createCollection("SchemaRevision");
+            //db.Schemarevision.createCollection().then(function(collection) {
+            //      console.log('Collection is created!', collection);
+            //});
+
+            //var rec = new db.Schemarevision(rev);
+            //rec.save(next)
+            /*.then(function(err) {
+                console.log("saved?");
+                console.log("err", err);
+
+            });
+            */
+            db.Schemarevision.create(rev, function( err, record ) {
+                console.log("created", record);
+                console.log("created err", record);
+                next();
+
+            });
+            //console.log("rec", rec);
+            /*
+            rec.save().then(function(asdf) {
+                console.log("asdf", asdf);
+                next();
+            })
+            ;*/
+            //return;
+            //next();
+        }, function(err) {
+            if ( err ) console.log("error logging: ", err);
+            
+        });
 
         //get_current_schema_revision(cb);
         /*
@@ -87,7 +222,7 @@ conn.on('open', function () {
 
 
         });
-});
+};
 
 function checkCollections( collections ) {
     if ( "archives" in collections ) {
@@ -101,6 +236,8 @@ function checkCollections( collections ) {
 
     } else {
         logger.warn("schema_revisions collection does not exist; assuming schema rev " + minRevision);
+        newRev = minRevision;
+        revDesc = "4.2.1";
 
     }
 
@@ -120,15 +257,18 @@ function get_current_schema_revision( cb ) {
     //db.Config.find( options ).exec( function (err, schemaArr) {
     
     //TODO: figure out why this isn't happening
-    db.SchemaRevision.find( options ).exec( function (err, schemaArr) {
+    console.log("options", options);
+    db.Schemarevision.find( options ).exec( function (err, schemaArr) {
         console.log("in find");
         logger.debug("ERR\n\nERR", err);
         console.log("schemaArr", schemaArr);
         logger.error("gettign schema rev");
         if (err) {
             logger.error("SCHEMA DB ERROR:", err);
+            console.log("SCHEMA DB ERROR:", err);
             return cb(err);
         } else {
+            console.log("schemaArr22", schemaArr);
             logger.warn("schemas", schemaArr);
             logger.debug("CB()");
         //async.setImmediate(function() {
