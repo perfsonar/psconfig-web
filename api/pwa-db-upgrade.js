@@ -33,11 +33,20 @@ const conn = mongoose.createConnection(config.mongodb, {useNewUrlParser: true
         , useCreateIndex: true});
 *
 */
+var conn;
 
 db.init(function(err) {
     if(err) throw err;
+    conn = db.conn;
     logger.info("connected to db IN UPGS");
-    startProcessing(); //this start loop
+        console.log("CONN", conn);
+        //console.log("DB", db);
+        //conn.on('open', function () {
+
+            startProcessing();
+
+        //});
+//    startProcessing(); //this start loop
 //console.log("db", JSON.stringify( db.conn, null, 2 ));
         // test
         var rev = {
@@ -46,103 +55,62 @@ db.init(function(err) {
             collection_name: "asdf"
         };
 
-/*
-            var rec = new db.Schemarevision(rev);
-            rec.save().then(function(err) {
-                console.log("saved?");
-                console.log("err", err);
-
-            });
-            db.Schemarevision.create(rev, function( err, record ) {
-                console.log("created", record);
-                console.log("created err", record);
-                next();
-
-            });
-            */
-       //return; 
-        // end test
 });
 
+/*
+db.then(function() {
+var conn = db.conn;
+});
+*/
+
+
+//conn.on('open', function () {
+/*
+conn.on('open', function () {
+
+    startProcessing();
+
+});
+*/
+
+//startProcessing();
 
 function startProcessing() {
     run();
 }
-
-
-//var conn = db.conn;
-
-
-
-//conn.on('open', function () {
-
-//startProcessing();
-
-//});
 
 function run() {
 
     //console.log("conn INSPECT", util.inspect( conn ) );
     console.log("db INSPECT", util.inspect( db ) );
 
-    /*
-    db.Host.find({'hostname': 'perfsonar-dev.grnoc.iu.edu'}, function( err, host ) {
-        if ( err ) console.log("ERR", err);
-        console.log("HOST", host);
-    console.log("afterwards hmm");
-
-    });
-    */
-
-   
-  /*
-    async.each( [ 
-            function (cb) {
-                console.log("TRYING FINDONE HOST");
-                //console.log("db.Host.findOne", db.Host.findOne);
-                db.Host.findOne({'hostname': 'perfsonar-dev.grnoc.iu.edu'}, function(err, host) {
-                    console.log("err", err);
-                    console.log("host", host);
-
-                    if ( err ) {
-                        console.log("Error retrieving hosts: ", err);
-                        return cb(err);
-
-                    }
-
-                    cb();
-
-
-                });
-
-            }
-        ], function(err) {
-                console.log("ERRRRRRRRR", err);
-                if ( err ) return err;
-
-            });
-            */
-    //return; // TODO: REMOVE AFTER TESTING
-
-        //get_current_schema_revision();
-        async.series([ getCollections, get_current_schema_revision ], function(err, results) {
+        var callbacks = [ getCollections, get_current_schema_revision ];
+        //var callbacks = [ getCollections, getHost ];
+        //var callbacks = [ getHost ];
+        async.series(callbacks, function(err, results) {
             if (err) {
                 logger.error("ERROR: FAILED GETTING SCHEMA REVS", err);
                 return err;
             }
             console.log("end of async series!");
             logger.debug("now in async series getting revision");
-            schemasObj.push(schemas);
+            //var schemas = results;
+            //console.log("schemas", schemas);
+            //schemasObj.push(schemas);
             logger.debug("schemas", JSON.stringify(schemas));
             //if (err) return err;
             //next();
 
 
+        }, function(err) { 
+            console.log("ERROR RETRIEVING HOST ETC", err);
         });
         //console.log("AFTER ASYNC SERIES");
 };
 
 function getCollections( cb ) {
+    console.log("conn", conn);
+    console.log("db", db);
     db.conn.db.listCollections().toArray(function (err, collectionArr) {
         if (err) {
             console.error("ERROR!!!", err);
@@ -232,6 +200,34 @@ function checkCollections( collections ) {
 
 }
 
+function getHost( cb ) {
+    console.log("getting host!");
+    var filter = {'hostname': 'perfsonar-dev.grnoc.iu.edu'};
+    //var filter = {"lsid" : "atlas"};
+    db.Host.find(filter, function(err, hostsRes) {
+        if ( err ) {
+            console.log("get host err", err);
+            return cb(err);
+
+        } else {
+            //console.log("hostsRes", hostsRes);
+            //logger.debug("HOSTSRes FROM DB:", hostsRes);
+            async.eachSeries( hostsRes, function( host, nextHost ) {
+                console.log("HOST", host);
+                nextHost();
+
+            }, function(err){
+                console.log("after hosts");
+                return cb();
+            });
+            
+        }
+
+    });
+    //cb();
+
+
+}
 
 function get_current_schema_revision( cb ) {
     var currentRev;
@@ -244,7 +240,7 @@ function get_current_schema_revision( cb ) {
     
     //TODO: figure out why this isn't happening
     //console.log("options", options);
-    return cb("error TODO: remove this!  get schema rev not working!");
+    //return cb("error TODO: remove this!  get schema rev not working!");
     db.Schemarevision.find( options, function (err, schemaArr) {
         console.log("in find");
         logger.debug("ERR\n\nERR", err);
@@ -258,6 +254,25 @@ function get_current_schema_revision( cb ) {
             console.log("schemaArr22", schemaArr);
             logger.warn("schemas", schemaArr);
             logger.debug("CB()");
+            if ( schemaArr.length == 0 ) {
+                console.log("0 schema revs found!");
+
+            }
+            async.eachSeries( schemaArr, function( schema, nextSchema ) {
+                console.log("schema", schema);
+                schemasObj.push( schema );
+                nextSchema();
+
+            }, function(err) {
+                if ( err ) {
+                    console.log("SCHEMA ERR", err);
+                    return cb(err);
+
+                }
+                console.log("SCHERMASOBJ", schemasObj);
+                cb();
+                
+            });
         //async.setImmediate(function() {
             cb();
         //});

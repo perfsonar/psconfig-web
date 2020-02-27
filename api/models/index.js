@@ -13,15 +13,21 @@ const logger = new winston.Logger(config.logger.winston);
 //without this, I will get Mongoose: mpromise (mongoose's default promise library) is deprecated
 mongoose.Promise = global.Promise;
 
-exports.init = function(cb) {
-    exports.conn = mongoose.createConnection(config.mongodb, {
+const mongodb = config.mongodb;
+const mongooseOptions = {
         //reconnectTries: Number.MAX_VALUE
         useNewUrlParser: true
         , useUnifiedTopology: true
         , useCreateIndex: true
         , autoCreate: true
         //, bufferCommands: false
-    }, function(err) {
+
+
+};
+
+exports.init = function(cb) {
+    mongoose.connect(mongodb, mongooseOptions, function(err) {
+        exports.conn = mongoose.connection;
         if(err) {
             logger.error(err);
             logger.error("mongodb might not be started yet.. going to retry in 5 seconds");
@@ -29,24 +35,10 @@ exports.init = function(cb) {
                 exports.init(cb);
             }, 5000);
             return;
+        } else {
+            logger.info("connected to mongo");
+            cb();
         }
-        //logger.info("connected to mongo");
-        //cb();
-    });
-    exports.conn.on('open', function () {
-        logger.info("connected to mongo");
-        //console.log("exports.conn", exports.conn);
-        cb();
-        /*
-        conn.db.listCollections().toArray(function (err, collectionNames) {
-            if (err) {
-                console.log(err);
-                return;
-            }
-            console.log(collectionNames);
-            conn.close();
-        });
-        */
     });
 }
 exports.disconnect = function(cb) {
