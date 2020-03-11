@@ -14,6 +14,7 @@ const util = require('util');
 const config = require('../api/config');
 const logger = new winston.Logger(config.logger.winston);
 const db = require('../api/models');
+const dbRevisions = require('../api/db-revisions');
 //const common = require('./common');
 var collections = {};
 var schemasObj = [];
@@ -22,9 +23,14 @@ var schemasObj = [];
 logger.debug("CONFIG", JSON.stringify(config.datasource));
 
 const minRevision = 10;
-var newRev;
+var newRev = 30;
 var curRev;
 var revDesc;
+var colNames = [];
+
+//newRev = minRevision;
+
+revDesc = "4.2.3";
 
 // connect to mongo and check collections
 /*
@@ -38,8 +44,9 @@ var conn;
 db.init(function(err) {
     if(err) throw err;
     conn = db.conn;
+    dbRevisions.init(db);
     logger.info("connected to db IN UPGS");
-        console.log("CONN", conn);
+        //console.log("CONN", conn);
         //console.log("DB", db);
         //conn.on('open', function () {
 
@@ -82,35 +89,38 @@ function startProcessing() {
 function run() {
 
     //console.log("conn INSPECT", util.inspect( conn ) );
-    console.log("db INSPECT", util.inspect( db ) );
+    //console.log("db INSPECT", util.inspect( db ) );
 
-        var callbacks = [ getCollections, get_current_schema_revision ];
+        var callbacks = [ getCollections, get_current_schema_revision, createSchemaRevision ];
         //var callbacks = [ getCollections, getHost ];
         //var callbacks = [ getHost ];
         async.series(callbacks, function(err, results) {
+            console.log("IN SERIES ASYNC WITH MULT FUNCTIONS!!!");
             if (err) {
                 logger.error("ERROR: FAILED GETTING SCHEMA REVS", err);
                 return err;
             }
             console.log("end of async series!");
-            logger.debug("now in async series getting revision");
+            console.log("curRev", curRev);
+            console.log("newRev", newRev);
+            console.log("revDesc", revDesc);
             //var schemas = results;
             //console.log("schemas", schemas);
             //schemasObj.push(schemas);
-            logger.debug("schemas", JSON.stringify(schemas));
+            //logger.debug("schemas", JSON.stringify(schemas));
             //if (err) return err;
             //next();
-
+            db.disconnect();
 
         }, function(err) { 
             console.log("ERROR RETRIEVING HOST ETC", err);
         });
-        //console.log("AFTER ASYNC SERIES");
+        console.log("AFTER ASYNC SERIES");
 };
 
 function getCollections( cb ) {
-    console.log("conn", conn);
-    console.log("db", db);
+    //console.log("conn", conn);
+    //console.log("db", db);
     db.conn.db.listCollections().toArray(function (err, collectionArr) {
         if (err) {
             console.error("ERROR!!!", err);
@@ -122,59 +132,11 @@ function getCollections( cb ) {
         console.log("COLLECTIONS: ");
         console.log(collections);
         checkCollections(collections);
-        var colNames = Object.keys( collections );
+        colNames = Object.keys( collections );
         console.log("colNames", colNames);
         cb();
 
 
-        if ( false ) {
-
-        async.eachSeries( colNames, function( colName, next ) {
-            var rev = {
-                revision: newRev,
-                description: revDesc,
-                collection_name: colName
-
-            // Something like this
-            //var rec = new db.Host(host);
-            //            rec.save(next);
-
-            };
-
-            console.log("rev", rev);
-            //conn.createCollection("SchemaRevision");
-            //db.Schemarevision.createCollection().then(function(collection) {
-            //      console.log('Collection is created!', collection);
-            //});
-
-            //var rec = new db.Schemarevision(rev);
-            //rec.save(next)
-            /*.then(function(err) {
-                console.log("saved?");
-                console.log("err", err);
-
-            });
-            */
-            db.Schemarevision.create(rev, function( err, record ) {
-                console.log("created", record);
-                console.log("created err", record);
-                next();
-
-            });
-            //console.log("rec", rec);
-            /*
-            rec.save().then(function(asdf) {
-                console.log("asdf", asdf);
-                next();
-            })
-            ;*/
-            //return;
-            //next();
-        }, function(err) {
-            if ( err ) console.log("error logging: ", err);
-            
-        });
-        } // end IF false
 
     });
 
@@ -188,11 +150,11 @@ function checkCollections( collections ) {
         logger.warn("archives collection does not exist");
     }
 
-    if ( "schema_revisions" in collections ) {
-        logger.warn("schema_revisions collection exists");
+    if ( "schemarevisions" in collections ) {
+        logger.warn("schemarevisions collection exists");
 
     } else {
-        logger.warn("schema_revisions collection does not exist; assuming schema rev " + minRevision);
+        logger.warn("schemarevisions collection does not exist; assuming schema rev " + minRevision);
         newRev = minRevision;
         revDesc = "4.2.1";
 
@@ -229,6 +191,67 @@ function getHost( cb ) {
 
 }
 
+function createSchemaRevision( cbSchemaRev ) {
+    if ( newRev == curRev ) {
+        //console.log("Nothing would change (new rev is same as current rev)");
+        //return cb();
+
+    }
+
+        async.eachSeries( colNames, function( colName, next ) {
+            var rev = {
+                revision: newRev,
+                description: revDesc,
+                //collection_name: colName
+
+            // Something like this
+            //var rec = new db.Host(host);
+            //            rec.save(next);
+
+            };
+
+            console.log("rev", rev);
+            //conn.createCollection("SchemaRevision");
+            //db.Schemarevision.createCollection().then(function(collection) {
+            //      console.log('Collection is created!', collection);
+            //});
+
+            //var rec = new db.Schemarevision(rev);
+            //rec.save(next)
+            /*.then(function(err) {
+                console.log("saved?");
+                console.log("err", err);
+
+            });
+            */
+            //db.Schemarevision.create(rev, function( err, record ) { });
+            db.Schemarevision.create( rev, function( err, record ) {
+            //db.Schemarevision.updateOne({revision: newRev}, rev, function( err, record ) {
+                console.log("created", record);
+                console.log("created err", record);
+                next();
+
+            });
+            //console.log("rec", rec);
+            /*
+            rec.save().then(function(asdf) {
+                console.log("asdf", asdf);
+                next();
+            })
+            ;*/
+            //return;
+            //next();
+        }, function(err) {
+            if ( err ) { 
+                console.log("error logging: ", err);
+                return cbSchemaRev(err);
+            }
+            cbSchemaRev();
+
+        });
+
+}
+
 function get_current_schema_revision( cb ) {
     var currentRev;
     var options = {};
@@ -245,22 +268,27 @@ function get_current_schema_revision( cb ) {
         console.log("in find");
         logger.debug("ERR\n\nERR", err);
         console.log("schemaArr", schemaArr);
-        logger.error("gettign schema rev");
+        console.log("gettign schema rev");
         if (err) {
             logger.error("SCHEMA DB ERROR:", err);
             console.log("SCHEMA DB ERROR:", err);
             return cb(err);
         } else {
-            console.log("schemaArr22", schemaArr);
-            logger.warn("schemas", schemaArr);
-            logger.debug("CB()");
+            //console.log("schemaArr22", schemaArr);
+            console.log("schemas", schemaArr);
+            //logger.debug("CB()");
             if ( schemaArr.length == 0 ) {
                 console.log("0 schema revs found!");
 
             }
+            var schemObj = {};
             async.eachSeries( schemaArr, function( schema, nextSchema ) {
                 console.log("schema", schema);
                 schemasObj.push( schema );
+                if ( ! ( schema.revision in schemObj ) ){
+                    schemObj[ schema.revision ] = [];
+                }
+                schemObj[ schema.revision ].push( schema );
                 nextSchema();
 
             }, function(err) {
@@ -270,11 +298,16 @@ function get_current_schema_revision( cb ) {
 
                 }
                 console.log("SCHERMASOBJ", schemasObj);
+                console.log("SCHERMOBJ", schemObj);
+                if ( Object.keys( schemObj ).length > 0 ) {
+                    curRev = Object.keys(schemObj).reverse()[0];
+                }
+                console.log("curRev", curRev);
                 cb();
                 
             });
         //async.setImmediate(function() {
-            cb();
+            //cb();
         //});
         }
     });

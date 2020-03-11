@@ -204,10 +204,10 @@ exports.Config = mongoose.model('Config', configSchema);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 var schemarevisionSchema = mongoose.Schema({
-    collection_name: {type: String, index: { unique: true }, required: true },
+    //collection_name: {type: String, index: { unique: true }, required: true },
     description: String,
     //desc: String,
-    revision: Number
+    revision: {type: Number, index: { unique: true }, required: true}
     //collection: {type: mongoose.Schema.Types.ObjectId, ref: 'Collections'} ,
     //collection_name: {type: String, unique: true},
     //data: mongoose.Schema.Types.Mixed,
