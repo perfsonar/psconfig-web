@@ -7,7 +7,6 @@ const winston = require('winston');
 const async = require('async');
 const request = require('request');
 const assert = require('assert');
-const urlLib = require('url');
 const util = require('util');
 
 //mine
