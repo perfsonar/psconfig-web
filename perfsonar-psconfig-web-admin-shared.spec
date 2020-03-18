@@ -5,7 +5,7 @@
 %define apache_base /etc/httpd/conf.d
 
 %define perfsonar_auto_version 4.2.4
-%define perfsonar_auto_relnum 0.a0.0
+%define perfsonar_auto_relnum 0.a0.1
 %define debug_package %{nil}
 
 Name:			perfsonar-psconfig-web-admin-shared
