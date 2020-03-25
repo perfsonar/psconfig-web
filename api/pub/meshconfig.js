@@ -819,7 +819,6 @@ exports._process_published_config = function( _config, opts, cb ) {
             if ( customString ) {
                 try { 
                     customArchiveConfig = JSON.parse( customString );
-                    console.log("customArchiveConfig", customArchiveConfig);
                     // add custom archiver to testspec.
                     var maNames = Object.keys( customArchiveConfig );
                     maNames.forEach( function( maName ) {
@@ -948,9 +947,11 @@ exports._process_published_config = function( _config, opts, cb ) {
 
             
             var include_schedule = true;
-            console.log("current_test", current_test);
 
             if ( current_test.type == "latencybg" ) {
+                if ( ("reverse" in current_test.spec ) ) {
+                    testSchema = 2;
+                }
                if ( current_test.schedule_type == "interval" ) {
                 current_test.type = "latency";
                 //delete current_test.spec.interval;
@@ -962,6 +963,7 @@ exports._process_published_config = function( _config, opts, cb ) {
 
 
                }
+
             } else if ( current_test.type == "throughput" ) {
                 if ( ("single-ended" in current_test.spec) || ( "single-ended-port" in current_test.spec) ) {
                     testSchema = 2;
