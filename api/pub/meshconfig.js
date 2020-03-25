@@ -32,6 +32,8 @@ var profile_cache_date = null;
 var host_catalog = {};
 var host_groups = {};
 var host_groups_details = {};
+//var defaultSchema = 1;
+//var currentSchema = defaultSchema;
 
 function load_profile(cb) {
     logger.info("reloading profiles");
@@ -388,6 +390,7 @@ function generate_mainfo(service, format) {
 }
 
 function generate_mainfo_url(locator, format, type) {
+    var archiveSchema = 1;
 
     if ( format != "psconfig" ) {
         return {
@@ -399,8 +402,9 @@ function generate_mainfo_url(locator, format, type) {
         return {
             archiver: "esmond",
             data: {
-                url: locator,
+                "url": locator,
                 "measurement-agent": "{% scheduled_by_address %}",
+                "schema": archiveSchema,
             }
         };
 
@@ -815,7 +819,6 @@ exports._process_published_config = function( _config, opts, cb ) {
             if ( customString ) {
                 try { 
                     customArchiveConfig = JSON.parse( customString );
-                    console.log("customArchiveConfig", customArchiveConfig);
                     // add custom archiver to testspec.
                     var maNames = Object.keys( customArchiveConfig );
                     maNames.forEach( function( maName ) {
@@ -920,7 +923,6 @@ exports._process_published_config = function( _config, opts, cb ) {
             var testspec = test.testspec;
 
 
-
             var config_archives = _config.ma_urls;
 
 
@@ -931,6 +933,8 @@ exports._process_published_config = function( _config, opts, cb ) {
 
             psc_tests[ name ].spec = testspec.specs || {};
             psc_tests[ name ].schedule_type = testspec.schedule_type || test.service_type;
+            var current_test = psc_tests[name];
+            var testSchema = 1;
 
 
             if ( format == "psconfig" ) {
@@ -941,11 +945,13 @@ exports._process_published_config = function( _config, opts, cb ) {
 
             var interval = psc_tests[ name ].spec["test-interval"];
 
-            var current_test = psc_tests[name];
             
             var include_schedule = true;
 
             if ( current_test.type == "latencybg" ) {
+                if ( ("reverse" in current_test.spec ) ) {
+                    testSchema = 2;
+                }
                if ( current_test.schedule_type == "interval" ) {
                 current_test.type = "latency";
                 //delete current_test.spec.interval;
@@ -957,7 +963,23 @@ exports._process_published_config = function( _config, opts, cb ) {
 
 
                }
+
+            } else if ( current_test.type == "throughput" ) {
+                if ( ("single-ended" in current_test.spec) || ( "single-ended-port" in current_test.spec) ) {
+                    testSchema = 2;
+                }
+
+            } else if ( current_test.type == "rtt" ) {
+                if ( ("protocol" in current_test.spec ) ) {
+                    testSchema = 2;
+                }
+                if ( "fragment" in current_test.spec ) {
+                    testSchema = 3;
+
+                }
+
             }
+            psc_tests[ name ].spec.schema = testSchema;
 
             delete current_test.schedule_type;
             delete current_test.spec["test-interval"];
