@@ -1,6 +1,6 @@
 {
   "name": "psconfig-web-admin",
-  "version": "4.1.0-beta.1",
+  "version": "4.2.4",
   "description": "Tools to generate / publish perfSONAR meshconfig/psconfig topologies",
   "scripts": {
     "test": "mocha",

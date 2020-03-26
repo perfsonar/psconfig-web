@@ -167,6 +167,20 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
         rename_field( spec, "packet-size", "length" );
         if ( ! spec["probe-type"] ) delete spec["probe-type"];
         delete spec.protocol;
+    } else if (  test.type == "throughput" ) {
+        console.log("throughput test");
+        console.log("spec", spec);
+        console.log("probe-type", spec["probe-type"]);
+        if ( ( "probe-type" in spec ) && ! ( "protocol" in spec ) ) {
+             if ( spec["probe-type"] == "udp" ) {
+                 spec.udp = true;
+
+             }
+
+
+        }
+        delete spec["probe-type"];
+
     }
 
     delete spec.tool;
