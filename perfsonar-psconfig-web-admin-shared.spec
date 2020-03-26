@@ -4,7 +4,7 @@
 # cron/apache entries are located in the 'etc' directory
 %define apache_base /etc/httpd/conf.d
 
-%define perfsonar_auto_version 4.2.3
+%define perfsonar_auto_version 4.2.4
 %define perfsonar_auto_relnum 1
 %define debug_package %{nil}
 
