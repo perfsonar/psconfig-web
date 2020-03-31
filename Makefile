@@ -46,6 +46,10 @@ npm:
 	npm install --only=prod
 	pushd ui; npm install --only=prod; popd
 
+npmdev:
+	npm install
+	pushd ui; npm install; popd
+
 webpack:
 	./ui/node_modules/webpack/bin/webpack.js ui/js/app.js -o ui/dist/pwa-admin-ui-bundle.js
 

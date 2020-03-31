@@ -444,6 +444,47 @@ function get_test_service_type( test ) {
 
 }
 
+//router.get('/config/:url', function(req, res, next) {
+exports.get_config = function( configName, options, next ) {
+    var format = options.format || "psconfig";
+    config.format = format;
+    console.log("format", format);
+    console.log("configName", configName);
+    var opts = {};
+    opts.format = format;
+    /*
+    db.Config.findOne({"url": configName}, function(err, config) {
+        console.log("err", err);
+        console.log("config", config);
+
+    }, function(err ) {
+        console.log("QUERY FAILED", err);
+        
+    });
+*/
+    db.init();
+    db.Config.findOne({url: configName}).lean().exec(function(err, config) {
+        console.log("err", err);
+        console.log("config", config);
+        //if(err) return next(err);
+
+        if(!config) {
+            console.log("404 error: Couldn't find config with name:"+configName);
+            return next(err);
+        } else {
+            console.log("Found config with name:"+configName, config);
+
+        }
+        //config._host_version = req.query.host_version; // TODO: what to do with this?
+        var res =  exports.generate(config, opts, function(err, m) {
+            //if(err) return next(err);
+            console.log("CONFIG GENERATED: ", m);
+            next(null,m);
+        });
+    });
+};  
+//});
+
 function generate_group_members( test, group, test_service_types, type, next, addr_prefix ) {
 
     var test_service_type = get_test_service_type( test );
