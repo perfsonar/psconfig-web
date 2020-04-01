@@ -9,7 +9,7 @@ const moment = require('moment');
 const _ = require('underscore');
 
 //mine
-const config = require('../config');
+var config = require('../config');
 const logger = new winston.Logger(config.logger.winston);
 const db = require('../models');
 const common = require('../common');
@@ -445,7 +445,7 @@ function get_test_service_type( test ) {
 }
 
 //router.get('/config/:url', function(req, res, next) {
-exports.get_config = function( configName, options, next ) {
+exports.get_config = function( configName, options, next, configObj ) {
     var format = options.format || "psconfig";
     config.format = format;
     console.log("format", format);
@@ -462,7 +462,13 @@ exports.get_config = function( configName, options, next ) {
         
     });
 */
-    db.init();
+    //db.init(null, configObj);
+    db.init(function(err) {
+            if(err) throw err;
+                logger.info("connected to db");
+                  //  startProcessing(); //this starts the loop
+                  //config = configObj;
+    }, configObj);
     db.Config.findOne({url: configName}).lean().exec(function(err, config) {
         console.log("err", err);
         console.log("config", config);
