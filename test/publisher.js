@@ -19,8 +19,8 @@ var testfiles = [];
 testfiles.push( 'publisher1-multi-mas.json-expected-filled-in-hostgroups');
 
 var expectedfiles = [];
-//expectedfiles.push( "throughput3-1_expected.json" );
-expectedfiles.push( "throughput3-2_expected2_shouldmatch.json" );
+expectedfiles.push( "throughput3-1_expected.json" );
+//expectedfiles.push( "throughput3-2_expected2_shouldmatch.json" );
 function formatlog( obj ) {
     var out = JSON.stringify( obj, null, 3 );
     return out;
@@ -37,6 +37,7 @@ describe('publisher', function() {
                 var testfile_expected = expectedfiles[0];
 
                 console.log("testfile_expected", testfile_expected);
+                        it( testfile_expected + ' publish', function(done) {
             //var expected_output;
                 fs.readFile("data/" + testfile_expected, 'utf8', function (err,data) {
                                 if (err) {
@@ -79,6 +80,7 @@ describe('publisher', function() {
 
                 console.log("RESULTS !!!!\n", formatlog( results ) );
             };
+                        });
 
                 if ( FILEZ ) {
                     testfiles.forEach( function( testfile ) {
