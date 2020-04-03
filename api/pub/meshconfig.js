@@ -45,8 +45,8 @@ function load_profile(cb) {
     });
 }
 //load profile for the first time
-load_profile();
-setInterval(load_profile, 10*60*1000); //reload every 10 minutes
+//load_profile();
+//setInterval(load_profile, 10*60*1000); //reload every 10 minutes
 
 exports.health = function() {
     var status = "ok";
