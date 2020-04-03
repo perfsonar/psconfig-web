@@ -49,7 +49,9 @@ function cleanup() {
 }
 
 describe('publisher', function() {
-    async.eachOfSeries( testsObj, function( item, key, nextTest ) {
+    //async.eachOfSeries( testsObj, function( item, key, nextTest ) {}
+    Object.keys(testsObj).forEach( function( key ) {
+        var item = testsObj[ key ];
     //let naem = "throughput3";
     let naem = key;
                 let opts = { 
@@ -92,7 +94,7 @@ describe('publisher', function() {
                         //var expected_output = {};
                         chai.expect( results ).to.deep.equal( expected_output ); //TODO: this sorta works
                         done();
-                        nextTest();
+                        //nextTest();
                         //return nextTest(null, results);
                         //done();
                     };
