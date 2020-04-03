@@ -485,7 +485,8 @@ exports.get_config = function( configName, options, next, configObj ) {
         var res =  exports.generate(config, opts, function(err, m) {
             //if(err) return next(err);
             console.log("CONFIG GENERATED: ", m);
-            next(null,m);
+            //db.disconnect();
+            return next(null,m);
         });
     });
 };  
@@ -1119,6 +1120,8 @@ exports._process_published_config = function( _config, opts, cb ) {
     });
 
 };
+
+exports.db = db;
 
 exports.generate = function(_config, opts, cb) {
 

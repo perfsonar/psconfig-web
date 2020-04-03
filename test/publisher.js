@@ -8,6 +8,7 @@ var config = require('./etc/config');
 var publisher = require('../api/pub/meshconfig');
 const winston = require('winston');
 const logger = new winston.Logger(config.logger.winston);
+const async = require('async');
 fs = require('fs');
 
 var interimfiles = [];
@@ -26,133 +27,84 @@ function formatlog( obj ) {
     return out;
 }
 
+var testsObj = {
+    "throughput3": {
+        expected_file: "throughput3-2_expected2_shouldmatch.json",
+        description: "checks for probe_type handling in throughput tests"
+    },
+    "trace-udp": {
+        expected_file: "trace_udp-expected.json",
+        description: "checks for probe_type handling in trace tests"
+
+    }
+
+
+};
+
 const FILEZ = false;
 
+function cleanup() {
+    publisher.db.disconnect();
+
+}
+
 describe('publisher', function() {
-    let naem = "throughput3";
+    async.eachOfSeries( testsObj, function( item, key, nextTest ) {
+    //let naem = "throughput3";
+    let naem = key;
                 let opts = { 
                     "format": "psconfig"
                 };
                 var expected_output = {};
-                var testfile_expected = expectedfiles[0];
+                //var testfile_expected = expectedfiles[0];
+                var testfile_expected = item.expected_file;
+                var desc = item.description;
 
+                console.log("Description: ", desc);
                 console.log("testfile_expected", testfile_expected);
-                        it( testfile_expected + ' publish', function(done) {
-            //var expected_output;
-                fs.readFile("data/" + testfile_expected, 'utf8', function (err,data) {
-                                if (err) {
-                                    console.log("ERROR reading file", err);
-                                    return;
-                                }
-                                expected_output = JSON.parse(data);
-                                console.log("expected DATA\n", JSON.stringify( expected_output, null, 3));
-                                console.log("\nEND EXPECTED DATA\n");
-                                //console.error("meshconfig before\n", JSON.stringify( meshconfig, null, 3 ) );
-                                let opts = { 
-                                    "format": "psconfig"
-                                };
-                                //publisher._process_published_config ( meshconfig, opts, cb, "psconfig" );
-                                //console.log("psconfig after\n", JSON.stringify( meshconfig, null, 3 ) );
+                it( testfile_expected + ' publish', function(done) {
+                    //var expected_output;
+                    fs.readFile("data/" + testfile_expected, 'utf8', function (err,data) {
+                        console.log("err, data", err, data);
+                        if (err) {
+                            console.log("ERROR reading file", err);
+                            return;
+                        }
+                        console.log("file contents", data);
+                        expected_output = JSON.parse(data);
+                        console.log("expected DATA\n", JSON.stringify( expected_output, null, 3));
+                        console.log("\nEND EXPECTED DATA\n");
+                        //console.error("meshconfig before\n", JSON.stringify( meshconfig, null, 3 ) );
+                        let opts = { 
+                            "format": "psconfig"
+                        };
+                        //publisher._process_published_config ( meshconfig, opts, cb, "psconfig" );
+                        //console.log("psconfig after\n", JSON.stringify( meshconfig, null, 3 ) );
 
+
+                    });
+                    var dbCB = function( err, results ) {
+                        console.log("CALLBACK err, results", err, results);
+                        //console.log("RESULTS !!!!\n", formatlog( results ) );
+                        console.log("RESULTS !!!!\n", JSON.stringify(results, null, 3) );
+                        //console.log("RESULTS !!!!\n", JSON.stringify(results));
+                        console.log("ERRRR !!!!\n", err );
+                        //var expected_output = {};
+                        chai.expect( results ).to.deep.equal( expected_output ); //TODO: this sorta works
+                        done();
+                        nextTest();
+                        //return nextTest(null, results);
+                        //done();
+                    };
+                    var _config = publisher.get_config( naem, opts, dbCB, config );
+                    //console.log("psconfig after\n", JSON.stringify( _config, null, 3 ) );
 
                 });
-            var dbCB = function( err, results ) {
-                console.log("CALLBACK err, results", err, results);
-                //console.log("RESULTS !!!!\n", formatlog( results ) );
-                //console.log("RESULTS !!!!\n", JSON.stringify(results, null, 3) );
-                console.log("RESULTS !!!!\n", JSON.stringify(results));
-                console.log("ERRRR !!!!\n", err );
-                //var expected_output = {};
-                chai.expect( results ).to.deep.equal( expected_output ); //TODO: this sorta works
-                done();
-            };
-            var _config = publisher.get_config( naem, opts, dbCB, config );
-                //publisher._process_published_config ( naem, opts, cb, "psconfig" );
-                console.log("psconfig after\n", JSON.stringify( _config, null, 3 ) );
+    }, function( finalErr ) {
+        console.log("Got to end. Err?", finalErr);
+        //nextTest();
+        cleanup();
+    });
+        
 
-            var cb = function( err, tests, config_params) {
-                //console.error("CALLBACK err, tests, config_params", err, tests, config_params);
-                var results = {
-                    err: err,
-                    tests: tests,
-                    config_params: config_params
-                };
-
-                console.log("RESULTS !!!!\n", formatlog( results ) );
-            };
-                        });
-
-                if ( FILEZ ) {
-                    testfiles.forEach( function( testfile ) {
-                        testfile = "publisher1-multi-mas.json-interim-filled-in-hostgroups";
-                        console.log("TESTFILE", testfile);
-
-                        it( testfile + ' publish', function(done) {
-                            var sub = 1;
-                            var meshconfig;
-                            //var testfile_expected = testfile.replace("-expected", "-interim"); // + "-expected";
-                            //var testfile_expected = testfile.replace("-interim", "-expected"); // + "-expected";
-                            var testfile_expected = 'publisher1-multi-mas.json-expected-filled-in-hostgroups';
-
-                            console.log("testfile_expected", testfile_expected);
-                            console.log("testfile", testfile);
-                            var testfile_out = testfile + "-out";
-                            var expected_output;
-                            var cb = function( err, tests, config_params) {
-                                //console.error("CALLBACK err, tests, config_params", err, tests, config_params);
-                                var results = {
-                                    err: err,
-                            tests: tests,
-                            config_params: config_params
-                                };
-
-                                console.log("RESULTS !!!!\n", formatlog( results ) );
-                                /*
-                                   fs.writeFile(testfile_out, JSON.stringify( results ), function (err) {
-                                   if (err) {
-                                   console.log("ERROR writing file", err);
-                                   throw err;
-                                   }
-                                   console.log('Saved!');
-                                   });
-                                   */
-                                //console.log("RESULTS", formatlog( results ) );
-                                //console.log("EXPECTED_OUTPUT", formatlog( expected_output ) );
-                                //console.log("RESULTS\n", JSON.stringify( results ) );
-                                chai.expect( results ).to.deep.equal( expected_output );
-                                done();
-
-                            };
-                            fs.readFile("data/" + testfile_expected, 'utf8', function (err,data) {
-                                if (err) {
-                                    console.log("ERROR reading EXPECTED file", err);
-                                    return;
-                                }
-                                //console.log("EXPECTED DATA", data);
-                                expected_output = JSON.parse(data);
-                                //console.log("AFTER JSON PARSE", data);
-                                //console.error("expected output\n", JSON.stringify( expected_output, null, 3 ) );
-
-                            });
-
-
-                            fs.readFile("data/" + testfile, 'utf8', function (err,data) {
-                                if (err) {
-                                    console.log("ERROR reading file", err);
-                                    return;
-                                }
-                                console.log("DATA", data);
-                                meshconfig = JSON.parse(data);
-                                //console.error("meshconfig before\n", JSON.stringify( meshconfig, null, 3 ) );
-                                let opts = { 
-                                    "format": "psconfig"
-                                };
-                                publisher._process_published_config ( meshconfig, opts, cb, "psconfig" );
-                                console.log("psconfig after\n", JSON.stringify( meshconfig, null, 3 ) );
-                            });
-
-
-                        });
-                    });
-                }
             });
