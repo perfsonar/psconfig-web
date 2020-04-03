@@ -444,6 +444,8 @@ function get_test_service_type( test ) {
 
 }
 
+    const dbTest = require('../models');
+    exports.dbTest = dbTest;
 //router.get('/config/:url', function(req, res, next) {
 exports.get_config = function( configName, options, next, configObj ) {
     var format = options.format || "psconfig";
@@ -463,32 +465,34 @@ exports.get_config = function( configName, options, next, configObj ) {
     });
 */
     //db.init(null, configObj);
-    db.init(function(err) {
+    //console.log('db', db);
+    dbTest.init(function(err) {
             if(err) throw err;
-                logger.info("connected to db");
+                logger.info("connected to dbTest");
                   //  startProcessing(); //this starts the loop
                   //config = configObj;
-    }, configObj);
-    db.Config.findOne({url: configName}).lean().exec(function(err, config) {
-        console.log("err", err);
-        console.log("config", config);
+    dbTest.Config.findOne({url: configName}).lean().exec(function(err, config) {
+        //console.log("err", err);
+        //console.log("config", config);
         //if(err) return next(err);
 
         if(!config) {
             console.log("404 error: Couldn't find config with name:"+configName);
+            dbTest.disconnect();
             return next(err);
         } else {
-            console.log("Found config with name:"+configName, config);
+            console.log("Found config with name:"+configName);
 
         }
         //config._host_version = req.query.host_version; // TODO: what to do with this?
         var res =  exports.generate(config, opts, function(err, m) {
             //if(err) return next(err);
-            console.log("CONFIG GENERATED: ", m);
-            //db.disconnect();
+            //console.log("CONFIG GENERATED: ", m);
+            dbTest.disconnect();
             return next(null,m);
         });
     });
+    }, configObj);
 };  
 //});
 
