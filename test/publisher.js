@@ -47,7 +47,7 @@ describe('publisher', function() {
         var testfile_expected = item.expected_file;
         var desc = item.description;
 
-        it( desc + " " + " file: " + testfile_expected, function(done) {
+        it( desc + " " + " matches contentsof file: " + testfile_expected, function(done) {
             console.log("Description: ", desc);
             console.log("testfile_expected", testfile_expected);
             //var expected_output;
@@ -78,7 +78,20 @@ describe('publisher', function() {
                     //console.log("RESULTS !!!!\n", JSON.stringify(results));
                     //console.log("ERRRR !!!!\n", err );
                     //var expected_output = {};
-                    chai.expect( results ).to.deep.equal( expected_output ); //TODO: this sorta works
+                    chai.expect( results ).to.deep.equal( expected_output );
+                    if ( naem == "throughput3" ) {
+                        // ensure ""single-ended " iset on througphput 3
+                        chai.expect( results.tests.throughput3[ "spec" ][ "single-ended" ] ).to.equal(true);
+                        // ensure schema is 2 for throughput3 since single-ended is enabled
+                        chai.expect( results.tests.throughput3[ "spec" ][ "schema" ] ).to.equal(2);
+                        // ensure "udp" is not set for this test
+                        chai.expect( results.tests.throughput3[ "spec" ] ).to.not.have.property("udp");
+                        // ensure that udp is enabled for this test
+                        chai.expect( results.tests["tput4 protocol udp probe_type tcp"][ "spec" ]["udp"]).to.equal(true);
+                        // ensure that udp is enabled for this test
+                        chai.expect( results.tests["throughput5"][ "spec" ]["udp"]).to.equal(true);
+
+                    }
                     done();
                     cleanup();
                     //nextTest();
