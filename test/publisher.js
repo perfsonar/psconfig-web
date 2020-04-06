@@ -19,11 +19,11 @@ function formatlog( obj ) {
 var testsObj = {
     "throughput3": {
         expected_file: "throughput3-2_expected2_shouldmatch.json",
-        description: "checks for probe_type handling in throughput tests"
+        description: "probe_type handling in throughput tests"
     },
     "trace-udp": {
         expected_file: "trace_udp-expected.json",
-        description: "checks for probe_type handling in trace tests"
+        description: "probe_type handling in trace tests"
 
     }
 
@@ -47,7 +47,7 @@ describe('publisher', function() {
         var testfile_expected = item.expected_file;
         var desc = item.description;
 
-        it( testfile_expected + ' publish', function(done) {
+        it( desc + " " + " file: " + testfile_expected, function(done) {
             console.log("Description: ", desc);
             console.log("testfile_expected", testfile_expected);
             //var expected_output;
