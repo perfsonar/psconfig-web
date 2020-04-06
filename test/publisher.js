@@ -18,7 +18,7 @@ function formatlog( obj ) {
 
 var testsObj = {
     "throughput3": {
-        expected_file: "throughput3-2_expected2_shouldmatch.json",
+        expected_file: "throughput3-expected.json",
         description: "probe_type handling in throughput tests"
     },
     "trace-udp": {
