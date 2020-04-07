@@ -25,7 +25,11 @@ var testsObj = {
             "tests.this little pingy.spec.schema": 3,
             "tests.lat4 444.spec.schema": 2,
             "tests.tput4 protocol udp probe_type tcp.spec.schema": 1,
-            "tests.throughput5.spec.schema": 1
+            "tests.throughput5.spec.schema": 1,
+            "archives.host-additional-archive0.data.schema": 1,
+            "archives.host-additional-archive1.data.schema": 1,
+            "archives.host-archive0.data.schema": 1,
+            "archives.host-archive1.data.schema": 1,
         }
     },
     "trace-udp": {
@@ -47,13 +51,16 @@ function getValueStringPath (obj, path) {
 function check_expected_values( config, testName ) {
     var expected_values = testsObj[ testName ].expected_values || {};
 
+describe(testName + 'certain values', function() {
     
       Object.keys( expected_values ).forEach( function( key ) {
+        it( " matches specific values: " + key, function(done) {
           console.log("key", key);
           var expected_val = expected_values[ key ];
           var received_val = getValueStringPath( config, key );
           console.log("received val", received_val);
           chai.expect( received_val ).to.equal( expected_val );
+          done();
 
           /*
         var expected_split = key.split(".");
@@ -65,9 +72,11 @@ function check_expected_values( config, testName ) {
         var received_val = config[][][[]
         //chai.expect( config.tests[ testName ]
 */
+        });
 
     }); 
 
+});
 }
 
 
@@ -86,6 +95,7 @@ describe('publisher', function() {
         var expected_output = {};
         var testfile_expected = item.expected_file;
         var desc = item.description;
+        var resultsTest;
 
         it( desc + " " + " matches contentsof file: " + testfile_expected, function(done) {
             console.log("Description: ", desc);
@@ -119,7 +129,8 @@ describe('publisher', function() {
                     //console.log("ERRRR !!!!\n", err );
                     //var expected_output = {};
                     chai.expect( results ).to.deep.equal( expected_output );
-                    check_expected_values( results, naem );
+                    resultsTest  = results;
+                    //check_expected_values( results, naem );
                     if ( naem == "throughput3" ) {
                         // ensure ""single-ended " iset on througphput 3
                         chai.expect( results.tests.throughput3[ "spec" ][ "single-ended" ] ).to.equal(true);
@@ -143,6 +154,10 @@ describe('publisher', function() {
             });
             //console.log("psconfig after\n", JSON.stringify( _config, null, 3 ) );
 
+        });
+        it( " matches specific values: " + naem, function(done) {
+            check_expected_values( resultsTest, naem );
+          done();
         });
     });
         console.log("Got to end.");
