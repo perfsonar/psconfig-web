@@ -9,7 +9,7 @@ const moment = require('moment');
 const _ = require('underscore');
 
 //mine
-const config = require('../config');
+var config = require('../config');
 const logger = new winston.Logger(config.logger.winston);
 const db = require('../models');
 const common = require('../common');
@@ -45,8 +45,8 @@ function load_profile(cb) {
     });
 }
 //load profile for the first time
-load_profile();
-setInterval(load_profile, 10*60*1000); //reload every 10 minutes
+//load_profile();
+//setInterval(load_profile, 10*60*1000); //reload every 10 minutes
 
 exports.health = function() {
     var status = "ok";
@@ -443,6 +443,58 @@ function get_test_service_type( test ) {
     return service;
 
 }
+
+    const dbTest = require('../models');
+    exports.dbTest = dbTest;
+//router.get('/config/:url', function(req, res, next) {
+exports.get_config = function( configName, options, next, configObj ) {
+    var format = options.format || "psconfig";
+    config.format = format;
+    console.log("format", format);
+    console.log("configName", configName);
+    var opts = {};
+    opts.format = format;
+    /*
+    db.Config.findOne({"url": configName}, function(err, config) {
+        console.log("err", err);
+        console.log("config", config);
+
+    }, function(err ) {
+        console.log("QUERY FAILED", err);
+        
+    });
+*/
+    //db.init(null, configObj);
+    //console.log('db', db);
+    dbTest.init(function(err) {
+            if(err) throw err;
+                logger.info("connected to dbTest");
+                  //  startProcessing(); //this starts the loop
+                  //config = configObj;
+    dbTest.Config.findOne({url: configName}).lean().exec(function(err, config) {
+        //console.log("err", err);
+        //console.log("config", config);
+        //if(err) return next(err);
+
+        if(!config) {
+            console.log("404 error: Couldn't find config with name:"+configName);
+            dbTest.disconnect();
+            return next(err);
+        } else {
+            console.log("Found config with name:"+configName);
+
+        }
+        //config._host_version = req.query.host_version; // TODO: what to do with this?
+        var res =  exports.generate(config, opts, function(err, m) {
+            //if(err) return next(err);
+            //console.log("CONFIG GENERATED: ", m);
+            dbTest.disconnect();
+            return next(null,m);
+        });
+    });
+    }, configObj);
+};  
+//});
 
 function generate_group_members( test, group, test_service_types, type, next, addr_prefix ) {
 
@@ -1072,6 +1124,8 @@ exports._process_published_config = function( _config, opts, cb ) {
     });
 
 };
+
+exports.db = db;
 
 exports.generate = function(_config, opts, cb) {
 
