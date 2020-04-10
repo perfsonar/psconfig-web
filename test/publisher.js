@@ -22,19 +22,38 @@ var testsObj = {
         description: "probe_type handling in throughput tests",
         expected_values: {
             "tests.throughput3.spec.schema": 2,
+            "tests.throughput3.spec.single-ended": true,
             "tests.this little pingy.spec.schema": 3,
             "tests.lat4 444.spec.schema": 2,
             "tests.tput4 protocol udp probe_type tcp.spec.schema": 1,
+            "tests.tput4 protocol udp probe_type tcp.spec.udp": true,
             "tests.throughput5.spec.schema": 1,
+            "tests.throughput5.spec.udp": true,
             "archives.host-additional-archive0.data.schema": 1,
             "archives.host-additional-archive1.data.schema": 1,
+            "archives.host-archive0.archiver": "esmond",
             "archives.host-archive0.data.schema": 1,
+            "archives.host-archive0.data.url": "https://perfsonar-dev9.grnoc.iu.edu/esmond/perfsonar/archive",
+            "archives.host-archive0.data.measurement-agent": "{% scheduled_by_address %}",
             "archives.host-archive1.data.schema": 1,
-        }
+        },
+        should_not_exist: [
+            "tests.throughput3.spec.udp",
+
+        ]
     },
     "trace-udp": {
         expected_file: "trace_udp-expected.json",
-        description: "probe_type handling in trace tests"
+        description: "probe_type handling in trace tests",
+        expected_values: {
+            "tests.tr1.spec.schema": 1,
+            "tests.tr1.spec.probe-type": "udp",
+        },
+        should_not_exist: [
+            "tests.tr1.spec.protocol",
+            "tests.tr1.spec.udp",
+
+        ]
 
     }
 
@@ -50,33 +69,40 @@ function getValueStringPath (obj, path) {
 
 function check_expected_values( config, testName ) {
     var expected_values = testsObj[ testName ].expected_values || {};
+    var should_not_exist = testsObj[ testName ].should_not_exist || [];
 
-describe(testName + 'certain values', function() {
-    
-      Object.keys( expected_values ).forEach( function( key ) {
-        it( " matches specific values: " + key, function(done) {
-          console.log("key", key);
-          var expected_val = expected_values[ key ];
-          var received_val = getValueStringPath( config, key );
-          console.log("received val", received_val);
-          chai.expect( received_val ).to.equal( expected_val );
-          done();
+    describe(testName + 'certain values', function() {
 
-          /*
-        var expected_split = key.split(".");
-        console.log("expected split", expected_split);
-        var tmp_obj = {};
-        expected_split.forEach( function(i) {
-            
-        });
-        var received_val = config[][][[]
-        //chai.expect( config.tests[ testName ]
-*/
+        Object.keys( expected_values ).forEach( function( key ) {
+            it( " matches specific values: " + key, function(done) {
+                //console.log("key", key);
+                var expected_val = expected_values[ key ];
+                var received_val = getValueStringPath( config, key );
+                //console.log("received val", received_val);
+                chai.expect( received_val ).to.equal( expected_val );
+                done();
+
+            });
+
         });
 
-    }); 
+       should_not_exist.forEach( function( key ) {
+           it( key + " should *not* be set", function(done) {
+               var keyArr = key.split(".");
+               //console.log("config", JSON.stringify(config, null, 3));
+               //console.log("keyArr", keyArr);
+               var lastKey = keyArr.pop();
+               var containerStr = keyArr.join("."); 
+               var obj = getValueStringPath(config, containerStr);
+               done();
 
-});
+
+           });
+
+
+       }); 
+
+    });
 }
 
 
@@ -133,15 +159,15 @@ describe('publisher', function() {
                     //check_expected_values( results, naem );
                     if ( naem == "throughput3" ) {
                         // ensure ""single-ended " iset on througphput 3
-                        chai.expect( results.tests.throughput3[ "spec" ][ "single-ended" ] ).to.equal(true);
+                        //chai.expect( results.tests.throughput3[ "spec" ][ "single-ended" ] ).to.equal(true);
                         // ensure schema is 2 for throughput3 since single-ended is enabled
-                        chai.expect( results.tests.throughput3[ "spec" ][ "schema" ] ).to.equal(2);
+                        //chai.expect( results.tests.throughput3[ "spec" ][ "schema" ] ).to.equal(2);
                         // ensure "udp" is not set for this test
-                        chai.expect( results.tests.throughput3[ "spec" ] ).to.not.have.property("udp");
+                        //chai.expect( results.tests.throughput3[ "spec" ] ).to.not.have.property("udp");
                         // ensure that udp is enabled for this test
-                        chai.expect( results.tests["tput4 protocol udp probe_type tcp"][ "spec" ]["udp"]).to.equal(true);
+                        //chai.expect( results.tests["tput4 protocol udp probe_type tcp"][ "spec" ]["udp"]).to.equal(true);
                         // ensure that udp is enabled for this test
-                        chai.expect( results.tests["throughput5"][ "spec" ]["udp"]).to.equal(true);
+                        //chai.expect( results.tests["throughput5"][ "spec" ]["udp"]).to.equal(true);
 
                     }
                     done();
