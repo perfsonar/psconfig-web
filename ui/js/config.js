@@ -205,7 +205,12 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
                         console.log("deleting custom json as it's empty; $scope.selected", $scope.selected);
             }
             */
+
+
             configs.update($scope.selected).then(function(config) {
+            console.log("config to update", config);
+            var importer_content = config._pwa_import.importer_content;
+            console.log("importer_content", importer_content);
                 //console.log("ma_custom before: ", config.ma_custom_json);
                 if ( ( "ma_urls" in config ) && _.isArray( config.ma_urls ) ) {
                     config.ma_urls = config.ma_urls.join("\n");
@@ -220,7 +225,9 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
             }
             */
                 console.log("config", config);
-                console.log("custom_json", custom_json);
+                console.log("custom_MA json", custom_json);
+
+                
                 if(isJSON(config.ma_custom_json)){
                     config.ma_custom_json = custom_json;
                     //console.log("ma_custom after: ", config.ma_custom_json);
@@ -265,7 +272,18 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     }
 
     $scope.import = function() {
-        $http.put(appconf.api+'/configs/import', {url: $scope.importer_url})
+        var uri = appconf.api+'/configs/import';
+        var data;
+        //data._pwa_import= {};
+        if ( $scope._pwa_import.importer_content ) {
+            data = {content: JSON.parse($scope._pwa_import.importer_content)};
+            uri += 'JSON';
+        } else if ( $scope._pwa_import.importer_url ) {
+            data = {url: $scope._pwa_import.importer_url};
+
+        }
+        console.log("data", data);
+        $http.put(uri, data)
         .then(function(res) {
             console.dir(res.data.tests);
             testspecs.clear();

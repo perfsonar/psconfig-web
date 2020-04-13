@@ -212,11 +212,24 @@
                                 <p>Tests from the Config won't be registered automatically - until you click Update on this page. If you import the same Config twice, already imported Tests won't be overriden - you need to remove old tests manually.</p>
                                 <div class="input-group">
                                     <span class="input-group-addon" id="sizing-addon2">URL</span>
-                                    <input type="text" class="form-control" ng-model="$parent.importer_url" 
-                                        placeholder="http://hostname/mesh_url"></input>
+                                                                        <input type="text" class="form-control" ng-model="$parent.importer_url"
+                                                                            placeholder="http://hostname/mesh_url"></input>
+                                </div>
+                                <div class="input-group">
+                                    <p>
+                                    <label class="col-sm-2 control-label">Import raw JSON</label></p>
+                    <div class="col-sm-10">
+                        <textarea class="form-control"  ng-model="$parent._pwa_import.importer_content"  ng-disabled="!selected._canedit" style="" rows="5"></textarea>
+                        <!--
+                        <span ng-show="form.ma_urls.$error.ma_urls" style="color:red">Ma_urls validation error: {{form.ma_urls.$error.ma_urls}}.</span>
+-->
+
+                        <p class="help-block">Paste raw JSON config to import</p>
+                </div>
+                    </div>
                                      <span class="input-group-btn">
                                         <button class="btn btn-default" type="button" 
-                                            ng-disabled="!$parent.importer_url" ng-click="import()">Go!</button>
+                                            ng-disabled="!$parent._pwa_import.importer_content" ng-click="import()">Go!</button>
                                     </span>
                                 </div>
                             </div>
