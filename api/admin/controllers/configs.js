@@ -121,6 +121,20 @@ router.put('/import', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
     });
 });
 
+router.put('/importJSON', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
+    if(!req.user.scopes.pwa || !~req.user.scopes.pwa.indexOf('user')) return res.status(401).end();
+    importer.importJSON(req.body.content, req.user.sub, function(err, tests, new_config_params) {
+        if(err) return next(err);
+        res.json({msg: "Created testspecs / host / hostgroups records", tests: tests, config_params: new_config_params});
+        var results = {
+            err: err,
+            tests: tests,
+            config_params: new_config_params
+        };
+
+    });
+});
+
 /**
  * @api {put} /configs/:id      Update Config
  * @apiGroup                    Configs

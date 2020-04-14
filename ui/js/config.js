@@ -276,16 +276,16 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
         var data;
         //data._pwa_import= {};
         if ( $scope._pwa_import.importer_content ) {
-            data = {content: JSON.parse($scope._pwa_import.importer_content)};
+            data = {"content": JSON.parse($scope._pwa_import.importer_content)};
             uri += 'JSON';
         } else if ( $scope._pwa_import.importer_url ) {
-            data = {url: $scope._pwa_import.importer_url};
+            data = {"url": $scope._pwa_import.importer_url};
 
         }
         console.log("data", data);
         $http.put(uri, data)
         .then(function(res) {
-            console.dir(res.data.tests);
+            console.log(res.data.tests);
             testspecs.clear();
             testspecs.getAll().then(function(_testspecs) {
                 $scope.testspecs = _testspecs;

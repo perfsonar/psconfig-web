@@ -198,9 +198,10 @@ exports.importJSON = function(data, sub, cb) {
     //logger.debug("importing JSON", data);
     //var importedConfig = JSON.parse(JSON.stringify(data));
     var importedConfig = data;
-    logger.debug("importing JSON", importedConfig);
+    logger.warn("importing JSON data", importedConfig);
 
     exports._process_imported_config( importedConfig, sub, cb );
+    //cb();
 
 
 };
