@@ -271,19 +271,45 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
         window.open(appconf.pub_url+"auto/"+address, '_blank');
     }
 
+    $scope.myFileSelected = null;
+    $scope.fileSelected = function (element) {
+            $scope.myFileSelected = element.files[0];
+            if ( $scope.myFileSelected ) {
+                $scope.fileIsSelected = true;
+
+            }
+            $scope.$apply();
+            console.log("$scope", $scope);
+            console.log("$scope.myFileSelected", $scope.myFileSelected);
+    };
+
     $scope.import = function() {
         var uri = appconf.api+'/configs/import';
         var data;
+        var reqOptions = {};
+        var userFile = $scope.myFileSelected;
         //data._pwa_import= {};
-        if ( $scope._pwa_import.importer_content ) {
+        if ( ( "_pwa_import" in $scope ) && $scope._pwa_import.importer_content ) {
             data = {"content": JSON.parse($scope._pwa_import.importer_content)};
             uri += 'JSON';
-        } else if ( $scope._pwa_import.importer_url ) {
-            data = {"url": $scope._pwa_import.importer_url};
-
+        } else if ( $scope.importer_url ) {
+            data = {"url": $scope.importer_url};
+        }  else if ( userFile ) {
+            //data = {"url": $scope._pwa_import.importer_url};
+            var formData = new FormData();
+            //formData.append('file', element[0].files[0]);
+            //TODO: fix formData
+            console.log( "userFile", userFile);
+            formData.append('file', userFile);
+            formData.append("content", "{}");
+            data = formData;
+            uri += "File";
+            reqOptions.headers = {'Content-Type': undefined , transformRequest: angular.identity};
+            console.log("data",data);
         }
-        console.log("data", data);
-        $http.put(uri, data)
+
+        //console.log("data", data);
+        $http.put(uri, data, reqOptions)
         .then(function(res) {
             console.log(res.data.tests);
             testspecs.clear();
