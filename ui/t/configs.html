@@ -205,9 +205,9 @@
                         <button type="button" ng-if="!showimporter" ng-click="$parent.showimporter = true" class="btn btn-primary">Import from existing Config</button>
                         <br><br>
                         <div class="panel panel-default" ng-if="showimporter">
-                            <div class="panel-heading">Config Importer</div>
+                            <div class="panel-heading">Import existing Config </div>
                             <div class="panel-body">
-                                <p>Enter pSConfig or MeshConfig URL to Import. </p>
+                                <p>Enter pSConfig or MeshConfig URL to Import, *OR* upload a psconfig json file, *OR* paste raw JSON in the text box </p>
                                 <p>This tool will register all missing hosts as adhoc hosts and register hostgroup, testspecs (if the same name doesn't exist already). Finally, it will create new config tests and populate here.</p>
                                 <p>Tests from the Config won't be registered automatically - until you click Update on this page. If you import the same Config twice, already imported Tests won't be overriden - you need to remove old tests manually.</p>
                                 <div class="input-group">
