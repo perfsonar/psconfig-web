@@ -4,6 +4,8 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     scaMessage.show(toaster);
     $scope.active_menu = "configs";
     $scope.show_map = false;
+    $scope.importStatus = {};
+    $scope.importer_url = null;
 
     //start loading things (should I parallelize)
     users.getAll().then(function(_users) {
@@ -35,6 +37,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
             });
         });
     });
+
 
     $scope.selected = null;
     $scope.select = function(config) {
@@ -150,6 +153,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
         });
     }
 
+
     $scope.refreshNAHosts = function(test) {
         reset_map(test);
         load_hosts(test, function(hosts) {
@@ -196,31 +200,20 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
                 $location.update_path("/configs/"+config._id);
             }).catch($scope.toast_error);
         } else {
-            /*
-            console.log("updating $scope.selected", $scope.selected);
-            if ( ( !( "ma_custom_json" in $scope.selected ) ) 
-                    || ( typeof $scope.selected.ma_custom_json == "undefined" )
-                    || $scope.selected.ma_custom_json == "" ) {
-                delete $scope.selected.ma_custom_json;
-                        console.log("deleting custom json as it's empty; $scope.selected", $scope.selected);
-            }
-            */
+
             configs.update($scope.selected).then(function(config) {
+            //console.log("config to update", config);
+            var importer_content = config.importer_content;
+            //console.log("importer_content", importer_content);
                 //console.log("ma_custom before: ", config.ma_custom_json);
                 if ( ( "ma_urls" in config ) && _.isArray( config.ma_urls ) ) {
                     config.ma_urls = config.ma_urls.join("\n");
                 }
                 var custom_json = config.ma_custom_json;
-/*
-            if ( ( !( "ma_custom_json" in config ) ) 
-                    || ( typeof config.ma_custom_json == "undefined" )
-                    || config.ma_custom_json == "" ) {
-                        console.log("deleting custom json as it's empty");
-                delete config.ma_custom_json;
-            }
-            */
-                console.log("config", config);
-                console.log("custom_json", custom_json);
+                //console.log("config", config);
+                //console.log("custom_MA json", custom_json);
+
+                
                 if(isJSON(config.ma_custom_json)){
                     config.ma_custom_json = custom_json;
                     //console.log("ma_custom after: ", config.ma_custom_json);
@@ -264,10 +257,55 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
         window.open(appconf.pub_url+"auto/"+address, '_blank');
     }
 
+    $scope.setImportType = function( status ) {
+        var name = status.name;
+        var val = status.value;
+        $scope[ name ] = val;
+        $scope.$apply();
+
+    };
+
+    $scope.myFileSelected = null;
+    $scope.fileSelected = function (element) {
+            $scope.myFileSelected = element.files[0];
+            if ( $scope.myFileSelected ) {
+                $scope.fileIsSelected = true;
+
+            }
+            $scope.$apply();
+    };
+
     $scope.import = function() {
-        $http.put(appconf.api+'/configs/import', {url: $scope.importer_url})
+        var uri = appconf.api+'/configs/import';
+        var data;
+        var reqOptions = {};
+        var userFile = $scope.myFileSelected;
+        var importStatus = $scope.importStatus;
+        // urlOpen: false
+        // uploadOpen: true
+        // rawOpen: false
+        //data._pwa_import= {};
+        if ( importStatus.rawOpen && $scope.importer_content ) {
+            data = {"content": JSON.parse($scope.importer_content)};
+            uri += 'JSON';
+        } else if ( importStatus.urlOpen && $scope.importer_url ) {
+            data = {"url": $scope.importer_url};
+        }  else if ( importStatus.uploadOpen && userFile ) {
+            //data = {"url": $scope._pwa_import.importer_url};
+            var formData = new FormData();
+            //formData.append('file', element[0].files[0]);
+            //TODO: fix formData
+            formData.append('file', userFile);
+            formData.append("content", "{}");
+            data = formData;
+            uri += "File";
+            reqOptions.headers = {'Content-Type': undefined , transformRequest: angular.identity};
+        }
+
+        //console.log("data", data);
+        $http.put(uri, data, reqOptions)
         .then(function(res) {
-            console.dir(res.data.tests);
+            console.log(res.data.tests);
             testspecs.clear();
             testspecs.getAll().then(function(_testspecs) {
                 $scope.testspecs = _testspecs;

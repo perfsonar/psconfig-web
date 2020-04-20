@@ -2,11 +2,15 @@
 
 //contrib
 const express = require('express');
+const busboy = require('busboy');
 const router = express.Router();
 const winston = require('winston');
 const jwt = require('express-jwt');
 const async = require('async');
 const request = require('request');
+const fs = require('fs');
+const path = require('path');
+
 
 //mine
 const config = require('../../config');
@@ -110,6 +114,46 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
 router.put('/import', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     if(!req.user.scopes.pwa || !~req.user.scopes.pwa.indexOf('user')) return res.status(401).end();
     importer.import(req.body.url, req.user.sub, function(err, tests, new_config_params) {
+        if(err) return next(err);
+        res.json({msg: "Created testspecs / host / hostgroups records", tests: tests, config_params: new_config_params});
+        var results = {
+            err: err,
+            tests: tests,
+            config_params: new_config_params
+        };
+
+    });
+});
+
+router.put('/importFile', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
+    if(!req.user.scopes.pwa || !~req.user.scopes.pwa.indexOf('user')) return res.status(401).end();
+
+    if(req.busboy) {
+        req.busboy.on("file", function(fieldName, fileStream, fileName, encoding, mimeType) {
+            // set encoding
+            fileStream.setEncoding( "utf8" );
+            //var fstream = fs.createWriteStream('/tmp/' + fileName);
+            fileStream.on('data', (chunk) => {
+                var content = JSON.parse(chunk);
+                importer.importJSON(content, req.user.sub, function(err, tests, new_config_params) {
+                    if(err) return next(err);
+                    res.json({msg: "Created testspecs / host / hostgroups records", tests: tests, config_params: new_config_params});
+                    var results = {
+                        err: err,
+                    tests: tests,
+                    config_params: new_config_params
+                    };
+                });
+            });
+        });
+          return req.pipe(req.busboy);
+    }
+
+});
+
+router.put('/importJSON', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
+    if(!req.user.scopes.pwa || !~req.user.scopes.pwa.indexOf('user')) return res.status(401).end();
+    importer.importJSON(req.body.content, req.user.sub, function(err, tests, new_config_params) {
         if(err) return next(err);
         res.json({msg: "Created testspecs / host / hostgroups records", tests: tests, config_params: new_config_params});
         var results = {
