@@ -4,6 +4,8 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     scaMessage.show(toaster);
     $scope.active_menu = "configs";
     $scope.show_map = false;
+    $scope.importStatus = {};
+    $scope.importer_url = null;
 
     //start loading things (should I parallelize)
     users.getAll().then(function(_users) {
@@ -35,6 +37,14 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
             });
         });
     });
+
+    /*
+    $scope.$watch('groups[0].open', function(isOpen){
+            if (isOpen) {
+                      console.log('First group was opened'); 
+                          }    
+              });
+              */
 
     $scope.selected = null;
     $scope.select = function(config) {
@@ -150,6 +160,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
         });
     }
 
+
     $scope.refreshNAHosts = function(test) {
         reset_map(test);
         load_hosts(test, function(hosts) {
@@ -209,7 +220,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
 
             configs.update($scope.selected).then(function(config) {
             console.log("config to update", config);
-            var importer_content = config._pwa_import.importer_content;
+            var importer_content = config.importer_content;
             console.log("importer_content", importer_content);
                 //console.log("ma_custom before: ", config.ma_custom_json);
                 if ( ( "ma_urls" in config ) && _.isArray( config.ma_urls ) ) {
@@ -271,6 +282,15 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
         window.open(appconf.pub_url+"auto/"+address, '_blank');
     }
 
+    $scope.setImportType = function( status ) {
+        console.log("status", status);
+        var name = status.name;
+        var val = status.value;
+        $scope[ name ] = val;
+        $scope.$apply();
+
+    };
+
     $scope.myFileSelected = null;
     $scope.fileSelected = function (element) {
             $scope.myFileSelected = element.files[0];
@@ -288,13 +308,17 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
         var data;
         var reqOptions = {};
         var userFile = $scope.myFileSelected;
+        var importStatus = $scope.importStatus;
+        // urlOpen: false
+        // uploadOpen: true
+        // rawOpen: false
         //data._pwa_import= {};
-        if ( ( "_pwa_import" in $scope ) && $scope._pwa_import.importer_content ) {
-            data = {"content": JSON.parse($scope._pwa_import.importer_content)};
+        if ( importStatus.rawOpen && $scope.importer_content ) {
+            data = {"content": JSON.parse($scope.importer_content)};
             uri += 'JSON';
-        } else if ( $scope.importer_url ) {
+        } else if ( importStatus.urlOpen && $scope.importer_url ) {
             data = {"url": $scope.importer_url};
-        }  else if ( userFile ) {
+        }  else if ( importStatus.uploadOpen && userFile ) {
             //data = {"url": $scope._pwa_import.importer_url};
             var formData = new FormData();
             //formData.append('file', element[0].files[0]);

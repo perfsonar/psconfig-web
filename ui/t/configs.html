@@ -205,17 +205,39 @@
                         <button type="button" ng-if="!showimporter" ng-click="$parent.showimporter = true" class="btn btn-primary">Import from existing Config</button>
                         <br><br>
                         <div class="panel panel-default" ng-if="showimporter">
-                            <div class="panel-heading">Import existing Config </div>
+                            <div class="panel-heading"><h3>Import existing Config </h3></div>
                             <div class="panel-body">
-                                <p>Enter pSConfig or MeshConfig URL to Import, *OR* upload a psconfig json file, *OR* paste raw JSON in the text box </p>
                                 <p>This tool will register all missing hosts as adhoc hosts and register hostgroup, testspecs (if the same name doesn't exist already). Finally, it will create new config tests and populate here.</p>
                                 <p>Tests from the Config won't be registered automatically - until you click Update on this page. If you import the same Config twice, already imported Tests won't be overriden - you need to remove old tests manually.</p>
+                                <p>Enter pSConfig or MeshConfig URL to Import, *OR* upload a psconfig json file, *OR* paste raw JSON below to import a config. </p>
+		<div ng-controller="paramsAccordion">
+    			<accordion close-others="true" class="panel-tighter">
+                {{status}}
+                {{importStatus}}
+                {{importer_url}}
+        			<accordion-group is-open="importStatus.urlOpen">
+            				<accordion-heading>
+                			<h4> Import from URL 
+                    			<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': importStatus.urlOpen, 'glyphicon-chevron-right': !importStatus.urlOpen}"></i>
+                			</h4>
+            				</accordion-heading>
+                            <p>Paste a Config URL to import. This might be a pSConfig JSON URL, a PWA config URL, etc. {{status}}</p>
                                 <div class="input-group space">
+
                                     <span class="input-group-addon" id="sizing-addon2">URL</span>
-                                                                        <input type="text" class="form-control" ng-model="$parent.importer_url"
+                                                                        <input type="text" class="form-control" name="importer_url"
+                                                                            onchange="angular.element(this).scope().setImportType(this)"
                                                                             placeholder="http://hostname/mesh_url"></input>
                                 </div>
-                                <div style="margin-left:1em;font-style:italic;">- OR -</div>
+                    </accordion-group>
+                    <div style="margin-left:1em;font-style:italic;">- OR -</div>
+        			<accordion-group is-open="importStatus.uploadOpen">
+            				<accordion-heading>
+                			<h4> Import from file
+                    			<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': importStatus.uploadOpen, 'glyphicon-chevron-right': !importStatus.uploadOpen}"></i>
+                			</h4>
+            				</accordion-heading>
+                            <p>Upload a file to import. This should be a JSON file in pSConfig format. {{status}}</p>
                                 <div class="input-group space">
                                     <!-- <p> -->
                                     <!-- <label class="col-sm-2 control-label">Upload pSConfig file</label></p> -->
@@ -229,27 +251,36 @@
                                         ></input>
                                        <!-- (change)="handleFileInput($event.target.files)"> -->
 
-                               </div>
-                                <div style="margin-left:1em;font-style:italic;">- OR -</div>
-                               <!--</div>-->
+                                   </div>
+                   </accordion-group>
+                    <div style="margin-left:1em;font-style:italic;">- OR -</div>
+        			<accordion-group is-open="importStatus.rawOpen">
+            				<accordion-heading>
+                			<h4> Import raw JSON
+                    			<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': importStatus.rawOpen, 'glyphicon-chevron-right': importStatus.rawOpen}"></i>
+                			</h4>
+            				</accordion-heading>
+                            <p>Paste raw JSON to import, in pSConfig format.</p>
                                 <div class="input-group space">
                                     <span class="input-group-addon" id="sizing-addon3">Import raw JSON</span>
-                        <textarea class="form-control"  ng-model="$parent._pwa_import.importer_content"  ng-disabled="!selected._canedit" style="" rows="5"></textarea>
+                        <textarea class="form-control" name="importer_content" ng-disabled="!selected._canedit" style="" rows="5"
+                            onchange="angular.element(this).scope().setImportType(this)"
+                            ></textarea>
+                        <!-- with ng-model
+<textarea class="form-control"  ng-model="$parent.importer_content"  ng-disabled="!selected._canedit" style="" rows="5"></textarea>
+-->
                         <!--
                         <span ng-show="form.ma_urls.$error.ma_urls" style="color:red">Ma_urls validation error: {{form.ma_urls.$error.ma_urls}}.</span>
 -->
 
                     </div>
                         <p class="help-block">Paste raw JSON config to import</p>
-                                     <span class="input-group-btn">
-                                        <button class="btn btn-default" type="button" ng-model="$parent.importer_file"
-                                        ng-disabled="!$parent._pwa_import.importer_content && !$parent.importer_url && !$parent.fileIsSelected" ng-click="import()">Go!</button>
-                                            <!--     ng-click="import()">Go!</button> -->
-                                         <p>$parent._pwa_import.importer_content: {{$parent._pwa_import.importer_content}}</p>
-                                         <p>$parent.importer_url: {{$parent.importer_url}}</p>
-                                         <p>$parent.importer_file: {{$parent.importer_file}}</p>
-                                         <p>$parent.myFileSelected: {{$parent.myFileSelected}}</p>
-                                         <p>$parent.fileIsSelected: {{$parent.fileIsSelected}}</p>
+                    </accordion-group>
+                   </accordion>
+               </div>
+                                     <span class="input-group-btn"><!-- ng-model="$parent.importer_file" -->
+                                         <button class="btn btn-default" type="button" 
+                                        ng-disabled="!$parent.importer_content && !$parent.importer_url && !$parent.fileIsSelected" ng-click="import()">Go!</button>
                                     </span>
                                 </div>
                             </div>

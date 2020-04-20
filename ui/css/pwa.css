@@ -9658,4 +9658,8 @@ span.ui-select-match-item .label-default {
   margin: 0.5em 0em;
 }
 
+.panel-tighter .panel.panel-default {
+  margin: 1em 0;
+}
+
 /*# sourceMappingURL=pwa.css.map */
