@@ -129,18 +129,13 @@ router.put('/importFile', jwt({secret: config.admin.jwt.pub}), function(req, res
     if(!req.user.scopes.pwa || !~req.user.scopes.pwa.indexOf('user')) return res.status(401).end();
 
     if(req.busboy) {
-        console.log("busboy YEAH", req.busboy);
         req.busboy.on("file", function(fieldName, fileStream, fileName, encoding, mimeType) {
-            console.log("fieldName, fileStream, fileName, encoding, mimeType", fieldName, fileStream, fileName, encoding, mimeType);
             // set encoding
             fileStream.setEncoding( "utf8" );
             //var fstream = fs.createWriteStream('/tmp/' + fileName);
             fileStream.on('data', (chunk) => {
-                console.log(`Received ${chunk.length} bytes of data.`);
-                console.log("chunk", chunk);
                 var content = JSON.parse(chunk);
                 importer.importJSON(content, req.user.sub, function(err, tests, new_config_params) {
-                    console.log("error", err);
                     if(err) return next(err);
                     res.json({msg: "Created testspecs / host / hostgroups records", tests: tests, config_params: new_config_params});
                     var results = {
@@ -150,21 +145,6 @@ router.put('/importFile', jwt({secret: config.admin.jwt.pub}), function(req, res
                     };
                 });
             });
-        //return req.pipe(req.busboy);
-        //return req.pipe(busboy);
-            /*
-            fileStream.on('close', function () {    
-               console.log("Upload Finished of " + fileName);              
-               });
-               */
-            /*
-               fileStream.pipe(fstream);
-               fstream.on('close', function () {    
-               console.log("Upload Finished of " + fileName);              
-               });
-
-*/
-            //Handle file stream here
         });
           return req.pipe(req.busboy);
     }
@@ -172,7 +152,6 @@ router.put('/importFile', jwt({secret: config.admin.jwt.pub}), function(req, res
 });
 
 router.put('/importJSON', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    console.log("res", res);
     if(!req.user.scopes.pwa || !~req.user.scopes.pwa.indexOf('user')) return res.status(401).end();
     importer.importJSON(req.body.content, req.user.sub, function(err, tests, new_config_params) {
         if(err) return next(err);

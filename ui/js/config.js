@@ -38,13 +38,6 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
         });
     });
 
-    /*
-    $scope.$watch('groups[0].open', function(isOpen){
-            if (isOpen) {
-                      console.log('First group was opened'); 
-                          }    
-              });
-              */
 
     $scope.selected = null;
     $scope.select = function(config) {
@@ -207,36 +200,18 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
                 $location.update_path("/configs/"+config._id);
             }).catch($scope.toast_error);
         } else {
-            /*
-            console.log("updating $scope.selected", $scope.selected);
-            if ( ( !( "ma_custom_json" in $scope.selected ) ) 
-                    || ( typeof $scope.selected.ma_custom_json == "undefined" )
-                    || $scope.selected.ma_custom_json == "" ) {
-                delete $scope.selected.ma_custom_json;
-                        console.log("deleting custom json as it's empty; $scope.selected", $scope.selected);
-            }
-            */
-
 
             configs.update($scope.selected).then(function(config) {
-            console.log("config to update", config);
+            //console.log("config to update", config);
             var importer_content = config.importer_content;
-            console.log("importer_content", importer_content);
+            //console.log("importer_content", importer_content);
                 //console.log("ma_custom before: ", config.ma_custom_json);
                 if ( ( "ma_urls" in config ) && _.isArray( config.ma_urls ) ) {
                     config.ma_urls = config.ma_urls.join("\n");
                 }
                 var custom_json = config.ma_custom_json;
-/*
-            if ( ( !( "ma_custom_json" in config ) ) 
-                    || ( typeof config.ma_custom_json == "undefined" )
-                    || config.ma_custom_json == "" ) {
-                        console.log("deleting custom json as it's empty");
-                delete config.ma_custom_json;
-            }
-            */
-                console.log("config", config);
-                console.log("custom_MA json", custom_json);
+                //console.log("config", config);
+                //console.log("custom_MA json", custom_json);
 
                 
                 if(isJSON(config.ma_custom_json)){
@@ -283,7 +258,6 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     }
 
     $scope.setImportType = function( status ) {
-        console.log("status", status);
         var name = status.name;
         var val = status.value;
         $scope[ name ] = val;
@@ -299,8 +273,6 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
 
             }
             $scope.$apply();
-            console.log("$scope", $scope);
-            console.log("$scope.myFileSelected", $scope.myFileSelected);
     };
 
     $scope.import = function() {
@@ -323,13 +295,11 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
             var formData = new FormData();
             //formData.append('file', element[0].files[0]);
             //TODO: fix formData
-            console.log( "userFile", userFile);
             formData.append('file', userFile);
             formData.append("content", "{}");
             data = formData;
             uri += "File";
             reqOptions.headers = {'Content-Type': undefined , transformRequest: angular.identity};
-            console.log("data",data);
         }
 
         //console.log("data", data);
