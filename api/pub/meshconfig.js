@@ -13,6 +13,7 @@ var config = require('../config');
 const logger = new winston.Logger(config.logger.winston);
 const db = require('../models');
 const common = require('../common');
+const shared = require('../sharedFunctions');
 
 // TODO: Remove bwctl hack
 // This is a ps 3.5/bwctl backwards-compatibility hack
@@ -109,6 +110,11 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
     }
 
     var schedule_type = test['schedule_type'];
+    if ( test.type != "owamp" ) {
+  //      schedule_type = "interval";
+    }
+
+    
     var include_schedule = true;
     if ( schedule_type == 'continuous' ) {
         include_schedule = false;
@@ -217,6 +223,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
             "repeat": interval,
             "sliprand": true
         };
+        
     }
 
     if ( include_schedule ) {
@@ -226,8 +233,17 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
 
 
         // "slip"
-        if(("slip" in spec) && (spec.slip != 0) && (schedule_type != 'continuous')) {
-            schedules[ sched_key ].slip = spec.slip;
+                console.log("TEST", test);
+        if ( schedule_type != 'continuous' ) {
+            if(("slip" in spec) && (spec.slip != 0)) {
+                schedules[ sched_key ].slip = spec.slip;
+            } else {
+                // TODO: calculate slip based on test interval
+                var testInt = shared.iso8601_to_seconds(interval) / 2;
+                schedules[ sched_key ].slip = seconds_to_iso8601( testInt );
+
+
+            }
         }
     }
     delete spec[ "slip" ];
