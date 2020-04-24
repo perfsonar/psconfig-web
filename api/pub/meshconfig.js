@@ -231,6 +231,10 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
 
         test._schedule = sched_key;
 
+        if ( ! ( sched_key in schedules ) ) {
+            schedules[ sched_key ] = {};
+        }
+
 
         // "slip"
                 console.log("TEST", test);
