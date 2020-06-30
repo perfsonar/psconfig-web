@@ -754,6 +754,11 @@ exports._process_published_config = function( _config, opts, cb ) {
                 if ( "local_archives" in _host ) {
                    _host["local_archives"].forEach( function( _id ) {
                        console.log("_id", _id);
+                       console.log("archives_obj[_id]", archives_obj[_id]);
+                       if (  ! ( _id in archives_obj ) ) {
+                           logger.warn("Host ", _host.hostname, " has nonexistent archive ", _id, "; ignoring");
+                           return;
+                       }
                         //psc_hosts[_host.hostname].archives.push(archives_obj[_id].name );
                         psc_hosts[_host.hostname].archives.push(archives_obj[_id].name + "-" + _id);
 
@@ -902,10 +907,22 @@ exports._process_published_config = function( _config, opts, cb ) {
 
         if ( "archives" in _config ) {
             _config.archives.forEach( function( _id ) {
-                var _arch = archives_obj[ _id ];
-                console.log("_config _arch", _arch);
-                console.log("archives_obj[ _arch ]", archives_obj[ _arch ]);
-                test_mas.push( pub_shared.archive_extract_name( _arch ) );
+                if (  ! ( _id in archives_obj ) ) {
+                           logger.warn("Config ", _config.name, " has nonexistent archive ", _id, "; ignoring");
+                           console.log("_config.name", _config.name);
+                           //delete _config.archives[_id];
+                           //return;
+                } else {
+                    var _arch = archives_obj[ _id ];
+                    console.log("_id", _id);
+                    console.log("_config _arch", _arch);
+                    console.log("archives_obj[ _arch ]", archives_obj[ _arch ]);
+                    var newArch = {};
+                    var name = pub_shared.archive_extract_name( _arch );
+                    newArch[ name ] = _arch;
+                    psc_archives = _.extend( psc_archives, newArch );
+                    //test_mas.push( pub_shared.archive_extract_name( _arch ) );
+                }
 
             });
 
@@ -969,6 +986,13 @@ exports._process_published_config = function( _config, opts, cb ) {
     async.eachSeries( _config.archives, function(arch, next_arch) {
         console.log("ARCHIVES ...");
         console.log("arch", arch);
+        var _id = arch._id;
+                if (  ! ( _id in archives_obj ) ) {
+                           logger.warn("Config ", _config.name, " has nonexistent archive ", _id, "; ignoring");
+                           console.log("_config.name", _config.name);
+                           //delete _config.archives[_id];
+                           return;
+                       }
         var name = pub_shared.archive_extract_name( archives_obj[ arch._id ] );
         console.log("NAME", name);
         psc_archives = _.extend( psc_archives, pub_shared.format_archive( archives_obj[ arch._id ] ) );
