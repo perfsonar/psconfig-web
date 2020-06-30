@@ -14,8 +14,10 @@ mongoose.Promise = global.Promise;
 
 exports.init = function(cb) {
     mongoose.connect(config.mongodb, {
-        reconnectTries: Number.MAX_VALUE
-        , useMongoClient: true
+        //reconnectTries: Number.MAX_VALUE
+        useNewUrlParser: true
+        , useUnifiedTopology: true
+        , useCreateIndex: true
     }, function(err) {
         if(err) {
             logger.error(err);
@@ -74,6 +76,10 @@ var hostSchema = mongoose.Schema({
     local_ma_url: String,
 
     ma_urls: [ String ],
+
+    local_archives: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Archive'} ],
+
+    additional_archives: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Archive'} ],
 
     //host info (pshost-toolkitversion, host-hardware-memory, host-os-version, host-hadeware-processorspeed, host-hadware-processorcount)
     //and location info (location-state, location-city, location-country, etc..)
@@ -140,6 +146,20 @@ exports.Testspec = mongoose.model('Testspec', testspecSchema);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+var archiveSchema = mongoose.Schema({
+    name: String,
+    desc: String,
+    archiver: String,
+    data: mongoose.Schema.Types.Mixed,
+
+    admins: [ String ], //array of user ids (sub string in auth service)
+    create_date: {type: Date, default: Date.now},
+    update_date: {type: Date, default: Date.now},
+});
+exports.Archive = mongoose.model('Archive', archiveSchema);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 //test is now part of config
 var testSchema = mongoose.Schema({
     service_type: String,
@@ -164,6 +184,8 @@ var configSchema = mongoose.Schema({
     desc: String,
 
     tests: [ testSchema ],
+    
+    archives: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Archive'} ],
 
     admins: [ String ], //array of user ids (sub string in auth service)
     create_date: {type: Date, default: Date.now},

@@ -16,7 +16,7 @@ app.factory('hosts', function(appconf, $http, jwtHelper) {
         //return basic (uuid, sitename, hostname, lsid) host info for all hosts
         getAll: function(opts) { 
             //if(all_promise) return all_promise;
-            var select = "sitename hostname lsid url update_date";
+            var select = "sitename hostname lsid url update_date local_archives additional_archives";
             if(opts && opts.select) select = opts.select;
             return $http.get(appconf.api+'/hosts?select='+select+'&sort=sitename hostname&limit=3000')
             .then(function(res) {
@@ -70,6 +70,8 @@ app.factory('hosts', function(appconf, $http, jwtHelper) {
                 info: {},
                 location: {},
                 communities: [],
+                local_archives: [],
+                additional_archives: []
             };
             
             //add user to admin
@@ -123,6 +125,65 @@ app.factory('users', function(appconf, $http, jwtHelper) {
         }
     }
 });
+
+app.factory('archives', function(appconf, $http, jwtHelper) {
+    var archives = null;
+    var all_promise = null;
+    return {
+        getAll: function() {
+            if(all_promise) return all_promise;
+            all_promise = $http.get(appconf.api+'/archives')
+            .then(function(res) {
+                archives = res.data.archives;
+                //console.dir(archives);
+                return res.data.archives;
+            });
+            return all_promise; 
+        },
+        clear: function() {
+            //invalidate
+            all_promise = null;
+        },
+        add: function() {
+            var archive = {
+                desc: "New Testspec",
+                admins: [],
+            };
+            var jwt = localStorage.getItem(appconf.jwt_id);
+            if(jwt) {
+                var user = jwtHelper.decodeToken(jwt);
+                archive.admins.push(user.sub.toString());
+                archive._canedit = true;
+            }
+            archives.unshift(archive);
+            return archive;
+        },
+        create: function(archive) {
+            return $http.post(appconf.api+'/archives/', archive)
+            .then(function(res) {
+                archive._id = res.data._id;
+                archive._canedit = res.data._canedit;
+                archive.create_date = res.data.create_date;
+                return archive;
+            });
+        },
+        update: function(archive) {
+            return $http.put(appconf.api+'/archives/'+archive._id, archive)
+            .then(function(res) {
+                archive._canedit = res.data._canedit;
+                return archive;
+            });
+        },
+        remove: function(archive) {
+            return $http.delete(appconf.api+'/archives/'+archive._id)
+            .then(function(res) {
+                archives.splice(archives.indexOf(archive), 1);
+            });
+        }
+    }
+}); // end archives factory
+
+
 
 app.factory('testspecs', function(appconf, $http, jwtHelper) {
     var testspecs = null;
@@ -190,7 +251,7 @@ app.factory('configs', function(appconf, $http, jwtHelper) {
         //return basic (uuid, sitename, hostname, lsid) config info for all configs
         getAll: function(opts) { 
             //if(all_promise) return all_promise;
-            var select = "url name desc ma_urls ma_custom_json force_endpoint_mas admins tests create_date";
+            var select = "url name desc ma_urls archives ma_custom_json force_endpoint_mas admins tests create_date";
             if(opts && opts.select) select = opts.select;
             return $http.get(appconf.api+'/configs?select='+select+'&sort=desc&limit=100000')
             .then(function(res) {
@@ -203,6 +264,7 @@ app.factory('configs', function(appconf, $http, jwtHelper) {
                 desc: "New Config",
                 admins: [],
                 tests: [],
+                archives: []
             };
             var jwt = localStorage.getItem(appconf.jwt_id);
             if(jwt) {

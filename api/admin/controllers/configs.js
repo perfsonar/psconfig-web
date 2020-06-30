@@ -150,11 +150,22 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             }
             config.tests = req.body.tests;
             config.admins = req.body.admins;
+            config.archives = req.body.archives;
 	    var custom_json = req.body.ma_custom_json;
-	    if(isJSON(req.body.ma_custom_json)){
-		config.ma_custom_json = custom_json;
-		//console.log("Here ma_custom is a valid json:",config.ma_custom_json);
-	    }
+        if( ( "ma_custom_json" in req.body ) 
+            && ( ( typeof req.body.ma_custom_json ) != "undefined" )
+            //&& ( req.body.ma_custom_json != "" )
+            && isJSON(req.body.ma_custom_json) ) {
+            config.ma_custom_json = custom_json;
+            //console.log("Here ma_custom is a valid json:",config.ma_custom_json);
+        } else {
+            config.ma_custom_json = "";
+            req.body.ma_custom_json = "";
+            //delete config.ma_custom_json;
+            //delete req.body.ma_custom_json;
+            //console.log("deleting ma_custom_json", config);
+
+        }
 	    config.force_endpoint_mas = req.body.force_endpoint_mas;
             config.update_date = new Date();
             if ( "ma_urls" in req.body ) {
@@ -165,8 +176,6 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
                 config = JSON.parse(JSON.stringify(config));
                 config._canedit = canedit(req.user, config);
                 res.json(config);
-            }).catch(function(err) {
-                next(err);
             });
         } else return res.status(401).end("you are not administrator");
     }); 

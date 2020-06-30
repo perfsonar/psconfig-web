@@ -10,7 +10,6 @@ cp -r ../../package.json pwa-pub/tmp
 rm -rf pwa-pub/tmp/api/config
 
 docker build pwa-pub -t perfsonar/pwa-pub
-#docker build pwa-pub -t perfsonar/pwa-pub:latest
 
 if [ ! $? -eq 0 ]; then
     echo "failed to build"

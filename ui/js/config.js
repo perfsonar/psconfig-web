@@ -1,9 +1,11 @@
 
 app.controller('ConfigsController',
-function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, hostgroups, configs, $routeParams, testspecs, uiGmapGoogleMapApi, $timeout) {
+function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, hostgroups, configs, $routeParams, testspecs, archives, uiGmapGoogleMapApi, $timeout) {
     scaMessage.show(toaster);
     $scope.active_menu = "configs";
     $scope.show_map = false;
+    console.log("asdf");
+    console.log("archives", archives);
 
     //start loading things (should I parallelize)
     users.getAll().then(function(_users) {
@@ -15,22 +17,28 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
             hostgroups.getAll().then(function(_hostgroups) {
                 $scope.hostgroups = _hostgroups;
 
-                configs.getAll().then(function(_configs) {
-                    $scope.configs = _configs;
-                    if($routeParams.id) {
-                        $scope.configs.forEach(function(config) {
-                            if(config._id == $routeParams.id) $scope.select(config);
-                        });
-                    } else {
-                        //select first one
-                        if($scope.configs.length > 0) $scope.select($scope.configs[0]);
-                    }
+                archives.getAll().then(function(_archives) {
+                    $scope.all_archives = _archives;
+                    console.log("all_archives", _archives);
 
-		    //delay showing map slightly to prevent gmap to miss resize event?
-		    //TODO - figure out what's going on with gmap and fix it instead of this hack..
-		    $timeout(()=>{
-			$scope.show_map = true;
-		    });
+
+                    configs.getAll().then(function(_configs) {
+                        $scope.configs = _configs;
+                        if($routeParams.id) {
+                            $scope.configs.forEach(function(config) {
+                                if(config._id == $routeParams.id) $scope.select(config);
+                            });
+                        } else {
+                            //select first one
+                            if($scope.configs.length > 0) $scope.select($scope.configs[0]);
+                        }
+
+                        //delay showing map slightly to prevent gmap to miss resize event?
+                        //TODO - figure out what's going on with gmap and fix it instead of this hack..
+                        $timeout(()=>{
+                            $scope.show_map = true;
+                        });
+                    });
                 });
             });
         });
@@ -39,6 +47,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     $scope.selected = null;
     $scope.select = function(config) {
         $scope.selected = config;
+                    console.log("selected", $scope.selected);
         $scope.closesubbar();
 
         config.tests.forEach(function(test) {
@@ -196,21 +205,40 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
                 $location.update_path("/configs/"+config._id);
             }).catch($scope.toast_error);
         } else {
+            /*
+            console.log("updating $scope.selected", $scope.selected);
+            if ( ( !( "ma_custom_json" in $scope.selected ) ) 
+                    || ( typeof $scope.selected.ma_custom_json == "undefined" )
+                    || $scope.selected.ma_custom_json == "" ) {
+                delete $scope.selected.ma_custom_json;
+                        console.log("deleting custom json as it's empty; $scope.selected", $scope.selected);
+            }
+            */
             configs.update($scope.selected).then(function(config) {
                 //console.log("ma_custom before: ", config.ma_custom_json);
-		if ( ( "ma_urls" in config ) && _.isArray( config.ma_urls ) ) {
+                if ( ( "ma_urls" in config ) && _.isArray( config.ma_urls ) ) {
                     config.ma_urls = config.ma_urls.join("\n");
                 }
-		var custom_json = config.ma_custom_json;
-		if(isJSON(config.ma_custom_json)){
-			config.ma_custom_json = custom_json;
-			//console.log("ma_custom after: ", config.ma_custom_json);
-			toaster.success("config updated successfully!");
-			$scope.form.$setPristine();
-		}
-		else{
-			throw "Invalid custom JSON";
-		}
+                var custom_json = config.ma_custom_json;
+/*
+            if ( ( !( "ma_custom_json" in config ) ) 
+                    || ( typeof config.ma_custom_json == "undefined" )
+                    || config.ma_custom_json == "" ) {
+                        console.log("deleting custom json as it's empty");
+                delete config.ma_custom_json;
+            }
+            */
+                console.log("config", config);
+                console.log("custom_json", custom_json);
+                if(isJSON(config.ma_custom_json)){
+                    config.ma_custom_json = custom_json;
+                    //console.log("ma_custom after: ", config.ma_custom_json);
+                    toaster.success("config updated successfully!");
+                    $scope.form.$setPristine();
+                }
+                else{
+                    throw "Invalid custom JSON";
+                }
             }).catch( function( err ) {
                 //console.log("err", err);
                 $scope.toast_error(err);
@@ -279,7 +307,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
             console.error(res);
             console.log("Oops. Failed to import specified URL.");
 
-            toaster.error("Oops. Failed to import specified URL.");
+            toaster.error("Oops. Failed to import specified URL.", res.data.message);
         });
     }
 });

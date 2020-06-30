@@ -8,7 +8,7 @@ CONFIGPATH=/etc/perfsonar/psconfig-web
 PUB_CONFIGPATH=/etc/perfsonar/psconfig-web
 #LIBPATH=/usr/lib/perfsonar/lib
 #GRAPHLIBPATH=/usr/lib/perfsonar/psconfig-web/lib
-PERFSONAR_AUTO_VERSION=4.3.0
+PERFSONAR_AUTO_VERSION=4.2.1
 PERFSONAR_AUTO_RELNUM=0.a0.0
 VERSION=${PERFSONAR_AUTO_VERSION}
 RELEASE=${PERFSONAR_AUTO_RELNUM}
@@ -17,7 +17,6 @@ default:
 	@echo No need to build the package. Just run \"make install\"
 
 dist:
-	#make manifest
 	mkdir /tmp/$(PACKAGE)-$(VERSION).$(RELEASE)
 	tar ch -T MANIFEST -T MANIFEST-node_modules | tar x -C /tmp/$(PACKAGE)-$(VERSION).$(RELEASE)
 	tar czf $(PACKAGE)-$(VERSION).$(RELEASE).tar.gz -C /tmp $(PACKAGE)-$(VERSION).$(RELEASE)
@@ -44,7 +43,6 @@ manifest:
 	echo "ui/node_modules/ace-builds/src-min-noconflict/ace.js" >> MANIFEST-ui-node_modules
 
 npm:
-	#cd ui; npm install --production
 	npm install --only=prod
 	pushd ui; npm install --only=prod; popd
 

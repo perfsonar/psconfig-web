@@ -21,7 +21,7 @@
     "express-winston": "^2.3.0",
     "jsonwebtoken": "^7.2.1",
     "moment-duration": "0.0.6",
-    "mongoose": "^4.9.3",
+    "mongoose": "^5.7.5",
     "promise": "^7.0.4",
     "request": "^2.81.0",
     "sandbox": "^0.8.6",
@@ -34,6 +34,7 @@
     "chai": "^3.4.1",
     "deep-equal-in-any-order": "^1.0.10",
     "jsonwebtoken": "^7.1.9",
+    "mocha": "^6.2.0",
     "supertest": "~2.0.1"
   }
 }

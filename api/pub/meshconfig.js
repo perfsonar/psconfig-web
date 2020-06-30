@@ -13,6 +13,7 @@ const config = require('../config');
 const logger = new winston.Logger(config.logger.winston);
 const db = require('../models');
 const common = require('../common');
+const pub_shared = require('./pub_shared');
 
 // TODO: Remove bwctl hack
 // This is a ps 3.5/bwctl backwards-compatibility hack
@@ -32,6 +33,8 @@ var profile_cache_date = null;
 var host_catalog = {};
 var host_groups = {};
 var host_groups_details = {};
+
+var archives_obj = {};
 
 function load_profile(cb) {
     logger.info("reloading profiles");
@@ -163,6 +166,8 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
         rename_field( spec, "packet-size", "length");
     } else if ( test.type == "trace" ) {
         rename_field( spec, "packet-size", "length" );
+        if ( ! spec["probe-type"] ) delete spec["probe-type"];
+        delete spec.protocol;
     }
 
     delete spec.tool;
@@ -493,6 +498,7 @@ exports._process_published_config = function( _config, opts, cb ) {
     var format = opts.format;
 
 
+
     //resolve all db entries first
     if(_config.admins) _config.admins = resolve_users(_config.admins);
 
@@ -503,6 +509,25 @@ exports._process_published_config = function( _config, opts, cb ) {
     });
 
     var test_service_types = Object.keys(service_type_obj).map(e => service_type_obj[e]);
+
+    db.Archive.find().exec(function(err, archs) {
+            if(err) return cb(err);
+            archs.forEach( function( arch ) {
+                //console.log("inside exec");
+                //console.log("arch", arch);
+                //archives_obj[ arch._id ] = pub_shared.format_archive( arch ); 
+                archives_obj[ arch._id ] = arch;
+                //_config.archives_obj = pub_shared.format_archive( arch ); 
+                //console.log("arch_obj", arch_obj);
+            });
+            console.log("archives_obj", archives_obj);
+            //next_arch();
+        }, function(err) {
+            if(err) return (err);
+
+
+
+    });
 
 
     async.eachSeries(_config.tests, function(test, next_test) {
@@ -536,6 +561,7 @@ exports._process_published_config = function( _config, opts, cb ) {
             function(next) {
                 //testspec
                 if(!test.testspec) return next();
+
                 resolve_testspec(test.testspec, function(err, row) {
                     if(err) return next(err);
                     test.testspec = row;
@@ -664,6 +690,7 @@ exports._process_published_config = function( _config, opts, cb ) {
             };
             if ( ! ( _host.hostname in psc_hosts) ) psc_hosts[ _host.hostname ]  = {};
 
+            /*
             if ( "ma_urls" in _host && _host.ma_urls.length > 0  ) {
                 for(var i in _host.ma_urls ) {
                     var extra_url = _host.ma_urls[i];
@@ -686,6 +713,7 @@ exports._process_published_config = function( _config, opts, cb ) {
 
                 }
             }
+*/
 
             //create ma entry for each service
             test_service_types.forEach(function(service) {
@@ -719,7 +747,48 @@ exports._process_published_config = function( _config, opts, cb ) {
                     }
                 }
 
-                // Handle host main MA 
+                // Handle NEW host main MA (REUSABLE STYLE) 
+                console.log("_host", _host);
+                console.log("maName", maName);
+                if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
+                if ( "local_archives" in _host ) {
+                   _host["local_archives"].forEach( function( _id ) {
+                       console.log("_id", _id);
+                        //psc_hosts[_host.hostname].archives.push(archives_obj[_id].name );
+                        psc_hosts[_host.hostname].archives.push(archives_obj[_id].name + "-" + _id);
+
+
+                   }); 
+                    //psc_hosts[_host.hostname].archives = psc_hosts[_host.hostname].local_archives.concat( _host.local_archives );
+                console.log("psc_hosts[_host.hostname]", psc_hosts[_host.hostname]);
+
+                }
+                //if ( ! ( "_archive" in _host ) ) _host._archive = [];
+
+                /* TODO: FIX!
+                if ( ! ( url in maHash )  ) {
+                    if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
+                        psc_archives[ maName ] = maInfo;
+                        _host._archive.push(maName);
+                        psc_hosts[ _host.hostname ].archives.push( maName );
+
+                        last_ma_number++;
+                        maHash[url] = maName;
+                    } else if ( url in extra_mas ) {
+
+                    }
+
+                } else {
+                    if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
+                    var maType = maHash[url];
+                        psc_archives[ maType ] = maInfo;
+                    }
+
+                }
+                */
+
+
+                // Handle host main MA (OLD URL STYLE) 
                 if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
                 if ( ! ( "_archive" in _host ) ) _host._archive = [];
 
@@ -744,7 +813,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                 }
 
                 // Handle extra host MAs
-
+                // TODO: remove this and have upgrade script fix
                 for(var key in extra_mas ) {
                     var maName = key;
                     var url = extra_mas[key];
@@ -801,9 +870,51 @@ exports._process_published_config = function( _config, opts, cb ) {
         }
 
         var ma_prefix = "config-archive";
+        // init variables for config archives
         var last_config_ma_number = 0;
         var last_test_ma_number = 0;
         var test_mas = [];
+
+        // Get custom MAs (which are defined as raw JSON in a string in the db)
+        if ( "ma_custom_json" in _config ) {
+            var customString = _config.ma_custom_json;
+            var customArchiveConfig;
+            if ( customString ) {
+                try { 
+                    customArchiveConfig = JSON.parse( customString );
+                    console.log("customArchiveConfig", customArchiveConfig);
+                    // add custom archiver to testspec.
+                    var maNames = Object.keys( customArchiveConfig );
+                    maNames.forEach( function( maName ) {
+                        var archiveDetails = customArchiveConfig[ maName ];
+                        test_mas.push(maName);
+
+                    });
+                    //psc_archives["asdf"] = customArchiveConfig;
+                    psc_archives = _.extend( psc_archives, customArchiveConfig );
+                } catch(e) {
+                    logger.error("Custom JSON archive did not validate", e, customString);
+
+                }
+            }
+        }
+
+
+        if ( "archives" in _config ) {
+            _config.archives.forEach( function( _id ) {
+                var _arch = archives_obj[ _id ];
+                console.log("_config _arch", _arch);
+                console.log("archives_obj[ _arch ]", archives_obj[ _arch ]);
+                test_mas.push( pub_shared.archive_extract_name( _arch ) );
+
+            });
+
+
+        }
+
+
+        /*
+        var ma_prefix = "config-archive";
         if ( "ma_urls" in _config ) {
             for(var i in _config.ma_urls ) {
                 var url = _config.ma_urls[i];
@@ -811,7 +922,7 @@ exports._process_published_config = function( _config, opts, cb ) {
 
                 var maName = "config-archive" + last_config_ma_number;
                 var maName = "config-archive" + last_test_ma_number;
-                test_mas.push( maName );
+                test_mas.push( maName ); // TODO: ADAPT FOR NEW MA STYLE
                 var maInfo;
                 var maType = maHash[url];
 
@@ -846,28 +957,27 @@ exports._process_published_config = function( _config, opts, cb ) {
                 last_config_ma_number++;
             }
         }
-
-        // Get custom MAs (which are defined as raw JSON in a string in the db)
-        if ( "ma_custom_json" in _config ) {
-            var customString = _config.ma_custom_json;
-            var customArchiveConfig;
-            if ( customString ) {
-                try { 
-                    customArchiveConfig = JSON.parse( customString );
-                    console.log("customArchiveConfig", customArchiveConfig);
-                    //psc_archives["asdf"] = customArchiveConfig;
-                    psc_archives = _.extend( psc_archives, customArchiveConfig );
-                } catch(e) {
-                    logger.error("Custom JSON archive did not validate", e, customString);
-
-                }
-            }
-        }
+*/
         // Retrieve MA URLs from the _config object
 
         psconfig.archives = psc_archives;
         psconfig.addresses = psc_addresses;
         psconfig.groups = host_groups_details;
+
+    console.log("_config", _config);
+    var psarch_obj = {};
+    async.eachSeries( _config.archives, function(arch, next_arch) {
+        console.log("ARCHIVES ...");
+        console.log("arch", arch);
+        var name = pub_shared.archive_extract_name( archives_obj[ arch._id ] );
+        console.log("NAME", name);
+        psc_archives = _.extend( psc_archives, pub_shared.format_archive( archives_obj[ arch._id ] ) );
+        next_arch();
+        //psarch_obj = _.extend( psarch_obj, pub_shared.format_archive( archives_obj[ arch._id ] ) );
+    });
+
+    //psconfig.psarch_obj = psarch_obj;
+
         //psconfig.groups = psc_groups;
         mc.organizations.push(org);
         if ( config_mas.length > 0 ) {
@@ -922,6 +1032,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                 psc_tests[ name ].spec.source = "{% address[0] %}";
                 psc_tests[ name ].spec.dest = "{% address[1] %}";
                 meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules );
+                logger.debug( "testspec", JSON.stringify( testspec, null, "  " ));
             }
 
             var interval = psc_tests[ name ].spec["test-interval"];
@@ -937,6 +1048,8 @@ exports._process_published_config = function( _config, opts, cb ) {
                 delete current_test.spec.duration;
                } else {
                    include_schedule = false;
+                   //delete psc_tasks[ name ].tools; (see below tools section)
+
 
 
                }
@@ -971,7 +1084,7 @@ exports._process_published_config = function( _config, opts, cb ) {
 
             delete psc_tests[ name ].spec["test-interval"];
 
-            if ( ( "_meta" in test ) &&  ( "_tool" in test._meta ) &&  typeof test._meta._tool != "undefined" ) {
+            if ( include_schedule && ( "_meta" in test ) &&  ( "_tool" in test._meta ) &&  typeof test._meta._tool != "undefined" ) {
                 psc_tasks[ name ].tools = [ test._meta._tool ];
                 add_bwctl_tools( psc_tasks[ name ] );
 
