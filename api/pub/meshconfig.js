@@ -45,6 +45,28 @@ function load_profile(cb) {
 
     });
 }
+
+function format_archive_obj( archObj ) {
+    let fields_to_include =  [ "archiver", "data" ];
+    for ( let arch in archObj ) {
+        let params = archObj[ arch ];
+        console.log("params", params);
+        console.log("params KEYZ", _.keys( params ));
+        Object.keys( params ).forEach( function( key ) {
+            console.log("key", key);
+            //let row = params[ key ];
+            if ( ! fields_to_include.includes(key) ) {
+                delete params[ key ];
+
+            }
+
+
+        });
+
+    }
+
+}
+
 //load profile for the first time
 load_profile();
 setInterval(load_profile, 10*60*1000); //reload every 10 minutes
@@ -510,7 +532,7 @@ exports._process_published_config = function( _config, opts, cb ) {
 
     var test_service_types = Object.keys(service_type_obj).map(e => service_type_obj[e]);
 
-    db.Archive.find().exec(function(err, archs) {
+    db.Archive.find().lean().exec(function(err, archs) {
             if(err) return cb(err);
             archs.forEach( function( arch ) {
                 //console.log("inside exec");
@@ -759,8 +781,15 @@ exports._process_published_config = function( _config, opts, cb ) {
                            logger.warn("Host ", _host.hostname, " has nonexistent archive ", _id, "; ignoring");
                            return;
                        }
-                        //psc_hosts[_host.hostname].archives.push(archives_obj[_id].name );
-                        psc_hosts[_host.hostname].archives.push(archives_obj[_id].name + "-" + _id);
+                       let name = archives_obj[_id].name.replace(" ", "_");
+                       psc_hosts[_host.hostname].archives.push(name + "-" + _id);
+                       let new_arch = {};
+                       new_arch[ name + "-" + _id] =  archives_obj[_id];
+                        console.log("psc_archives BEFORE", psc_archives);
+                        console.log("archives_obj[_id]", archives_obj[_id]);
+                        psc_archives = _.extend( psc_archives, new_arch );
+                        console.log("psc_archives AFTER", psc_archives);
+
 
 
                    }); 
@@ -976,6 +1005,7 @@ exports._process_published_config = function( _config, opts, cb ) {
         }
 */
         // Retrieve MA URLs from the _config object
+        format_archive_obj( psc_archives );
 
         psconfig.archives = psc_archives;
         psconfig.addresses = psc_addresses;
@@ -993,8 +1023,10 @@ exports._process_published_config = function( _config, opts, cb ) {
                            //delete _config.archives[_id];
                            return;
                        }
-        var name = pub_shared.archive_extract_name( archives_obj[ arch._id ] );
+                //var name = pub_shared.archive_extract_name( archives_obj[ arch._id ] );
+        let name = archives_obj[_id].name.replace(" ", "_");
         console.log("NAME", name);
+        archives_obj[_id].name = name;
         psc_archives = _.extend( psc_archives, pub_shared.format_archive( archives_obj[ arch._id ] ) );
         next_arch();
         //psarch_obj = _.extend( psarch_obj, pub_shared.format_archive( archives_obj[ arch._id ] ) );
