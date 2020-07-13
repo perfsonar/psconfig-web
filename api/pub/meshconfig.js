@@ -153,7 +153,8 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
         delete spec.interval;
     }
     rename_field( spec, "sample-count", "packet-count" );
-    rename_field( spec, "udp-bandwidth", "bandwidth" ); // TODO: remove backwards compat hack
+    rename_field( spec, "udp-bandwidth", "bandwidth" ); // TODO: remove backwards compat hack?
+    rename_field( spec, "tcp-bandwidth", "bandwidth" ); // TODO: remove backwards compat hack?
     rename_field( spec, "waittime", "sendwait" );
     rename_field( spec, "timeout", "wait" );
     rename_field( spec, "tos-bits", "ip-tos" );
