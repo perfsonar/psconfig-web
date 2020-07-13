@@ -766,6 +766,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                     if( _host.local_ma || _config.force_endpoint_mas ) {
 
                         host.measurement_archives.push(generate_mainfo(service, format));
+                       last_host_ma_number++;
                     }
                 }
 
@@ -781,7 +782,9 @@ exports._process_published_config = function( _config, opts, cb ) {
                            logger.warn("Host ", _host.hostname, " has nonexistent archive ", _id, "; ignoring");
                            return;
                        }
-                       let name = archives_obj[_id].name.replace(" ", "_");
+                       //let name = archives_obj[_id].name.replace(" ", "_");
+                       
+                       var name = "host-additional-archive" + last_host_ma_number;
                        psc_hosts[_host.hostname].archives.push(name + "-" + _id);
                        let new_arch = {};
                        new_arch[ name + "-" + _id] =  archives_obj[_id];
@@ -789,6 +792,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                         console.log("archives_obj[_id]", archives_obj[_id]);
                         psc_archives = _.extend( psc_archives, new_arch );
                         console.log("psc_archives AFTER", psc_archives);
+                       last_host_ma_number++;
 
 
 
@@ -831,8 +835,8 @@ exports._process_published_config = function( _config, opts, cb ) {
                         psc_archives[ maName ] = maInfo;
                         _host._archive.push(maName);
                         psc_hosts[ _host.hostname ].archives.push( maName );
-
                         last_ma_number++;
+
                         maHash[url] = maName;
                     } else if ( url in extra_mas ) {
 
@@ -842,6 +846,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                     if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
                     var maType = maHash[url];
                         psc_archives[ maType ] = maInfo;
+                        last_ma_number++;
                     }
 
                 }
@@ -864,6 +869,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                         maName = maType;
                         psc_archives[ maName ] = maInfo;
                         maHash[url] = maName;
+                        last_ma_number++;
 
                     }
                     if(config_service_types.indexOf(service.type) != -1 && _host._archive.indexOf( maName) == -1) {
@@ -1017,14 +1023,16 @@ exports._process_published_config = function( _config, opts, cb ) {
         console.log("ARCHIVES ...");
         console.log("arch", arch);
         var _id = arch._id;
-                if (  ! ( _id in archives_obj ) ) {
-                           logger.warn("Config ", _config.name, " has nonexistent archive ", _id, "; ignoring");
-                           console.log("_config.name", _config.name);
-                           //delete _config.archives[_id];
-                           return;
-                       }
-                //var name = pub_shared.archive_extract_name( archives_obj[ arch._id ] );
-        let name = archives_obj[_id].name.replace(" ", "_");
+        if (  ! ( _id in archives_obj ) ) {
+            logger.warn("Config ", _config.name, " has nonexistent archive ", _id, "; ignoring");
+            console.log("_config.name", _config.name);
+            //delete _config.archives[_id];
+            return;
+        }
+        //var name = pub_shared.archive_extract_name( archives_obj[ arch._id ] );
+        //let name = archives_obj[_id].name.replace(" ", "_");
+        let name = "config-archive" + last_config_ma_number;
+        last_config_ma_number++;
         console.log("NAME", name);
         archives_obj[_id].name = name;
         psc_archives = _.extend( psc_archives, pub_shared.format_archive( archives_obj[ arch._id ] ) );
