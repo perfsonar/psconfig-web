@@ -15,7 +15,7 @@
 
         <div class="subbar-list" style="top: 159px;">
             <p class="alert alert-default" ng-if="loading"><i class="fa fa-circle-o-notch fa-spin"></i> Loading..</p>
-            <p class="alert alert-info" ng-if="hosts.length == 0">Please register the first meshconfig.</p>
+            <p class="alert alert-info" ng-if="hosts.length == 0">No Configs found; please create one.</p>
             <div class="subbar-list-item"
                 id="{{host._id}}"
                 ng-repeat="host in filter_hosts(hosts)"
