@@ -784,14 +784,19 @@ exports._process_published_config = function( _config, opts, cb ) {
                        }
                        //let name = archives_obj[_id].name.replace(" ", "_");
                        
-                       var name = "host-additional-archive" + last_host_ma_number;
-                       psc_hosts[_host.hostname].archives.push(name + "-" + _id);
+                       var name = "host-additional-archive" + last_host_ma_number + "-" + _id;
+                       var archid = name;
+                       psc_hosts[_host.hostname].archives.push( archid );
                        let new_arch = {};
-                       new_arch[ name + "-" + _id] =  archives_obj[_id];
+                       new_arch[ archid ] =  archives_obj[_id];
+                       //new_arch[ name + "-" + _id] =  archives_obj[_id];
                         console.log("psc_archives BEFORE", psc_archives);
                         console.log("archives_obj[_id]", archives_obj[_id]);
+                        //new_arch = pub_shared.format_archive( new_arch[ name + "-" + _id]  );
+                        new_arch = pub_shared.format_archive( new_arch[ archid ], archid  );
                         psc_archives = _.extend( psc_archives, new_arch );
                         console.log("psc_archives AFTER", psc_archives);
+                        console.log("new_arch", new_arch);
                        last_host_ma_number++;
 
 
@@ -872,7 +877,8 @@ exports._process_published_config = function( _config, opts, cb ) {
                         last_ma_number++;
 
                     }
-                    if(config_service_types.indexOf(service.type) != -1 && _host._archive.indexOf( maName) == -1) {
+                    console.log("_host._archive", _host._archive);
+                    if( Object.keys( _host._archive ) > 0 && config_service_types.indexOf(service.type) != -1 && _host._archive.indexOf( maName) == -1) {
                         _host._archive.push(maName);
                         host.measurement_archives.push( maInfo );
                     }
@@ -954,9 +960,14 @@ exports._process_published_config = function( _config, opts, cb ) {
                     console.log("archives_obj[ _arch ]", archives_obj[ _arch ]);
                     var newArch = {};
                     var name = pub_shared.archive_extract_name( _arch );
-                    newArch[ name ] = _arch;
-                    psc_archives = _.extend( psc_archives, newArch );
-                    //test_mas.push( pub_shared.archive_extract_name( _arch ) );
+                    if ( _arch !== undefined && name !== undefined && archives_obj[ _arch ] !== undefined ) {
+                        newArch[ name ] = _arch;
+                        newArch = pub_shared.format_archive(newArch);
+                        psc_archives = _.extend( psc_archives, newArch );
+                        //test_mas.push( pub_shared.archive_extract_name( _arch ) );
+                    } else {
+                        console.log("skipping _id ", _id);
+                    }
                 }
 
             });
@@ -1035,7 +1046,9 @@ exports._process_published_config = function( _config, opts, cb ) {
         last_config_ma_number++;
         console.log("NAME", name);
         archives_obj[_id].name = name;
-        psc_archives = _.extend( psc_archives, pub_shared.format_archive( archives_obj[ arch._id ] ) );
+        if ( archives_obj[ arch ] !== undefined && archives_obj[ arch ] != {} ) {
+            psc_archives = _.extend( psc_archives, pub_shared.format_archive( archives_obj[ arch._id ] ) );
+        }
         next_arch();
         //psarch_obj = _.extend( psarch_obj, pub_shared.format_archive( archives_obj[ arch._id ] ) );
     });
