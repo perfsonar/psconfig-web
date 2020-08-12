@@ -771,8 +771,8 @@ exports._process_published_config = function( _config, opts, cb ) {
                 }
 
                 // Handle NEW host main MA (REUSABLE STYLE) 
-                console.log("_host", _host);
-                console.log("maName", maName);
+                //console.log("_host", _host);
+                //console.log("maName", maName);
                 if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
                 if ( "local_archives" in _host ) {
                    _host["local_archives"].forEach( function( _id ) {
@@ -786,18 +786,30 @@ exports._process_published_config = function( _config, opts, cb ) {
                        
                        var name = "host-additional-archive" + last_host_ma_number + "-" + _id;
                        var archid = name;
-                       psc_hosts[_host.hostname].archives.push( archid );
                        let new_arch = {};
+                       //if ( _id in psc_archives )
                        new_arch[ archid ] =  archives_obj[_id];
-                       //new_arch[ name + "-" + _id] =  archives_obj[_id];
-                        console.log("psc_archives BEFORE", psc_archives);
-                        console.log("archives_obj[_id]", archives_obj[_id]);
-                        //new_arch = pub_shared.format_archive( new_arch[ name + "-" + _id]  );
-                        new_arch = pub_shared.format_archive( new_arch[ archid ], archid  );
-                        psc_archives = _.extend( psc_archives, new_arch );
-                        console.log("psc_archives AFTER", psc_archives);
-                        console.log("new_arch", new_arch);
-                       last_host_ma_number++;
+                       //var alreadyExists = _.find(psc_archives, function (obj) { return obj._id == _id; } );
+                       var alreadyExists = ( archives_obj[_id].data._url in maHash );
+                       if ( alreadyExists ) {
+                           console.log("_id", _id, "already in psc_archives; skipping");
+
+                       } else {
+
+                           maHash[ archives_obj[_id].data._url ] = name;
+                           psc_hosts[_host.hostname].archives.push( archid );
+
+                           //new_arch[ archid ]._meta = "asdf";
+                           //new_arch[ name + "-" + _id] =  archives_obj[_id];
+                           console.log("psc_archives BEFORE", psc_archives);
+                           console.log("archives_obj[_id]", archives_obj[_id]);
+                           //new_arch = pub_shared.format_archive( new_arch[ name + "-" + _id]  );
+                           new_arch = pub_shared.format_archive( new_arch[ archid ], archid  );
+                           psc_archives = _.extend( psc_archives, new_arch );
+                           console.log("psc_archives AFTER", psc_archives);
+                           console.log("new_arch", new_arch);
+                           last_host_ma_number++;
+                       }
 
 
 
@@ -835,7 +847,8 @@ exports._process_published_config = function( _config, opts, cb ) {
                 if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
                 if ( ! ( "_archive" in _host ) ) _host._archive = [];
 
-                if ( ! ( url in maHash )  ) {
+                    console.log("adding host mas, maName, maInfo", maName, maInfo);
+                if ( ! ( url in maHash ) ) {
                     if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
                         psc_archives[ maName ] = maInfo;
                         _host._archive.push(maName);
@@ -849,7 +862,7 @@ exports._process_published_config = function( _config, opts, cb ) {
 
                 } else {
                     if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
-                    var maType = maHash[url];
+                        var maType = maHash[url];
                         psc_archives[ maType ] = maInfo;
                         last_ma_number++;
                     }
@@ -859,27 +872,30 @@ exports._process_published_config = function( _config, opts, cb ) {
                 // Handle extra host MAs
                 // TODO: remove this and have upgrade script fix
                 for(var key in extra_mas ) {
-                    var maName = key;
+                    //var maName = key;
                     var url = extra_mas[key];
                     var maInfo =  generate_mainfo_url( url, format, service.type);
 
+                    var maNameHost = maName + "-" + key;
+
                     var maType = maHash[url];
-                    if ( psc_hosts[ _host.hostname ].archives.indexOf( maName ) == -1 ) {
-                        psc_hosts[ _host.hostname ].archives.push( maName );
-                    }
-                    if ( ! ( url in maHash ) ) {
-                        psc_archives[ maName ] = maInfo;
-                        maHash[url] = maName;
-                    } else {
-                        maName = maType;
-                        psc_archives[ maName ] = maInfo;
-                        maHash[url] = maName;
-                        last_ma_number++;
+                    if ( psc_hosts[ _host.hostname ].archives.indexOf( key ) == -1 ) {
+                        psc_hosts[ _host.hostname ].archives.push( maNameHost );
 
                     }
+                    if ( ! ( url in maHash ) ) {
+                        psc_archives[ maNameHost ] = maInfo;
+                        maHash[url] = maNameHost;
+                    } else {
+                        maNameHost = maType;
+                        //psc_archives[ maNameHost ] = maInfo;
+                        //maHash[url] = maNameHost;
+                       }
+
                     console.log("_host._archive", _host._archive);
-                    if( Object.keys( _host._archive ) > 0 && config_service_types.indexOf(service.type) != -1 && _host._archive.indexOf( maName) == -1) {
-                        _host._archive.push(maName);
+                    if( Object.keys( _host._archive ) > 0 && config_service_types.indexOf(service.type) != -1 && _host._archive.indexOf( maNameHost) == -1) {
+                        _host._archive.push(maNameHost);
+                        last_ma_number++;
                         host.measurement_archives.push( maInfo );
                     }
 
@@ -897,6 +913,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                 delete psc_hosts[ _host.hostname ].archives;
 
             }
+                    console.log("maHash", maHash);
 
                 // TODO figure out how to have multiple tests of same type
                 // (need unique hostgroup names)
