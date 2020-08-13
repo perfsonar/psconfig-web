@@ -151,15 +151,15 @@
                     <div class="col-md-offset-2 col-md-10">
                         <div class="checkbox">
                             <label><input type="checkbox" name="local_ma"
-                                ng-disabled="!selected._canedit" ng-model="selected.local_ma"> Use local MA</label>
-                            <p class="help-block">If checked, test results for all tests involving this host will be written to the host's local MA. Not all hosts
+                                ng-disabled="!selected._canedit" ng-model="selected.local_ma"> Use local Esmond MA</label>
+                            <p class="help-block">If checked, test results for all tests involving this host will be written to the host's local Esmond MA. The MA URL is guessed based on the hostname; you can override it in the next field. Not all hosts
                             run their own MA, so in some cases this may not be desired (disabled by default).</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">Local MA URL</label>
+                    <label class="col-sm-2 control-label">Local esmond URL</label>
                     <div class="col-sm-10">
                         <input type="text" class="form-control" name="local_ma_url" 
                             ng-disabled="!selected._canedit" ng-model="selected.local_ma_url" placeholder="Auto generate from hostname">
@@ -192,7 +192,7 @@
 
                 <!-- other ma form group -->
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">Additional measurement archives (MAs)</label>
+                    <label class="col-sm-2 control-label">Shared Measurement Archives (MAs)</label>
                     <div class="col-sm-10">
 
                         <ui-select multiple ng-model="selected.additional_archives" ng-disabled="!selected._canedit">
@@ -211,7 +211,7 @@
 
 
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">Additional MA URLs</label>
+                    <label class="col-sm-2 control-label">Additional Esmond MA URLs</label>
                     <div class="col-sm-10">
                         <textarea class="form-control" name="ma_urls" id="ma_urls" ng-model="selected.ma_urls" ng-disabled="!selected._canedit" style="" rows="3"></textarea>
 
