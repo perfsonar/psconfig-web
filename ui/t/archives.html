@@ -4,7 +4,7 @@
     <div class="subbar">
         <div style="padding-left: 20px; margin-bottom: 10px;">
             <h2>Archives</h2>
-            <p class="help-block">List of defined test specifications</p>
+            <p class="help-block">List of reusable archiver definitions</p>
             <span class="text-muted">{{archives.length}} Archives</span>
         </div>
         <div class="filterbox" ng-class="{active: filter}">
@@ -41,7 +41,7 @@
             <div class="fixed-top">
                 <h2>
                     <i class="fa fa-trash-o clickable" aria-hidden="true" ng-if="selected._id && selected._canedit"
-                        ng-confirm-click="Are you sure you want to remove this test spec?"
+                        ng-confirm-click="Are you sure you want to remove this archive?"
                         confirmed-click="remove()"></i>
                         &nbsp;&nbsp;&nbsp;
                         Edit Archive
@@ -86,7 +86,7 @@
                               <b>{{user.fullname}}</b> <small>&lt;{{user.email}}&gt;</small>
                             </ui-select-choices>
                         </ui-select>
-                        <p class="help-block">Users who can update this test spec</p>
+                        <p class="help-block">Users who can update this archive spec</p>
                     </div>
                 </div>
 
