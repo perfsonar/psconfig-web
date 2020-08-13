@@ -574,8 +574,8 @@ exports._process_published_config = function( _config, opts, cb ) {
                 resolve_hosts(test.nahosts, function(err, hosts) {
                     if(err) return next(err);
                     test.nahosts = hosts;
-                    hosts.forEach(function(host) { 
-                        host_catalog[host._id] = host; 
+                    hosts.forEach(function(host) {
+                        host_catalog[host._id] = host;
                     });
                     next();
                 });
@@ -736,173 +736,175 @@ exports._process_published_config = function( _config, opts, cb ) {
                 }
             }
 */
+                // create one MA entry per host
 
-            //create ma entry for each service
-            test_service_types.forEach(function(service) {
-                service.ma = _host;
-                if(service.type == "mp-bwctl") return;
-                if(service.type == "ma") return;
-                if(service.type == "mp-owamp") return;
-                if(opts.ma_override) service.ma = { hostname: opts.ma_override }
-                mc_test_types[ service.type ] = 1;
-                if(!service.ma) {
-                    logger.error("NO MA service running on ..");
-                    logger.debug(service);
-                    return;
-                }
 
-                if ( !_host.local_ma && !_config.force_endpoint_mas && !_host.ma_urls ) {
-                    return;
-                }
-
-                var maInfo = generate_mainfo(service, format);
-                var maName = "host-archive" + last_ma_number;
-                var url = "";
-
-                if ( format == "psconfig" ) {
-                    url = maInfo.data.url;
-                } else {
-                    url = maInfo.write_url;
-                    if( _host.local_ma || _config.force_endpoint_mas ) {
-
-                        host.measurement_archives.push(generate_mainfo(service, format));
-                       last_host_ma_number++;
+                //create ma entry for each service
+                test_service_types.forEach(function(service) {
+                    service.ma = _host;
+                    if(service.type == "mp-bwctl") return;
+                    if(service.type == "ma") return;
+                    if(service.type == "mp-owamp") return;
+                    if(opts.ma_override) service.ma = { hostname: opts.ma_override }
+                    mc_test_types[ service.type ] = 1;
+                    if(!service.ma) {
+                        logger.error("NO MA service running on ..");
+                        logger.debug(service);
+                        return;
                     }
-                }
 
-                // Handle NEW host main MA (REUSABLE STYLE) 
-                //console.log("_host", _host);
-                //console.log("maName", maName);
-                if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
-                if ( "local_archives" in _host ) {
-                   _host["local_archives"].forEach( function( _id ) {
-                       console.log("_id", _id);
-                       console.log("archives_obj[_id]", archives_obj[_id]);
-                       if (  ! ( _id in archives_obj ) ) {
-                           logger.warn("Host ", _host.hostname, " has nonexistent archive ", _id, "; ignoring");
-                           return;
+                    if ( !_host.local_ma && !_config.force_endpoint_mas && !_host.ma_urls ) {
+                        return;
+                    }
+
+                    var maInfo = generate_mainfo(service, format);
+                    var maName = "host-archive" + last_ma_number;
+                    var url = "";
+
+                    if ( format == "psconfig" ) {
+                        url = maInfo.data.url;
+                    } else {
+                        url = maInfo.write_url;
+                        if( _host.local_ma || _config.force_endpoint_mas ) {
+
+                            host.measurement_archives.push(generate_mainfo(service, format));
+                            last_host_ma_number++;
+                        }
+                    }
+
+                    // Handle NEW host main MA (REUSABLE STYLE) 
+                    //console.log("_host", _host);
+                    //console.log("maName", maName);
+                    if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
+                    if ( "local_archives" in _host ) {
+                        _host["local_archives"].forEach( function( _id ) {
+                            console.log("_id", _id);
+                            console.log("archives_obj[_id]", archives_obj[_id]);
+                            if (  ! ( _id in archives_obj ) ) {
+                                logger.warn("Host ", _host.hostname, " has nonexistent archive ", _id, "; ignoring");
+                                return;
+                            }
+                            //let name = archives_obj[_id].name.replace(" ", "_");
+
+                            var name = "host-additional-archive" + last_host_ma_number + "-" + _id;
+                            var archid = name;
+                            let new_arch = {};
+                            //if ( _id in psc_archives )
+                            new_arch[ archid ] =  archives_obj[_id];
+                            //var alreadyExists = _.find(psc_archives, function (obj) { return obj._id == _id; } );
+                            var alreadyExists = ( archives_obj[_id].data._url in maHash );
+                            if ( alreadyExists ) {
+                                console.log("_id", _id, "already in psc_archives; skipping");
+
+                            } else {
+
+                                maHash[ archives_obj[_id].data._url ] = name;
+                                psc_hosts[_host.hostname].archives.push( archid );
+
+                                //new_arch[ archid ]._meta = "asdf";
+                                //new_arch[ name + "-" + _id] =  archives_obj[_id];
+                                console.log("psc_archives BEFORE", psc_archives);
+                                console.log("archives_obj[_id]", archives_obj[_id]);
+                                //new_arch = pub_shared.format_archive( new_arch[ name + "-" + _id]  );
+                                new_arch = pub_shared.format_archive( new_arch[ archid ], archid  );
+                                psc_archives = _.extend( psc_archives, new_arch );
+                                console.log("psc_archives AFTER", psc_archives);
+                                console.log("new_arch", new_arch);
+                                last_host_ma_number++;
+                            }
+
+
+
+                        }); 
+                        //psc_hosts[_host.hostname].archives = psc_hosts[_host.hostname].local_archives.concat( _host.local_archives );
+                        console.log("psc_hosts[_host.hostname]", psc_hosts[_host.hostname]);
+
+                    }
+                    //if ( ! ( "_archive" in _host ) ) _host._archive = [];
+
+                    /* TODO: FIX!
+                       if ( ! ( url in maHash )  ) {
+                       if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
+                       psc_archives[ maName ] = maInfo;
+                       _host._archive.push(maName);
+                       psc_hosts[ _host.hostname ].archives.push( maName );
+
+                       last_ma_number++;
+                       maHash[url] = maName;
+                       } else if ( url in extra_mas ) {
+
                        }
-                       //let name = archives_obj[_id].name.replace(" ", "_");
-                       
-                       var name = "host-additional-archive" + last_host_ma_number + "-" + _id;
-                       var archid = name;
-                       let new_arch = {};
-                       //if ( _id in psc_archives )
-                       new_arch[ archid ] =  archives_obj[_id];
-                       //var alreadyExists = _.find(psc_archives, function (obj) { return obj._id == _id; } );
-                       var alreadyExists = ( archives_obj[_id].data._url in maHash );
-                       if ( alreadyExists ) {
-                           console.log("_id", _id, "already in psc_archives; skipping");
 
                        } else {
-
-                           maHash[ archives_obj[_id].data._url ] = name;
-                           psc_hosts[_host.hostname].archives.push( archid );
-
-                           //new_arch[ archid ]._meta = "asdf";
-                           //new_arch[ name + "-" + _id] =  archives_obj[_id];
-                           console.log("psc_archives BEFORE", psc_archives);
-                           console.log("archives_obj[_id]", archives_obj[_id]);
-                           //new_arch = pub_shared.format_archive( new_arch[ name + "-" + _id]  );
-                           new_arch = pub_shared.format_archive( new_arch[ archid ], archid  );
-                           psc_archives = _.extend( psc_archives, new_arch );
-                           console.log("psc_archives AFTER", psc_archives);
-                           console.log("new_arch", new_arch);
-                           last_host_ma_number++;
+                       if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
+                       var maType = maHash[url];
+                       psc_archives[ maType ] = maInfo;
                        }
 
+                       }
+                       */
 
 
-                   }); 
-                    //psc_hosts[_host.hostname].archives = psc_hosts[_host.hostname].local_archives.concat( _host.local_archives );
-                console.log("psc_hosts[_host.hostname]", psc_hosts[_host.hostname]);
-
-                }
-                //if ( ! ( "_archive" in _host ) ) _host._archive = [];
-
-                /* TODO: FIX!
-                if ( ! ( url in maHash )  ) {
-                    if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
-                        psc_archives[ maName ] = maInfo;
-                        _host._archive.push(maName);
-                        psc_hosts[ _host.hostname ].archives.push( maName );
-
-                        last_ma_number++;
-                        maHash[url] = maName;
-                    } else if ( url in extra_mas ) {
-
-                    }
-
-                } else {
-                    if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
-                    var maType = maHash[url];
-                        psc_archives[ maType ] = maInfo;
-                    }
-
-                }
-                */
-
-
-                // Handle host main MA (OLD URL STYLE) 
-                if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
-                if ( ! ( "_archive" in _host ) ) _host._archive = [];
+                    // Handle host main MA (OLD URL STYLE) 
+                    if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
+                    if ( ! ( "_archive" in _host ) ) _host._archive = [];
 
                     console.log("adding host mas, maName, maInfo", maName, maInfo);
-                if ( ! ( url in maHash ) ) {
-                    if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
-                        psc_archives[ maName ] = maInfo;
-                        _host._archive.push(maName);
-                        psc_hosts[ _host.hostname ].archives.push( maName );
-                        last_ma_number++;
-
-                        maHash[url] = maName;
-                    } else if ( url in extra_mas ) {
-
-                    }
-
-                } else {
-                    if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
-                        var maType = maHash[url];
-                        psc_archives[ maType ] = maInfo;
-                        last_ma_number++;
-                    }
-
-                }
-
-                // Handle extra host MAs
-                // TODO: remove this and have upgrade script fix
-                for(var key in extra_mas ) {
-                    //var maName = key;
-                    var url = extra_mas[key];
-                    var maInfo =  generate_mainfo_url( url, format, service.type);
-
-                    var maNameHost = maName + "-" + key;
-
-                    var maType = maHash[url];
-                    if ( psc_hosts[ _host.hostname ].archives.indexOf( key ) == -1 ) {
-                        psc_hosts[ _host.hostname ].archives.push( maNameHost );
-
-                    }
                     if ( ! ( url in maHash ) ) {
-                        psc_archives[ maNameHost ] = maInfo;
-                        maHash[url] = maNameHost;
-                    } else {
-                        maNameHost = maType;
-                        //psc_archives[ maNameHost ] = maInfo;
-                        //maHash[url] = maNameHost;
-                       }
+                        if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
+                            psc_archives[ maName ] = maInfo;
+                            _host._archive.push(maName);
+                            psc_hosts[ _host.hostname ].archives.push( maName );
+                            last_ma_number++;
 
-                    console.log("_host._archive", _host._archive);
-                    if( Object.keys( _host._archive ) > 0 && config_service_types.indexOf(service.type) != -1 && _host._archive.indexOf( maNameHost) == -1) {
-                        _host._archive.push(maNameHost);
-                        last_ma_number++;
-                        host.measurement_archives.push( maInfo );
+                            maHash[url] = maName;
+                        } else if ( url in extra_mas ) {
+
+                        }
+
+                    } else {
+                        if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
+                            var maType = maHash[url];
+                            psc_archives[ maType ] = maInfo;
+                            last_ma_number++;
+                        }
+
                     }
 
-                }
+                    // Handle extra host MAs
+                    // TODO: remove this and have upgrade script fix
+                    for(var key in extra_mas ) {
+                        //var maName = key;
+                        var url = extra_mas[key];
+                        var maInfo =  generate_mainfo_url( url, format, service.type);
+
+                        var maNameHost = maName + "-" + key;
+
+                        var maType = maHash[url];
+                        if ( psc_hosts[ _host.hostname ].archives.indexOf( key ) == -1 ) {
+                            psc_hosts[ _host.hostname ].archives.push( maNameHost );
+
+                        }
+                        if ( ! ( url in maHash ) ) {
+                            psc_archives[ maNameHost ] = maInfo;
+                            maHash[url] = maNameHost;
+                        } else {
+                            maNameHost = maType;
+                            //psc_archives[ maNameHost ] = maInfo;
+                            //maHash[url] = maNameHost;
+                        }
+
+                        console.log("_host._archive", _host._archive);
+                        if( Object.keys( _host._archive ) > 0 && config_service_types.indexOf(service.type) != -1 && _host._archive.indexOf( maNameHost) == -1) {
+                            _host._archive.push(maNameHost);
+                            last_ma_number++;
+                            host.measurement_archives.push( maInfo );
+                        }
+
+                    }
 
 
-            });
+                });
             if (  host.measurement_archives.length == 0 ) {
                 delete host.measurement_archives;
             }
