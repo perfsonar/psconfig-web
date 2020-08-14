@@ -1081,7 +1081,6 @@ exports._process_published_config = function( _config, opts, cb ) {
         }
 
 
-        /*
         var ma_prefix = "config-archive";
         if ( "ma_urls" in _config ) {
             for(var i in _config.ma_urls ) {
@@ -1125,7 +1124,6 @@ exports._process_published_config = function( _config, opts, cb ) {
                 last_config_ma_number++;
             }
         }
-*/
         // Retrieve MA URLs from the _config object
         format_archive_obj( psc_archives );
 
