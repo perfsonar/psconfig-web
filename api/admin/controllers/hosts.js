@@ -41,6 +41,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
 
     //we need to select admins , or can't get _canedit set
     var select = req.query.select;
+    //console.log("select", select);
     if(select && !~select.indexOf("admins")) select += " admins";
 
     db.Host.find(find)
@@ -138,6 +139,10 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
         req.body.services.forEach(function(service) {
             if(!service.ma) service.ma = undefined;
         });
+
+        // reusable archivers
+        host.local_archives = req.body.local_archives;
+        host.additional_archives = req.body.additional_archives;
 
         //things always allowed to edit (TODO - shouldn't I have to mask fields not set?)
         host.no_agent = req.body.no_agent;

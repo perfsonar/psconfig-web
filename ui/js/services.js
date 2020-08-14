@@ -16,7 +16,7 @@ app.factory('hosts', function(appconf, $http, jwtHelper) {
         //return basic (uuid, sitename, hostname, lsid) host info for all hosts
         getAll: function(opts) { 
             //if(all_promise) return all_promise;
-            var select = "sitename hostname lsid url update_date";
+            var select = "sitename hostname lsid url update_date local_archives additional_archives";
             if(opts && opts.select) select = opts.select;
             return $http.get(appconf.api+'/hosts?select='+select+'&sort=sitename hostname&limit=3000')
             .then(function(res) {
@@ -70,6 +70,8 @@ app.factory('hosts', function(appconf, $http, jwtHelper) {
                 info: {},
                 location: {},
                 communities: [],
+                local_archives: [],
+                additional_archives: []
             };
             
             //add user to admin
@@ -249,7 +251,7 @@ app.factory('configs', function(appconf, $http, jwtHelper) {
         //return basic (uuid, sitename, hostname, lsid) config info for all configs
         getAll: function(opts) { 
             //if(all_promise) return all_promise;
-            var select = "url name desc ma_urls ma_custom_json force_endpoint_mas admins tests create_date";
+            var select = "url name desc ma_urls archives ma_custom_json force_endpoint_mas admins tests create_date";
             if(opts && opts.select) select = opts.select;
             return $http.get(appconf.api+'/configs?select='+select+'&sort=desc&limit=100000')
             .then(function(res) {
@@ -262,6 +264,7 @@ app.factory('configs', function(appconf, $http, jwtHelper) {
                 desc: "New Config",
                 admins: [],
                 tests: [],
+                archives: []
             };
             var jwt = localStorage.getItem(appconf.jwt_id);
             if(jwt) {

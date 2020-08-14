@@ -13,6 +13,7 @@ var config = require('../config');
 const logger = new winston.Logger(config.logger.winston);
 const db = require('../models');
 const common = require('../common');
+const pub_shared = require('./pub_shared');
 const shared = require('../sharedFunctions');
 
 // TODO: Remove bwctl hack
@@ -36,6 +37,8 @@ var host_groups_details = {};
 //var defaultSchema = 1;
 //var currentSchema = defaultSchema;
 
+var archives_obj = {};
+
 function load_profile(cb) {
     logger.info("reloading profiles");
     common.profile.getall(function(err, profiles) {
@@ -45,6 +48,28 @@ function load_profile(cb) {
 
     });
 }
+
+function format_archive_obj( archObj ) {
+    let fields_to_include =  [ "archiver", "data" ];
+    for ( let arch in archObj ) {
+        let params = archObj[ arch ];
+        console.log("params", params);
+        console.log("params KEYZ", _.keys( params ));
+        Object.keys( params ).forEach( function( key ) {
+            console.log("key", key);
+            //let row = params[ key ];
+            if ( ! fields_to_include.includes(key) ) {
+                delete params[ key ];
+
+            }
+
+
+        });
+
+    }
+
+}
+
 //load profile for the first time
 //load_profile();
 //setInterval(load_profile, 10*60*1000); //reload every 10 minutes
@@ -580,6 +605,7 @@ exports._process_published_config = function( _config, opts, cb ) {
     var format = opts.format;
 
 
+
     //resolve all db entries first
     if(_config.admins) _config.admins = resolve_users(_config.admins);
 
@@ -590,6 +616,25 @@ exports._process_published_config = function( _config, opts, cb ) {
     });
 
     var test_service_types = Object.keys(service_type_obj).map(e => service_type_obj[e]);
+
+    db.Archive.find().lean().exec(function(err, archs) {
+            if(err) return cb(err);
+            archs.forEach( function( arch ) {
+                //console.log("inside exec");
+                //console.log("arch", arch);
+                //archives_obj[ arch._id ] = pub_shared.format_archive( arch ); 
+                archives_obj[ arch._id ] = arch;
+                //_config.archives_obj = pub_shared.format_archive( arch ); 
+                //console.log("arch_obj", arch_obj);
+            });
+            console.log("archives_obj", archives_obj);
+            //next_arch();
+        }, function(err) {
+            if(err) return (err);
+
+
+
+    });
 
 
     async.eachSeries(_config.tests, function(test, next_test) {
@@ -614,8 +659,8 @@ exports._process_published_config = function( _config, opts, cb ) {
                 resolve_hosts(test.nahosts, function(err, hosts) {
                     if(err) return next(err);
                     test.nahosts = hosts;
-                    hosts.forEach(function(host) { 
-                        host_catalog[host._id] = host; 
+                    hosts.forEach(function(host) {
+                        host_catalog[host._id] = host;
                     });
                     next();
                 });
@@ -623,6 +668,7 @@ exports._process_published_config = function( _config, opts, cb ) {
             function(next) {
                 //testspec
                 if(!test.testspec) return next();
+
                 resolve_testspec(test.testspec, function(err, row) {
                     if(err) return next(err);
                     test.testspec = row;
@@ -751,6 +797,7 @@ exports._process_published_config = function( _config, opts, cb ) {
             };
             if ( ! ( _host.hostname in psc_hosts) ) psc_hosts[ _host.hostname ]  = {};
 
+            /*
             if ( "ma_urls" in _host && _host.ma_urls.length > 0  ) {
                 for(var i in _host.ma_urls ) {
                     var extra_url = _host.ma_urls[i];
@@ -773,92 +820,176 @@ exports._process_published_config = function( _config, opts, cb ) {
 
                 }
             }
+*/
+                // create one MA entry per host
 
-            //create ma entry for each service
-            test_service_types.forEach(function(service) {
-                service.ma = _host;
-                if(service.type == "mp-bwctl") return;
-                if(service.type == "ma") return;
-                if(service.type == "mp-owamp") return;
-                if(opts.ma_override) service.ma = { hostname: opts.ma_override }
-                mc_test_types[ service.type ] = 1;
-                if(!service.ma) {
-                    logger.error("NO MA service running on ..");
-                    logger.debug(service);
-                    return;
-                }
 
-                if ( !_host.local_ma && !_config.force_endpoint_mas && !_host.ma_urls ) {
-                    return;
-                }
-
-                var maInfo = generate_mainfo(service, format);
-                var maName = "host-archive" + last_ma_number;
-                var url = "";
-
-                if ( format == "psconfig" ) {
-                    url = maInfo.data.url;
-                } else {
-                    url = maInfo.write_url;
-                    if( _host.local_ma || _config.force_endpoint_mas ) {
-
-                        host.measurement_archives.push(generate_mainfo(service, format));
-                    }
-                }
-
-                // Handle host main MA 
-                if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
-                if ( ! ( "_archive" in _host ) ) _host._archive = [];
-
-                if ( ! ( url in maHash )  ) {
-                    if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
-                        psc_archives[ maName ] = maInfo;
-                        _host._archive.push(maName);
-                        psc_hosts[ _host.hostname ].archives.push( maName );
-
-                        last_ma_number++;
-                        maHash[url] = maName;
-                    } else if ( url in extra_mas ) {
-
+                //create ma entry for each service
+                test_service_types.forEach(function(service) {
+                    service.ma = _host;
+                    if(service.type == "mp-bwctl") return;
+                    if(service.type == "ma") return;
+                    if(service.type == "mp-owamp") return;
+                    if(opts.ma_override) service.ma = { hostname: opts.ma_override }
+                    mc_test_types[ service.type ] = 1;
+                    if(!service.ma) {
+                        logger.error("NO MA service running on ..");
+                        logger.debug(service);
+                        return;
                     }
 
-                } else {
-                    if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
-                    var maType = maHash[url];
-                        psc_archives[ maType ] = maInfo;
+                    if ( !_host.local_ma && !_config.force_endpoint_mas && !_host.ma_urls ) {
+                        return;
                     }
 
-                }
+                    var maInfo = generate_mainfo(service, format);
+                    var maName = "host-archive" + last_ma_number;
+                    var url = "";
 
-                // Handle extra host MAs
-
-                for(var key in extra_mas ) {
-                    var maName = key;
-                    var url = extra_mas[key];
-                    var maInfo =  generate_mainfo_url( url, format, service.type);
-
-                    var maType = maHash[url];
-                    if ( psc_hosts[ _host.hostname ].archives.indexOf( maName ) == -1 ) {
-                        psc_hosts[ _host.hostname ].archives.push( maName );
-                    }
-                    if ( ! ( url in maHash ) ) {
-                        psc_archives[ maName ] = maInfo;
-                        maHash[url] = maName;
+                    if ( format == "psconfig" ) {
+                        url = maInfo.data.url;
                     } else {
-                        maName = maType;
-                        psc_archives[ maName ] = maInfo;
-                        maHash[url] = maName;
+                        url = maInfo.write_url;
+                        if( _host.local_ma || _config.force_endpoint_mas ) {
 
-                    }
-                    if(config_service_types.indexOf(service.type) != -1 && _host._archive.indexOf( maName) == -1) {
-                        _host._archive.push(maName);
-                        host.measurement_archives.push( maInfo );
+                            host.measurement_archives.push(generate_mainfo(service, format));
+                            last_host_ma_number++;
+                        }
                     }
 
-                }
+                    // Handle NEW host main MA (REUSABLE STYLE) 
+                    //console.log("_host", _host);
+                    //console.log("maName", maName);
+                    if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
+                    if ( "local_archives" in _host ) {
+                        _host["local_archives"].forEach( function( _id ) {
+                            console.log("_id", _id);
+                            console.log("archives_obj[_id]", archives_obj[_id]);
+                            if (  ! ( _id in archives_obj ) ) {
+                                logger.warn("Host ", _host.hostname, " has nonexistent archive ", _id, "; ignoring");
+                                return;
+                            }
+                            //let name = archives_obj[_id].name.replace(" ", "_");
+
+                            var name = "host-additional-archive" + last_host_ma_number + "-" + _id;
+                            var archid = name;
+                            let new_arch = {};
+                            //if ( _id in psc_archives )
+                            new_arch[ archid ] =  archives_obj[_id];
+                            //var alreadyExists = _.find(psc_archives, function (obj) { return obj._id == _id; } );
+                            var alreadyExists = ( archives_obj[_id].data._url in maHash );
+                            if ( alreadyExists ) {
+                                console.log("_id", _id, "already in psc_archives; skipping");
+
+                            } else {
+
+                                maHash[ archives_obj[_id].data._url ] = name;
+                                psc_hosts[_host.hostname].archives.push( archid );
+
+                                //new_arch[ archid ]._meta = "asdf";
+                                //new_arch[ name + "-" + _id] =  archives_obj[_id];
+                                console.log("psc_archives BEFORE", psc_archives);
+                                console.log("archives_obj[_id]", archives_obj[_id]);
+                                //new_arch = pub_shared.format_archive( new_arch[ name + "-" + _id]  );
+                                new_arch = pub_shared.format_archive( new_arch[ archid ], archid  );
+                                psc_archives = _.extend( psc_archives, new_arch );
+                                console.log("psc_archives AFTER", psc_archives);
+                                console.log("new_arch", new_arch);
+                                last_host_ma_number++;
+                            }
 
 
-            });
+
+                        }); 
+                        //psc_hosts[_host.hostname].archives = psc_hosts[_host.hostname].local_archives.concat( _host.local_archives );
+                        console.log("psc_hosts[_host.hostname]", psc_hosts[_host.hostname]);
+
+                    }
+                    //if ( ! ( "_archive" in _host ) ) _host._archive = [];
+
+                    /* TODO: FIX!
+                       if ( ! ( url in maHash )  ) {
+                       if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
+                       psc_archives[ maName ] = maInfo;
+                       _host._archive.push(maName);
+                       psc_hosts[ _host.hostname ].archives.push( maName );
+
+                       last_ma_number++;
+                       maHash[url] = maName;
+                       } else if ( url in extra_mas ) {
+
+                       }
+
+                       } else {
+                       if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
+                       var maType = maHash[url];
+                       psc_archives[ maType ] = maInfo;
+                       }
+
+                       }
+                       */
+
+
+                    // Handle host main MA (OLD URL STYLE) 
+                    if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
+                    if ( ! ( "_archive" in _host ) ) _host._archive = [];
+
+                    console.log("adding host mas, maName, maInfo", maName, maInfo);
+                    if ( ! ( url in maHash ) ) {
+                        if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
+                            psc_archives[ maName ] = maInfo;
+                            _host._archive.push(maName);
+                            psc_hosts[ _host.hostname ].archives.push( maName );
+                            last_ma_number++;
+
+                            maHash[url] = maName;
+                        } else if ( url in extra_mas ) {
+
+                        }
+
+                    } else {
+                        if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
+                            var maType = maHash[url];
+                            psc_archives[ maType ] = maInfo;
+                            last_ma_number++;
+                        }
+
+                    }
+
+                    // Handle extra host MAs
+                    // TODO: remove this and have upgrade script fix
+                    for(var key in extra_mas ) {
+                        //var maName = key;
+                        var url = extra_mas[key];
+                        var maInfo =  generate_mainfo_url( url, format, service.type);
+
+                        var maNameHost = maName + "-" + key;
+
+                        var maType = maHash[url];
+                        if ( psc_hosts[ _host.hostname ].archives.indexOf( key ) == -1 ) {
+                            psc_hosts[ _host.hostname ].archives.push( maNameHost );
+
+                        }
+                        if ( ! ( url in maHash ) ) {
+                            psc_archives[ maNameHost ] = maInfo;
+                            maHash[url] = maNameHost;
+                        } else {
+                            maNameHost = maType;
+                            //psc_archives[ maNameHost ] = maInfo;
+                            //maHash[url] = maNameHost;
+                        }
+
+                        console.log("_host._archive", _host._archive);
+                        if( Object.keys( _host._archive ) > 0 && config_service_types.indexOf(service.type) != -1 && _host._archive.indexOf( maNameHost) == -1) {
+                            _host._archive.push(maNameHost);
+                            last_ma_number++;
+                            host.measurement_archives.push( maInfo );
+                        }
+
+                    }
+
+
+                });
             if (  host.measurement_archives.length == 0 ) {
                 delete host.measurement_archives;
             }
@@ -869,6 +1000,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                 delete psc_hosts[ _host.hostname ].archives;
 
             }
+                    console.log("maHash", maHash);
 
                 // TODO figure out how to have multiple tests of same type
                 // (need unique hostgroup names)
@@ -916,8 +1048,38 @@ exports._process_published_config = function( _config, opts, cb ) {
             }
         }
 
-    
 
+        if ( "archives" in _config ) {
+            _config.archives.forEach( function( _id ) {
+                if (  ! ( _id in archives_obj ) ) {
+                           logger.warn("Config ", _config.name, " has nonexistent archive ", _id, "; ignoring");
+                           console.log("_config.name", _config.name);
+                           //delete _config.archives[_id];
+                           //return;
+                } else {
+                    var _arch = archives_obj[ _id ];
+                    console.log("_id", _id);
+                    console.log("_config _arch", _arch);
+                    console.log("archives_obj[ _arch ]", archives_obj[ _arch ]);
+                    var newArch = {};
+                    var name = pub_shared.archive_extract_name( _arch );
+                    if ( _arch !== undefined && name !== undefined && archives_obj[ _arch ] !== undefined ) {
+                        newArch[ name ] = _arch;
+                        newArch = pub_shared.format_archive(newArch);
+                        psc_archives = _.extend( psc_archives, newArch );
+                        //test_mas.push( pub_shared.archive_extract_name( _arch ) );
+                    } else {
+                        console.log("skipping _id ", _id);
+                    }
+                }
+
+            });
+
+
+        }
+
+
+        /*
         var ma_prefix = "config-archive";
         if ( "ma_urls" in _config ) {
             for(var i in _config.ma_urls ) {
@@ -926,7 +1088,7 @@ exports._process_published_config = function( _config, opts, cb ) {
 
                 var maName = "config-archive" + last_config_ma_number;
                 var maName = "config-archive" + last_test_ma_number;
-                test_mas.push( maName );
+                test_mas.push( maName ); // TODO: ADAPT FOR NEW MA STYLE
                 var maInfo;
                 var maType = maHash[url];
 
@@ -961,12 +1123,41 @@ exports._process_published_config = function( _config, opts, cb ) {
                 last_config_ma_number++;
             }
         }
-
+*/
         // Retrieve MA URLs from the _config object
+        format_archive_obj( psc_archives );
 
         psconfig.archives = psc_archives;
         psconfig.addresses = psc_addresses;
         psconfig.groups = host_groups_details;
+
+    console.log("_config", _config);
+    var psarch_obj = {};
+    async.eachSeries( _config.archives, function(arch, next_arch) {
+        console.log("ARCHIVES ...");
+        console.log("arch", arch);
+        var _id = arch._id;
+        if (  ! ( _id in archives_obj ) ) {
+            logger.warn("Config ", _config.name, " has nonexistent archive ", _id, "; ignoring");
+            console.log("_config.name", _config.name);
+            //delete _config.archives[_id];
+            return;
+        }
+        //var name = pub_shared.archive_extract_name( archives_obj[ arch._id ] );
+        //let name = archives_obj[_id].name.replace(" ", "_");
+        let name = "config-archive" + last_config_ma_number;
+        last_config_ma_number++;
+        console.log("NAME", name);
+        archives_obj[_id].name = name;
+        if ( archives_obj[ arch ] !== undefined && archives_obj[ arch ] != {} ) {
+            psc_archives = _.extend( psc_archives, pub_shared.format_archive( archives_obj[ arch._id ] ) );
+        }
+        next_arch();
+        //psarch_obj = _.extend( psarch_obj, pub_shared.format_archive( archives_obj[ arch._id ] ) );
+    });
+
+    //psconfig.psarch_obj = psarch_obj;
+
         //psconfig.groups = psc_groups;
         mc.organizations.push(org);
         if ( config_mas.length > 0 ) {
@@ -1022,6 +1213,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                 psc_tests[ name ].spec.source = "{% address[0] %}";
                 psc_tests[ name ].spec.dest = "{% address[1] %}";
                 meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules );
+                logger.debug( "testspec", JSON.stringify( testspec, null, "  " ));
             }
 
             var interval = psc_tests[ name ].spec["test-interval"];

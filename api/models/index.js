@@ -80,6 +80,10 @@ var hostSchema = mongoose.Schema({
 
     ma_urls: [ String ],
 
+    local_archives: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Archive'} ],
+
+    additional_archives: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Archive'} ],
+
     //host info (pshost-toolkitversion, host-hardware-memory, host-os-version, host-hadeware-processorspeed, host-hadware-processorcount)
     //and location info (location-state, location-city, location-country, etc..)
     info: mongoose.Schema.Types.Mixed,
@@ -183,6 +187,8 @@ var configSchema = mongoose.Schema({
     desc: String,
 
     tests: [ testSchema ],
+    
+    archives: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Archive'} ],
 
     admins: [ String ], //array of user ids (sub string in auth service)
     create_date: {type: Date, default: Date.now},

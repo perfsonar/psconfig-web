@@ -14,10 +14,11 @@ exports.archive_extract_name = function( archive_obj ) {
 
 };
 
-exports.format_archive = function( archive_obj ) {
+exports.format_archive = function( archive_obj, id_override ) {
     log_json("formatting archive obj ...", archive_obj);
     var out = {};
-    var name = archive_obj.name + "-" + archive_obj._id;
+    var name = id_override || archive_obj.name + "-" + archive_obj._id;
+
     //var name = archive_obj.name;
     out[ name ] = {};
     var row = out[name];
@@ -29,8 +30,8 @@ exports.format_archive = function( archive_obj ) {
                 "url": archive_obj.data._url,
                 "measurement-agent": "{% scheduled_by_address %}"
             };
-
-
+            delete out._url;
+        
             break;
         case "rabbitmq":
             row.archiver = "rabbitmq";
@@ -50,6 +51,9 @@ exports.format_archive = function( archive_obj ) {
             break;
 
     }
+    delete out.name;
+    delete out.desc;
+
     console.log("formatted output: ", out);
     return out;
 

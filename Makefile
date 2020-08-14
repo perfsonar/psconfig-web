@@ -46,7 +46,7 @@ npm:
 	npm install --only=prod
 	pushd ui; npm install --only=prod; popd
 
-npmdev:
+npm_dev:
 	npm install
 	pushd ui; npm install; popd
 
