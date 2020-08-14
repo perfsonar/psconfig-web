@@ -17,7 +17,7 @@ if [ ! $? -eq 0 ]; then
 fi
 
 #docker tag perfsonar/pwa-pub perfsonar/pwa-pub:$VERSION
-#docker push perfsonar/pwa-pub:$VERSION
+docker push perfsonar/pwa-pub:$VERSION
 
 #docker tag perfsonar/pwa-pub perfsonar/pwa-pub:latest
 #docker push perfsonar/pwa-pub:latest

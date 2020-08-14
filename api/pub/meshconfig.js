@@ -797,12 +797,13 @@ exports._process_published_config = function( _config, opts, cb ) {
             };
             if ( ! ( _host.hostname in psc_hosts) ) psc_hosts[ _host.hostname ]  = {};
 
-            /*
+            console.log("_host", _host);
+
             if ( "ma_urls" in _host && _host.ma_urls.length > 0  ) {
                 for(var i in _host.ma_urls ) {
                     var extra_url = _host.ma_urls[i];
                     //if ( typeof extra_url == "undefined" ) continue;
-                    var maInfo = generate_mainfo_url(extra_url, format, service);
+                    var maInfo = generate_mainfo_url(extra_url, format);
                     var maName = "host-additional-archive" + last_host_ma_number;
                     if ( ! ( extra_url in maHash ) ) {
                         //maHash[extra_url] = maName;
@@ -820,7 +821,6 @@ exports._process_published_config = function( _config, opts, cb ) {
 
                 }
             }
-*/
                 // create one MA entry per host
 
 
@@ -943,9 +943,9 @@ exports._process_published_config = function( _config, opts, cb ) {
                             last_ma_number++;
 
                             maHash[url] = maName;
-                        } else if ( url in extra_mas ) {
-
-                        }
+                        } 
+                        //if ( url in extra_mas ) {
+                        //}
 
                     } else {
                         if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
@@ -958,18 +958,20 @@ exports._process_published_config = function( _config, opts, cb ) {
 
                     // Handle extra host MAs
                     // TODO: remove this and have upgrade script fix
+                    console.log("extra_mas", extra_mas);
                     for(var key in extra_mas ) {
                         //var maName = key;
                         var url = extra_mas[key];
                         var maInfo =  generate_mainfo_url( url, format, service.type);
 
-                        var maNameHost = maName + "-" + key;
+                        var maNameHost = key;
 
                         var maType = maHash[url];
                         if ( psc_hosts[ _host.hostname ].archives.indexOf( key ) == -1 ) {
                             psc_hosts[ _host.hostname ].archives.push( maNameHost );
 
                         }
+                        console.log("host-extra-ma maName, maNameHost, maType, maInfo", maName, maNameHost, maType, maInfo);
                         if ( ! ( url in maHash ) ) {
                             psc_archives[ maNameHost ] = maInfo;
                             maHash[url] = maNameHost;
