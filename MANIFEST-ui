@@ -176,3 +176,4 @@ api/sharedFunctions.js
 api/pub/controllers.js
 api/pub/meshconfig.js
 api/pub/server.js
+api/sharedFunctions.js

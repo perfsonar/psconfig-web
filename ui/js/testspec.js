@@ -26,14 +26,21 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
 
     $scope.select = function(testspec) {
         //TODO - maybe I should catch $dirty flag here.. but what about page nagivation?
-        testspec.schedule_type = testspec.schedule_type || 'continuous';
+        testspec.schedule_type = testspec.schedule_type || 'interval';
+        console.log("testspec", testspec);
         // if probe_type is not set, but protocol is, fall back on protocol
-        if ( (! testspec.specs.probe_type ) && testspec.specs.protocol ) {
-            testspec.specs.probe_type = testspec.specs.protocol;
-            delete testspec.specs.protocol;
-            //console.log("probe_type not set; using protocol instead", testspec);
-        } else {
-            //console.log("probe_type IS SET!!");
+        if (  testspec.service_type == "trace" ) {
+            if ( (! testspec.specs.probe_type ) && testspec.specs.protocol ) {
+                testspec.specs.probe_type = testspec.specs.protocol;
+                delete testspec.specs.protocol;
+            }
+                //console.log("probe_type not set; using protocol instead", testspec);
+        } else if ( testspec.service_type == "bwctl" && testspec.specs.probe_type )  {
+            console.log("Throughput test, but; testspec.specs.probe_type:", testspec.specs.probe_type);
+            testspec.specs.protocol = testspec.specs.probe_type;
+            delete testspec.specs.probe_type;
+
+            //delete testspec.specs.probe_type;
 
         }
         $scope.selected = testspec;

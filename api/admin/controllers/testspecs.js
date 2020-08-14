@@ -51,7 +51,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     .lean() //so that I can add _canedit later
     .exec(function(err, testspecs) {
         if(err) return next(err);
-        db.Testspec.count(find).exec(function(err, count) { 
+        db.Testspec.countDocuments(find).exec(function(err, count) { 
             if(err) return next(err);
             //set _canedit flag for each specs
             testspecs.forEach(function(testspec) {
@@ -123,6 +123,7 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
         } 
 
         function update() {
+            //console.log("req.body.service_type", req.body.service_type);
             //not used by anyone .. update (field no set won't be updated - unless it's set to undefined explicitly)
             testspec.service_type = req.body.service_type;
             testspec.name = req.body.name;
@@ -132,17 +133,24 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             testspec.admins = req.body.admins;
             testspec.update_date = new Date();
 
-            // Rename protocol to probe_type
-            if ( (! req.body.specs.probe_type ) && req.body.specs.protocol ) {
-                testspec.specs.probe_type = req.body.specs.protocol;
-                delete testspec.specs.protocol;
+            if ( testspec.service_type != "owamp" ) {
+                testspec.schedule_type = "interval";
 
-            } else {
-                if ( req.body.specs.probe_type ) {
-                    testspec.specs.probe_type = req.body.specs.probe_type;
+            }
+
+            // Rename protocol to probe_type for trace tests
+            if ( testspec.service_type == "traceroute" ) {
+                if ( (! req.body.specs.probe_type ) && req.body.specs.protocol ) {
+                    testspec.specs.probe_type = req.body.specs.protocol;
                     delete testspec.specs.protocol;
-                }
 
+                } else {
+                    if ( req.body.specs.probe_type ) {
+                        testspec.specs.probe_type = req.body.specs.probe_type;
+                        delete testspec.specs.protocol;
+                    }
+
+                }
             }
             testspec.save(function(err) {
                 if(err) return next(err);

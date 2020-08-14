@@ -10,7 +10,6 @@ const logger = new winston.Logger(config.logger.winston);
 exports.archive_extract_name = function( archive_obj ) {
     var name;
     name = archive_obj.name + "-" + archive_obj._id;
-    console.log("NAME", name);
     return name;
 
 };
@@ -19,6 +18,7 @@ exports.format_archive = function( archive_obj, id_override ) {
     log_json("formatting archive obj ...", archive_obj);
     var out = {};
     var name = id_override || archive_obj.name + "-" + archive_obj._id;
+
     //var name = archive_obj.name;
     out[ name ] = {};
     var row = out[name];
@@ -32,8 +32,6 @@ exports.format_archive = function( archive_obj, id_override ) {
             };
             delete out._url;
         
-
-
             break;
         case "rabbitmq":
             row.archiver = "rabbitmq";
@@ -55,6 +53,7 @@ exports.format_archive = function( archive_obj, id_override ) {
     }
     delete out.name;
     delete out.desc;
+
     console.log("formatted output: ", out);
     return out;
 

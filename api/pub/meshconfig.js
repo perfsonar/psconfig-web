@@ -9,11 +9,12 @@ const moment = require('moment');
 const _ = require('underscore');
 
 //mine
-const config = require('../config');
+var config = require('../config');
 const logger = new winston.Logger(config.logger.winston);
 const db = require('../models');
 const common = require('../common');
 const pub_shared = require('./pub_shared');
+const shared = require('../sharedFunctions');
 
 // TODO: Remove bwctl hack
 // This is a ps 3.5/bwctl backwards-compatibility hack
@@ -33,6 +34,8 @@ var profile_cache_date = null;
 var host_catalog = {};
 var host_groups = {};
 var host_groups_details = {};
+//var defaultSchema = 1;
+//var currentSchema = defaultSchema;
 
 var archives_obj = {};
 
@@ -68,8 +71,8 @@ function format_archive_obj( archObj ) {
 }
 
 //load profile for the first time
-load_profile();
-setInterval(load_profile, 10*60*1000); //reload every 10 minutes
+//load_profile();
+//setInterval(load_profile, 10*60*1000); //reload every 10 minutes
 
 exports.health = function() {
     var status = "ok";
@@ -132,6 +135,11 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
     }
 
     var schedule_type = test['schedule_type'];
+    if ( test.type != "owamp" ) {
+  //      schedule_type = "interval";
+    }
+
+    
     var include_schedule = true;
     if ( schedule_type == 'continuous' ) {
         include_schedule = false;
@@ -190,6 +198,20 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
         rename_field( spec, "packet-size", "length" );
         if ( ! spec["probe-type"] ) delete spec["probe-type"];
         delete spec.protocol;
+    } else if (  test.type == "throughput" ) {
+        console.log("throughput test");
+        console.log("spec", spec);
+        console.log("probe-type", spec["probe-type"]);
+        if ( ( "probe-type" in spec ) && ! ( "protocol" in spec ) ) {
+             if ( spec["probe-type"] == "udp" ) {
+                 spec.udp = true;
+
+             }
+
+
+        }
+        delete spec["probe-type"];
+
     }
 
     delete spec.tool;
@@ -226,6 +248,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
             "repeat": interval,
             "sliprand": true
         };
+        
     }
 
     if ( include_schedule ) {
@@ -233,10 +256,18 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
 
         test._schedule = sched_key;
 
-
         // "slip"
-        if(("slip" in spec) && (spec.slip != 0) && (schedule_type != 'continuous')) {
-            schedules[ sched_key ].slip = spec.slip;
+        console.log("TEST", test);
+        if ( (  sched_key in schedules ) && schedule_type != 'continuous' ) {
+            if(("slip" in spec) && (spec.slip != 0)) {
+                schedules[ sched_key ].slip = spec.slip;
+            } else {
+                // TODO: calculate slip based on test interval
+                var testInt = shared.iso8601_to_seconds(interval) / 2;
+                schedules[ sched_key ].slip = seconds_to_iso8601( testInt );
+
+
+            }
         }
     }
     delete spec[ "slip" ];
@@ -413,6 +444,7 @@ function generate_mainfo(service, format) {
 }
 
 function generate_mainfo_url(locator, format, type) {
+    var archiveSchema = 1;
 
     if ( format != "psconfig" ) {
         return {
@@ -424,8 +456,9 @@ function generate_mainfo_url(locator, format, type) {
         return {
             archiver: "esmond",
             data: {
-                url: locator,
+                "url": locator,
                 "measurement-agent": "{% scheduled_by_address %}",
+                "schema": archiveSchema,
             }
         };
 
@@ -450,6 +483,58 @@ function get_test_service_type( test ) {
     return service;
 
 }
+
+    const dbTest = require('../models');
+    exports.dbTest = dbTest;
+//router.get('/config/:url', function(req, res, next) {
+exports.get_config = function( configName, options, next, configObj ) {
+    var format = options.format || "psconfig";
+    config.format = format;
+    console.log("format", format);
+    console.log("configName", configName);
+    var opts = {};
+    opts.format = format;
+    /*
+    db.Config.findOne({"url": configName}, function(err, config) {
+        console.log("err", err);
+        console.log("config", config);
+
+    }, function(err ) {
+        console.log("QUERY FAILED", err);
+        
+    });
+*/
+    //db.init(null, configObj);
+    //console.log('db', db);
+    dbTest.init(function(err) {
+            if(err) throw err;
+                logger.info("connected to dbTest");
+                  //  startProcessing(); //this starts the loop
+                  //config = configObj;
+    dbTest.Config.findOne({url: configName}).lean().exec(function(err, config) {
+        //console.log("err", err);
+        //console.log("config", config);
+        //if(err) return next(err);
+
+        if(!config) {
+            console.log("404 error: Couldn't find config with name:"+configName);
+            dbTest.disconnect();
+            return next(err);
+        } else {
+            console.log("Found config with name:"+configName);
+
+        }
+        //config._host_version = req.query.host_version; // TODO: what to do with this?
+        var res =  exports.generate(config, opts, function(err, m) {
+            //if(err) return next(err);
+            //console.log("CONFIG GENERATED: ", m);
+            dbTest.disconnect();
+            return next(null,m);
+        });
+    });
+    }, configObj);
+};  
+//});
 
 function generate_group_members( test, group, test_service_types, type, next, addr_prefix ) {
 
@@ -947,7 +1032,6 @@ exports._process_published_config = function( _config, opts, cb ) {
             if ( customString ) {
                 try { 
                     customArchiveConfig = JSON.parse( customString );
-                    console.log("customArchiveConfig", customArchiveConfig);
                     // add custom archiver to testspec.
                     var maNames = Object.keys( customArchiveConfig );
                     maNames.forEach( function( maName ) {
@@ -1111,7 +1195,6 @@ exports._process_published_config = function( _config, opts, cb ) {
             var testspec = test.testspec;
 
 
-
             var config_archives = _config.ma_urls;
 
 
@@ -1122,6 +1205,8 @@ exports._process_published_config = function( _config, opts, cb ) {
 
             psc_tests[ name ].spec = testspec.specs || {};
             psc_tests[ name ].schedule_type = testspec.schedule_type || test.service_type;
+            var current_test = psc_tests[name];
+            var testSchema = 1;
 
 
             if ( format == "psconfig" ) {
@@ -1133,11 +1218,13 @@ exports._process_published_config = function( _config, opts, cb ) {
 
             var interval = psc_tests[ name ].spec["test-interval"];
 
-            var current_test = psc_tests[name];
             
             var include_schedule = true;
 
             if ( current_test.type == "latencybg" ) {
+                if ( ("reverse" in current_test.spec ) ) {
+                    testSchema = 2;
+                }
                if ( current_test.schedule_type == "interval" ) {
                 current_test.type = "latency";
                 //delete current_test.spec.interval;
@@ -1149,7 +1236,23 @@ exports._process_published_config = function( _config, opts, cb ) {
 
 
                }
+
+            } else if ( current_test.type == "throughput" ) {
+                if ( ("single-ended" in current_test.spec) || ( "single-ended-port" in current_test.spec) ) {
+                    testSchema = 2;
+                }
+
+            } else if ( current_test.type == "rtt" ) {
+                if ( ("protocol" in current_test.spec ) ) {
+                    testSchema = 2;
+                }
+                if ( "fragment" in current_test.spec ) {
+                    testSchema = 3;
+
+                }
+
             }
+            psc_tests[ name ].spec.schema = testSchema;
 
             delete current_test.schedule_type;
             delete current_test.spec["test-interval"];
@@ -1228,6 +1331,8 @@ exports._process_published_config = function( _config, opts, cb ) {
     });
 
 };
+
+exports.db = db;
 
 exports.generate = function(_config, opts, cb) {
 

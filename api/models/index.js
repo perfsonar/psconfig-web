@@ -5,16 +5,19 @@ const mongoose = require('mongoose');
 const winston = require('winston');
 
 //mine
-const config = require('../config');
+var config = require('../config');
 const logger = new winston.Logger(config.logger.winston);
 
 //use native promise for mongoose
 //without this, I will get Mongoose: mpromise (mongoose's default promise library) is deprecated
 mongoose.Promise = global.Promise;
 
-exports.init = function(cb) {
+exports.init = function(cb, configToUse) {
+    if ( configToUse ) {
+        config = configToUse;
+
+    }
     mongoose.connect(config.mongodb, {
-        //reconnectTries: Number.MAX_VALUE
         useNewUrlParser: true
         , useUnifiedTopology: true
         , useCreateIndex: true

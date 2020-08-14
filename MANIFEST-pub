@@ -4,6 +4,7 @@ Makefile
 perfsonar-psconfig-web-admin-publisher.spec
 api/common.js
 api/pwapub.js
+api/sharedFunctions.js
 api/pub/controllers.js
 api/pub/meshconfig.js
 api/pub/server.js

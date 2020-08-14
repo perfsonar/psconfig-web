@@ -1,6 +1,6 @@
 {
   "name": "psconfig-web-admin",
-  "version": "4.1.0-beta.1",
+  "version": "4.2.4",
   "description": "Tools to generate / publish perfSONAR meshconfig/psconfig topologies",
   "scripts": {
     "test": "mocha",
@@ -16,12 +16,13 @@
     "async": "^2.3.0",
     "body-parser": "^1.17.1",
     "compression": "^1.6.1",
+    "connect-busboy": "0.0.2",
     "express": "^4.15.2",
     "express-jwt": "^5.1.0",
     "express-winston": "^2.3.0",
     "jsonwebtoken": "^7.2.1",
     "moment-duration": "0.0.6",
-    "mongoose": "^5.7.5",
+    "mongoose": "^5.7.6",
     "promise": "^7.0.4",
     "request": "^2.81.0",
     "sandbox": "^0.8.6",
