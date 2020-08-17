@@ -36,12 +36,23 @@ exports.format_archive = function( archive_obj, id_override ) {
         case "rabbitmq":
             row.archiver = "rabbitmq";
             row.data = archive_obj.data;
-            /*
-            {
+            var url = row.data._url;
+            var user = row.data._username;
+            var password = row.data._password;
 
+            if ( url && ( user || password ) ) {
+                user = user || "";
+                password = password || "";
+                if ( url.match(/^ampqs?:\/\//) ) {
+                    url = url.replace(/^(ampqs?:\/\/)(.+)$/, "$1" + user +":" + password + "@$2");
+                    row.data._url = url;
 
-            };
-            */
+                }
+            
+            }
+            delete row.data._username;
+            delete row.data._password;
+
             break;
         case "rawjson":
             console.log("PARSEC", JSON.parse( archive_obj.data.archiver_custom_json ));

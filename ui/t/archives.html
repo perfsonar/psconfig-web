@@ -4,7 +4,7 @@
     <div class="subbar">
         <div style="padding-left: 20px; margin-bottom: 10px;">
             <h2>Shared Archives</h2>
-            <p class="help-block">List of shared (reusable) archiver definitions. These can be reused in multiple configs/hosts</p>
+            <p class="help-block">List of shared (reusable) archiver definitions.</p>
             <span class="text-muted">{{archives.length}} shared archives</span>
         </div>
         <div class="filterbox" ng-class="{active: filter}">
@@ -37,7 +37,7 @@
 
     <div class="subbar-content">
         <p class="alert alert-info" ng-if="!selected">Please select archive</p>
-        <form ng-submit="submit()" class="form-horizontal margin30" name="form" ng-show="selected" confirm-on-exit>
+        <form ng-submit="submit()" class="form-horizontal margin30" name="form" ng-show="selected" confirm-on-exit autocomplete="new-password">
             <div class="fixed-top">
                 <h2>
                     <i class="fa fa-trash-o clickable" aria-hidden="true" ng-if="selected._id && selected._canedit"
