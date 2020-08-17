@@ -861,8 +861,8 @@ exports._process_published_config = function( _config, opts, cb ) {
                     //console.log("_host", _host);
                     //console.log("maName", maName);
                     if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
-                    if ( "local_archives" in _host ) {
-                        _host["local_archives"].forEach( function( _id ) {
+                    if ( "additional_archives" in _host ) {
+                        _host["additional_archives"].forEach( function( _id ) {
                             console.log("_id", _id);
                             console.log("archives_obj[_id]", archives_obj[_id]);
                             if (  ! ( _id in archives_obj ) ) {
