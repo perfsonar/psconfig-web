@@ -102,7 +102,7 @@ clean:
 	#rm -f ui/dist/pwa-admin-ui-bundle.js
 
 npm_clean:
-	rm -f MANIFEST-node_modules
+	#rm -f MANIFEST-node_modules
 	rm -rf node_modules
 	rm -rf ui/node_modules
 
