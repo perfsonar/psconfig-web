@@ -1340,6 +1340,24 @@ exports.generate = function(_config, opts, cb) {
     host_groups_details = {};
     host_catalog = {};
 
+    console.log("configZ", config);
+    console.log("configZ.pub", config.pub);
+    console.log("configZ.pub.plugins.enabled", config.pub.plugins.enabled);
+    console.log("configZ.pub.plugins.scripts", config.pub.plugins.scripts);
+
+    var plugins_enabled = config.pub.plugins.enabled;
+    var scripts = config.pub.plugins.scripts
+    if ( scripts ) {
+        for(var i=0; i<scripts.length; i++) {
+            var script = scripts[i];
+            pwd();
+            require('../' + script);
+            
+
+        }
+
+    }
+
     return exports._process_published_config( _config, opts, cb );
 }
 
