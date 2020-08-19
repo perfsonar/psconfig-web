@@ -138,6 +138,8 @@ router.get('/config/:url', function(req, res, next) {
             return res.status(404).json({error: "404 error: Couldn't find config with URL:"+req.params.url});
         }
         config._host_version = req.query.host_version;
+        console.log("req.query", req.query);
+        console.log("req", Object.keys(req));
         meshconfig.generate(config, opts, function(err, m) {
             if(err) return next(err);
             res.json(m);
@@ -160,8 +162,11 @@ router.get('/auto/:address', function(req, res, next) {
     //config.format = format;
     req.query.format = format;
     logger.debug("format", format);
-    //var opts = {};
-    //opts.format = format;
+        console.log("req.query", req.query);
+        console.log("req", Object.keys(req));
+    var opts = {};
+    opts.format = format;
+    opts.request = req;
     //find host from hostname or ip
     db.Host.findOne({ hostname: address }, '_id  info.pshost-toolkitversion', function(err, host) {
         if(err) return next(err);
@@ -207,8 +212,10 @@ router.get('/auto/:address', function(req, res, next) {
                     host.info['pshost-toolkitversion'] || 
                     host.info['pshost-bundle-version'] || 
                     null;
+
+
                 
-                meshconfig.generate(config, req.query, function(err, m) {
+                meshconfig.generate(config, opts, function(err, m) {
                     if(err) return next(err);
                     res.json(m);
                 });

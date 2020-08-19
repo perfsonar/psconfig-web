@@ -1340,25 +1340,45 @@ exports.generate = function(_config, opts, cb) {
     host_groups_details = {};
     host_catalog = {};
 
-    console.log("configZ", config);
-    console.log("configZ.pub", config.pub);
-    console.log("configZ.pub.plugins.enabled", config.pub.plugins.enabled);
-    console.log("configZ.pub.plugins.scripts", config.pub.plugins.scripts);
 
+    exports._process_published_config( _config, opts, function(err, data) {
+        if (err) return cb(err);
+        return _apply_plugin(data, opts, cb);
+        
+    });
+}
+
+function _apply_plugin( _config, opts, cb ) {
+    //console.log("configZ", config);
+    console.log("configZ.pub", config.pub);
+    console.log("_config", _config);
+    //console.log("configZ.pub.plugins.enabled", config.pub.plugins.enabled);
+    //console.log("configZ.pub.plugins.scripts", config.pub.plugins.scripts);
+
+    console.log("opts", opts);
+
+    var request = opts.request;
     var plugins_enabled = config.pub.plugins.enabled;
     var scripts = config.pub.plugins.scripts
     if ( scripts ) {
         for(var i=0; i<scripts.length; i++) {
             var script = scripts[i];
-            pwd();
-            require('../' + script);
+            var cwd = process.cwd();
+            console.log("cwd", cwd);
+            var script_path = cwd + "/etc/" + script;
+            console.log("requiring script_path: ", script_path);
+            var filter = require( script_path );
+            filter.process( request, _config, function( err, data ) {
+                     if(err) return cb(err);
+                     return cb(null, data);
+                    
+                    });
             
 
         }
 
     }
 
-    return exports._process_published_config( _config, opts, cb );
 }
 
 // TODO: Remove bwctl hack
