@@ -130,6 +130,7 @@ router.get('/config/:url', function(req, res, next) {
     logger.debug("format", format);
     var opts = {};
     opts.format = format;
+    opts.request = req;
     //if ( req.params.ma_override) opts.ma_override = req.params.ma_override;
     db.Config.findOne({url: req.params.url}).lean().exec(function(err, config) {
         if(err) return next(err);
