@@ -156,6 +156,12 @@ router.get('/config/:url', function(req, res, next) {
  */
 router.get('/auto/:address', function(req, res, next) {
     var address = req.params.address;
+    var format = req.query.format || globalConfig.pub.default_config_format  || "psconfig";
+    //config.format = format;
+    req.query.format = format;
+    logger.debug("format", format);
+    //var opts = {};
+    //opts.format = format;
     //find host from hostname or ip
     db.Host.findOne({ hostname: address }, '_id  info.pshost-toolkitversion', function(err, host) {
         if(err) return next(err);

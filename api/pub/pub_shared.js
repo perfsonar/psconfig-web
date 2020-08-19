@@ -43,8 +43,8 @@ exports.format_archive = function( archive_obj, id_override ) {
             if ( url && ( user || password ) ) {
                 user = user || "";
                 password = password || "";
-                if ( url.match(/^ampqs?:\/\//) ) {
-                    url = url.replace(/^(ampqs?:\/\/)(.+)$/, "$1" + user +":" + password + "@$2");
+                if ( url.match(/^amqps?:\/\//) ) {
+                    url = url.replace(/^(amqps?:\/\/)(.+)$/, "$1" + user +":" + password + "@$2");
                     row.data._url = url;
 
                 }
