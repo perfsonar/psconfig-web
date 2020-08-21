@@ -14,6 +14,14 @@ exports.pub = {
     default_config_format: "psconfig"
 };
 
+exports.pub.plugins = {
+    enabled: false,
+    plugin_scripts: [ 'plugins/pub/filter_example.js' ]
+
+};
+
+console.log("exports.pub", exports.pub);
+
 // Mongo DB to use (the default should work fine, unless you specifically need a different db)
 exports.mongodb = "mongodb://localhost/pwa";
 
