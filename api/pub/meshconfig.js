@@ -1367,13 +1367,20 @@ function _apply_plugin( _config, opts, cb ) {
             console.log("cwd", cwd);
             var script_path = cwd + "/etc/" + script;
             console.log("requiring script_path: ", script_path);
-            var filter = require( script_path );
-            filter.process( request, _config, function( err, data ) {
-                     if(err) return cb(err);
-                     return cb(null, data);
-                    
-                    });
-            
+            try {
+                var filter = require( script_path );
+                filter.process( request, _config, function( err, data ) {
+                    if(err) return cb(err);
+                    return cb(null, data);
+
+                });
+            } catch(e) {
+                var code = 500;
+                console.log("plugin e", e);
+                return cb({"message": "Plugin error in " + script, "code": code});
+
+            }
+
 
         }
 
