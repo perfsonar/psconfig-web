@@ -248,40 +248,6 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <div ng-if="selected.specs.tool == 'bwctl/nuttcp'">
-                    <label for="dscp" class="col-sm-2 control-label">DSCP</label>
-                    <div class="col-sm-4">
-                        <div class="input-group">
-                            <input type="number" string-to-number class="form-control" name="dscp" 
-                            ng-disabled="!selected._canedit" 
-                            ng-model="selected.specs.dscp">
-                            <div class="input-group-addon">bps</div>
-                        </div>
-                        <p class="help-block">
-                            The <a href="https://en.wikipedia.org/wiki/Differentiated_services">Differentiated Services</a> code point value to set in the IP header of outgoing packets
-                            <code>dscp</code> 
-                            <minver min="minver.dscp"></minver>
-                        </p>
-                    </div>
-                </div>
-
-                <div ng-if="selected.specs.tool == 'bwctl/nuttcp'">
-                    <label for="mss" class="col-sm-2 control-label">Maxium Segment Size</label>
-                    <div class="col-sm-4">
-                        <div class="input-group">
-                            <input type="number" string-to-number step="1" class="form-control" name="mss" 
-                            ng-disabled="!selected._canedit" 
-                            ng-model="selected.specs.mss">
-                            <div class="input-group-addon">Bytes</div>
-                        </div>
-                        <p class="help-block">
-                            Tell the tool to use a <a target="_blank" href="https://en.wikipedia.org/wiki/Maximum_segment_size">Maximum TCP segment Size</a> of N bytes <code>mss</code>
-                            <minver min="minver.mss"></minver>
-                        </p>
-                    </div>
-                </div>
-            </div>
 
             <div class="form-group">
                 <label for="mss" class="col-sm-2 control-label">Max Segment Size (MSS)</label>
@@ -296,17 +262,6 @@
                     </p>
                 </div>
 
-                <label for="dscp" class="col-sm-2 control-label">DSCP</label>
-                <div class="col-sm-4">
-                    <input type="number" string-to-number class="form-control" name="dscp"
-                    ng-disabled="!selected._canedit"
-                    ng-model="selected.specs.dscp">
-                    <p class="help-block">
-                        The differentiated services code point (DSCP) value to set in the IP header of outgoing packets
-                        <code>dscp</code>
-                        <minver min="minver.dscp"></minver>
-                    </p>
-                </div>
             </div>
 
             <div class="form-group">
