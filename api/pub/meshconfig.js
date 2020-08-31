@@ -1355,17 +1355,32 @@ function _apply_plugin( _config, opts, cb ) {
     //console.log("configZ.pub.plugins.enabled", config.pub.plugins.enabled);
     //console.log("configZ.pub.plugins.scripts", config.pub.plugins.scripts);
 
-    console.log("opts", opts);
+    //console.log("opts", opts);
 
     var request = opts.request;
-    var plugins_enabled = config.pub.plugins.enabled;
-    var scripts = config.pub.plugins.scripts
-    if ( scripts ) {
+    var plugins_enabled;
+    var scripts;
+    if ( ! ("plugins" in config.pub ) ) {
+        console.log("No plugins configured");
+        return cb(null, _config);
+    }
+    try {
+        plugins_enabled = config.pub.plugins.enabled;
+        scripts = config.pub.plugins.scripts
+    } catch(e) {
+        console.log("Error loading plugin(s); skipping");
+        //return cb({"message": "Error loading plugin(s); aborting" });
+        return cb(null, _config);
+    }
+    console.log("plugins_enabled", plugins_enabled);
+    console.log("scripts", scripts);
+    if ( plugins_enabled && scripts ) {
         for(var i=0; i<scripts.length; i++) {
             var script = scripts[i];
             var cwd = process.cwd();
             console.log("cwd", cwd);
-            var script_path = cwd + "/etc/" + script;
+            //var script_path = cwd + "/etc/" + script;
+            var script_path = script;
             console.log("requiring script_path: ", script_path);
             try {
                 var filter = require( script_path );
@@ -1383,6 +1398,10 @@ function _apply_plugin( _config, opts, cb ) {
 
 
         }
+
+    } else {
+        console.log("no plugins configured");
+        return cb(null, _config);
 
     }
 
