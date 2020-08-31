@@ -1,6 +1,6 @@
 
 app.controller('ConfigsController',
-function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, hostgroups, configs, $routeParams, testspecs, uiGmapGoogleMapApi, $timeout) {
+function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, hostgroups, configs, $routeParams, testspecs, archives, uiGmapGoogleMapApi, $timeout) {
     scaMessage.show(toaster);
     $scope.active_menu = "configs";
     $scope.show_map = false;
@@ -17,22 +17,28 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
             hostgroups.getAll().then(function(_hostgroups) {
                 $scope.hostgroups = _hostgroups;
 
-                configs.getAll().then(function(_configs) {
-                    $scope.configs = _configs;
-                    if($routeParams.id) {
-                        $scope.configs.forEach(function(config) {
-                            if(config._id == $routeParams.id) $scope.select(config);
-                        });
-                    } else {
-                        //select first one
-                        if($scope.configs.length > 0) $scope.select($scope.configs[0]);
-                    }
+                archives.getAll().then(function(_archives) {
+                    $scope.all_archives = _archives;
+                    console.log("all_archives", _archives);
 
-		    //delay showing map slightly to prevent gmap to miss resize event?
-		    //TODO - figure out what's going on with gmap and fix it instead of this hack..
-		    $timeout(()=>{
-			$scope.show_map = true;
-		    });
+
+                    configs.getAll().then(function(_configs) {
+                        $scope.configs = _configs;
+                        if($routeParams.id) {
+                            $scope.configs.forEach(function(config) {
+                                if(config._id == $routeParams.id) $scope.select(config);
+                            });
+                        } else {
+                            //select first one
+                            if($scope.configs.length > 0) $scope.select($scope.configs[0]);
+                        }
+
+                        //delay showing map slightly to prevent gmap to miss resize event?
+                        //TODO - figure out what's going on with gmap and fix it instead of this hack..
+                        $timeout(()=>{
+                            $scope.show_map = true;
+                        });
+                    });
                 });
             });
         });
@@ -42,6 +48,7 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     $scope.selected = null;
     $scope.select = function(config) {
         $scope.selected = config;
+                    console.log("selected", $scope.selected);
         $scope.closesubbar();
 
         config.tests.forEach(function(test) {

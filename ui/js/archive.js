@@ -72,7 +72,7 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
             if(!$scope.filter) return true; //show all
 
             var name = archive.name.toLowerCase();
-            var type = archive.service_type.toLowerCase();
+            //var type = archive.service_type.toLowerCase();
 
             //all tokens must match somewhere
             var tokens = $scope.filter.toLowerCase().split(" ");
@@ -80,7 +80,7 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
             tokens.forEach(function(token) {
                 var match = false;
                 if(~name.indexOf(token)) match = true;
-                if(~type.indexOf(token)) match = true;
+                //if(~type.indexOf(token)) match = true;
                 if(!match) accept = false;
             });
             return accept;

@@ -18,13 +18,13 @@ rm -f pwa-admin/tmp/api/auth.pub
 rm -f pwa-admin/tmp/api/auth.key
 rm -f pwa-admin/tmp/api/user.jwt
 
-docker build pwa-admin -t perfsonar/pwa-admin
+docker build pwa-admin -t perfsonar/pwa-admin:$VERSION
 if [ ! $? -eq 0 ]; then
     echo "failed to build"
     exit
 fi
 
-docker tag perfsonar/pwa-admin perfsonar/pwa-admin:$VERSION
+#docker tag perfsonar/pwa-admin perfsonar/pwa-admin:$VERSION
 docker push perfsonar/pwa-admin:$VERSION
 
 #docker tag perfsonar/pwa-admin perfsonar/pwa-admin:latest

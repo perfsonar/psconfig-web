@@ -38,18 +38,24 @@ function canedit(user, archive) {
 router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     var find = {};
     if(req.query.find) find = JSON.parse(req.query.find);
+
     
     //we need to select admins , or can't get _canedit set
     var select = req.query.select;
     if(select && !~select.indexOf("admins")) select += " admins";
 
+    console.log("find", find);
+    console.log("select", select);
+    console.log("limit", req.query.limit);
+
     db.Archive.find(find)
     .select(select)
-    .limit(parseInt(req.query.limit) || 100)
+    .limit(parseInt(req.query.limit) || 500)
     .skip(parseInt(req.query.skip) || 0)
     .sort(req.query.sort || '_id')
     .lean() //so that I can add _canedit later
     .exec(function(err, archives) {
+        console.log("archives", archives);
         if(err) return next(err);
         db.Archive.count(find).exec(function(err, count) { 
             if(err) return next(err);

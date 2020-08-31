@@ -14,10 +14,11 @@ exports.archive_extract_name = function( archive_obj ) {
 
 };
 
-exports.format_archive = function( archive_obj ) {
+exports.format_archive = function( archive_obj, id_override ) {
     log_json("formatting archive obj ...", archive_obj);
     var out = {};
-    var name = archive_obj.name + "-" + archive_obj._id;
+    var name = id_override || archive_obj.name + "-" + archive_obj._id;
+
     //var name = archive_obj.name;
     out[ name ] = {};
     var row = out[name];
@@ -29,18 +30,29 @@ exports.format_archive = function( archive_obj ) {
                 "url": archive_obj.data._url,
                 "measurement-agent": "{% scheduled_by_address %}"
             };
-
-
+            delete out._url;
+        
             break;
         case "rabbitmq":
             row.archiver = "rabbitmq";
             row.data = archive_obj.data;
-            /*
-            {
+            var url = row.data._url;
+            var user = row.data._username;
+            var password = row.data._password;
 
+            if ( url && ( user || password ) ) {
+                user = user || "";
+                password = password || "";
+                if ( url.match(/^amqps?:\/\//) ) {
+                    url = url.replace(/^(amqps?:\/\/)(.+)$/, "$1" + user +":" + password + "@$2");
+                    row.data._url = url;
 
-            };
-            */
+                }
+            
+            }
+            delete row.data._username;
+            delete row.data._password;
+
             break;
         case "rawjson":
             console.log("PARSEC", JSON.parse( archive_obj.data.archiver_custom_json ));
@@ -50,6 +62,9 @@ exports.format_archive = function( archive_obj ) {
             break;
 
     }
+    delete out.name;
+    delete out.desc;
+
     console.log("formatted output: ", out);
     return out;
 

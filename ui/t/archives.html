@@ -3,9 +3,9 @@
 <div class="sca-sidebar-page">
     <div class="subbar">
         <div style="padding-left: 20px; margin-bottom: 10px;">
-            <h2>Archives</h2>
-            <p class="help-block">List of defined test specifications</p>
-            <span class="text-muted">{{archives.length}} Archives</span>
+            <h2>Shared Archives</h2>
+            <p class="help-block">List of shared (reusable) archiver definitions.</p>
+            <span class="text-muted">{{archives.length}} shared archives</span>
         </div>
         <div class="filterbox" ng-class="{active: filter}">
             <i class="fa fa-times pull-right remove" ng-click="filter = ''"></i>
@@ -14,7 +14,7 @@
         </div>
 
         <div class="subbar-list" style="top: 159px">
-            <p class="alert alert-info" ng-if="archives.length == 0">Please register a archive.</p>
+            <p class="alert alert-info" ng-if="archives.length == 0">Please register a shared archive.</p>
             <div class="subbar-list-item" 
                 id="{{archive._id}}"
                 ng-repeat="archive in filter_archives(archives)" 
@@ -30,21 +30,21 @@
             </div>
             <div class="list-addbutton animated" ng-class="{bounceInLeft: archives.length == 0}" ng-click="add()" title="Add new archive">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> 
-                <div class="add-text">New archive</div>
+                <div class="add-text">New Archive</div>
             </div>
         </div>
     </div><!--subbar-->
 
     <div class="subbar-content">
         <p class="alert alert-info" ng-if="!selected">Please select archive</p>
-        <form ng-submit="submit()" class="form-horizontal margin30" name="form" ng-show="selected" confirm-on-exit>
+        <form ng-submit="submit()" class="form-horizontal margin30" name="form" ng-show="selected" confirm-on-exit autocomplete="new-password">
             <div class="fixed-top">
                 <h2>
                     <i class="fa fa-trash-o clickable" aria-hidden="true" ng-if="selected._id && selected._canedit"
-                        ng-confirm-click="Are you sure you want to remove this test spec?"
+                        ng-confirm-click="Are you sure you want to remove this archive?"
                         confirmed-click="remove()"></i>
                         &nbsp;&nbsp;&nbsp;
-                        Edit Archive
+                        Edit shared archive
                     <!--
                     <i class="fa fa-info-circle" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
                     <i class="fa fa-star-o" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
@@ -86,7 +86,7 @@
                               <b>{{user.fullname}}</b> <small>&lt;{{user.email}}&gt;</small>
                             </ui-select-choices>
                         </ui-select>
-                        <p class="help-block">Users who can update this test spec</p>
+                        <p class="help-block">Users who can update this archive spec</p>
                     </div>
                 </div>
 
