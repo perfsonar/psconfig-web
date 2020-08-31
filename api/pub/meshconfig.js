@@ -680,7 +680,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                     var minver = config.meshconfig.minver[test.service_type];
                     for(var k in test.testspec.specs) {
                         //if minver is set for this testspec, make sure host version meets it
-                        if(minver[k]) {
+                        if( minver && (k in minver)) {
                             if(hostv < minver[k]) delete test.testspec.specs[k]; 
                         }
                     }
