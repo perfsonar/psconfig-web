@@ -133,7 +133,8 @@ describe('publisher', function() {
                     console.log("ERROR reading file", err);
                     return;
                 }
-                //console.log("file contents", data);
+                //console.log("file contents\n");
+                //console.log(data);
                 expected_output = JSON.parse(data);
                 //console.log("expected DATA\n", JSON.stringify( expected_output, null, 3));
                 //console.log("\nEND EXPECTED DATA\n");
@@ -148,7 +149,8 @@ describe('publisher', function() {
 
 
                 var dbCB = function( err, results ) {
-                    //console.log("CALLBACK err, results", err, results);
+                    //console.log("CALLBACK err, results", err, "\n");
+                    //console.log(results);
                     //console.log("RESULTS !!!!\n", formatlog( results ) );
                     //console.log("RESULTS !!!!\n", JSON.stringify(results, null, 3) );
                     //console.log("RESULTS !!!!\n", JSON.stringify(results));
