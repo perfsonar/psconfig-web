@@ -53,6 +53,10 @@ exports.format_archive = function( archive_obj, id_override ) {
             delete row.data._username;
             delete row.data._password;
 
+            if ( row.data && "connection_lifetime" in row.data ) {
+                row.data.schema = 2;
+            } 
+
             break;
         case "rawjson":
             console.log("PARSEC", JSON.parse( archive_obj.data.archiver_custom_json ));

@@ -139,8 +139,8 @@ router.get('/config/:url', function(req, res, next) {
             return res.status(404).json({error: "404 error: Couldn't find config with URL:"+req.params.url});
         }
         config._host_version = req.query.host_version;
-        console.log("req.query", req.query);
-        console.log("req", Object.keys(req));
+        //console.log("req.query", req.query);
+        //console.log("req", Object.keys(req));
         meshconfig.generate(config, opts, function(err, m) {
             if(err) return next(err);
             res.json(m);
@@ -163,8 +163,8 @@ router.get('/auto/:address', function(req, res, next) {
     //config.format = format;
     req.query.format = format;
     logger.debug("format", format);
-        console.log("req.query", req.query);
-        console.log("req", Object.keys(req));
+    //    console.log("req.query", req.query);
+    //    console.log("req", Object.keys(req));
     var opts = {};
     opts.format = format;
     opts.request = req;
