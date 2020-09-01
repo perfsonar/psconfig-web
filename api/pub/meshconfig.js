@@ -53,10 +53,10 @@ function format_archive_obj( archObj ) {
     let fields_to_include =  [ "archiver", "data" ];
     for ( let arch in archObj ) {
         let params = archObj[ arch ];
-        console.log("params", params);
-        console.log("params KEYZ", _.keys( params ));
+        //console.log("params", params);
+        //console.log("params KEYZ", _.keys( params ));
         Object.keys( params ).forEach( function( key ) {
-            console.log("key", key);
+            //console.log("key", key);
             //let row = params[ key ];
             if ( ! fields_to_include.includes(key) ) {
                 delete params[ key ];
@@ -200,9 +200,9 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
         if ( ! spec["probe-type"] ) delete spec["probe-type"];
         delete spec.protocol;
     } else if (  test.type == "throughput" ) {
-        console.log("throughput test");
-        console.log("spec", spec);
-        console.log("probe-type", spec["probe-type"]);
+        //console.log("throughput test");
+        //console.log("spec", spec);
+        //console.log("probe-type", spec["probe-type"]);
         if ( ( "probe-type" in spec ) && ! ( "protocol" in spec ) ) {
              if ( spec["probe-type"] == "udp" ) {
                  spec.udp = true;
@@ -258,7 +258,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
         test._schedule = sched_key;
 
         // "slip"
-        console.log("TEST", test);
+        //console.log("TEST", test);
         if ( (  sched_key in schedules ) && schedule_type != 'continuous' ) {
             if(("slip" in spec) && (spec.slip != 0)) {
                 schedules[ sched_key ].slip = spec.slip;
@@ -491,8 +491,8 @@ function get_test_service_type( test ) {
 exports.get_config = function( configName, options, next, configObj ) {
     var format = options.format || "psconfig";
     config.format = format;
-    console.log("format", format);
-    console.log("configName", configName);
+    //console.log("format", format);
+    //console.log("configName", configName);
     var opts = {};
     opts.format = format;
     /*
@@ -628,7 +628,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                 //_config.archives_obj = pub_shared.format_archive( arch ); 
                 //console.log("arch_obj", arch_obj);
             });
-            console.log("archives_obj", archives_obj);
+            //console.log("archives_obj", archives_obj);
             //next_arch();
         }, function(err) {
             if(err) return (err);
@@ -798,7 +798,7 @@ exports._process_published_config = function( _config, opts, cb ) {
             };
             if ( ! ( _host.hostname in psc_hosts) ) psc_hosts[ _host.hostname ]  = {};
 
-            console.log("_host", _host);
+            //console.log("_host", _host);
 
             if ( "ma_urls" in _host && _host.ma_urls.length > 0  ) {
                 for(var i in _host.ma_urls ) {
@@ -864,8 +864,8 @@ exports._process_published_config = function( _config, opts, cb ) {
                     if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
                     if ( "additional_archives" in _host ) {
                         _host["additional_archives"].forEach( function( _id ) {
-                            console.log("_id", _id);
-                            console.log("archives_obj[_id]", archives_obj[_id]);
+                            //console.log("_id", _id);
+                            //console.log("archives_obj[_id]", archives_obj[_id]);
                             if (  ! ( _id in archives_obj ) ) {
                                 logger.warn("Host ", _host.hostname, " has nonexistent archive ", _id, "; ignoring");
                                 return;
@@ -889,13 +889,13 @@ exports._process_published_config = function( _config, opts, cb ) {
 
                                 //new_arch[ archid ]._meta = "asdf";
                                 //new_arch[ name + "-" + _id] =  archives_obj[_id];
-                                console.log("psc_archives BEFORE", psc_archives);
-                                console.log("archives_obj[_id]", archives_obj[_id]);
+                                //console.log("psc_archives BEFORE", psc_archives);
+                                //console.log("archives_obj[_id]", archives_obj[_id]);
                                 //new_arch = pub_shared.format_archive( new_arch[ name + "-" + _id]  );
                                 new_arch = pub_shared.format_archive( new_arch[ archid ], archid  );
                                 psc_archives = _.extend( psc_archives, new_arch );
-                                console.log("psc_archives AFTER", psc_archives);
-                                console.log("new_arch", new_arch);
+                                //console.log("psc_archives AFTER", psc_archives);
+                                //console.log("new_arch", new_arch);
                                 last_host_ma_number++;
                             }
 
@@ -903,7 +903,7 @@ exports._process_published_config = function( _config, opts, cb ) {
 
                         }); 
                         //psc_hosts[_host.hostname].archives = psc_hosts[_host.hostname].local_archives.concat( _host.local_archives );
-                        console.log("psc_hosts[_host.hostname]", psc_hosts[_host.hostname]);
+                        //console.log("psc_hosts[_host.hostname]", psc_hosts[_host.hostname]);
 
                     }
                     //if ( ! ( "_archive" in _host ) ) _host._archive = [];
@@ -935,7 +935,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                     if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
                     if ( ! ( "_archive" in _host ) ) _host._archive = [];
 
-                    console.log("adding host mas, maName, maInfo", maName, maInfo);
+                    //console.log("adding host mas, maName, maInfo", maName, maInfo);
                     if ( ! ( url in maHash ) ) {
                         if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
                             psc_archives[ maName ] = maInfo;
@@ -959,7 +959,7 @@ exports._process_published_config = function( _config, opts, cb ) {
 
                     // Handle extra host MAs
                     // TODO: remove this and have upgrade script fix
-                    console.log("extra_mas", extra_mas);
+                    //console.log("extra_mas", extra_mas);
                     for(var key in extra_mas ) {
                         //var maName = key;
                         var url = extra_mas[key];
@@ -972,7 +972,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                             psc_hosts[ _host.hostname ].archives.push( maNameHost );
 
                         }
-                        console.log("host-extra-ma maName, maNameHost, maType, maInfo", maName, maNameHost, maType, maInfo);
+                        //console.log("host-extra-ma maName, maNameHost, maType, maInfo", maName, maNameHost, maType, maInfo);
                         if ( ! ( url in maHash ) ) {
                             psc_archives[ maNameHost ] = maInfo;
                             maHash[url] = maNameHost;
@@ -982,7 +982,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                             //maHash[url] = maNameHost;
                         }
 
-                        console.log("_host._archive", _host._archive);
+                        //console.log("_host._archive", _host._archive);
                         if( Object.keys( _host._archive ) > 0 && config_service_types.indexOf(service.type) != -1 && _host._archive.indexOf( maNameHost) == -1) {
                             _host._archive.push(maNameHost);
                             last_ma_number++;
@@ -1003,7 +1003,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                 delete psc_hosts[ _host.hostname ].archives;
 
             }
-                    console.log("maHash", maHash);
+                    //console.log("maHash", maHash);
 
                 // TODO figure out how to have multiple tests of same type
                 // (need unique hostgroup names)
@@ -1056,14 +1056,14 @@ exports._process_published_config = function( _config, opts, cb ) {
             _config.archives.forEach( function( _id ) {
                 if (  ! ( _id in archives_obj ) ) {
                            logger.warn("Config ", _config.name, " has nonexistent archive ", _id, "; ignoring");
-                           console.log("_config.name", _config.name);
+                           //console.log("_config.name", _config.name);
                            //delete _config.archives[_id];
                            //return;
                 } else {
                     var _arch = archives_obj[ _id ];
-                    console.log("_id", _id);
-                    console.log("_config _arch", _arch);
-                    console.log("archives_obj[ _arch ]", archives_obj[ _arch ]);
+                    //console.log("_id", _id);
+                    //console.log("_config _arch", _arch);
+                    //console.log("archives_obj[ _arch ]", archives_obj[ _arch ]);
                     var newArch = {};
                     var name = pub_shared.archive_extract_name( _arch );
                     if ( _arch !== undefined && name !== undefined && archives_obj[ _arch ] !== undefined ) {
@@ -1132,15 +1132,15 @@ exports._process_published_config = function( _config, opts, cb ) {
         psconfig.addresses = psc_addresses;
         psconfig.groups = host_groups_details;
 
-    console.log("_config", _config);
+    //console.log("_config", _config);
     var psarch_obj = {};
     async.eachSeries( _config.archives, function(arch, next_arch) {
-        console.log("ARCHIVES ...");
-        console.log("arch", arch);
+        //console.log("ARCHIVES ...");
+        //console.log("arch", arch);
         var _id = arch._id;
         if (  ! ( _id in archives_obj ) ) {
             logger.warn("Config ", _config.name, " has nonexistent archive ", _id, "; ignoring");
-            console.log("_config.name", _config.name);
+            //console.log("_config.name", _config.name);
             //delete _config.archives[_id];
             return;
         }
@@ -1148,7 +1148,7 @@ exports._process_published_config = function( _config, opts, cb ) {
         //let name = archives_obj[_id].name.replace(" ", "_");
         let name = "config-archive" + last_config_ma_number;
         last_config_ma_number++;
-        console.log("NAME", name);
+        //console.log("NAME", name);
         archives_obj[_id].name = name;
         if ( archives_obj[ arch ] !== undefined && archives_obj[ arch ] != {} ) {
             psc_archives = _.extend( psc_archives, pub_shared.format_archive( archives_obj[ arch._id ] ) );
@@ -1214,7 +1214,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                 psc_tests[ name ].spec.source = "{% address[0] %}";
                 psc_tests[ name ].spec.dest = "{% address[1] %}";
                 meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules );
-                logger.debug( "testspec", JSON.stringify( testspec, null, "  " ));
+                //logger.debug( "testspec", JSON.stringify( testspec, null, "  " ));
             }
 
             var interval = psc_tests[ name ].spec["test-interval"];
@@ -1351,8 +1351,8 @@ exports.generate = function(_config, opts, cb) {
 
 function _apply_plugin( _config, opts, cb ) {
     //console.log("configZ", config);
-    console.log("configZ.pub", config.pub);
-    console.log("_config", _config);
+    //console.log("configZ.pub", config.pub);
+    //console.log("_config", _config);
     //console.log("configZ.pub.plugins.enabled", config.pub.plugins.enabled);
     //console.log("configZ.pub.plugins.scripts", config.pub.plugins.scripts);
 
