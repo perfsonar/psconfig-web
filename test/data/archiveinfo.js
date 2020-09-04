@@ -21,11 +21,11 @@ archive_checks.push(
     );
 archive_checks.push(
     {
-        name:"Rabbit with username/pass",
+        name:"Rabbit with username/pass and connection lifetime (schema 2)",
         in:
-        {"_id":"5efb409a47117561c498000a","admins":["1"],"desc":"New Testspec","name":"rabbit2","archiver":"rabbitmq","data":{"_url":"amqp://mj82:123@rabbithost.example.org:12345"},"create_date":"2020-06-30T13:39:38.383Z","update_date":"2020-08-18T15:14:44.449Z","__v":0},
+        {"_id":"5efb409a47117561c498000a","admins":["1"],"desc":"New Testspec","name":"rabbit2","archiver":"rabbitmq","data":{"_url":"amqp://mj82:123@rabbithost.example.org:12345","connection_lifetime":1},"create_date":"2020-06-30T13:39:38.383Z","update_date":"2020-08-18T15:14:44.449Z","__v":0},
     out: 
-        {"rabbit2-5efb409a47117561c498000a":{"archiver":"rabbitmq","data":{"_url":"amqp://mj82:123@rabbithost.example.org:12345"}}}
+        {"rabbit2-5efb409a47117561c498000a":{"archiver":"rabbitmq","data":{"_url":"amqp://mj82:123@rabbithost.example.org:12345","connection_lifetime":1,"schema":2}}}
     }
     );
 archive_checks.push(        

@@ -15,7 +15,7 @@ exports.archive_extract_name = function( archive_obj ) {
 };
 
 exports.format_archive = function( archive_obj, id_override ) {
-    console.log("formatting archive obj ...\n", JSON.stringify(archive_obj));
+    //console.log("formatting archive obj ...\n", JSON.stringify(archive_obj));
     var out = {};
     var name = id_override || archive_obj.name + "-" + archive_obj._id;
 
@@ -70,7 +70,7 @@ exports.format_archive = function( archive_obj, id_override ) {
     delete out.desc;
 
     //console///.log("formatted output: ", out);
-    console.log("formatting out ...\n", JSON.stringify(out));
+    //console.log("formatting out ...\n", JSON.stringify(out));
     return out;
 
 };

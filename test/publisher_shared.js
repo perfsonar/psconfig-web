@@ -132,6 +132,22 @@ describe('publisher_shared', function() {
             cleanup();
 
         });
+        it( name + " " + " OVERRIDEN NAME format_archives matches expected output. ", function(done) {
+            let newName = "NAME" + i + "-" + input._id;
+            let overrideOutput = pubShared.format_archive( input, newName );
+            let overrideOutputExpected = transform_expected_output_override_name( outputExpected, newName );
+            //overrideOutputExpected[ newName ] = outputExpected[ Object.keys( outputExpected)[0] ];
+            //console.log("overrideOutputExpected", overrideOutputExpected);
+            chai.expect( overrideOutput ).to.deep.equal( overrideOutputExpected );
+            done();
+            cleanup();
+
+        });
+        function transform_expected_output_override_name( outputExpected, newName ) {
+            let overridden = {};
+            overridden[ newName ] = outputExpected[ Object.keys( outputExpected)[0] ];
+            return overridden;
+        }
     }
 });
     /*
