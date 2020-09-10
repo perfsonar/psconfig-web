@@ -1,11 +1,12 @@
-console.log("NOTE: db mca copied to pwa-test1");
 //contrib
 var assert = require('assert');
 var chai = require('chai');
 
 //mine
+var archiveInfo = require('./data/archiveinfo.js');
 var config = require('./etc/config');
-var publisher = require('../api/pub/meshconfig');
+var pubShared = require('../api/pub/pub_shared');
+//var publisher = require('../api/pub/meshconfig');
 const winston = require('winston');
 const logger = new winston.Logger(config.logger.winston);
 const async = require('async');
@@ -16,6 +17,11 @@ function formatlog( obj ) {
     return out;
 }
 
+console.log("archiveInfo", archiveInfo);
+testsArr = archiveInfo.archive_checks;
+
+
+/*
 var testsObj = {
     "throughput3": {
         expected_file: "throughput3-expected.json",
@@ -59,6 +65,7 @@ var testsObj = {
 
 
 };
+*/
 
 function getValueStringPath (obj, path) {
     if (!path) return obj;
@@ -107,11 +114,43 @@ function check_expected_values( config, testName ) {
 
 
 function cleanup() {
-    publisher.dbTest.disconnect();
+    //publisher.dbTest.disconnect();
 
 }
 
-describe('publisher', function() {
+describe('publisher_shared', function() {
+    for( let i=0; i<testsArr.length; i++ ) {
+        let row = testsArr[i];
+        let input = row.in;
+        let outputExpected = row.out;
+        let name = row.name || "row" + i;
+        let output = pubShared.format_archive( input );
+
+        it( name + " " + " format_archives matches expected output. ", function(done) {
+            chai.expect( output ).to.deep.equal( outputExpected );
+            done();
+            cleanup();
+
+        });
+        it( name + " " + " OVERRIDEN NAME format_archives matches expected output. ", function(done) {
+            let newName = "NAME" + i + "-" + input._id;
+            let overrideOutput = pubShared.format_archive( input, newName );
+            let overrideOutputExpected = transform_expected_output_override_name( outputExpected, newName );
+            //overrideOutputExpected[ newName ] = outputExpected[ Object.keys( outputExpected)[0] ];
+            //console.log("overrideOutputExpected", overrideOutputExpected);
+            chai.expect( overrideOutput ).to.deep.equal( overrideOutputExpected );
+            done();
+            cleanup();
+
+        });
+        function transform_expected_output_override_name( outputExpected, newName ) {
+            let overridden = {};
+            overridden[ newName ] = outputExpected[ Object.keys( outputExpected)[0] ];
+            return overridden;
+        }
+    }
+});
+    /*
     Object.keys(testsObj).forEach( function( key ) {
         var item = testsObj[ key ];
         let naem = key;
@@ -139,11 +178,6 @@ describe('publisher', function() {
                 //console.log("expected DATA\n", JSON.stringify( expected_output, null, 3));
                 //console.log("\nEND EXPECTED DATA\n");
                 //console.error("meshconfig before\n", JSON.stringify( meshconfig, null, 3 ) );
-                /*
-                let opts = { 
-                    "format": "psconfig"
-                };
-                */
                 //publisher._process_published_config ( meshconfig, opts, cb, "psconfig" );
                 //console.log("psconfig after\n", JSON.stringify( meshconfig, null, 3 ) );
 
@@ -178,7 +212,7 @@ describe('publisher', function() {
                     //return nextTest(null, results);
                     //done();
                 };
-                publisher.get_config( naem, opts, dbCB, config );
+                //publisher.get_config( naem, opts, dbCB, config );
             });
             //console.log("psconfig after\n", JSON.stringify( _config, null, 3 ) );
 
@@ -194,3 +228,4 @@ describe('publisher', function() {
         
 
             });
+    */

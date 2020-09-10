@@ -55,7 +55,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     .sort(req.query.sort || '_id')
     .lean() //so that I can add _canedit later
     .exec(function(err, archives) {
-        console.log("archives", archives);
+        //console.log("archives", archives);
         if(err) return next(err);
         db.Archive.count(find).exec(function(err, count) { 
             if(err) return next(err);
