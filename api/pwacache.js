@@ -57,7 +57,7 @@ function create_hostrec(service, uri, cb) {
     var pathname = pathname_tokens.join("/");
 
     //reconstruct the url for the host record
-    console.log("uri", uri, "service['service-host']", service['service-host']);
+    console.log("service['service-host']", service['service-host']);
     var url = uri.protocol+"//"+uri.host+'/'+service['service-host'][0];
     console.log("URL", url);
     request({url: url, timeout: 1000*10, json: true}, function(err, res, host) {
@@ -305,7 +305,7 @@ function run() {
                     //db.Host.find({$and: [{uuid: filter.uuid}, {hostname: filter.hostname}]}, function(err, uuidhosts) {
                         if ( err ) logger.error(err);
                         if ( uuidhosts.length > 0 ) {
-                            console.log("Possible ", host.hostname, " RECORD UUIDHOSTS", uuidhosts.length, uuidhosts);
+                            console.log("Possible ", host.hostname, " RECORD UUIDHOSTS", uuidhosts.length); //, uuidhosts);
                         } else {
                             console.log("no matching record with this UUID for host", host.hostname, filter.uuid);
 
