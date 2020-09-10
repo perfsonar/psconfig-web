@@ -44,7 +44,7 @@ exports.disconnect = function(cb) {
 var serviceSchema = mongoose.Schema({
     type: String, //like "owamp", "bwctl", etc.
     //name: String, //from service-name
-    //locator: String, // like "tcp://ps-latency.atlas.unimelb.edu.au:861" (used to pull hostname)
+    locator: [String], // like "tcp://ps-latency.atlas.unimelb.edu.au:861" (used to pull hostname)
 
     //ma to send data to. if not set, it uses local ma
     ma: {type: mongoose.Schema.Types.ObjectId, ref: 'Host'},

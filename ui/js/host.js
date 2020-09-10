@@ -14,7 +14,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
     $scope.newAddress = "";
 
     $scope.refreshHosts = function(query, service) {
-        var select = "sitename hostname lsid";
+        var select = "sitename hostname lsid services";
         var find = {}
         if(query) {
             find.$or = [
@@ -235,7 +235,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         $scope.selected.services.push({
             type: $scope.addservice_item.id,
             //name: "tdb..", //TODO is service name used? maybe I should deprecate?
-            //locator: "",
+            locator: $scope.addservice_item.locator,
         });
         find_missing_services();
         $scope.addservice_item = null;

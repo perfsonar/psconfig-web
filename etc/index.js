@@ -156,13 +156,23 @@ exports.datasource = {
             query: "?type=service&group-communities=*WIDGET,*widget&group-communities-operator=any",
         },
 */
+        // IN:
+        /*"gls": {
+            label: "GLS",
+            type: "global-sls",
+            activehosts_url: "http://ps1.es.net:8096/lookup/activehosts.json",
+            query: "?type=service&group-communities=Indiana",
+        }
+        */
         // Global LS instance (by default, this is the only LS specified)
+    
         "gls": {
             label: "GLS",
             type: "global-sls",
             activehosts_url: "http://ps1.es.net:8096/lookup/activehosts.json",
             query: "?type=service",
         }
+        
 
         // Private sLS instance
         // only uncomment this if you are running a private sLS instance
