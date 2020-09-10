@@ -54,6 +54,9 @@ exports.format_archive = function( archive_obj, id_override ) {
             delete row.data._password;
 
             if ( row.data && "connection_lifetime" in row.data ) {
+                var expires = row.data.connection_lifetime;
+                row.data.connection_expires = expires;
+                delete row.data.connection_lifetime;
                 row.data.schema = 2;
             } 
 
