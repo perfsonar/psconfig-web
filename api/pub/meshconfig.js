@@ -5,7 +5,6 @@ const express = require('express');
 const router = express.Router();
 const winston = require('winston');
 const async = require('async');
-const moment = require('moment');
 const _ = require('underscore');
 
 //mine
@@ -14,6 +13,9 @@ const logger = new winston.Logger(config.logger.winston);
 const db = require('../models');
 const common = require('../common');
 const pub_shared = require('./pub_shared');
+const rename_underscores_to_dashes = pub_shared.rename_underscores_to_dashes;
+const rename_field = pub_shared.rename_field;
+const seconds_to_iso8601 = pub_shared.seconds_to_iso8601;
 const shared = require('../sharedFunctions');
 
 // TODO: Remove bwctl hack
@@ -304,33 +306,7 @@ function meshconfig_testspec_to_psconfig( testspec, name, psc_tests, schedules )
 
 }
 
-function rename_underscores_to_dashes( obj ) {
-    for(var key in obj ) {
-        var newkey = key.replace(/_/g, "-");
-        obj[ newkey ] = obj[ key ];
-        if (key.match(/_/) ) delete obj[ key ];
 
-    }
-
-}
-
-function rename_field( obj, oldname, newname ) {
-    if ( typeof obj == "undefined" ) {
-        return;
-    }
-    if ( oldname in obj ) {
-        obj[ newname ] = obj[ oldname ];
-        delete obj[ oldname ];
-    }
-    return obj;
-
-}
-
-function seconds_to_iso8601( dur ) {
-    var isoOut = moment.duration(dur * 1000); // moment.duration expects milliseconds
-    isoOut = isoOut.toISOString();
-    return isoOut;
-}
 
 
 function resolve_testspec(id, cb) {
@@ -745,6 +721,7 @@ exports._process_published_config = function( _config, opts, cb ) {
         var psc_groups = {};
         // make a list of the psconfig archives
         var psc_archives = {};
+        var psc_archive_ids_included = {};
         var psc_tests = {};
         var psc_schedules = {};
         var psc_tasks = {};
@@ -878,23 +855,26 @@ exports._process_published_config = function( _config, opts, cb ) {
                             //if ( _id in psc_archives )
                             new_arch[ archid ] =  archives_obj[_id];
                             //var alreadyExists = _.find(psc_archives, function (obj) { return obj._id == _id; } );
-                            var alreadyExists = ( archives_obj[_id].data._url in maHash );
+                            var alreadyExists = ( archives_obj[_id].data._url in maHash ) ||( _id in psc_archive_ids_included);
+                        console.log("alreadyExists", alreadyExists, _id);
                             if ( alreadyExists ) {
                                 console.log("_id", _id, "already in psc_archives; skipping");
 
                             } else {
+
+                                psc_archive_ids_included[ _id ] = true;
 
                                 maHash[ archives_obj[_id].data._url ] = name;
                                 psc_hosts[_host.hostname].archives.push( archid );
 
                                 //new_arch[ archid ]._meta = "asdf";
                                 //new_arch[ name + "-" + _id] =  archives_obj[_id];
-                                //console.log("psc_archives BEFORE", psc_archives);
+                                console.log("psc_archives BEFORE", psc_archives);
                                 //console.log("archives_obj[_id]", archives_obj[_id]);
                                 //new_arch = pub_shared.format_archive( new_arch[ name + "-" + _id]  );
                                 new_arch = pub_shared.format_archive( new_arch[ archid ], archid  );
                                 psc_archives = _.extend( psc_archives, new_arch );
-                                //console.log("psc_archives AFTER", psc_archives);
+                                console.log("psc_archives AFTER", psc_archives);
                                 //console.log("new_arch", new_arch);
                                 last_host_ma_number++;
                             }
@@ -1065,15 +1045,34 @@ exports._process_published_config = function( _config, opts, cb ) {
                     //console.log("_config _arch", _arch);
                     //console.log("archives_obj[ _arch ]", archives_obj[ _arch ]);
                     var newArch = {};
-                    var name = pub_shared.archive_extract_name( _arch );
-                    if ( _arch !== undefined && name !== undefined && archives_obj[ _arch ] !== undefined ) {
-                        newArch[ name ] = _arch;
-                        newArch = pub_shared.format_archive(newArch);
-                        psc_archives = _.extend( psc_archives, newArch );
-                        //test_mas.push( pub_shared.archive_extract_name( _arch ) );
-                    } else {
-                        console.log("skipping _id ", _id);
-                    }
+                    //var name = pub_shared.archive_extract_name( _arch );
+        var name = "config-archive" + last_config_ma_number;
+        last_config_ma_number++;
+                    console.log("psc_archive_ids_included", psc_archive_ids_included);
+                        console.log("psc_archives", psc_archives);
+                        var alreadyExists = ( archives_obj[_id].data._url in maHash || ( _id in psc_archive_ids_included ) );
+                        console.log("alreadyExists", alreadyExists, _id);
+                        //var alreadyExists = ( archives_obj[_id].data._url in maHash );
+                        if ( !alreadyExists ) {
+                                console.log("config archive._id", _id);
+                                console.log("config _arch", _arch);
+                                console.log("name", name);
+                                console.log("archives_obj[_id]", archives_obj[_id]);
+
+                            if ( _arch !== undefined && name !== undefined && archives_obj[ _id ] !== undefined ) {
+                                newArch[ name ] = archives_obj[ _id ];
+                                newArch = pub_shared.format_archive(newArch[name], name + "-" + _id);
+                                console.log("newArch", newArch);
+                                psc_archives = _.extend( psc_archives, newArch );
+                                psc_archive_ids_included[ _id ] = true;
+                                test_mas.push( name + "-" + _id  );
+                                //test_mas.push( pub_shared.archive_extract_name( _arch ) );
+                            } else {
+                                console.log("skipping _id ", _id);
+                            }
+                        } else {
+                            console.log("archive id _id", _id);
+                        }
                 }
 
             });
@@ -1136,7 +1135,7 @@ exports._process_published_config = function( _config, opts, cb ) {
     var psarch_obj = {};
     async.eachSeries( _config.archives, function(arch, next_arch) {
         //console.log("ARCHIVES ...");
-        //console.log("arch", arch);
+        console.log("arch", arch);
         var _id = arch._id;
         if (  ! ( _id in archives_obj ) ) {
             logger.warn("Config ", _config.name, " has nonexistent archive ", _id, "; ignoring");
@@ -1150,8 +1149,9 @@ exports._process_published_config = function( _config, opts, cb ) {
         last_config_ma_number++;
         //console.log("NAME", name);
         archives_obj[_id].name = name;
-        if ( archives_obj[ arch ] !== undefined && archives_obj[ arch ] != {} ) {
-            psc_archives = _.extend( psc_archives, pub_shared.format_archive( archives_obj[ arch._id ] ) );
+        if ( archives_obj[ _id ] !== undefined && archives_obj[ _id ] != {}  ) {
+            //psc_archives = _.extend( psc_archives, pub_shared.format_archive( archives_obj[ _id ] ) );
+            psc_archive_ids_included[ _id ] = true;
         }
         next_arch();
         //psarch_obj = _.extend( psarch_obj, pub_shared.format_archive( archives_obj[ arch._id ] ) );
@@ -1341,6 +1341,8 @@ exports.generate = function(_config, opts, cb) {
     host_groups_details = {};
     host_catalog = {};
 
+    console.log("_config");
+    log_json(_config);
 
     exports._process_published_config( _config, opts, function(err, data) {
         if (err) return cb(err);

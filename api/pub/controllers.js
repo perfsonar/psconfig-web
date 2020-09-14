@@ -11,6 +11,8 @@ const logger = new winston.Logger(globalConfig.logger.winston);
 const db = require('../models');
 const meshconfig = require('./meshconfig');
 const url = require('url');
+const _ = require('underscore');
+
 var config = {};
 
 /**
@@ -168,9 +170,17 @@ router.get('/auto/:address', function(req, res, next) {
     var opts = {};
     opts.format = format;
     opts.request = req;
+    var archive_ids = {};
+    var archives = {};
+    console.log("address", address);
     //find host from hostname or ip
     db.Host.findOne({ hostname: address }, '_id  info.pshost-toolkitversion', function(err, host) {
-        if(err) return next(err);
+        console.log("host");
+        log_json(host);
+        if(err) {
+            logger.warn("host error", err);
+            return next(err);
+        }
         if(!host) return res.status(404).json({message: "no such hostname registered: "+address});
         var config = {
             name: "Auto-MeshConfig for "+address,
@@ -179,6 +189,7 @@ router.get('/auto/:address', function(req, res, next) {
 
         //find all hostgroups that has the host
         db.Hostgroup.find({ hosts: host._id }, '_id', function(err, hostgroups) {
+            log_json(hostgroups);
             if(err) return next(err);
             var hostgroup_ids = []; 
             hostgroups.forEach(function(hostgroup) {
@@ -197,6 +208,33 @@ router.get('/auto/:address', function(req, res, next) {
 
                 //add all tests that has hostgroup_id or host._id references
                 configs.forEach(function(_config) {
+                    log_json(_config);
+                    if ( "archives" in _config ) {
+                        if ( ! "archives" in config ) {
+                            config.archives = [];
+
+                        }
+                        _config.archives.forEach( function( _arch )  {
+                            archives[ _arch ] = true;
+                        });
+
+
+
+                        //let archives = _.object( _config.archives );
+
+                        //archive_ids[ _config.] 
+                        log_json(_config.archives);
+                        console.log("config.archives", config.archives);
+                        log_json(config.archives);
+                        //archives = _.union(archives, _config.archives);
+                        console.log("config archives after _.union", archives);
+                        console.log("archives", archives);
+                        config.archives = _.union(config.archives, Object.keys( archives ));
+                        //config.archives = _.uniq(config.archives);
+                        console.log("_config.archives after", _config.archives);
+                        console.log("config.archives after", config.archives);
+                        log_json(config.archives);
+                    }
                     _config.tests.forEach(function(test) {
                         if(!test.enabled) return;
                         var found = false;
@@ -206,6 +244,10 @@ router.get('/auto/:address', function(req, res, next) {
                         if(found) config.tests.push(test);
                     });
                 });
+
+                console.log("CONFIG@!@!");
+                log_json(config);
+
 
                 //figure out version
                 config._host_version = 

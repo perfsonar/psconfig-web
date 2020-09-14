@@ -60,6 +60,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     //we need to select admins , or can't get _canedit set
     var select = req.query.select;
     if(select && !~select.indexOf("admins")) select += " admins";
+    console.log("select", select);
 
     db.Config.find(find)
     .select(select)

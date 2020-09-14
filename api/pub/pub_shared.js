@@ -2,6 +2,7 @@
 // contrib
 const winston = require('winston');
 const _ = require('underscore');
+const moment = require('moment');
 
 // mine
 const config = require('../config');
@@ -40,6 +41,8 @@ exports.format_archive = function( archive_obj, id_override ) {
             var user = row.data._username;
             var password = row.data._password;
 
+            console.log("row.data before", row.data);
+
             if ( url && ( user || password ) ) {
                 user = user || "";
                 password = password || "";
@@ -48,17 +51,21 @@ exports.format_archive = function( archive_obj, id_override ) {
                     row.data._url = url;
 
                 }
-            
+
             }
             delete row.data._username;
             delete row.data._password;
 
             if ( row.data && "connection_lifetime" in row.data ) {
                 var expires = row.data.connection_lifetime;
-                row.data.connection_expires = expires;
+                expires = exports.seconds_to_iso8601( expires );
+                row.data["connection-expires"] = expires;
                 delete row.data.connection_lifetime;
                 row.data.schema = 2;
             } 
+            //exports.rename_underscores_to_dashes( row.data );
+            exports.rename_field( row.data, "exchange_key", "exchange" );
+            exports.rename_underscores_to_dashes( row.data, [ "_url" ] );
 
             break;
         case "rawjson":
@@ -77,6 +84,42 @@ exports.format_archive = function( archive_obj, id_override ) {
     return out;
 
 };
+
+exports.rename_underscores_to_dashes = function ( obj, keysToIgnore ) {
+
+    for(var key in obj ) {
+        if ( _.contains( keysToIgnore, key ) ) {
+            continue;
+        }
+        var pattern = /_/g;
+        //if ( preserveLeading ) {
+        //    pattern = /(?!^)_/g;
+        //}
+        var newkey = key.replace( pattern, "-");
+        obj[ newkey ] = obj[ key ];
+        if (key.match( pattern ) ) delete obj[ key ];
+
+    }
+
+};
+
+exports.rename_field = function ( obj, oldname, newname ) {
+    if ( typeof obj == "undefined" ) {
+        return;
+    }
+    if ( oldname in obj ) {
+        obj[ newname ] = obj[ oldname ];
+        delete obj[ oldname ];
+    }
+    return obj;
+
+}
+
+exports.seconds_to_iso8601 = function( dur ) {
+    var isoOut = moment.duration(dur * 1000); // moment.duration expects milliseconds
+    isoOut = isoOut.toISOString();
+    return isoOut;
+}
 
 function log_json( message, json_text ) {
     logger.debug(message, JSON.stringify(json_text, null, 3));
