@@ -41,7 +41,6 @@ exports.format_archive = function( archive_obj, id_override ) {
             var user = row.data._username;
             var password = row.data._password;
 
-            console.log("row.data before", row.data);
 
             if ( url && ( user || password ) ) {
                 user = user || "";
@@ -72,7 +71,7 @@ exports.format_archive = function( archive_obj, id_override ) {
             console.log("PARSE RAWJSON", JSON.parse( archive_obj.data.archiver_custom_json ));
             out = _.extend( row, JSON.parse( archive_obj.data.archiver_custom_json ));
             //row.data = JSON.parse( archive_obj.data.archiver_custom_json );
-            console.log("ROW", out);
+            //console.log("ROW", out);
             break;
 
     }
