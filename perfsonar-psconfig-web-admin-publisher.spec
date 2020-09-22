@@ -86,6 +86,9 @@ systemctl restart perfsonar-psconfig-web-admin-publisher.service
 %{install_base}/api/pub/*.js
 
 %changelog
+* Tue Sep 22 2020 mj82@grnoc.iu.edu 4.3.0.1-1.beta.1
+- Release 4.3.0-beta.1
+ 
 * Fri Mar 1 2019 mj82@grnoc.iu.edu 4.2.0.1-1.a1
 - Initial release as an RPM 
 

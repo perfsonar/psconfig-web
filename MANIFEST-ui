@@ -132,6 +132,7 @@ ui/images/star.png
 ui/images/trident.png
 ui/index.html
 ui/js/app.js
+ui/js/archive.js
 ui/js/components.js
 ui/js/config.js
 ui/js/controllers.js
@@ -142,6 +143,10 @@ ui/js/testspec.js
 ui/package.json
 ui/scss/pwa.scss
 ui/t/admins.html
+ui/t/archives.html
+ui/t/archive-esmond.html
+ui/t/archive-rabbitmq.html
+ui/t/archive-rawjson.html
 ui/t/configs.html
 ui/t/footer.html
 ui/t/hostgroups.html
