@@ -1,6 +1,6 @@
 
 app.controller('HostsController',
-function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hosts, $modal, $routeParams, users, $cookies) {
+function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hosts, $modal, $routeParams, users, $cookies, archives) {
 
     scaMessage.show(toaster);
     serverconf.then(function(_serverconf) { $scope.serverconf = _serverconf; });
@@ -14,7 +14,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
     $scope.newAddress = "";
 
     $scope.refreshHosts = function(query, service) {
-        var select = "sitename hostname lsid";
+        var select = "sitename hostname lsid services";
         var find = {}
         if(query) {
             find.$or = [
@@ -38,25 +38,31 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
 
     //load users for admin
     users.getAll().then(function(_users) {
+        archives.getAll().then(function(_archives) {
+            $scope.all_archives = _archives;
+            console.log("all_archives", _archives);
 
-        $scope.users = _users;
-        hosts.getAll().then(function(_hosts) {
-            $scope.hosts = _hosts;
-            $scope.loading = false;
+            $scope.users = _users;
+            hosts.getAll().then(function(_hosts) {
+                $scope.hosts = _hosts;
+                $scope.loading = false;
+                console.log("all hosts", _hosts);
+                // TODO: load all archives here
 
-            //select specified host
-            if($routeParams.id) {
-                _hosts.forEach(function(host) {
-                    if(host._id == $routeParams.id) {
-                        $scope.select(host);
-                    }
-                });
-                //scroll element to view - after this apply cycle is complete
-                setTimeout(function() {
-                    var item = document.getElementById($routeParams.id);
-                    if(item) item.scrollIntoView(true);
-                },0);
-            } else $scope.select(_hosts[0]); //select first one then
+                //select specified host
+                if($routeParams.id) {
+                    _hosts.forEach(function(host) {
+                        if(host._id == $routeParams.id) {
+                            $scope.select(host);
+                        }
+                    });
+                    //scroll element to view - after this apply cycle is complete
+                    setTimeout(function() {
+                        var item = document.getElementById($routeParams.id);
+                        if(item) item.scrollIntoView(true);
+                    },0);
+                } else $scope.select(_hosts[0]); //select first one then
+            });
         });
     });
 
@@ -229,7 +235,7 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         $scope.selected.services.push({
             type: $scope.addservice_item.id,
             //name: "tdb..", //TODO is service name used? maybe I should deprecate?
-            //locator: "",
+            locator: $scope.addservice_item.locator,
         });
         find_missing_services();
         $scope.addservice_item = null;

@@ -5,14 +5,18 @@ const mongoose = require('mongoose');
 const winston = require('winston');
 
 //mine
-const config = require('../config');
+var config = require('../config');
 const logger = new winston.Logger(config.logger.winston);
 
 //use native promise for mongoose
 //without this, I will get Mongoose: mpromise (mongoose's default promise library) is deprecated
 mongoose.Promise = global.Promise;
 
-exports.init = function(cb) {
+exports.init = function(cb, configToUse) {
+    if ( configToUse ) {
+        config = configToUse;
+
+    }
     mongoose.connect(config.mongodb, {
         useNewUrlParser: true
         , useUnifiedTopology: true
@@ -40,7 +44,7 @@ exports.disconnect = function(cb) {
 var serviceSchema = mongoose.Schema({
     type: String, //like "owamp", "bwctl", etc.
     //name: String, //from service-name
-    //locator: String, // like "tcp://ps-latency.atlas.unimelb.edu.au:861" (used to pull hostname)
+    locator: [String], // like "tcp://ps-latency.atlas.unimelb.edu.au:861" (used to pull hostname)
 
     //ma to send data to. if not set, it uses local ma
     ma: {type: mongoose.Schema.Types.ObjectId, ref: 'Host'},
@@ -75,6 +79,10 @@ var hostSchema = mongoose.Schema({
     local_ma_url: String,
 
     ma_urls: [ String ],
+
+    local_archives: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Archive'} ],
+
+    additional_archives: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Archive'} ],
 
     //host info (pshost-toolkitversion, host-hardware-memory, host-os-version, host-hadeware-processorspeed, host-hadware-processorcount)
     //and location info (location-state, location-city, location-country, etc..)
@@ -141,6 +149,20 @@ exports.Testspec = mongoose.model('Testspec', testspecSchema);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+var archiveSchema = mongoose.Schema({
+    name: String,
+    desc: String,
+    archiver: String,
+    data: mongoose.Schema.Types.Mixed,
+
+    admins: [ String ], //array of user ids (sub string in auth service)
+    create_date: {type: Date, default: Date.now},
+    update_date: {type: Date, default: Date.now},
+});
+exports.Archive = mongoose.model('Archive', archiveSchema);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 //test is now part of config
 var testSchema = mongoose.Schema({
     service_type: String,
@@ -165,11 +187,14 @@ var configSchema = mongoose.Schema({
     desc: String,
 
     tests: [ testSchema ],
+    
+    archives: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Archive'} ],
 
     admins: [ String ], //array of user ids (sub string in auth service)
     create_date: {type: Date, default: Date.now},
     update_date: {type: Date, default: Date.now},
     ma_urls: [ String ], // an array of measurement archive URLs to archive test results to
+    ma_custom_json: String,
     force_endpoint_mas: {type: Boolean, default: false} // bool determining whether to force archiving to MAs on all hosts in the config
 
 });

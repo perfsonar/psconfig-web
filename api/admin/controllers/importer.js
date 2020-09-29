@@ -47,9 +47,10 @@ function get_service_type(mc_type) {
     }
     return null;
 }
-
 function resolve_hosts(hostnames, cb) {
-    db.Host.find({'addresses.address': {$in: hostnames}}, function(err, hosts) {
+    logger.debug("resolving hostnames", JSON.stringify(hostnames));
+    db.Host.find({$or: [{'addresses.address': {$in: hostnames}}, {'hostname': {$in: hostnames}}]}, function(err, hosts) {
+    //logger.debug("IN HOSTS", JSON.stringify(hosts, null, "  "));
         if(err) return cb(err);
         var ids = hosts.map(host=>host._id);
         cb(null, ids);
@@ -91,7 +92,7 @@ function ensure_hosts(hosts_info, tests, cb) {
                         });
                         logger.debug("updating services");
                     }
-                    logger.debug("_host before saving", _host);
+                    logger.debug("_host before saving", JSON.stringify(_host, null, "  "));
                         _host.save(next_host);
                 }
             } else {
@@ -124,10 +125,15 @@ function ensure_hostgroups(hostgroups, cb) {
             } else {
                 logger.debug("need to create hostgroup resolving hosts..", hostgroup._hosts);
                 //console.log("hostgroup before resolving hosts", hostgroup);
+                // TODO: use cb to make the hostgroup not get created until after all the hosts are added?
                 resolve_hosts(hostgroup._hosts, function(err, hosts) {
-                    if(err) return next_hostgroup(err);
+                    if(err) {
+                        logger.error("Error resolving hosts in hostgroup", JSON.stringify(hostgroup, null, "  "));
+                        return next_hostgroup(err);
+                    }
                     hostgroup.hosts = hosts;
                     logger.debug("creating hostgroup");
+                    logger.debug("with hosts", JSON.stringify(hosts, null, "  "));
                     db.Hostgroup.create(hostgroup, function(err, _hostgroup) {
                         if(err) return next_hostgroup(err);
                         hostgroup._id = _hostgroup._id;
@@ -186,7 +192,20 @@ exports.import = function(url, sub, cb) {
 
 
     }); //loading config json
-}
+};
+
+exports.importJSON = function(data, sub, cb) {
+    //logger.debug("importing JSON", data);
+    //var importedConfig = JSON.parse(JSON.stringify(data));
+    var importedConfig = data;
+    logger.warn("importing JSON data", importedConfig);
+
+    exports._process_imported_config( importedConfig, sub, cb );
+    //cb();
+
+
+};
+
 
 exports._detect_config_type = function( config ) {
     var format;
@@ -248,6 +267,7 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
                             if (  _testspec._agroup.name == _group.name || _testspec._agroup.name == _group.name + " Group" ) {
                                 _testspec._agroup._id = _group._id;
                             }
+                            //console.log("_testspec contains _agroup", _testspec);
                         }
                         else { 
                             //console.log("_testspec does not contain _agroup", _testspec);
@@ -274,7 +294,6 @@ exports._process_imported_config = function ( importedConfig, sub, cb, disable_e
                         });
                         test.agroup = test._agroup._id;
                         test.testspec = test._testspec._id;
-                        logger.debug("TEST AFTER CHANGES", test);
                     });
                     cb(null, tests, config_params);
                 });
@@ -467,14 +486,7 @@ exports._extract_psconfig_tests = function( importedConfig, sub, mainConfig ) {
             testObj.schedule_type = "interval";
         }
         var type = shared.convert_service_type( testObj.type );
-        if ( importedConfig.tasks[ testName ].tools ) {
-            var tool = importedConfig.tasks[ testName ].tools[0];
-            tool = tool.replace("bwctl", "");
-            if ( tool ) {
-                testObj.spec.tool= shared.convert_tool( tool, true );
 
-            }
-        }
         if ("duration" in testObj.spec && isNaN(testObj.spec.duration)) {
             testObj.spec.duration = shared.iso8601_to_seconds( testObj.spec.duration );
             testObj.spec.omit = shared.iso8601_to_seconds( testObj.spec.omit );
@@ -500,6 +512,22 @@ exports._extract_psconfig_tests = function( importedConfig, sub, mainConfig ) {
                     var interval = shared.iso8601_to_seconds( scheduleObj.repeat );
                     testObj.spec.interval = interval;
                 }
+/*
+logger.error("importedConfig.tasks", JSON.stringify(importedConfig.tasks, null, "  "));
+logger.error("testObj", JSON.stringify(testObj, null, "  "));
+logger.error("testName", testName);
+logger.error("taskObj", JSON.stringify(taskObj, null, "  "));
+logger.error("taskName", taskName);
+*/
+
+        if ( importedConfig.tasks[ taskName ].tools ) {
+            var tool = importedConfig.tasks[ taskName ].tools[0];
+            tool = tool.replace("bwctl", "");
+            if ( tool ) {
+                testObj.spec.tool= shared.convert_tool( tool, true );
+
+            }
+        }
             }
 
         });
@@ -611,6 +639,15 @@ exports._extract_psconfig_hosts = function( importedConfig, config_params, sub )
         var desc = hostInfo._meta["display-name"];
         var toolkitURL = hostInfo._meta["display-url"];
         var address = hostInfo.address;
+        /*
+logger.error("hostsImported", JSON.stringify(hostsImported, null, '  '));
+logger.error("address", address);
+logger.error("hostInfo", JSON.stringify(hostInfo, null, '  '));
+*/
+if ( ! ( address in hostsImported ) ) {
+	hostsImported[address] = {};
+
+}
         var archives = hostsImported[address].archives;
         var ma_urls = [];
         var local_ma = false;

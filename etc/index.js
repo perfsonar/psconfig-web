@@ -14,6 +14,14 @@ exports.pub = {
     default_config_format: "psconfig"
 };
 
+exports.pub.plugins = {
+    enabled: false,
+    plugin_scripts: [ 'plugins/pub/filter_example.js' ]
+
+};
+
+console.log("exports.pub", exports.pub);
+
 // Mongo DB to use (the default should work fine, unless you specifically need a different db)
 exports.mongodb = "mongodb://localhost/pwa";
 
@@ -148,13 +156,23 @@ exports.datasource = {
             query: "?type=service&group-communities=*WIDGET,*widget&group-communities-operator=any",
         },
 */
+        // IN:
+        /*"gls": {
+            label: "GLS",
+            type: "global-sls",
+            activehosts_url: "http://ps1.es.net:8096/lookup/activehosts.json",
+            query: "?type=service&group-communities=Indiana",
+        }
+        */
         // Global LS instance (by default, this is the only LS specified)
+    
         "gls": {
             label: "GLS",
             type: "global-sls",
             activehosts_url: "http://ps1.es.net:8096/lookup/activehosts.json",
             query: "?type=service",
         }
+        
 
         // Private sLS instance
         // only uncomment this if you are running a private sLS instance

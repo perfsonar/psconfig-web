@@ -133,6 +133,11 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             testspec.admins = req.body.admins;
             testspec.update_date = new Date();
 
+            if ( testspec.service_type != "owamp" ) {
+                testspec.schedule_type = "interval";
+
+            }
+
             // Rename protocol to probe_type for trace tests
             if ( testspec.service_type == "traceroute" ) {
                 if ( (! req.body.specs.probe_type ) && req.body.specs.protocol ) {

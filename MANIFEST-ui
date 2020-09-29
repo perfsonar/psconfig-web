@@ -132,6 +132,7 @@ ui/images/star.png
 ui/images/trident.png
 ui/index.html
 ui/js/app.js
+ui/js/archive.js
 ui/js/components.js
 ui/js/config.js
 ui/js/controllers.js
@@ -142,6 +143,10 @@ ui/js/testspec.js
 ui/package.json
 ui/scss/pwa.scss
 ui/t/admins.html
+ui/t/archives.html
+ui/t/archive-esmond.html
+ui/t/archive-rabbitmq.html
+ui/t/archive-rawjson.html
 ui/t/configs.html
 ui/t/footer.html
 ui/t/hostgroups.html
@@ -158,6 +163,7 @@ ui/t/testspec-owamp.html
 ui/t/testspec-ping.html
 ui/t/testspec-traceroute.html
 ui/t/testspecs.html
+api/admin/controllers/archives.js
 api/admin/controllers/configs.js
 api/admin/controllers/hostgroups.js
 api/admin/controllers/hosts.js
@@ -171,6 +177,7 @@ api/pwaadmin.js
 api/pwacache-expire-dedupe.js
 api/pwacache.js
 api/pwapub.js
+api/sharedFunctions.js
 api/pub/controllers.js
 api/pub/meshconfig.js
 api/pub/server.js

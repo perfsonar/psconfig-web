@@ -73,6 +73,7 @@ router.get('/config', jwt({secret: config.admin.jwt.pub, credentialsRequired: fa
 
 router.use('/configs', require('./configs'));
 router.use('/testspecs', require('./testspecs'));
+router.use('/archives', require('./archives'));
 router.use('/hosts', require('./hosts'));
 router.use('/hostgroups', require('./hostgroups'));
 

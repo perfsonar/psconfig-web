@@ -6,8 +6,8 @@
 %define apache_base /etc/httpd/conf.d
 %define apacheconf pwa-pub.conf
 
-%define perfsonar_auto_version 4.2.4
-%define perfsonar_auto_relnum 1
+%define perfsonar_auto_version 4.3.0
+%define perfsonar_auto_relnum 0.b1.1
 %define debug_package %{nil}
 
 Name:			perfsonar-psconfig-web-admin-publisher
@@ -86,6 +86,9 @@ systemctl restart perfsonar-psconfig-web-admin-publisher.service
 %{install_base}/api/pub/*.js
 
 %changelog
+* Tue Sep 22 2020 mj82@grnoc.iu.edu 4.3.0.1-1.beta.1
+- Release 4.3.0-beta.1
+ 
 * Fri Mar 1 2019 mj82@grnoc.iu.edu 4.2.0.1-1.a1
 - Initial release as an RPM 
 

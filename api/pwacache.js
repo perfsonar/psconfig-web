@@ -57,7 +57,9 @@ function create_hostrec(service, uri, cb) {
     var pathname = pathname_tokens.join("/");
 
     //reconstruct the url for the host record
-    var url = uri.protocol+"//"+uri.host+pathname+'/'+service['service-host'][0];
+    console.log("service['service-host']", service['service-host']);
+    var url = uri.protocol+"//"+uri.host+'/'+service['service-host'][0];
+    console.log("URL", url);
     request({url: url, timeout: 1000*10, json: true}, function(err, res, host) {
         if(err) return cb(err);
         if(res.statusCode != 200) return cb(new Error("failed to cache host from: "+url+" statusCode:"+res.statusCode));
@@ -153,6 +155,9 @@ function cache_ls(hosts, ls, lsid, cb) {
         async.eachSeries(services, function(service, next) {
             //pick client-uuid or service-host(for old version of toolkit) as host id
             var id;
+        //if ( service["service-type"][0] == "pscheduler" ) {
+            //console.log("hostSERVICE!!", service);
+        //}
             if(!service['client-uuid']) {
                 if(!service['service-host']) {
                     logger.error("client-uuid nor service-host is set.. can't process this service");
@@ -174,14 +179,18 @@ function cache_ls(hosts, ls, lsid, cb) {
                 //we need to make sure we don't register more than 1 service for each type per host
                 var exist = false;
                 var type = service['service-type'][0];
+                var locator = service['service-locator'];
+                //console.log("LOCATOR FOUND: ", locator);
                 host.services.forEach(function(_service) {
                     if(_service.type == type) exist = true;
                 });
                 if(!exist) {
                     //construct service record
-                    host.services.push({
-                        type: type,
-                    });
+                    var _new_service = { type: type };
+                    if ( locator ) {
+                        _new_service.locator = locator;
+                    }
+                    host.services.push(_new_service);
                 }
                 next();
             });
@@ -276,30 +285,39 @@ function run() {
                 if ( uuid ) {
                     logger.debug(host.hostname + " filtering on uuid " + uuid);
                     filter.uuid = uuid;
+                    filter.hostname = host.hostname;
                 } else {
                     logger.debug(host.hostname + " filtering on hostname " + host.hostname);
                     filter.hostname = host.hostname;
                 }
 
                 // check for duplicate hosts
-                /*
-                if ( "uuid" in filter ) {
-                    //console.log("CHECKING FOR DUPE RECORDS!");
-                    db.Host.find({"uuid": uuid}, function(err, uuidhosts) {
-                        if ( err ) logger.error(err);
-                        if ( uuidhosts.length > 1 ) {
-                            //console.log("Possible DUPE UUIDHOSTS", uuidhosts.length, uuidhosts);
-                        }
+            //console.log(JSON.stringify(host, null, 3));
 
+                        if ( host.hostname == "perfsonar-dev.grnoc.iu.edu" ) {
+                            console.log("host", host);
+                        }
+                if ( "uuid" in filter ) {
+                    delete filter.uuid;
+                    console.log("CHECKING FOR RECORDS! filter", filter);
+                    db.Host.find({"hostname": host.hostname}, function(err, uuidhosts) {
+                    //db.Host.find({"uuid": uuid}, function(err, uuidhosts) {
+                    //db.Host.find({$and: [{uuid: filter.uuid}, {hostname: filter.hostname}]}, function(err, uuidhosts) {
+                        if ( err ) logger.error(err);
+                        if ( uuidhosts.length > 0 ) {
+                            console.log("Possible ", host.hostname, " RECORD UUIDHOSTS", uuidhosts.length); //, uuidhosts);
+                        } else {
+                            console.log("no matching record with this UUID for host", host.hostname, filter.uuid);
+
+                        }
 
 
                     });
                 }
-                */
 
                 db.Host.findOneAndUpdate( filter ,
                     {$set: host}, {upsert: true, setDefaultsOnInsert: true}, function(err) {
-                    if(err) logger.error(err);
+                    if(err) logger.error("Error find a and update", err);
                     next();
                 });
             } else {

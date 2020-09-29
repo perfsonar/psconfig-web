@@ -1,0 +1,84 @@
+<div ng-controller="paramsAccordion">
+
+    <accordion close-others="false">
+
+        <accordion-group is-open="status.basicOpen">
+            <accordion-heading>
+                <h3>Esmond Archive Parameters
+                <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.basicOpen, 'glyphicon-chevron-right': !status.basicOpen}"></i>
+            </h3>
+            </accordion-heading>
+
+
+            <div class="form-section">
+
+
+<div class="form-group">
+    <label for="test_interval" class="col-sm-2 control-label">URL *</label>
+    <div class="col-sm-10">
+        <div class="input-group">
+            <input type="text" string class="form-control" name="url" ng-disabled="!selected._canedit" ng-model="selected.data._url" required>
+            Url: {{selected.data._url}}
+            <!-- <div class="input-group-addon">URL</div> -->
+        </div>
+        <p class="help-block">
+            Esmond URL 
+            <code>data._url</code>
+        </p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="test_interval" class="col-sm-2 control-label">Measurement Agent</label>
+    <div class="col-sm-10">
+        <div class="input-group">
+            <input type="text" string class="form-control" name="url" ng-disabled="!selected._canedit" ng-model="selected.data.measurement_agent">
+            Measurement Agent: {{selected.data.measurement_agent}}
+            <!-- <div class="input-group-addon">URL</div> -->
+        </div>
+        <p class="help-block">
+           Measurement Agent (DOCS LINK) 
+            <code>data.measurement_agent</code>
+        </p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="auth_token" class="col-sm-2 control-label">Auth Token</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" string class="form-control" name="auth_token" ng-disabled="!selected._canedit" ng-model="selected.data._auth_token">
+            <!-- <div class="input-group-addon">URL</div> -->
+        </div>
+        <p class="help-block">
+           Esmond auth token 
+            <code>data._auth_token</code>
+        </p>
+    </div>
+
+    <label for="verify_ssl" class="col-sm-2 control-label">Verify SSL MAKE CHECKBOX</label>
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input type="text" string class="form-control" name="verify_ssl" ng-disabled="!selected._canedit" ng-model="selected.data.verify_ssl">
+            <!-- <div class="input-group-addon">URL</div> -->
+        </div>
+        <p class="help-block">
+           Whether to verify the SSL key when archiving 
+            <code>data.verify_ssl</code>
+        </p>
+    </div>
+</div>
+
+                <div class="form-group">
+                    <label for="type" class="col-sm-2 control-label">Data Formatting Policy</label>
+                    <div class="col-sm-10">
+                        <select class="form-control"
+                            ng-disabled="!selected._canedit"
+                            ng-model="selected.data.data_formatting_policy"
+                            ng-change="setdefault(selected.data.data_formatting_policy)" required>
+                            <option ng-repeat="(aid, item) in serverconf.dataFormattingPolicies" value="{{aid}}">{{item}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+

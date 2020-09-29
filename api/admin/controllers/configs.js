@@ -2,11 +2,15 @@
 
 //contrib
 const express = require('express');
+const busboy = require('busboy');
 const router = express.Router();
 const winston = require('winston');
 const jwt = require('express-jwt');
 const async = require('async');
 const request = require('request');
+const fs = require('fs');
+const path = require('path');
+
 
 //mine
 const config = require('../../config');
@@ -21,6 +25,16 @@ function canedit(user, config) {
         if(~config.admins.indexOf(user.sub.toString())) return true;
     }
     return false;
+}
+
+function isJSON(archive){
+    try{
+            JSON.parse(archive);
+    }
+    catch(err){
+            return false;
+    }
+    return true;
 }
 
 /**
@@ -46,6 +60,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     //we need to select admins , or can't get _canedit set
     var select = req.query.select;
     if(select && !~select.indexOf("admins")) select += " admins";
+    console.log("select", select);
 
     db.Config.find(find)
     .select(select)
@@ -64,6 +79,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
                     config.ma_urls = config.ma_urls.join("\n");
 
                 }
+		//console.log("Custom json Getting from db", config);
             });
             res.json({configs: configs, count: count});
         });
@@ -110,6 +126,46 @@ router.put('/import', jwt({secret: config.admin.jwt.pub}), function(req, res, ne
     });
 });
 
+router.put('/importFile', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
+    if(!req.user.scopes.pwa || !~req.user.scopes.pwa.indexOf('user')) return res.status(401).end();
+
+    if(req.busboy) {
+        req.busboy.on("file", function(fieldName, fileStream, fileName, encoding, mimeType) {
+            // set encoding
+            fileStream.setEncoding( "utf8" );
+            //var fstream = fs.createWriteStream('/tmp/' + fileName);
+            fileStream.on('data', (chunk) => {
+                var content = JSON.parse(chunk);
+                importer.importJSON(content, req.user.sub, function(err, tests, new_config_params) {
+                    if(err) return next(err);
+                    res.json({msg: "Created testspecs / host / hostgroups records", tests: tests, config_params: new_config_params});
+                    var results = {
+                        err: err,
+                    tests: tests,
+                    config_params: new_config_params
+                    };
+                });
+            });
+        });
+          return req.pipe(req.busboy);
+    }
+
+});
+
+router.put('/importJSON', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
+    if(!req.user.scopes.pwa || !~req.user.scopes.pwa.indexOf('user')) return res.status(401).end();
+    importer.importJSON(req.body.content, req.user.sub, function(err, tests, new_config_params) {
+        if(err) return next(err);
+        res.json({msg: "Created testspecs / host / hostgroups records", tests: tests, config_params: new_config_params});
+        var results = {
+            err: err,
+            tests: tests,
+            config_params: new_config_params
+        };
+
+    });
+});
+
 /**
  * @api {put} /configs/:id      Update Config
  * @apiGroup                    Configs
@@ -139,7 +195,23 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             }
             config.tests = req.body.tests;
             config.admins = req.body.admins;
-            config.force_endpoint_mas = req.body.force_endpoint_mas;
+            config.archives = req.body.archives;
+	    var custom_json = req.body.ma_custom_json;
+        if( ( "ma_custom_json" in req.body ) 
+            && ( ( typeof req.body.ma_custom_json ) != "undefined" )
+            //&& ( req.body.ma_custom_json != "" )
+            && isJSON(req.body.ma_custom_json) ) {
+            config.ma_custom_json = custom_json;
+            //console.log("Here ma_custom is a valid json:",config.ma_custom_json);
+        } else {
+            config.ma_custom_json = "";
+            req.body.ma_custom_json = "";
+            //delete config.ma_custom_json;
+            //delete req.body.ma_custom_json;
+            //console.log("deleting ma_custom_json", config);
+
+        }
+	    config.force_endpoint_mas = req.body.force_endpoint_mas;
             config.update_date = new Date();
             if ( "ma_urls" in req.body ) {
                 config.ma_urls = req.body.ma_urls.split("\n");

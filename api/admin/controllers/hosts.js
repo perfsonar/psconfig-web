@@ -41,6 +41,8 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
 
     //we need to select admins , or can't get _canedit set
     var select = req.query.select;
+    console.log("select", select);
+    console.log("find", find);
     if(select && !~select.indexOf("admins")) select += " admins";
 
     db.Host.find(find)
@@ -55,6 +57,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
             if(err) return next(err);
 
             hosts.forEach(function(host) {
+                console.log("host", host);
                 //append canedit flag
                 host._canedit = canedit(req.user, host);
                 // format ma_urls
@@ -139,6 +142,10 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             if(!service.ma) service.ma = undefined;
         });
 
+        // reusable archivers
+        host.local_archives = req.body.local_archives;
+        host.additional_archives = req.body.additional_archives;
+
         //things always allowed to edit (TODO - shouldn't I have to mask fields not set?)
         host.no_agent = req.body.no_agent;
         host.local_ma = req.body.local_ma;
@@ -164,13 +171,13 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
 
         if(!host.lsid) {
             //adhoc records can set more info
+            host.admins =  req.body.admins;
             host.hostname = req.body.hostname;
+        }
             host.sitename = req.body.sitename;
             host.info = req.body.info;
             //host.location = req.body.location;
             host.communities = req.body.communities;
-            host.admins =  req.body.admins;
-        }
 
         host.save(function(err) {
             if(err) return next(err);

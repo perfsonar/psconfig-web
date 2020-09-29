@@ -7,8 +7,8 @@ PUB_ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin/pub
 CONFIGPATH=/etc/perfsonar/psconfig-web
 PUB_CONFIGPATH=/etc/perfsonar/psconfig-web
 #LIBPATH=/usr/lib/perfsonar/lib
-PERFSONAR_AUTO_VERSION=4.2.4
-PERFSONAR_AUTO_RELNUM=1
+PERFSONAR_AUTO_VERSION=4.3.0
+PERFSONAR_AUTO_RELNUM=0.b1.1
 VERSION=${PERFSONAR_AUTO_VERSION}
 RELEASE=${PERFSONAR_AUTO_RELNUM}
 
@@ -45,6 +45,10 @@ manifest:
 npm:
 	npm install --only=prod
 	pushd ui; npm install --only=prod; popd
+
+npm_dev:
+	npm install
+	pushd ui; npm install; popd
 
 webpack:
 	./ui/node_modules/webpack/bin/webpack.js ui/js/app.js -o ui/dist/pwa-admin-ui-bundle.js
@@ -98,7 +102,7 @@ clean:
 	#rm -f ui/dist/pwa-admin-ui-bundle.js
 
 npm_clean:
-	rm -f MANIFEST-node_modules
+	#rm -f MANIFEST-node_modules
 	rm -rf node_modules
 	rm -rf ui/node_modules
 

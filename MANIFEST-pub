@@ -4,9 +4,11 @@ Makefile
 perfsonar-psconfig-web-admin-publisher.spec
 api/common.js
 api/pwapub.js
+api/sharedFunctions.js
 api/pub/controllers.js
 api/pub/meshconfig.js
 api/pub/server.js
+api/pub/pub_shared.js
 api/models/index.js
 etc/apache/pwa-pub.conf
 deploy/systemd/perfsonar-psconfig-web-admin-publisher.service

@@ -6,6 +6,7 @@ const path = require('path');
 
 //contrib
 const express = require('express');
+const busboy = require("connect-busboy");
 const bodyParser = require('body-parser');
 const winston = require('winston');
 const expressWinston = require('express-winston');
@@ -21,6 +22,7 @@ const common = require('../common');
 const app = express();
 app.use(compression());
 app.use(bodyParser.json()); //parse application/json
+app.use(busboy()); // busboy for file uploads
 app.use(expressWinston.logger(config.logger.winston));
 
 //setup routes
