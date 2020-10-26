@@ -23,8 +23,9 @@ BuildArch:		x86_64
 Requires:       nodejs
 Requires:		httpd
 Requires:       mod_ssl
-Requires:       (mongodb-org-server or mongodb-server)
 Requires:       perfsonar-psconfig-web-admin-shared
+Recommends:     mongodb-org-server
+Recommends:     mongodb-server
 
 %description
 The perfSONAR pSConfig Web Administrator Publisher package provides a webservice for
