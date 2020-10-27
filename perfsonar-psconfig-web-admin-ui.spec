@@ -23,10 +23,10 @@ BuildArch:		x86_64
 Requires:       nodejs
 Requires:		httpd
 Requires:       mod_ssl
-Requires:     mongodb-org
-#Requires:     mongodb
-Requires:     mongodb-org-server
-#Requires:     mongodb-server
+Requires:       mongodb
+Requires:       mongodb-server
+#Requires:       mongodb-org #TODO we may need to use this instead
+#Requires:       mongodb-org-server #TODO we may need to use this instead
 Requires:		perfsonar-psconfig-web-admin-shared
 Requires:		perfsonar-psconfig-web-admin-auth
 
