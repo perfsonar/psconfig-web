@@ -7,7 +7,7 @@
 %define apacheconf pwa-pub.conf
 
 %define perfsonar_auto_version 4.3.0
-%define perfsonar_auto_relnum 0.b1.1
+%define perfsonar_auto_relnum 1
 %define debug_package %{nil}
 
 Name:			perfsonar-psconfig-web-admin-publisher
@@ -23,8 +23,9 @@ BuildArch:		x86_64
 Requires:       nodejs
 Requires:		httpd
 Requires:       mod_ssl
-Requires:       mongodb-server
 Requires:       perfsonar-psconfig-web-admin-shared
+Requires:       mongodb-server 
+#Requires:       mongodb-org-server #TODO we may have to change to this
 
 %description
 The perfSONAR pSConfig Web Administrator Publisher package provides a webservice for

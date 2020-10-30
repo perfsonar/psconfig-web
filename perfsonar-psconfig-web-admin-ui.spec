@@ -7,7 +7,7 @@
 %define apacheconf pwa-admin.conf
 
 %define perfsonar_auto_version 4.3.0
-%define perfsonar_auto_relnum 0.b1.1
+%define perfsonar_auto_relnum 1
 %define debug_package %{nil}
 
 Name:			perfsonar-psconfig-web-admin-ui
@@ -25,6 +25,8 @@ Requires:		httpd
 Requires:       mod_ssl
 Requires:       mongodb
 Requires:       mongodb-server
+#Requires:       mongodb-org #TODO we may need to use this instead
+#Requires:       mongodb-org-server #TODO we may need to use this instead
 Requires:		perfsonar-psconfig-web-admin-shared
 Requires:		perfsonar-psconfig-web-admin-auth
 
