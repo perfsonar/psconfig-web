@@ -1,13 +1,17 @@
+<fieldset ng-class="{disabled: false}">
 <div class="form-group">
     <div class="col-sm-offset-2 col-sm-8">
         <div class="checkbox">
-            <label> <input type="checkbox" ng-model="test.enabled" ng-disabled="!selected._canedit"> Enabled (include in mesh config)</label>
+            <label> <input type="checkbox" ng-model="test.enabled" ng-disabled="false"> Enabled (include in mesh config)</label>
         </div>
     </div>
     <div class="col-sm-2" ng-if="selected._canedit">
         <button type="button" class="btn btn-danger btn-xs pull-right" ng-click="removetest(test)"><i class="fa fa-times"></i> Remove Test</button>
     </div>
 </div>
+    </fieldset>
+
+    <fieldset ng-disabled="!test.enabled">
 
 <div class="form-group">
     <label class="col-sm-2 control-label">Test Name</label>
@@ -159,3 +163,4 @@
         </div>
     </div>
 </div>
+</fieldset>
