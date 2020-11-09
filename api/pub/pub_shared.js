@@ -24,6 +24,7 @@ exports.format_archive = function( archive_obj, id_override ) {
     out[ name ] = {};
     var row = out[name];
 
+
     switch ( archive_obj.archiver ) {
         case "esmond":
             row.archiver = "esmond";
@@ -31,6 +32,9 @@ exports.format_archive = function( archive_obj, id_override ) {
                 "url": archive_obj.data._url,
                 "measurement-agent": "{% scheduled_by_address %}"
             };
+            if ( "verify_ssl" in archive_obj.data && archive_obj.data["verify_ssl"] ) {
+                row.data["verify-ssl"] = archive_obj.data["verify_ssl"];
+            }
             delete out._url;
         
             break;
@@ -79,7 +83,6 @@ exports.format_archive = function( archive_obj, id_override ) {
     delete out.desc;
 
     //console///.log("formatted output: ", out);
-    //console.log("formatting out ...\n", JSON.stringify(out));
     return out;
 
 };
