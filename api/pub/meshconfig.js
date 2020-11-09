@@ -52,6 +52,9 @@ function load_profile(cb) {
 }
 
 function format_archive_obj( archObj ) {
+    if ( _.isObject( archObj ) ) {
+        return;
+    }
     let fields_to_include =  [ "archiver", "data" ];
     for ( let arch in archObj ) {
         let params = archObj[ arch ];
