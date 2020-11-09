@@ -146,7 +146,7 @@ app.factory('archives', function(appconf, $http, jwtHelper) {
         },
         add: function() {
             var archive = {
-                desc: "New Testspec",
+                desc: "New Archive",
                 admins: [],
             };
             var jwt = localStorage.getItem(appconf.jwt_id);
