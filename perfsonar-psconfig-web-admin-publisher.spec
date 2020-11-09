@@ -6,7 +6,7 @@
 %define apache_base /etc/httpd/conf.d
 %define apacheconf pwa-pub.conf
 
-%define perfsonar_auto_version 4.3.1
+%define perfsonar_auto_version 4.3.2
 %define perfsonar_auto_relnum 0.a1.0
 %define debug_package %{nil}
 
