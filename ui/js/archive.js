@@ -58,8 +58,11 @@ function($scope, $route, toaster, $http, jwtHelper, $location, serverconf, scaMe
     };
 
     $scope.setdefault = function(archiver) {
-        var def = $scope.serverconf.defaults.archives[archiver];
+        var def = {};
+        if ( "archives" in $scope.serverconf.defaults ) { 
+            def = $scope.serverconf.defaults.archives[archiver] || {};
         $scope.selected.data = $.extend( true, {}, def, $scope.selected.data );
+        }
     };
 
     $scope.filter_archives = function(archives) {
