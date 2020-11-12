@@ -47,56 +47,8 @@ function($scope, toaster, $http, jwtHelper, serverconf, users, $modal, scaMessag
             $scope.hosts.forEach(function(host) {
                 $scope.host_catalog[host._id] = host;
             });
-            update_map();
         });
     };
-
-    $scope.map = {
-        center: { latitude: 0, longitude: 0 }, zoom: 1, //world
-        options: {
-            scrollwheel: false,
-        },
-        markers: [],
-    }
-
-    $scope.$watch('selected.hosts', function() {
-        update_map();
-    });
-
-    function update_map() {
-        $scope.map.markers = [];
-        if(!$scope.selected) return;
-        if(!$scope.hosts) return;
-        $scope.selected.hosts.forEach(function(host_id) {
-            //find host info
-            /*
-            $scope.hosts.forEach(function(host) {
-                if(host._id == host_id) {
-                    var lat = host.info['location-latitude'];
-                    var lng = host.info['location-longitude'];
-                    if(lat && lng) {
-                        $scope.map.markers.push({
-                            id: host._id,
-                            latitude: lat,
-                            longitude: lng,
-                        });
-                    }
-                }
-            });
-            */
-            var host = $scope.host_catalog[host_id];
-            if(!host) return;
-            var lat = host.info['location-latitude'];
-            var lng = host.info['location-longitude'];
-            if(lat && lng) {
-                $scope.map.markers.push({
-                    id: host._id,
-                    latitude: lat,
-                    longitude: lng,
-                });
-            }
-        });
-    }
 
     $scope.selected = null;
     $scope.select = function(hostgroup) {
