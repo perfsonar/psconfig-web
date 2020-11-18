@@ -176,23 +176,6 @@
                     </div>
                 </div>
 		
-		<!--Archiver configs-->
-		<div ng-controller="paramsAccordion">
-    			<accordion close-others="false">
-        			<accordion-group is-open="status.open">
-            				<accordion-heading>
-                			<h3> Custom Archiver
-                    			<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-                			</h3>
-            				</accordion-heading>
-			                <label class="col-sm-2 control-label">Custom Archive</label>
-                    			<div class="col-sm-6">
-                        			<textarea class="form-control" name="ma_custom_json" id="ma_custom_json" ng-disabled="!selected._canedit" ng-model="selected.ma_custom_json" rows="5"></textarea>
-						<p class="help-block"> * RAW JSON -- be careful, you might break things if you don't know what you're doing</p>
-                    			</div>
-        			</accordion-group>
-    			</accordion>
-		</div>
 
                 <div class="form-group">
                     <label class="col-sm-2 control-label">Force endpoint MAs</label>
@@ -211,7 +194,7 @@
                     <label class="col-sm-2 control-label">Tests</label>
                     <div class="col-sm-10">
                         <ul class="list-group" ng-if="selected.tests.length > 0">
-                            <li class="list-group-item" ng-repeat="test in selected.tests" ng-class="{disabled: !test.enabled, 'slide-down': !test._id}">
+                            <li class="list-group-item" ng-repeat="test in selected.tests" ng-class="{'slide-down': !test._id}">
                                 <ng-include src="'t/testeditor.html'"></ng-include>
                             </li>
                         </ul>
@@ -292,6 +275,23 @@
                         </div>
                     </div>
                 </div>
+		<!--Archiver configs-->
+		<div ng-controller="paramsAccordion">
+    			<accordion close-others="false">
+        			<accordion-group is-open="status.open">
+            				<accordion-heading>
+                			<h3> Custom Archiver
+                    			<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                			</h3>
+            				</accordion-heading>
+			                <label class="col-sm-2 control-label">Custom Archive</label>
+                    			<div class="col-sm-6">
+                        			<textarea class="form-control" name="ma_custom_json" id="ma_custom_json" ng-disabled="!selected._canedit" ng-model="selected.ma_custom_json" rows="5"></textarea>
+						<p class="help-block"> * RAW JSON -- be careful, you might break things if you don't know what you're doing</p>
+                    			</div>
+        			</accordion-group>
+    			</accordion>
+		</div>
 
                 <br>
                 <br>

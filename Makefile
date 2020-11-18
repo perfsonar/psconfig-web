@@ -7,7 +7,7 @@ PUB_ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin/pub
 CONFIGPATH=/etc/perfsonar/psconfig-web
 PUB_CONFIGPATH=/etc/perfsonar/psconfig-web
 #LIBPATH=/usr/lib/perfsonar/lib
-PERFSONAR_AUTO_VERSION=4.3.0
+PERFSONAR_AUTO_VERSION=4.3.2
 PERFSONAR_AUTO_RELNUM=1
 VERSION=${PERFSONAR_AUTO_VERSION}
 RELEASE=${PERFSONAR_AUTO_RELNUM}
@@ -43,12 +43,12 @@ manifest:
 	echo "ui/node_modules/ace-builds/src-min-noconflict/mode-javascript.js" >> MANIFEST-ui-node_modules
 
 npm:
-	npm install --only=prod
-	pushd ui; npm install --only=prod; popd
+	npm install --only=prod && \
+	pushd ui && npm install --only=prod && popd
 
 npm_dev:
-	npm install
-	pushd ui; npm install; popd
+	npm install && \
+	pushd ui && npm install && popd
 
 webpack:
 	./ui/node_modules/webpack/bin/webpack.js ui/js/app.js -o ui/dist/pwa-admin-ui-bundle.js

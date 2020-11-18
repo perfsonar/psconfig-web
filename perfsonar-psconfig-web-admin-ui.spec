@@ -6,7 +6,7 @@
 %define apache_base /etc/httpd/conf.d
 %define apacheconf pwa-admin.conf
 
-%define perfsonar_auto_version 4.3.0
+%define perfsonar_auto_version 4.3.2
 %define perfsonar_auto_relnum 1
 %define debug_package %{nil}
 
@@ -29,6 +29,7 @@ Requires:       mongodb-server
 #Requires:       mongodb-org-server #TODO we may need to use this instead
 Requires:		perfsonar-psconfig-web-admin-shared
 Requires:		perfsonar-psconfig-web-admin-auth
+Requires:		perfsonar-psconfig-web-admin-publisher
 
 %description
 The perfSONAR pSConfig Web Administrator package provides an authenticated, multi-user,

@@ -15,7 +15,6 @@ var app = angular.module('app', [
     'ui.ace',
     'ngLocationUpdate',
     'yaru22.angular-timeago',
-    'uiGmapgoogle-maps'
 ]);
 
 //can't quite do the slidedown animation through pure angular/css.. borrowing slideDown from jQuery..
@@ -90,14 +89,6 @@ app.directive('stopEvent', function () {
 
 app.config(function(uiSelectConfig) {
   uiSelectConfig.dropdownPosition = 'down';
-})
-
-app.config(function(appconf, uiGmapGoogleMapApiProvider) {
-    uiGmapGoogleMapApiProvider.configure({
-        key: appconf.google_map_api,
-        //v: '3.20', //defaults to latest 3.X anyhow
-        //libraries: 'weather,geometry,visualization'
-    });
 })
 
 //show loading bar at the top
@@ -266,22 +257,6 @@ app.directive('meshName', function ( ) {
 });
 
 
-//http://stackoverflow.com/questions/21311401/angularjs-get-element-in-controller
-app.directive('hostmap', function (uiGmapGoogleMapApi) {
-    return {
-        restrict:"E", 
-        link: function($scope, elem, attrs) {
-            uiGmapGoogleMapApi.then(function(maps) { 
-                var mapOptions = {
-                    zoom: 4,
-                    center: new maps.LatLng(40.0000, -98.0000),
-                    mapTypeId: maps.MapTypeId.TERRAIN
-                }
-                $scope.map = new maps.Map(elem[0], mapOptions);
-            });
-        }
-    };
-});
 
 app.controller('paramsAccordion', function ($scope) {
     $scope.oneAtATime = true;

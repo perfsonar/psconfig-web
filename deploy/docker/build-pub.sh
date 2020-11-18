@@ -9,7 +9,7 @@ rm -f pwa-pub/tmp/api/config.js
 cp -r ../../package.json pwa-pub/tmp
 rm -rf pwa-pub/tmp/api/config
 
-docker build pwa-pub -t perfsonar/pwa-pub:$VERSION
+docker build pwa-pub -t perfsonar/pwa-pub:$VERSION --no-cache --force-rm
 
 if [ ! $? -eq 0 ]; then
     echo "failed to build"

@@ -52,6 +52,9 @@ function load_profile(cb) {
 }
 
 function format_archive_obj( archObj ) {
+    if ( _.isObject( archObj ) ) {
+        return;
+    }
     let fields_to_include =  [ "archiver", "data" ];
     for ( let arch in archObj ) {
         let params = archObj[ arch ];
@@ -584,11 +587,14 @@ exports._process_published_config = function( _config, opts, cb ) {
             if(err) return cb(err);
             archs.forEach( function( arch ) {
                 //console.log("inside exec");
-                //console.log("arch", arch);
                 //archives_obj[ arch._id ] = pub_shared.format_archive( arch ); 
+
+                //rename_field( arch.data, "verify_ssl", "verify-ssl" );
+                //pub_shared.format_archive( arch ); 
                 archives_obj[ arch._id ] = arch;
+                _config.archives_obj = arch;
                 //_config.archives_obj = pub_shared.format_archive( arch ); 
-                //console.log("arch_obj", arch_obj);
+
             });
             //console.log("archives_obj", archives_obj);
             //next_arch();
@@ -840,6 +846,7 @@ exports._process_published_config = function( _config, opts, cb ) {
                             //var alreadyExists = _.find(psc_archives, function (obj) { return obj._id == _id; } );
                             //var alreadyExists = ( archives_obj[_id].data._url in maHash ) ;
                             var alreadyExists =  _id in psc_archive_ids_included;
+
                             if ( alreadyExists ) {
                                 logger.debug("_id", _id, "already in psc_archives; not adding again");
                                 //psc_archive_ids_included[ _id ] = true;
@@ -904,7 +911,6 @@ exports._process_published_config = function( _config, opts, cb ) {
                     if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
                     if ( ! ( "_archive" in _host ) ) _host._archive = [];
 
-                    //console.log("adding host mas, maName, maInfo", maName, maInfo);
                     if ( ! ( url in maHash ) ) {
                         if ( ( _host.local_ma || _config.force_endpoint_mas ) ) {
                             psc_archives[ maName ] = maInfo;

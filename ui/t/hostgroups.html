@@ -131,7 +131,7 @@
                                     ng-click="selected.hosts = []; form.$setDirty();">
                                     Clear All {{selected.hosts.length}} Hosts</button>
 
-                                <p class="help-block">Map only shows sites that has location information published.</p>
+                                <!-- <p class="help-block">Map only shows sites that has location information published.</p> -->
 
                             </tab>
                             <tab heading="Dynamic" 
@@ -156,23 +156,13 @@
                             </tab>
                         </tabset>
 
-                        <ui-gmap-google-map 
-                            center="map.center" 
-                            zoom="map.zoom" 
-                            options="map.options">
-                            <ui-gmap-markers fit="true" 
-                                models="map.markers" 
-                                coords="'self'" 
-                                icon="'icon'"></ui-gmap-markers>
-                        </ui-gmap-google-map>
-
                     </div>
                 </div>
                 <br>
                 <br>
 
                 <!-- don't remove this or ui-select won't be displayed correctly (containing div trims it?)-->
-                <div ng-if="!appconf.debug" style="height: 300px">     
+                <div ng-if="!appconf.debug" style="height: 300px">
                 </div> 
 
                 <div ng-if="appconf.debug">

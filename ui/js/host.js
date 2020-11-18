@@ -66,24 +66,6 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
         });
     });
 
-    function reset_mapinfo() {
-        delete $scope.selected.map;
-        if( !$scope.selected.info["location-latitude"] ||
-            !$scope.selected.info["location-latitude"]) return;
-        //reset map info
-        var marker = {
-            id: $scope.selected._id,
-            latitude: $scope.selected.info["location-latitude"],
-            longitude: $scope.selected.info["location-longitude"],
-        }
-        $scope.selected.map = {
-            center: marker, zoom: 5,
-            options: {
-                scrollwheel: false,
-            },
-            markers: [ marker ],
-        }
-    }
 
     $scope.selected = null;
     $scope.select = function(host) {
@@ -102,7 +84,6 @@ function($scope, appconf, toaster, $http, serverconf, $location, scaMessage, hos
 
             });
 
-            reset_mapinfo();
             $scope.refreshHosts();
         });
 
