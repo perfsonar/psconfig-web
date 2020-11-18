@@ -29,6 +29,7 @@ Requires:       mongodb-server
 #Requires:       mongodb-org-server #TODO we may need to use this instead
 Requires:		perfsonar-psconfig-web-admin-shared
 Requires:		perfsonar-psconfig-web-admin-auth
+Requires:		perfsonar-psconfig-web-admin-publisher
 
 %description
 The perfSONAR pSConfig Web Administrator package provides an authenticated, multi-user,

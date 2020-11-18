@@ -55,7 +55,7 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
     .sort(req.query.sort || '_id')
     .lean() //so that I can add _canedit later
     .exec(function(err, archives) {
-        //console.log("archives", archives);
+        console.log("archives", archives);
         if(err) return next(err);
         db.Archive.count(find).exec(function(err, count) { 
             if(err) return next(err);
@@ -135,7 +135,11 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
             archive.archiver = req.body.archiver;
             archive.data = req.body.data;
             archive.admins = req.body.admins;
+            if ( req.body.verify_ssl ) {
+                archive.data.verify_ssl = req.body.data.verify_ssl;
+            }
             archive.update_date = new Date();
+            console.log("updating archive ", archive);
             archive.save(function(err) {
                 if(err) return next(err);
                 archive = JSON.parse(JSON.stringify(archive));

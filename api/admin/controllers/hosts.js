@@ -41,8 +41,6 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
 
     //we need to select admins , or can't get _canedit set
     var select = req.query.select;
-    console.log("select", select);
-    console.log("find", find);
     if(select && !~select.indexOf("admins")) select += " admins";
 
     db.Host.find(find)
@@ -57,7 +55,6 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
             if(err) return next(err);
 
             hosts.forEach(function(host) {
-                console.log("host", host);
                 //append canedit flag
                 host._canedit = canedit(req.user, host);
                 // format ma_urls

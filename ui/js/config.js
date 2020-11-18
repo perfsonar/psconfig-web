@@ -1,6 +1,5 @@
-
 app.controller('ConfigsController',
-function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, hostgroups, configs, $routeParams, testspecs, archives, uiGmapGoogleMapApi, $timeout) {
+function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, hostgroups, configs, $routeParams, testspecs, archives) {
     scaMessage.show(toaster);
     $scope.active_menu = "configs";
     $scope.show_map = false;
@@ -19,8 +18,6 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
 
                 archives.getAll().then(function(_archives) {
                     $scope.all_archives = _archives;
-                    console.log("all_archives", _archives);
-
 
                     configs.getAll().then(function(_configs) {
                         $scope.configs = _configs;
@@ -33,11 +30,6 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
                             if($scope.configs.length > 0) $scope.select($scope.configs[0]);
                         }
 
-                        //delay showing map slightly to prevent gmap to miss resize event?
-                        //TODO - figure out what's going on with gmap and fix it instead of this hack..
-                        $timeout(()=>{
-                            $scope.show_map = true;
-                        });
                     });
                 });
             });
@@ -48,43 +40,11 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
     $scope.selected = null;
     $scope.select = function(config) {
         $scope.selected = config;
-                    console.log("selected", $scope.selected);
         $scope.closesubbar();
 
-        config.tests.forEach(function(test) {
-            reset_map(test);
-        });
 
         $location.update_path("/configs/"+config._id);
         window.scrollTo(0,0);
-    }
-
-    function reset_map(test) {
-        test.map = {
-            center: { latitude: 0, longitude: 0 }, zoom: 1, //world
-            options: {
-                scrollwheel: false,
-            },
-            markers: [],
-        }
-        load_hosts(test, function(hosts) {
-            hosts.forEach(function(host) {
-                var lat = host.info['location-latitude'];
-                var lng = host.info['location-longitude'];
-                if(lat && lng) {
-                    test.map.markers.push({
-                        id: host._id,
-                        latitude: lat,
-                        longitude: lng,
-                    });
-                }
-            });
-            //bounds = bounds.toJSON();
-            //console.log("setting test.map");
-            //test.map.bounds.northeast = {latitude: bounds.north, longitude: bounds.east};
-            //test.map.bounds.southwest = {latitude: bounds.south, longitude: bounds.west};
-            //console.dir(test.map.bounds);
-        });
     }
 
     $scope.add = function() {
@@ -100,7 +60,6 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
             service_type: "owamp",
             mesh_type: "mesh",
         }
-        reset_map(test);
         $scope.selected.tests.push(test);
         $scope.form.$setDirty();
     }
@@ -162,7 +121,6 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
 
 
     $scope.refreshNAHosts = function(test) {
-        reset_map(test);
         load_hosts(test, function(hosts) {
             $scope.na_hosts = hosts;
         });
@@ -217,7 +175,6 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
                     config.ma_urls = config.ma_urls.join("\n");
                 }
                 var custom_json = config.ma_custom_json;
-                //console.log("config", config);
                 //console.log("custom_MA json", custom_json);
 
                 
@@ -332,7 +289,6 @@ function($scope, appconf, toaster, $http, $location, scaMessage, users, hosts, h
                     res.data.tests.forEach(function(test) {
                         $scope.refreshNAHosts(test);
                         $scope.refreshHosts(null, test);
-                        reset_map(test);
                         $scope.selected.tests.push(test);
                     });
                     $scope.form.$setDirty();
