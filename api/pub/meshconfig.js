@@ -582,6 +582,7 @@ exports._process_published_config = function( _config, opts, cb ) {
     });
 
     var test_service_types = Object.keys(service_type_obj).map(e => service_type_obj[e]);
+    var customArchiveLookup = {};
 
     db.Archive.find().lean().exec(function(err, archs) {
             if(err) return cb(err);
@@ -591,8 +592,18 @@ exports._process_published_config = function( _config, opts, cb ) {
 
                 //rename_field( arch.data, "verify_ssl", "verify-ssl" );
                 //pub_shared.format_archive( arch ); 
-                archives_obj[ arch._id ] = arch;
-                _config.archives_obj = arch;
+                //console.log("Arch being added", arch);
+                var name = arch._id;
+                if ( arch.archiver == "rawjson" ) {
+                    //name = "custom-" + arch._id;
+                    archives_obj[ arch._id ] = arch;
+                    //console.log("raw arch", archives_obj);
+                } else {
+                    archives_obj[ arch._id ] = arch;
+                    _config.archives_obj = arch;
+
+                }
+                
                 //_config.archives_obj = pub_shared.format_archive( arch ); 
 
             });
@@ -832,33 +843,62 @@ exports._process_published_config = function( _config, opts, cb ) {
                     if ( ! ( "archives" in psc_hosts[ _host.hostname ]) ) psc_hosts[ _host.hostname ].archives  = [];
                     if ( "additional_archives" in _host ) {
                         _host["additional_archives"].forEach( function( _id ) {
+                            //console.log("_id", _id);
+                            //console.log("archives_obj", archives_obj);
                             if (  ! ( _id in archives_obj ) ) {
                                 logger.warn("Host ", _host.hostname, " has nonexistent archive ", _id, "; ignoring");
                                 return;
                             }
                             //let name = archives_obj[_id].name.replace(" ", "_");
 
+                            var new_arch = {};
                             var name = "host-additional-archive" + last_host_ma_number + "-" + _id;
+                            if ( archives_obj[_id].archiver == "rawjson" ) {
+                                //name = _id;
+                                name = "custom-" + _id;
+                                new_arch[ name ] =  archives_obj[_id];
+                                new_arch = rename_field(new_arch, _id, name);
+
+                                //console.log("arch after rename!!", new_arch);
+                                //new_arch[ name ] =  {};
+                               //new_arch[ name ][ _id ] = archives_obj[_id];
+                            } else {
+                                new_arch[ name ] =  archives_obj[_id];
+
+                            }
                             var archid = name;
-                            let new_arch = {};
                             //if ( _id in psc_archives )
-                            new_arch[ archid ] =  archives_obj[_id];
+                            //console.log("_id", _id);
+                            //console.log("new_arch", new_arch);
                             //var alreadyExists = _.find(psc_archives, function (obj) { return obj._id == _id; } );
                             //var alreadyExists = ( archives_obj[_id].data._url in maHash ) ;
+                            //console.log("psc_archive_ids_included", psc_archive_ids_included);
                             var alreadyExists =  _id in psc_archive_ids_included;
+
+                            //console.log( "host_archive_ids_included", host_archive_ids_included );
 
                             if ( alreadyExists ) {
                                 logger.debug("_id", _id, "already in psc_archives; not adding again");
                                 //psc_archive_ids_included[ _id ] = true;
+                                //console.log("host_archive_ids_included before setting _id true", host_archive_ids_included);
+                                //console.log("psc_hosts[_host.hostname]",psc_hosts[_host.hostname]);
+                                if ( ! ( _id in host_archive_ids_included ) ) {
+                                    //console.log("already exists and not in host archive ids");
+                                    psc_hosts[_host.hostname].archives.push( psc_archive_ids_included[ _id ] );
+                                }
+                                    host_archive_ids_included[ _id ] = true;
+                                //psc_archive_ids_included[ _id ] = archid;
+
+
 
                             } else {
                                 new_arch = pub_shared.format_archive( new_arch[ archid ], archid  );
+                                //console.log("psc_archives", psc_archives);
                                 psc_archives = _.extend( psc_archives, new_arch );
                                 psc_archive_ids_included[ _id ] = name;
                                 //host_archive_ids_included[ _id ] = true;
                                 maHash[ archives_obj[_id].data._url ] = name;
                                 last_host_ma_number++;
-                                  // host_additional_increment++;
                             }
 
 
@@ -1010,10 +1050,12 @@ exports._process_published_config = function( _config, opts, cb ) {
             if ( customString ) {
                 try { 
                     customArchiveConfig = JSON.parse( customString );
+                    //console.log("customArchiveConfig", customArchiveConfig);
                     // add custom archiver to testspec.
                     var maNames = Object.keys( customArchiveConfig );
                     maNames.forEach( function( maName ) {
                         var archiveDetails = customArchiveConfig[ maName ];
+                        //console.log("archiveDetails", archiveDetails);
                         test_mas.push(maName);
 
                     });
@@ -1038,8 +1080,8 @@ exports._process_published_config = function( _config, opts, cb ) {
                     var _arch = archives_obj[ _id ];
                     var newArch = {};
                     //var name = pub_shared.archive_extract_name( _arch );
-        var name = "config-archive" + last_config_ma_number;
-        last_config_ma_number++;
+                    var name = "config-archive" + last_config_ma_number;
+                    last_config_ma_number++;
                         var alreadyExists = ( archives_obj[_id].data._url in maHash || ( _id in psc_archive_ids_included ) );
                         //var alreadyExists = ( archives_obj[_id].data._url in maHash );
                         if ( !alreadyExists ) {
@@ -1054,6 +1096,10 @@ exports._process_published_config = function( _config, opts, cb ) {
                             } else {
                             }
                         } else {
+                            console.log("archives_obj[_id]", archives_obj[_id]);
+                            if ( psc_archive_ids_included[ _id ] ) {
+                                test_mas.push( psc_archive_ids_included[ _id ] );
+                            }
                         }
                 }
 
@@ -1351,15 +1397,15 @@ function _apply_plugin( _config, opts, cb ) {
         return cb(null, _config);
     }
     console.log("plugins_enabled", plugins_enabled);
-    console.log("scripts", scripts);
+    //console.log("scripts", scripts);
     if ( plugins_enabled && scripts ) {
         for(var i=0; i<scripts.length; i++) {
             var script = scripts[i];
             var cwd = process.cwd();
-            console.log("cwd", cwd);
+            //console.log("cwd", cwd);
             //var script_path = cwd + "/etc/" + script;
             var script_path = script;
-            console.log("requiring script_path: ", script_path);
+            //console.log("requiring script_path: ", script_path);
             try {
                 var filter = require( script_path );
                 filter.process( request, _config, function( err, data ) {
@@ -1369,7 +1415,7 @@ function _apply_plugin( _config, opts, cb ) {
                 });
             } catch(e) {
                 var code = 500;
-                console.log("plugin e", e);
+                //console.log("plugin e", e);
                 return cb({"message": "Plugin error in " + script, "code": code});
 
             }
