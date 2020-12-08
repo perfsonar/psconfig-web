@@ -456,7 +456,7 @@ exports.get_config = function( configName, options, next, configObj ) {
     opts.format = format;
     dbTest.init(function(err) {
             if(err) throw err;
-                logger.info("connected to dbTest");
+                logger.debug("connected to dbTest");
                   //  startProcessing(); //this starts the loop
                   //config = configObj;
     dbTest.Config.findOne({url: configName}).lean().exec(function(err, config) {
@@ -467,7 +467,7 @@ exports.get_config = function( configName, options, next, configObj ) {
             dbTest.disconnect();
             return next(err);
         } else {
-            logger.info("Found config with name:"+configName);
+            logger.debug("Found config with name:"+configName);
 
         }
         //config._host_version = req.query.host_version; // TODO: what to do with this?

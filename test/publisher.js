@@ -1,4 +1,3 @@
-console.log("NOTE: db mca copied to pwa-test1");
 //contrib
 var assert = require('assert');
 var chai = require('chai');
@@ -25,17 +24,17 @@ var testsObj = {
             "tests.throughput3.spec.single-ended": true,
             "tests.this little pingy.spec.schema": 3,
             "tests.lat4 444.spec.schema": 2,
-            "tests.tput4 protocol udp probe_type tcp.spec.schema": 1,
-            "tests.tput4 protocol udp probe_type tcp.spec.udp": true,
-            "tests.throughput5.spec.schema": 1,
-            "tests.throughput5.spec.udp": true,
+            //"tests.tput4 protocol udp probe_type tcp.spec.schema": 1,
+            //"tests.tput4 protocol udp probe_type tcp.spec.udp": true,
+            //"tests.throughput5.spec.schema": 1,
+            //"tests.throughput5.spec.udp": true,
             "archives.host-additional-archive0.data.schema": 1,
             "archives.host-additional-archive1.data.schema": 1,
             "archives.host-archive0.archiver": "esmond",
             "archives.host-archive0.data.schema": 1,
             "archives.host-archive0.data.url": "https://perfsonar-dev9.grnoc.iu.edu/esmond/perfsonar/archive",
             "archives.host-archive0.data.measurement-agent": "{% scheduled_by_address %}",
-            "archives.host-archive1.data.schema": 1,
+            //"archives.host-archive1.data.schema": 1,
         },
         should_not_exist: [
             "tests.throughput3.spec.udp",
