@@ -18,7 +18,11 @@ exports.archive_extract_name = function( archive_obj ) {
 exports.format_archive = function( archive_obj, id_override ) {
     //console.log("formatting archive obj ...\n", JSON.stringify(archive_obj));
     var out = {};
+    var _id = archive_obj._id;
     var name = id_override || archive_obj.name + "-" + archive_obj._id;
+    if ( archive_obj.archiver == "rawjson" ) {
+        name = archive_obj._id;
+    }
 
     //var name = archive_obj.name;
     out[ name ] = {};
@@ -72,15 +76,22 @@ exports.format_archive = function( archive_obj, id_override ) {
 
             break;
         case "rawjson":
+            //out = {};
             console.log("PARSE RAWJSON", JSON.parse( archive_obj.data.archiver_custom_json ));
-            out = _.extend( row, JSON.parse( archive_obj.data.archiver_custom_json ));
+            //var _id = archive_obj[_id];
+            name = "custom-" + name;
+            //row[ _id ] = {};
+            out[ name ] = JSON.parse( archive_obj.data.archiver_custom_json );
+            delete out[_id];
             //row.data = JSON.parse( archive_obj.data.archiver_custom_json );
-            //console.log("ROW", out);
+            //exports.rename_field(row, _id, name);
+
             break;
 
     }
     delete out.name;
     delete out.desc;
+
 
     //console///.log("formatted output: ", out);
     return out;
