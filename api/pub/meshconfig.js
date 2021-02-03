@@ -6,9 +6,13 @@ const router = express.Router();
 const winston = require('winston');
 const async = require('async');
 const _ = require('underscore');
+const URL = require('url').URL;
+
 
 //mine
 var config = require('../config');
+const pscheduler_service_locators_from_ls = config.pub.pscheduler_service_locators_from_ls || false;
+console.log("pscheduler_service_locators_from_ls", pscheduler_service_locators_from_ls);
 const logger = new winston.Logger(config.logger.winston);
 const db = require('../models');
 const common = require('../common');
@@ -519,6 +523,7 @@ function generate_group_members( test, group, test_service_types, type, next, ad
             host_catalog[host._id] = host;
             var host_addr;
             if ( host.hostname ) {
+
                 host_addr = host.hostname;
 
                 if ( ! host_groups_details[ test.name ][ addr ].find(o => o.name == host_addr) ) {
@@ -730,6 +735,43 @@ exports._process_published_config = function( _config, opts, cb ) {
 
             }
 
+            if ( pscheduler_service_locators_from_ls ) {
+                // honor the pscheduler address/port from the LS's
+                // pscheduler service-locator record
+
+                // search the hosts' service locator values (if any) 
+                // for pscheduler records
+                if ( "services" in _host ) {
+                    for( var i in _host.services ) {
+                        var service = _host.services[ i ];
+                        if ( service.type == "pscheduler" ) {
+                            console.log("service", service);
+                            if ( "locator" in service && _.isArray(service.locator) && ! _.isEmpty(service.locator) ) {
+                                console.log("nonempty service locator:", service.locator);
+                                for( var j in service.locator ) {
+                                    var locRow = service.locator[ j ];
+                                    var urlParse = new URL( locRow );
+                                    var loc = urlParse.host;
+                                    console.log("loc", loc);
+                                    var port = urlParse.port;
+                                    console.log("port", port);
+                                    if ( port ) {
+                                        _host.pscheduler_service_locator = _host.hostname + ":" +  port;
+                                    }
+
+
+                                }
+                            }
+                        }
+                        
+
+                    }
+                }
+                
+
+console.log("_host", _host);
+            }
+
             psc_addresses[ _host.hostname ] = {
                 "address":  _host.hostname,
                 "host": _host.hostname,
@@ -741,7 +783,12 @@ exports._process_published_config = function( _config, opts, cb ) {
 
                 }
             };
+                if ( pscheduler_service_locators_from_ls && _host.pscheduler_service_locator ) {
+                    psc_addresses[ _host.hostname ]["pscheduler-address"] = _host.pscheduler_service_locator;
+
+                }
             if ( ! ( _host.hostname in psc_hosts) ) psc_hosts[ _host.hostname ]  = {};
+
 
 
             if ( "ma_urls" in _host && _host.ma_urls.length > 0  ) {
@@ -768,7 +815,6 @@ exports._process_published_config = function( _config, opts, cb ) {
                 }
             }
                 // create one MA entry per host
-
 
                 //create ma entry for each service
                 test_service_types.forEach(function(service) {
@@ -1112,6 +1158,10 @@ exports._process_published_config = function( _config, opts, cb ) {
             if ( format == "psconfig" ) {
                 psc_tests[ name ].spec.source = "{% address[0] %}";
                 psc_tests[ name ].spec.dest = "{% address[1] %}";
+                if ( pscheduler_service_locators_from_ls ) {
+                    psc_tests[ name ].spec["source-node"] ="{% pscheduler_address[0] %}";
+                    psc_tests[ name ].spec["dest-node"] ="{% pscheduler_address[1] %}";
+                }
                 meshconfig_testspec_to_psconfig( testspec, name, psc_tests, psc_schedules );
             }
 
