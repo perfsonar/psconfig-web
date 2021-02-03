@@ -12,3 +12,5 @@ Documentation for PWA can be found on the main perfSONAR documentation site:
 
 
 ## Development Info
+
+![Alt text](docs/pwa-architecture.png "pwa architecture")
