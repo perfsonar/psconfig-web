@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="503px" preserveAspectRatio="none" style="width:621px;height:503px;" version="1.1" viewBox="0 0 621 503" width="621px" zoomAndPan="magnify">
+    <defs>
+        <filter height="300%" id="fmjmmhhb9fl4x" width="300%" x="-1" y="-1">
+            <feGaussianBlur result="blurOut" stdDeviation="2.0" />
+            <feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0" />
+            <feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3" />
+            <feBlend in="SourceGraphic" in2="blurOut3" mode="normal" />
+        </filter>
+    </defs>
+    <g>
+        <!--cluster Docker-->
+        <polygon fill="#FFFFFF" filter="url(#fmjmmhhb9fl4x)" points="165,26,175,16,599,16,599,481,589,491,165,491,165,26" style="stroke: #000000; stroke-width: 1.5;" />
+        <line style="stroke: #000000; stroke-width: 1.5;" x1="589" x2="598" y1="26" y2="17" />
+        <line style="stroke: #000000; stroke-width: 1.5;" x1="165" x2="589" y1="26" y2="26" />
+        <line style="stroke: #000000; stroke-width: 1.5;" x1="589" x2="589" y1="26" y2="491" /><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="50" x="353" y="42.5352">Docker</text>
+        <!--entity nginx-->
+        <rect fill="#FEFECE" filter="url(#fmjmmhhb9fl4x)" height="36.4883" style="stroke: #A80036; stroke-width: 1.5;" width="60" x="173" y="234" /><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="40" x="183" y="257.5352">nginx</text>
+        <!--entity pwa_admin_api-->
+        <rect fill="#FEFECE" filter="url(#fmjmmhhb9fl4x)" height="36.4883" style="stroke: #A80036; stroke-width: 1.5;" width="126" x="293" y="376" /><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="106" x="303" y="399.5352">pwa_admin_api</text>
+        <!--entity publisher-->
+        <rect fill="#FEFECE" filter="url(#fmjmmhhb9fl4x)" height="36.4883" style="stroke: #A80036; stroke-width: 1.5;" width="85" x="313.5" y="305" /><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="65" x="323.5" y="328.5352">publisher</text>
+        <!--entity cache-->
+        <rect fill="#FEFECE" filter="url(#fmjmmhhb9fl4x)" height="36.4883" style="stroke: #A80036; stroke-width: 1.5;" width="59" x="326.5" y="447" /><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="39" x="336.5" y="470.5352">cache</text>
+        <!--entity auth_api-->
+        <rect fill="#FEFECE" filter="url(#fmjmmhhb9fl4x)" height="36.4883" style="stroke: #A80036; stroke-width: 1.5;" width="79" x="316.5" y="234" /><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="59" x="326.5" y="257.5352">auth_api</text>
+        <!--entity pwa_admin_ui-->
+        <ellipse cx="356" cy="170" fill="#FEFECE" filter="url(#fmjmmhhb9fl4x)" rx="8" ry="8" style="stroke: #A80036; stroke-width: 2.0;" /><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="98" x="307" y="200.5352">pwa_admin_ui</text>
+        <!--entity auth_ui-->
+        <ellipse cx="356" cy="77" fill="#FEFECE" filter="url(#fmjmmhhb9fl4x)" rx="8" ry="8" style="stroke: #A80036; stroke-width: 2.0;" /><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="51" x="330.5" y="107.5352">auth_ui</text>
+        <!--entity MongoDB-->
+        <path d="M492,381.5 C492,371.5 535,371.5 535,371.5 C535,371.5 578,371.5 578,381.5 L578,406.9883 C578,416.9883 535,416.9883 535,416.9883 C535,416.9883 492,416.9883 492,406.9883 L492,381.5 " fill="#FEFECE" filter="url(#fmjmmhhb9fl4x)" style="stroke: #000000; stroke-width: 1.5;" />
+        <path d="M492,381.5 C492,391.5 535,391.5 535,391.5 C535,391.5 578,391.5 578,381.5 " fill="none" style="stroke: #000000; stroke-width: 1.5;" /><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="66" x="502" y="409.0352">MongoDB</text>
+        <!--entity AuthDB.sqlite-->
+        <path d="M479,239.5 C479,229.5 535,229.5 535,229.5 C535,229.5 591,229.5 591,239.5 L591,264.9883 C591,274.9883 535,274.9883 535,274.9883 C535,274.9883 479,274.9883 479,264.9883 L479,239.5 " fill="#FEFECE" filter="url(#fmjmmhhb9fl4x)" style="stroke: #000000; stroke-width: 1.5;" />
+        <path d="M479,239.5 C479,249.5 535,249.5 535,249.5 C535,249.5 591,249.5 591,239.5 " fill="none" style="stroke: #000000; stroke-width: 1.5;" /><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="92" x="489" y="267.0352">AuthDB.sqlite</text>
+        <!--entity host_firewall-->
+        <rect fill="#FEFECE" filter="url(#fmjmmhhb9fl4x)" height="22.4883" style="stroke: #000000; stroke-width: 1.5;" width="107" x="6" y="241" /><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="87" x="16" y="257.5352">host_firewall</text>
+        <!--link cache to MongoDB-->
+        <path d="M390.4502,451.3354 C417.9196,440.4397 456.7011,425.0571 487.1796,412.9679 " fill="none" id="cache-MongoDB" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="491.997,411.0571,482.1563,410.6573,487.3493,412.9006,485.1059,418.0936,491.997,411.0571" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="385.5582,453.2758,395.3989,453.6755,390.2059,451.4322,392.4492,446.2392,385.5582,453.2758" style="stroke: #A80036; stroke-width: 1.0;" />
+        <!--link pwa_admin_api to MongoDB-->
+        <path d="M424.2218,394 C444.9657,394 467.3284,394 486.4926,394 " fill="none" id="pwa_admin_api-MongoDB" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="491.8091,394,482.8091,390,486.8091,394,482.8091,398,491.8091,394" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="419.1087,394,428.1087,398,424.1087,394,428.1087,390,419.1087,394" style="stroke: #A80036; stroke-width: 1.0;" />
+        <!--link publisher to MongoDB-->
+        <path d="M403.5642,341.8662 C430.9919,352.7454 465.2089,366.3175 491.8545,376.8864 " fill="none" id="publisher-MongoDB" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="398.875,340.0063,405.7661,347.0428,403.5227,341.8498,408.7157,339.6065,398.875,340.0063" style="stroke: #A80036; stroke-width: 1.0;" />
+        <!--link auth_api to AuthDB.sqlite-->
+        <path d="M400.9783,252 C422.9982,252 449.8425,252 473.7066,252 " fill="none" id="auth_api-AuthDB.sqlite" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="478.7509,252,469.7509,248,473.7509,252,469.7509,256,478.7509,252" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="395.7259,252,404.7259,256,400.7259,252,404.7259,248,395.7259,252" style="stroke: #A80036; stroke-width: 1.0;" />
+        <!--link host_firewall to nginx-->
+        <path d="M118.5491,252 C135.102,252 152.5866,252 167.3257,252 " fill="none" id="host_firewall-nginx" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="172.6249,252,163.6249,248,167.6249,252,163.6249,256,172.6249,252" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="113.3424,252,122.3424,256,118.3424,252,122.3424,248,113.3424,252" style="stroke: #A80036; stroke-width: 1.0;" />
+        <!--link nginx to publisher-->
+        <path d="M237.8448,268.1698 C259.9827,278.443 288.8163,291.8233 312.4579,302.7942 " fill="none" id="nginx-publisher" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="317.1134,304.9546,310.6333,297.5378,312.5779,302.8499,307.2658,304.7946,317.1134,304.9546" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="233.2279,266.0273,239.708,273.4441,237.7634,268.132,243.0755,266.1873,233.2279,266.0273" style="stroke: #A80036; stroke-width: 1.0;" />
+        <!--link nginx to auth_api-->
+        <path d="M238.3787,252 C260.0163,252 287.8989,252 311.0857,252 " fill="none" id="nginx-auth_api" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="316.2612,252,307.2612,248,311.2612,252,307.2612,256,316.2612,252" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="233.2279,252,242.2279,256,238.2279,252,242.2279,248,233.2279,252" style="stroke: #A80036; stroke-width: 1.0;" />
+        <!--link nginx to auth_ui-->
+        <path d="M215.6093,229.4142 C231.442,202.2619 260.4991,156.2079 293,123 C308.1488,107.5217 328.9562,93.4306 342.4407,85.0339 " fill="none" id="nginx-auth_ui" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="346.7142,82.4108,336.9514,83.7098,342.4529,85.0264,341.1363,90.5279,346.7142,82.4108" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="212.9962,233.9307,220.9658,228.144,215.5003,229.6029,214.0413,224.1375,212.9962,233.9307" style="stroke: #A80036; stroke-width: 1.0;" />
+        <!--link nginx to pwa_admin_api-->
+        <path d="M218.346,274.3069 C234.8907,297.2386 262.9267,333.0274 293,358 C299.5811,363.4649 307.1037,368.5636 314.6052,373.1059 " fill="none" id="nginx-pwa_admin_api" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="319.2646,375.8605,313.553,367.837,314.9605,373.3159,309.4816,374.7235,319.2646,375.8605" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="215.3926,270.1802,217.3776,279.827,218.3025,274.2462,223.8832,275.1712,215.3926,270.1802" style="stroke: #A80036; stroke-width: 1.0;" />
+        <!--link nginx to pwa_admin_ui-->
+        <path d="M237.8983,233.2963 C271.0196,215.5451 319.0925,189.7805 342.3636,177.3084 " fill="none" id="nginx-pwa_admin_ui" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="346.9386,174.8564,337.1165,175.5821,342.5316,177.2183,340.8955,182.6333,346.9386,174.8564" style="stroke: #A80036; stroke-width: 1.0;" />
+        <polygon fill="#A80036" points="233.2279,235.7994,243.05,235.0737,237.6349,233.4375,239.271,228.0225,233.2279,235.7994" style="stroke: #A80036; stroke-width: 1.0;" />
+        <!--
+@startuml
+left to right direction
+
+card host_firewall
+
+node "Docker" {
+agent nginx
+agent "pwa_admin_api"
+agent publisher
+agent cache
+agent auth_api
+
+interface pwa_admin_ui
+interface auth_ui
+
+
+database MongoDB
+database AuthDB.sqlite
+
+cache <- -> MongoDB
+pwa_admin_api <- -> MongoDB
+publisher <- - MongoDB
+auth_api <- -> AuthDB.sqlite
+host_firewall <- -> nginx
+nginx <- -> publisher
+nginx <- -> auth_api
+nginx <- -> auth_ui
+
+nginx <- -> pwa_admin_api
+nginx <- -> pwa_admin_ui
+
+
+
+@enduml
+
+PlantUML version 1.2018.14(Fri Dec 21 11:33:16 EST 2018)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.9.1+1
+Operating System: Mac OS X
+OS Version: 10.15.7
+Default Encoding: UTF-8
+Language: en
+Country: US
+-->
+    </g>
+</svg>

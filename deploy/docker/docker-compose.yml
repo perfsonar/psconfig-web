@@ -1,0 +1,52 @@
+version: "2.4"
+services:
+  mongo:
+    image: mongo:4.2-bionic
+    restart: unless-stopped
+    volumes:
+      - /usr/local/data/mongo:/data/db
+    networks:
+      - pwa
+
+  sca-auth:
+    image: perfsonar/sca-auth
+    restart: unless-stopped
+    volumes:
+      - /etc/pwa/auth:/app/api/config
+      - /usr/local/data/auth:/db
+    networks:
+      - pwa
+
+  pwa-admin1:
+    image: perfsonar/pwa-admin
+    restart: unless-stopped
+    volumes:
+      - /etc/pwa:/app/api/config:ro
+    networks:
+      - pwa
+
+  pwa-pub1:
+    image: perfsonar/pwa-pub
+    restart: unless-stopped
+    volumes:
+      - /etc/pwa:/app/api/config:ro
+    networks:
+      - pwa
+
+  nginx:
+    image: nginx
+    restart: unless-stopped
+    volumes:
+      - /etc/pwa/shared:/shared:ro
+      - /etc/pwa/nginx:/etc/nginx:ro
+      - /etc/pwa/nginx/certs:/certs:ro
+    ports:
+      - "80:80"
+      - "443:443"
+      - "9443:9443"
+    networks:
+      - pwa
+
+networks:
+  pwa:
+    driver: bridge
