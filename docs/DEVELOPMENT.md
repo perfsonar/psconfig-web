@@ -17,7 +17,7 @@ Add how to set up a dev environment here.
 
 ## Architecture
 ### Architecture Diagram
-![Alt text](docs/pwa-architecture.png "pwa architecture")
+![Alt text](pwa-architecture.png "pwa architecture")
 
 
 pSConfig Web-based administration GUI and tools to publish configs in pSConfig/MeshConfig formats.
