@@ -26,4 +26,3 @@ Documentation for PWA can be found on the main perfSONAR documentation site:
 
 * [pSConfig Web Admin documentation](http://docs.perfsonar.net/pwa.html)
 
-## Screenshot
