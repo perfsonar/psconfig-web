@@ -30,6 +30,12 @@ See separate documentation in [BUILDING.md](BUILDING.md)
 
 ## Docker build
 
+Currently, the docker build is done manually. This should be added to Jenkins, but there are some. questions we'd have to answer first -- mostly, where do the finished images get pushed? 
+
+There is a pscheduler docker build already, but that just build pscheduler in a docker container, then handles the RPMs as usual. In this case, the docker images are the build artifacts. Not sure how to deal with those. These scripts push to dockerhub.
+
+### Building
+
 1. Checkout the branch or tag you want to build
 1. Change to the docker deploy dir:
 
