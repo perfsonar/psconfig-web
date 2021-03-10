@@ -18,15 +18,6 @@ const rename_field = pub_shared.rename_field;
 const seconds_to_iso8601 = pub_shared.seconds_to_iso8601;
 const shared = require('../sharedFunctions');
 
-// TODO: Remove bwctl hack
-// This is a ps 3.5/bwctl backwards-compatibility hack
-const bwctl_tool_lookup = { // TODO: Remove bwctl hack 
-    iperf3: "bwctliperf3",
-    iperf2: "bwctliperf2",
-    ping: "bwctlping",
-    traceroute: "bwctltraceroute",
-    tracepath: "bwctltracepath"
-};
 
 //catalog of all hosts referenced in member groups keyed by _id
 
@@ -1173,8 +1164,6 @@ exports._process_published_config = function( _config, opts, cb ) {
 
             if ( include_schedule && ( "_meta" in test ) &&  ( "_tool" in test._meta ) &&  typeof test._meta._tool != "undefined" ) {
                 psc_tasks[ name ].tools = [ test._meta._tool ];
-                add_bwctl_tools( psc_tasks[ name ] );
-
             }
 
             var parameters = test.testspec.specs;
@@ -1273,23 +1262,6 @@ function _apply_plugin( _config, opts, cb ) {
     } else {
         logger.info("no plugins configured");
         return cb(null, _config);
-
-    }
-
-}
-
-// TODO: Remove bwctl hack
-// This function adds bwctl backwards-compatible tools to the list of tools
-function add_bwctl_tools ( task ) {
-    if ( ! ("tools" in task ) ) {
-        return;
-    }
-    for( var i in task.tools ) {
-        var tool = task.tools[i];
-        if ( ( tool in bwctl_tool_lookup ) && ( ! (bwctl_tool_lookup[ tool ] in task.tools ) ) ) {
-            task.tools.unshift( bwctl_tool_lookup[ tool ] );
-
-        }
 
     }
 
