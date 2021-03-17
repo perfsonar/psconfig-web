@@ -1,0 +1,36 @@
+@startuml
+left to right direction
+
+card host_firewall
+
+node "Docker" {
+agent nginx
+agent "pwa_admin_api"
+agent publisher
+agent cache
+agent auth_api
+
+interface pwa_admin_ui
+interface auth_ui
+
+
+database MongoDB
+database AuthDB.sqlite
+
+cache <--> MongoDB
+pwa_admin_api <--> MongoDB
+publisher <-- MongoDB
+auth_api <--> AuthDB.sqlite
+host_firewall <--> nginx
+nginx <--> publisher
+nginx <--> auth_api
+nginx <--> auth_ui
+
+nginx <--> pwa_admin_api
+nginx <--> pwa_admin_ui
+
+'pwa_admin_ui <--> pwa_admin_api
+'auth_ui <--> auth_api
+
+
+@enduml

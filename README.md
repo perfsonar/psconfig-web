@@ -11,3 +11,8 @@ Documentation for PWA can be found on the main perfSONAR documentation site:
 ![Alt text](docs/pwa.png "pwa screenshot")
 
 
+## PWA Development
+
+Read [DEVELOPMENT.md](docs/DEVELOPMENT.md) for development details.
+
+Read [BUILDING.md](docs/BUILDING.md) for building details.
