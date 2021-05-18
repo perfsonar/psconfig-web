@@ -7,7 +7,7 @@
 %define apacheconf pwa-pub.conf
 
 %define perfsonar_auto_version 4.4.0
-%define perfsonar_auto_relnum 0.a1.0
+%define perfsonar_auto_relnum 0.1.b1
 %define debug_package %{nil}
 
 Name:			perfsonar-psconfig-web-admin-publisher
