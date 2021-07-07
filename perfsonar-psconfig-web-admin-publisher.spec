@@ -24,8 +24,7 @@ Requires:       nodejs >= 8
 Requires:		httpd
 Requires:       mod_ssl
 Requires:       perfsonar-psconfig-web-admin-shared
-Requires:       mongodb-server 
-#Requires:       mongodb-org-server #TODO we may have to change to this
+Requires:       mongodb-org-server >= 3.4
 
 %description
 The perfSONAR pSConfig Web Administrator Publisher package provides a webservice for
