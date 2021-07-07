@@ -20,7 +20,7 @@ URL:			http://www.perfsonar.net
 Source0:	    perfsonar-psconfig-web-admin-publisher-%{version}.%{perfsonar_auto_relnum}.tar.gz
 BuildRoot:		%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:		x86_64
-Requires:       nodejs
+Requires:       nodejs >= 8
 Requires:		httpd
 Requires:       mod_ssl
 Requires:       perfsonar-psconfig-web-admin-shared
