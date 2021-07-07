@@ -6,4 +6,3 @@ CMD ["node", "/app/api/pwapub.js"]
 
 ADD tmp/ /app
 RUN cd /app && npm install --production
-

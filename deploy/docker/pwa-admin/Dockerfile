@@ -20,4 +20,3 @@ RUN apt-get update && \
 ADD tmp/ /app
 RUN cd /app && npm install --production
 RUN cd /app/ui && npm install --production
-
