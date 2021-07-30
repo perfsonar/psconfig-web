@@ -139,3 +139,8 @@ deploy/docker/pwa-admin/tmp/
 deploy/docker/pwa-pub/tmp/
 #MANIFEST-node_modules
 #MANIFEST-ui-node_modules
+
+
+## From grigutis (2021-07-30)
+
+**/package-lock.json
