@@ -1,41 +1,41 @@
 {
-  "name": "psconfig-web-admin",
-  "version": "4.3.2",
-  "description": "Tools to generate / publish perfSONAR meshconfig/psconfig topologies",
-  "scripts": {
-    "test": "mocha",
-    "apidoc": "apidoc -i api/ -o ui/apidoc/"
-  },
-  "author": "",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/perfsonar/psconfig-web"
-  },
-  "dependencies": {
-    "async": "^2.3.0",
-    "body-parser": "^1.17.1",
-    "compression": "^1.6.1",
-    "connect-busboy": "0.0.2",
-    "express": "^4.15.2",
-    "express-jwt": "^5.1.0",
-    "express-winston": "^2.3.0",
-    "jsonwebtoken": "^7.2.1",
-    "moment-duration": "0.0.6",
-    "mongoose": "^5.7.6",
-    "promise": "^7.0.4",
-    "request": "^2.81.0",
-    "sandbox": "^0.8.6",
-    "underscore": "^1.9.1",
-    "winston": "^2.3.0"
-  },
-  "devDependencies": {
-    "apidoc": "^0.17.6",
-    "assert": "^1.4.1",
-    "chai": "^3.4.1",
-    "deep-equal-in-any-order": "^1.0.10",
-    "jsonwebtoken": "^7.1.9",
-    "mocha": "^6.2.0",
-    "supertest": "~2.0.1"
-  }
+    "name": "psconfig-web-admin",
+    "version": "4.3.2",
+    "description": "Tools to generate / publish perfSONAR meshconfig/psconfig topologies",
+    "scripts": {
+        "test": "mocha",
+        "apidoc": "apidoc -i api/ -o ui/apidoc/"
+    },
+    "author": "",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/perfsonar/psconfig-web"
+    },
+    "dependencies": {
+        "async": "^2.3.0",
+        "body-parser": "^1.17.1",
+        "compression": "^1.6.1",
+        "connect-busboy": "0.0.2",
+        "express": "^4.15.2",
+        "express-jwt": "^5.1.0",
+        "express-winston": "^2.3.0",
+        "jsonwebtoken": "^7.2.1",
+        "moment-duration": "0.0.6",
+        "mongoose": "^5.7.6",
+        "promise": "^7.0.4",
+        "request": "^2.81.0",
+        "sandbox": "^0.8.6",
+        "underscore": "^1.9.1",
+        "winston": "^2.3.0"
+    },
+    "devDependencies": {
+        "apidoc": "^0.17.6",
+        "assert": "^1.4.1",
+        "chai": "^3.4.1",
+        "deep-equal-in-any-order": "^1.0.10",
+        "mocha": "^6.2.0",
+        "nyc": "^15.1.0",
+        "supertest": "~2.0.1"
+    }
 }
