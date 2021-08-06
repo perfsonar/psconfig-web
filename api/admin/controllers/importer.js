@@ -329,13 +329,26 @@ exports._process_imported_config = function (
                         if ("_agroup" in _testspec) {
                             if (
                                 _testspec._agroup.name == _group.name ||
-                                _testspec._agroup.name == _group.name + " Group"
+                                _testspec._agroup.name == _group.name + " Group" ||
+                                _testspec._agroup.name == _group.name + " Group A"
                             ) {
                                 _testspec._agroup._id = _group._id;
                             }
                             //console.log("_testspec contains _agroup", _testspec);
                         } else {
                             //console.log("_testspec does not contain _agroup", _testspec);
+                        }
+                        if ("_bgroup" in _testspec) {
+                            if (
+                                _testspec._bgroup.name == _group.name ||
+                                _testspec._bgroup.name == _group.name + " Group" ||
+                                _testspec._bgroup.name == _group.name + " Group B"
+                            ) {
+                                _testspec._bgroup._id = _group._id;
+                            }
+                            //console.log("_testspec contains _bgroup", _testspec);
+                        } else {
+                            //console.log("_testspec does not contain _bgroup", _testspec);
                         }
                     });
                 });
@@ -354,6 +367,9 @@ exports._process_imported_config = function (
                             }
                         });
                         test.agroup = test._agroup._id;
+                        if (test._bgroup._id) {
+                            test.bgroup = test._bgroup._id;
+                        }
                         test.testspec = test._testspec._id;
                     });
                     cb(null, tests, config_params);
@@ -575,6 +591,7 @@ exports._extract_psconfig_tests = function (importedConfig, sub, mainConfig) {
         var tasksObj = importedConfig.tasks;
 
         var hosts = [];
+        var b_hosts = [];
         _.each(tasksObj, function (taskObj, taskName) {
             if (taskObj.test == testName) {
                 var thisTask = taskObj;
@@ -582,12 +599,27 @@ exports._extract_psconfig_tests = function (importedConfig, sub, mainConfig) {
                 //var tools = thisTask.tools;
                 //testObj.spec.tool = tools;
                 //hosts = importedConfig.tests[ thisTask.test ].type;
-                hosts = _.map(
-                    groups[groupName].addresses,
-                    function (obj, index) {
-                        return obj.name;
-                    }
-                );
+                if (groups[groupName].type == "mesh") {
+                    hosts = _.map(
+                        groups[groupName].addresses,
+                        function (obj, index) {
+                            return obj.name;
+                        }
+                    );
+                } else if (groups[groupName].type == "disjoint") {
+                    hosts = _.map(
+                        groups[groupName]["a-addresses"],
+                        function (obj, index) {
+                            return obj.name;
+                        }
+                    );
+                    b_hosts = _.map(
+                        groups[groupName]["b-addresses"],
+                        function (obj, index) {
+                            return obj.name;
+                        }
+                    );
+                }
                 var scheduleName = thisTask.schedule;
                 if (scheduleName in importedConfig.schedules) {
                     var scheduleObj = importedConfig.schedules[scheduleName];
@@ -613,14 +645,33 @@ logger.error("taskName", taskName);
                 }
             }
         });
-        var hostgroup = {
-            name: testName + " Group",
-            desc: "Imported by PWA importer",
-            type: "static",
-            service_type: type,
-            admins: [sub.toString()],
-            _hosts: hosts, //hostnames that needs to be converted to host id
-        };
+        if (b_hosts.length == 0) {
+            var hostgroup = {
+                name: testName + " Group",
+                desc: "Imported by PWA importer",
+                type: "static",
+                service_type: type,
+                admins: [sub.toString()],
+                _hosts: hosts, //hostnames that needs to be converted to host id
+            };
+        } else {
+            var ahostgroup = {
+                name: testName + " Group A",
+                desc: "Imported by PWA importer",
+                type: "static",
+                service_type: type,
+                admins: [sub.toString()],
+                _hosts: hosts, //hostnames that needs to be converted to host id
+            };
+            var bhostgroup = {
+                name: testName + " Group B",
+                desc: "Imported by PWA importer",
+                type: "static",
+                service_type: type,
+                admins: [sub.toString()],
+                _hosts: b_hosts, //hostnames that needs to be converted to host id
+            };
+        }
 
         shared.rename_dashes_to_underscores(testObj.spec);
 
@@ -631,28 +682,55 @@ logger.error("taskName", taskName);
             specs: testObj.spec,
         };
 
-        testspecs.push({
-            name: testName + " Testspec",
-            desc: "Imported by PWA pSConfig importer",
-            service_type: type,
-            mesh_type: "mesh", // TODO: allow other mesh_types
-            enabled: true,
-            nahosts: [],
-            _agroup: hostgroup,
-            //specs: testspec //tmp
-            specs: testObj.spec,
-        });
+        if (b_hosts.length == 0) {
+            testspecs.push({
+                name: testName + " Testspec",
+                desc: "Imported by PWA pSConfig importer",
+                service_type: type,
+                mesh_type: "mesh",
+                enabled: true,
+                nahosts: [],
+                _agroup: hostgroup,
+                //specs: testspec //tmp
+                specs: testObj.spec,
+            });
 
-        tests.push({
-            name: testName + " Testspec",
-            desc: "Imported by PWA pSConfig importer",
-            service_type: type,
-            mesh_type: "mesh", // TODO: allow other mesh_types
-            enabled: true,
-            nahosts: [],
-            _agroup: hostgroup, //
-            _testspec: testspec, //tmp
-        });
+            tests.push({
+                name: testName + " Testspec",
+                desc: "Imported by PWA pSConfig importer",
+                service_type: type,
+                mesh_type: "mesh",
+                enabled: true,
+                nahosts: [],
+                _agroup: hostgroup, //
+                _testspec: testspec, //tmp
+            });
+        } else {
+            testspecs.push({
+                name: testName + " Testspec",
+                desc: "Imported by PWA pSConfig importer",
+                service_type: type,
+                mesh_type: "disjoint",
+                enabled: true,
+                nahosts: [],
+                _agroup: ahostgroup,
+                _bgroup: bhostgroup,
+                //specs: testspec //tmp
+                specs: testObj.spec,
+            });
+
+            tests.push({
+                name: testName + " Testspec",
+                desc: "Imported by PWA pSConfig importer",
+                service_type: type,
+                mesh_type: "disjoint",
+                enabled: true,
+                nahosts: [],
+                _agroup: ahostgroup,
+                _bgroup: bhostgroup,
+                _testspec: testspec, //tmp
+            });
+        }
     });
     /*
     var theseTests = _.clone( testspecs );
@@ -688,20 +766,56 @@ exports._extract_psconfig_hostgroups = function (
             }
         });
 
-        var group = {
-            name: groupName,
-            type: "static",
-            //service_type: serviceType,
-            admins: [sub.toString()],
-            //desc: "Imported by PWA pSConfig importer",
-            _hosts: _.map(groupObj.addresses, function (obj, index) {
-                return obj.name;
-            }),
-        };
-        if (serviceType) {
-            group.service_type = shared.convert_service_type(serviceType);
+        // Create two separate hostgroups if the imported group
+        // is of type "disjoint".
+        if (groupObj.type == "disjoint") {
+            var groupA = {
+                name: groupName + " Group A",
+                type: "static",
+                //service_type: serviceType,
+                admins: [sub.toString()],
+                //desc: "Imported by PWA pSConfig importer",
+                _hosts: _.map(groupObj["a-addresses"], function (obj, index) {
+                    return obj.name;
+                }),
+            };
+            if (serviceType) {
+                groupA.service_type = shared.convert_service_type(serviceType);
+            }
+            hostgroups.push(groupA);
+
+            var groupB = {
+                name: groupName + " Group B",
+                type: "static",
+                //service_type: serviceType,
+                admins: [sub.toString()],
+                //desc: "Imported by PWA pSConfig importer",
+                _hosts: _.map(groupObj["b-addresses"], function (obj, index) {
+                    return obj.name;
+                }),
+            };
+            if (serviceType) {
+                groupB.service_type = shared.convert_service_type(serviceType);
+            }
+            hostgroups.push(groupB);
+        } else {
+            // Assume the imported group is of type "mesh" if not.
+            // Only one hostgroup is needed in this case.
+            var group = {
+                name: groupName,
+                type: "static",
+                //service_type: serviceType,
+                admins: [sub.toString()],
+                //desc: "Imported by PWA pSConfig importer",
+                _hosts: _.map(groupObj.addresses, function (obj, index) {
+                    return obj.name;
+                }),
+            };
+            if (serviceType) {
+                group.service_type = shared.convert_service_type(serviceType);
+            }
+            hostgroups.push(group);
         }
-        hostgroups.push(group);
     });
 
     return hostgroups;
