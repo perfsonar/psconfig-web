@@ -1,158 +1,267 @@
 <fieldset ng-class="{disabled: false}">
-<div class="form-group">
-    <div class="col-sm-offset-2 col-sm-8">
-        <div class="checkbox">
-            <label> <input type="checkbox" ng-model="test.enabled" ng-disabled="false"> Enabled (include in mesh config)</label>
-        </div>
-    </div>
-    <div class="col-sm-2" ng-if="selected._canedit">
-        <button type="button" class="btn btn-danger btn-xs pull-right" ng-click="removetest(test)"><i class="fa fa-times"></i> Remove Test</button>
-    </div>
-</div>
-    </fieldset>
-
-    <fieldset ng-disabled="!test.enabled">
-
-<div class="form-group">
-    <label class="col-sm-2 control-label">Test Name</label>
-    <div class="col-sm-10">
-        <input type="text" class="form-control" 
-            ng-model="test.name" 
-            placeholder="Enter test name" 
-            ng-disabled="!selected._canedit" required>
-    </div>
-</div>
-
-<div class="form-group">
-    <label class="col-sm-2 control-label">Service Type</label>
-    <div class="col-sm-4">
-        <select class="form-control" ng-model="test.service_type" 
-            ng-disabled="!selected._canedit" 
-            ng-change="serviceChange(test)" required>
-            <option ng-repeat="(id, type) in serverconf.service_types" value="{{id}}">{{type.label}}</option>
-        </select>
-    </div>
-    <label class="col-sm-2 control-label">Topology</label>
-    <div class="col-sm-4">
-        <select class="form-control" ng-model="test.mesh_type" 
-            ng-disabled="!selected._canedit" required>
-            <option ng-repeat="(id, type) in serverconf.mesh_types" value="{{id}}">{{type.label}}</option>
-        </select>
-    </div>
-</div>
-
-
-<div class="form-group" ng-if="test.service_type && test.mesh_type == 'star'">
-    <label for="center_address" class="col-sm-2 control-label">Star Center</label>
-    <div class="col-sm-10">
-        <!-- can't get ng-required to work !------------------------->
-        <ui-select 
-            ng-model="test.center" 
-            ng-change="refreshNAHosts(test)"
-            ng-disabled="!selected._canedit">
-            <ui-select-match 
-                placeholder="Pick a center host" 
-                allow-clear="true">
-                <code>{{$select.selected.hostname}}</code>
-                {{$select.selected.sitename}}
-            </ui-select-match>
-            <ui-select-choices 
-                group-by="'sitename'"
-                refresh-delay="200"
-                refresh="refreshHosts($select.search, test)"
-                repeat="host._id as host in hosts">
-                <span class="label label-default" ng-if="host.lsid">{{host.lsid}}</span>
-                <span class="label label-warning" ng-if="!host.lsid">Adhoc</span>
-                <code>{{host.hostname|trim_locator}}</code>
-            </ui-select-choices>
-        </ui-select>
-    </div>
-</div>
-
-<div class="form-group" ng-if="test.service_type">
-    <label class="col-sm-2 control-label">Host Group A</label>
-    <div class="col-sm-10">
-        <select class="form-control" 
-            ng-model="test.agroup" 
-            ng-change="refreshNAHosts(test)"
-            ng-disabled="!selected._canedit" required>
-            <option value="">(Select Host Group)</option>
-            <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group._id}}">{{group.name}} ({{group.hosts.length}} Hosts)</option>
-        </select>
-        <div ng-if="test.agroup">
-            <div ng-if="gethostgroup(test.agroup).type == 'static'"
-                class="well well-sm well-detail" 
-                style="max-height: 100px; overflow: auto;">
-                <mc-hostlist hostids="gethostgroup(test.agroup).hosts"></mc-hostlist>
-            </div>
-            <div ng-if="gethostgroup(test.agroup).type == 'dynamic'">
-                <div name="host_filter" ui-ace="{ mode: 'javascript', theme: 'twilight' }" readonly
-                    ng-model="gethostgroup(test.agroup).host_filter"></div>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-8">
+            <div class="checkbox">
+                <label>
+                    <input
+                        type="checkbox"
+                        ng-model="test.enabled"
+                        ng-disabled="false"
+                    />
+                    Enabled (include in mesh config)</label
+                >
             </div>
         </div>
+        <div class="col-sm-2" ng-if="selected._canedit">
+            <button
+                type="button"
+                class="btn btn-danger btn-xs pull-right"
+                ng-click="removetest(test)"
+            >
+                <i class="fa fa-times"></i> Remove Test
+            </button>
+        </div>
     </div>
-</div>
+</fieldset>
 
-<div class="form-group" ng-if="test.service_type && test.mesh_type == 'disjoint'">
-    <label class="col-sm-2 control-label">Host Group B</label>
-    <div class="col-sm-10">
-        <select class="form-control" 
-            ng-model="test.bgroup" 
-            ng-change="refreshNAHosts(test)"
-            ng-disabled="!selected._canedit" required>
-            <option value="">(Select Host Group)</option>
-            <option ng-repeat="group in hostgroups | filter:{service_type:test.service_type}" value="{{group._id}}">{{group.name}} ({{group.hosts.length}} Hosts)</option>
-        </select>
-        <div ng-if="test.bgroup">
-            <div ng-if="gethostgroup(test.bgroup).type == 'static'"
-                class="well well-sm well-detail" 
-                style="max-height: 100px; overflow: auto;">
-                <mc-hostlist hostids="gethostgroup(test.bgroup).hosts"></mc-hostlist>
-            </div>
-            <div ng-if="gethostgroup(test.bgroup).type == 'dynamic'">
-                <div name="host_filter" ui-ace="{ mode: 'javascript', theme: 'twilight' }" readonly
-                    ng-model="gethostgroup(test.bgroup).host_filter"></div>
+<fieldset ng-disabled="!test.enabled">
+    <div class="form-group">
+        <label class="col-sm-2 control-label">Test Name</label>
+        <div class="col-sm-10">
+            <input
+                type="text"
+                class="form-control"
+                ng-model="test.name"
+                placeholder="Enter test name"
+                ng-disabled="!selected._canedit"
+                required
+            />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">Service Type</label>
+        <div class="col-sm-4">
+            <select
+                class="form-control"
+                ng-model="test.service_type"
+                ng-disabled="!selected._canedit"
+                ng-change="serviceChange(test)"
+                required
+            >
+                <option
+                    ng-repeat="(id, type) in serverconf.service_types"
+                    value="{{id}}"
+                >
+                    {{type.label}}
+                </option>
+            </select>
+        </div>
+        <label class="col-sm-2 control-label">Topology</label>
+        <div class="col-sm-4">
+            <select
+                class="form-control"
+                ng-model="test.mesh_type"
+                ng-disabled="!selected._canedit"
+                required
+            >
+                <option
+                    ng-repeat="(id, type) in serverconf.mesh_types"
+                    value="{{id}}"
+                >
+                    {{type.label}}
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <div
+        class="form-group"
+        ng-if="test.service_type && test.mesh_type == 'star'"
+    >
+        <label for="center_address" class="col-sm-2 control-label"
+            >Star Center</label
+        >
+        <div class="col-sm-10">
+            <!-- can't get ng-required to work !------------------------->
+            <ui-select
+                ng-model="test.center"
+                ng-change="refreshNAHosts(test)"
+                ng-disabled="!selected._canedit"
+            >
+                <ui-select-match
+                    placeholder="Pick a center host"
+                    allow-clear="true"
+                >
+                    <code>{{$select.selected.hostname}}</code>
+                    {{$select.selected.sitename}}
+                </ui-select-match>
+                <ui-select-choices
+                    group-by="'sitename'"
+                    refresh-delay="200"
+                    refresh="refreshHosts($select.search, test)"
+                    repeat="host._id as host in hosts"
+                >
+                    <span class="label label-default" ng-if="host.lsid"
+                        >{{host.lsid}}</span
+                    >
+                    <span class="label label-warning" ng-if="!host.lsid"
+                        >Adhoc</span
+                    >
+                    <code>{{host.hostname|trim_locator}}</code>
+                </ui-select-choices>
+            </ui-select>
+        </div>
+    </div>
+
+    <div class="form-group" ng-if="test.service_type">
+        <label class="col-sm-2 control-label">Host Group A</label>
+        <div class="col-sm-10">
+            <select
+                class="form-control"
+                ng-model="test.agroup"
+                ng-change="refreshNAHosts(test)"
+                ng-disabled="!selected._canedit"
+                required
+            >
+                <option value="">(Select Host Group)</option>
+                <option
+                    ng-repeat="group in hostgroups | filter:{service_type:test.service_type}"
+                    value="{{group._id}}"
+                >
+                    {{group.name}} ({{group.hosts.length}} Hosts)
+                </option>
+            </select>
+            <div ng-if="test.agroup">
+                <div
+                    ng-if="gethostgroup(test.agroup).type == 'static'"
+                    class="well well-sm well-detail"
+                    style="max-height: 100px; overflow: auto"
+                >
+                    <mc-hostlist
+                        hostids="gethostgroup(test.agroup).hosts"
+                    ></mc-hostlist>
+                </div>
+                <div ng-if="gethostgroup(test.agroup).type == 'dynamic'">
+                    <div
+                        name="host_filter"
+                        ui-ace="{ mode: 'javascript', theme: 'twilight' }"
+                        readonly
+                        ng-model="gethostgroup(test.agroup).host_filter"
+                    ></div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="form-group" ng-if="test.service_type && test.mesh_type">
-    <label class="col-sm-2 control-label">No Agent Hosts <span class="text-muted">(Optional)</span></label>
-    <div class="col-sm-10">
-        <ui-select multiple ng-model="test.nahosts" style="margin-top: 5px;">
-            <ui-select-match placeholder="Enter Hostnames">
-                <span class="label label-default" ng-if="$item.lsid">{{$item.lsid}}</span>
-                <span class="label label-warning" ng-if="!$item.lsid">Adhoc</span>
-                <!--<b>{{$item.sitename}}</b>-->
-                <span>{{$item.hostname|trim_locator}}</span>
-            </ui-select-match>
-            <!--can't filter by service_type because we aren't loading service_type detail for hosts-->
-            <ui-select-choices 
-                group-by="'sitename'"
-                refresh-delay="200"
-                refresh="refreshNAHosts(test)"
-                repeat="host._id as host in na_hosts | filter: $select.search">
-                <span class="label label-default" ng-if="host.lsid">{{host.lsid}}</span>
-                <span class="label label-warning" ng-if="!host.lsid">Adhoc</span>
-                <code>{{host.hostname|trim_locator}}</code>
-            </ui-select-choices>
-        </ui-select>
-        <p class="help-block">
-        Defines an address that will not initiate tests when used in this group. This will override the no_agent field specified in the host directive if defined. It is recommended you use the host directive to define this if a address cannot initiate tests for any group. Only use this form if you want a host to initiate tests when used in some groups but not others.
-        </p>
-    </div>
-</div>
-<div class="form-group" ng-if="test.service_type">
-    <label class="col-sm-2 control-label">Testspec</label>
-    <div class="col-sm-10">
-        <select class="form-control" ng-model="test.testspec" ng-disabled="!selected._canedit" required>
-            <option value="">(Select Test Spec)</option>
-            <option ng-repeat="spec in testspecs | filter:{service_type:test.service_type}" value="{{spec._id}}">{{spec.name}} </option>
-        </select>
-        <div class="well well-sm well-detail" ng-if="test.testspec">
-            <mc-specs readonly="true" specs="getselectedtestspec(test).specs"></mc-specs>
+    <div
+        class="form-group"
+        ng-if="test.service_type && test.mesh_type == 'disjoint'"
+    >
+        <label class="col-sm-2 control-label">Host Group B</label>
+        <div class="col-sm-10">
+            <select
+                class="form-control"
+                ng-model="test.bgroup"
+                ng-change="refreshNAHosts(test)"
+                ng-disabled="!selected._canedit"
+                required
+            >
+                <option value="">(Select Host Group)</option>
+                <option
+                    ng-repeat="group in hostgroups | filter:{service_type:test.service_type}"
+                    value="{{group._id}}"
+                >
+                    {{group.name}} ({{group.hosts.length}} Hosts)
+                </option>
+            </select>
+            <div ng-if="test.bgroup">
+                <div
+                    ng-if="gethostgroup(test.bgroup).type == 'static'"
+                    class="well well-sm well-detail"
+                    style="max-height: 100px; overflow: auto"
+                >
+                    <mc-hostlist
+                        hostids="gethostgroup(test.bgroup).hosts"
+                    ></mc-hostlist>
+                </div>
+                <div ng-if="gethostgroup(test.bgroup).type == 'dynamic'">
+                    <div
+                        name="host_filter"
+                        ui-ace="{ mode: 'javascript', theme: 'twilight' }"
+                        readonly
+                        ng-model="gethostgroup(test.bgroup).host_filter"
+                    ></div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+
+    <div class="form-group" ng-if="test.service_type && test.mesh_type">
+        <label class="col-sm-2 control-label"
+            >No Agent Hosts <span class="text-muted">(Optional)</span></label
+        >
+        <div class="col-sm-10">
+            <ui-select multiple ng-model="test.nahosts" style="margin-top: 5px">
+                <ui-select-match placeholder="Enter Hostnames">
+                    <span class="label label-default" ng-if="$item.lsid"
+                        >{{$item.lsid}}</span
+                    >
+                    <span class="label label-warning" ng-if="!$item.lsid"
+                        >Adhoc</span
+                    >
+                    <!--<b>{{$item.sitename}}</b>-->
+                    <span>{{$item.hostname|trim_locator}}</span>
+                </ui-select-match>
+                <!--can't filter by service_type because we aren't loading service_type detail for hosts-->
+                <ui-select-choices
+                    group-by="'sitename'"
+                    refresh-delay="200"
+                    refresh="refreshNAHosts(test)"
+                    repeat="host._id as host in na_hosts | filter: $select.search"
+                >
+                    <span class="label label-default" ng-if="host.lsid"
+                        >{{host.lsid}}</span
+                    >
+                    <span class="label label-warning" ng-if="!host.lsid"
+                        >Adhoc</span
+                    >
+                    <code>{{host.hostname|trim_locator}}</code>
+                </ui-select-choices>
+            </ui-select>
+            <p class="help-block">
+                Defines an address that will not initiate tests when used in
+                this group. This will override the no_agent field specified in
+                the host directive if defined. It is recommended you use the
+                host directive to define this if a address cannot initiate tests
+                for any group. Only use this form if you want a host to initiate
+                tests when used in some groups but not others.
+            </p>
+        </div>
+    </div>
+    <div class="form-group" ng-if="test.service_type">
+        <label class="col-sm-2 control-label">Testspec</label>
+        <div class="col-sm-10">
+            <select
+                class="form-control"
+                ng-model="test.testspec"
+                ng-disabled="!selected._canedit"
+                required
+            >
+                <option value="">(Select Test Spec)</option>
+                <option
+                    ng-repeat="spec in testspecs | filter:{service_type:test.service_type}"
+                    value="{{spec._id}}"
+                >
+                    {{spec.name}}
+                </option>
+            </select>
+            <div class="well well-sm well-detail" ng-if="test.testspec">
+                <mc-specs
+                    readonly="true"
+                    specs="getselectedtestspec(test).specs"
+                ></mc-specs>
+            </div>
+        </div>
+    </div>
 </fieldset>

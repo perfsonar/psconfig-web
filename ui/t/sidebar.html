@@ -1,53 +1,59 @@
 <div class="sca-sidebar">
-
     <div class="menu subbar-opener" ng-click="opensubbar()">
-        <h3><i class="fa fa-bars"></i></h3> 
+        <h3><i class="fa fa-bars"></i></h3>
     </div>
 
-    <h2 class="text-muted" ng-click="openpage('/home');" style="padding-top: 0px; cursor: pointer;">
+    <h2
+        class="text-muted"
+        ng-click="openpage('/home');"
+        style="padding-top: 0px; cursor: pointer"
+    >
         <!--<i class="fa fa-flask" aria-hidden="true"></i>-->
-        <img src="images/logoicon.45.png" width="35" alt="PWA Home">
+        <img src="images/logoicon.45.png" width="35" alt="PWA Home" />
     </h2>
-    <br>
-    <br>
+    <br />
+    <br />
 
     <a ng-href="{{getpageurl('/configs')}}">
         <div class="menu" ng-class="{'active':  active_menu == 'configs'}">
-                <h3><i class="fa fa-globe" aria-hidden="true"></i></h3> 
-                <span class="label">Configs</span>
+            <h3><i class="fa fa-globe" aria-hidden="true"></i></h3>
+            <span class="label">Configs</span>
         </div>
     </a>
-    <hr>
+    <hr />
 
     <a ng-href="{{getpageurl('/hosts')}}">
         <div class="menu" ng-class="{'active':  active_menu == 'hosts'}">
-                <h3><i class="fa fa-laptop" aria-hidden="true"></i></h3> 
-                <span class="label">Hosts</span>
+            <h3><i class="fa fa-laptop" aria-hidden="true"></i></h3>
+            <span class="label">Hosts</span>
         </div>
     </a>
 
     <a ng-href="{{getpageurl('/hostgroups')}}">
-        <div class="menu" ng-class="{'active':  active_menu == 'hostgroups'}" >
-                <h3><i class="fa fa-server" aria-hidden="true"></i></h3> 
-                <span class="label">Host Groups</span>
+        <div class="menu" ng-class="{'active':  active_menu == 'hostgroups'}">
+            <h3><i class="fa fa-server" aria-hidden="true"></i></h3>
+            <span class="label">Host Groups</span>
         </div>
     </a>
     <a ng-href="{{getpageurl('/testspecs')}}">
-        <div class="menu" ng-class="{'active':  active_menu == 'testspecs'}" >
-                <h3><i class="fa fa-flask" aria-hidden="true"></i></h3> 
-                <span class="label">Testspecs</span>
+        <div class="menu" ng-class="{'active':  active_menu == 'testspecs'}">
+            <h3><i class="fa fa-flask" aria-hidden="true"></i></h3>
+            <span class="label">Testspecs</span>
         </div>
     </a>
     <a ng-href="{{getpageurl('/archives')}}">
-        <div class="menu" ng-class="{'active':  active_menu == 'archives'}" >
-                <h3><i class="fa fa-database" aria-hidden="true"></i></h3> 
-                <span class="label">Archives</span>
+        <div class="menu" ng-class="{'active':  active_menu == 'archives'}">
+            <h3><i class="fa fa-database" aria-hidden="true"></i></h3>
+            <span class="label">Archives</span>
         </div>
     </a>
 
     <div class="bottom">
         <div class="menu">
-            <a ng-href="https://github.com/perfsonar/psconfig-web/issues" target="_blank">
+            <a
+                ng-href="https://github.com/perfsonar/psconfig-web/issues"
+                target="_blank"
+            >
                 <h3><i class="fa fa-bug" aria-hidden="true"></i></h3>
                 <!-- <span class="label">Report Bugs</span> -->
             </a>
@@ -58,10 +64,13 @@
                 <!-- <span class="label">Docs</span> -->
             </a>
         </div>
-        <hr>
+        <hr />
         <div class="menu">
-            <a ng-href="{{appconf.base_url}}/auth/#!/settings/account" target="_blank">
-                <h3><i class="fa fa-cog" aria-hidden="true"></i></h3> 
+            <a
+                ng-href="{{appconf.base_url}}/auth/#!/settings/account"
+                target="_blank"
+            >
+                <h3><i class="fa fa-cog" aria-hidden="true"></i></h3>
                 <span class="label">Settings</span>
             </a>
         </div>

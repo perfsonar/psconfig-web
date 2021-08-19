@@ -7,14 +7,12 @@
 //$enable-shadows:            true !default;
 //$enable-gradients:          true !default;
 
-
 button,
 html [type="button"], // 1
 [type="reset"],
 [type="submit"] {
-      -webkit-appearance: none; // 2
+    -webkit-appearance: none; // 2
 }
-
 
 /*
 .button-flat span[type="button"] { // 1
@@ -24,13 +22,12 @@ html [type="button"], // 1
 */
 
 .button-flat .btn .label {
-    font-size:85%;
+    font-size: 85%;
 }
-
 
 .button-flat span[type="button"],
 .ui-select-match span[type="button"] {
-    background-color: darken( $input-bg, 3% );
+    background-color: darken($input-bg, 3%);
 }
 
 span.ui-select-match-item .label-default {
@@ -41,6 +38,6 @@ span.ui-select-match-item .label-default {
     margin: 0.5em 0em;
 }
 
-.panel-tighter .panel.panel-default  {
+.panel-tighter .panel.panel-default {
     margin: 1em 0;
 }

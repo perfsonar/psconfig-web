@@ -11,20 +11,18 @@ exports.pub = {
     port: 8082,
     //url: "http://<hostname>/pwa/pub/",
     url: "/pwa/pub/",
-    default_config_format: "psconfig"
+    default_config_format: "psconfig",
 };
 
 exports.pub.plugins = {
     enabled: false,
-    plugin_scripts: [ 'plugins/pub/filter_example.js' ]
-
+    plugin_scripts: ["plugins/pub/filter_example.js"],
 };
 
 console.log("exports.pub", exports.pub);
 
 // Mongo DB to use (the default should work fine, unless you specifically need a different db)
 exports.mongodb = "mongodb://localhost/pwa";
-
 
 // PWA general settings
 
@@ -33,22 +31,21 @@ exports.meshconfig = {
 
     // service-types to support
     service_types: {
-        "owamp": {label: "Latency"},
-        "bwctl": {label: "Throughput"},
-        "traceroute": {label: "Traceroute"},
-        "ping": {label: "Ping"},
+        owamp: { label: "Latency" },
+        bwctl: { label: "Throughput" },
+        traceroute: { label: "Traceroute" },
+        ping: { label: "Ping" },
     },
 
     // Supported mesh types
     mesh_types: {
-        "mesh": {label: "Mesh"},
-        "disjoint": {label: "Disjoint"}
+        mesh: { label: "Mesh" },
+        disjoint: { label: "Disjoint" },
     },
-
 
     // Default values for various new entities created via the GUI
     // Each time a new testspec is created, many parameters have default values -- for instance, test duration
-    // These defaults are specified here; they should work fine in most cases, but you can tweak them if necessary 
+    // These defaults are specified here; they should work fine in most cases, but you can tweak them if necessary
     defaults: {
         testspecs: {
             bwctl: {
@@ -59,7 +56,7 @@ exports.meshconfig = {
                 random_start_percentage: 10,
                 omit_interval: 5,
                 force_bidirectional: false,
-                ipv4_only: true
+                ipv4_only: true,
             },
             owamp: {
                 packet_interval: 0.1,
@@ -71,7 +68,7 @@ exports.meshconfig = {
                 interval: 3600,
                 duration: 30,
                 tool: "owping",
-                schedule_type: "continuous"
+                schedule_type: "continuous",
             },
             traceroute: {
                 tool: "traceroute",
@@ -85,12 +82,12 @@ exports.meshconfig = {
                 ipv6_only: false,
                 pause: 0,
                 waittime: 10,
-                timeout: 60
+                timeout: 60,
             },
             ping: {
-                test_interval: 1
+                test_interval: 1,
             },
-        }
+        },
     },
 
     //minumum option version catalog (used to suppress them for known v3 host)
@@ -104,11 +101,11 @@ exports.meshconfig = {
             congestion: 4,
             flow_label: 4,
             server_cpu_affinity: 4,
-            client_cpu_affinity: 4
+            client_cpu_affinity: 4,
         },
         owamp: {
             tos_bits: 4,
-            output_raw: 4
+            output_raw: 4,
         },
         traceroute: {
             tos_bits: 4,
@@ -119,7 +116,7 @@ exports.meshconfig = {
             probe_type: 4,
             queries: 4,
             sendwait: 4,
-            wait: 4
+            wait: 4,
         },
         ping: {
             tool: 4,
@@ -128,27 +125,27 @@ exports.meshconfig = {
             hostnames: 4,
             suppress_loopback: 4,
             deadline: 4,
-            timeout: 4
+            timeout: 4,
         },
     },
 
     //meshconfig admin loads sls content at startup, and then every once a while with following frequency
-    sls_cache_frequency: 60*1000*10, //every 10 minutes
-}
+    sls_cache_frequency: 60 * 1000 * 10, //every 10 minutes
+};
 
 exports.datasource = {
     //amount of time between each cache
-    delay: 1000*3600,
+    delay: 1000 * 3600,
 
-    //ls endpoints to pull host information from 
+    //ls endpoints to pull host information from
     lses: {
         // Global LS queries
         // if hostname collision happens, the first datasource will take precedence
-     	
-	// Example: here, we are creating a label based on querying the Global LS for a given community
-	// Fake institution "Widget Factory"
-	// Note the "label" should be short as it will display for each host in the GUI and there is limited space
-/*
+
+        // Example: here, we are creating a label based on querying the Global LS for a given community
+        // Fake institution "Widget Factory"
+        // Note the "label" should be short as it will display for each host in the GUI and there is limited space
+        /*
         "widgetfactory": {
             label: "widget",
             type: "global-sls",
@@ -165,14 +162,13 @@ exports.datasource = {
         }
         */
         // Global LS instance (by default, this is the only LS specified)
-    
-        "gls": {
+
+        gls: {
             label: "GLS",
             type: "global-sls",
             activehosts_url: "http://ps1.es.net:8096/lookup/activehosts.json",
             query: "?type=service",
-        }
-        
+        },
 
         // Private sLS instance
         // only uncomment this if you are running a private sLS instance
@@ -183,9 +179,8 @@ exports.datasource = {
             url: "http://sls:8090/lookup/records/?type=service", 
         },
         */
-    }
-}
-
+    },
+};
 
 //admin api
 exports.admin = {
@@ -194,28 +189,30 @@ exports.admin = {
     port: 8080,
 
     //authentication service public key to verify jwt token generated by it
-    jwt: { pub: fs.readFileSync(__dirname+"/auth/auth.pub") }
-
-}
+    jwt: { pub: fs.readFileSync(__dirname + "/auth/auth.pub") },
+};
 
 exports.common = {
     //needed to access auth service to pull profile
     auth_api: "http://localhost:12000",
     //auth_api: "http://sca-auth:8080",
-    auth_jwt: fs.readFileSync(__dirname+"/auth/user.jwt").toString().trim()
-}
+    auth_jwt: fs
+        .readFileSync(__dirname + "/auth/user.jwt")
+        .toString()
+        .trim(),
+};
 
 exports.logger = {
     winston: {
         transports: [
             //display all logs to console
             new winston.transports.Console({
-                timestamp: function() {
+                timestamp: function () {
                     var d = new Date();
                     return d.toString();
                 },
                 level: "info",
-                colorize: true
+                colorize: true,
             }),
 
             /*
@@ -225,7 +222,6 @@ exports.logger = {
                 level: "warn"
             })
             */
-        ]
-    }
-}
-
+        ],
+    },
+};
