@@ -1,42 +1,47 @@
-'use strict';
+"use strict";
 
 //contrib
-const mongoose = require('mongoose');
-const winston = require('winston');
+const mongoose = require("mongoose");
+const winston = require("winston");
 
 //mine
-var config = require('../config');
+var config = require("../config");
 const logger = new winston.Logger(config.logger.winston);
 
 //use native promise for mongoose
 //without this, I will get Mongoose: mpromise (mongoose's default promise library) is deprecated
 mongoose.Promise = global.Promise;
 
-exports.init = function(cb, configToUse) {
-    if ( configToUse ) {
+exports.init = function (cb, configToUse) {
+    if (configToUse) {
         config = configToUse;
-
     }
-    mongoose.connect(config.mongodb, {
-        useNewUrlParser: true
-        , useUnifiedTopology: true
-        , useCreateIndex: true
-    }, function(err) {
-        if(err) {
-            logger.error(err);
-            logger.error("mongodb might not be started yet.. going to retry in 5 seconds");
-            setTimeout(function() {
-                exports.init(cb);
-            }, 5000);
-            return;
+    mongoose.connect(
+        config.mongodb,
+        {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            useCreateIndex: true,
+        },
+        function (err) {
+            if (err) {
+                logger.error(err);
+                logger.error(
+                    "mongodb might not be started yet.. going to retry in 5 seconds"
+                );
+                setTimeout(function () {
+                    exports.init(cb);
+                }, 5000);
+                return;
+            }
+            logger.info("connected to mongo");
+            cb();
         }
-        logger.info("connected to mongo");
-        cb();
-    });
-}
-exports.disconnect = function(cb) {
+    );
+};
+exports.disconnect = function (cb) {
     mongoose.disconnect(cb);
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -47,61 +52,67 @@ var serviceSchema = mongoose.Schema({
     locator: [String], // like "tcp://ps-latency.atlas.unimelb.edu.au:861" (used to pull hostname)
 
     //ma to send data to. if not set, it uses local ma
-    ma: {type: mongoose.Schema.Types.ObjectId, ref: 'Host'},
+    ma: { type: mongoose.Schema.Types.ObjectId, ref: "Host" },
 });
 
 //workflow instance
-var hostSchema = mongoose.Schema({
+var hostSchema = mongoose.Schema(
+    {
+        /////////////////////////////////////////////////////////////////////////////////////////..
+        //key
+        hostname: { type: String, index: { unique: true }, required: true },
 
-    /////////////////////////////////////////////////////////////////////////////////////////..
-    //key
-    hostname: {type: String, index: { unique: true }, required: true },
+        uuid: String, //this is now much less important..(maybe I should deprecate?)
+        sitename: String,
+        desc: String, //if not set, sitename will be used for host "description" in meshconfig
 
-    uuid: String, //this is now much less important..(maybe I should deprecate?)
-    sitename: String,
-    desc: String, //if not set, sitename will be used for host "description" in meshconfig
+        //TODO - right now I don't know what I can use this information for..
+        //stores ip address resolved from the hostname using dns.resolve
+        addresses: [
+            mongoose.Schema({
+                family: Number, //4 or 6
+                address: String, //ip address
+            }),
+        ],
 
-    //TODO - right now I don't know what I can use this information for..
-    //stores ip address resolved from the hostname using dns.resolve
-    addresses: [
-        mongoose.Schema({
-            family: Number, //4 or 6
-            address: String, //ip address
-        })
-    ],
+        toolkit_url: String,
+        no_agent: { type: Boolean, default: false },
 
-    toolkit_url: String,
-    no_agent: {type: Boolean, default: false},
+        // whether to use the local host MA
+        local_ma: { type: Boolean, default: false },
 
-    // whether to use the local host MA
-    local_ma: {type: Boolean, default: false},
+        local_ma_url: String,
 
-    local_ma_url: String,
+        ma_urls: [String],
 
-    ma_urls: [ String ],
+        local_archives: [
+            { type: mongoose.Schema.Types.ObjectId, ref: "Archive" },
+        ],
 
-    local_archives: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Archive'} ],
+        additional_archives: [
+            { type: mongoose.Schema.Types.ObjectId, ref: "Archive" },
+        ],
 
-    additional_archives: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Archive'} ],
+        //host info (pshost-toolkitversion, host-hardware-memory, host-os-version, host-hadeware-processorspeed, host-hadware-processorcount)
+        //and location info (location-state, location-city, location-country, etc..)
+        info: mongoose.Schema.Types.Mixed,
 
-    //host info (pshost-toolkitversion, host-hardware-memory, host-os-version, host-hadeware-processorspeed, host-hadware-processorcount)
-    //and location info (location-state, location-city, location-country, etc..)
-    info: mongoose.Schema.Types.Mixed,
+        //location: mongoose.Schema.Types.Mixed,
 
-    //location: mongoose.Schema.Types.Mixed,
+        communities: [String],
 
-    communities: [ String ],
+        services: [serviceSchema],
 
-    services: [ serviceSchema ],
+        lsid: String, //LS instance that this record came from (if this is not set, this record is considered "adhoc")
+        url: String, //source ls url (not set if this record is "simulated")
 
-    lsid: String,  //LS instance that this record came from (if this is not set, this record is considered "adhoc")
-    url: String, //source ls url (not set if this record is "simulated")
+        admins: [String], //array of user ids (sub string in auth service) (not used if lsid is set)
 
-    admins: [ String ], //array of user ids (sub string in auth service) (not used if lsid is set)
-
-    create_date: {type: Date, default: Date.now},
-    update_date: {type: Date, default: Date.now},
-}, {minimize: false}); //let empty info/location object to be set on creation
+        create_date: { type: Date, default: Date.now },
+        update_date: { type: Date, default: Date.now },
+    },
+    { minimize: false }
+); //let empty info/location object to be set on creation
 
 /*
 //mongoose's pre/post are just too fragile.. it gets call on some and not on others.. (like findOneAndUpdate)
@@ -111,7 +122,7 @@ instanceSchema.pre('update', function(next) {
     next();
 });
 */
-exports.Host = mongoose.model('Host', hostSchema);
+exports.Host = mongoose.model("Host", hostSchema);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -119,18 +130,18 @@ var hostgroupSchema = mongoose.Schema({
     service_type: String,
     name: String,
     desc: String,
-    type: { type: String, default: 'static' },
+    type: { type: String, default: "static" },
 
-    hosts:[ {type: mongoose.Schema.Types.ObjectId, ref: 'Host'} ],
+    hosts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Host" }],
 
     //(dynamic) javascript filter code to select services (takes precedence over static list)
     host_filter: String,
 
-    admins: [ String ], //array of user ids (sub string in auth service)
-    create_date: {type: Date, default: Date.now},
-    update_date: {type: Date, default: Date.now},
+    admins: [String], //array of user ids (sub string in auth service)
+    create_date: { type: Date, default: Date.now },
+    update_date: { type: Date, default: Date.now },
 });
-exports.Hostgroup = mongoose.model('Hostgroup', hostgroupSchema);
+exports.Hostgroup = mongoose.model("Hostgroup", hostgroupSchema);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -141,11 +152,11 @@ var testspecSchema = mongoose.Schema({
     schedule_type: String,
     specs: mongoose.Schema.Types.Mixed,
 
-    admins: [ String ], //array of user ids (sub string in auth service)
-    create_date: {type: Date, default: Date.now},
-    update_date: {type: Date, default: Date.now},
+    admins: [String], //array of user ids (sub string in auth service)
+    create_date: { type: Date, default: Date.now },
+    update_date: { type: Date, default: Date.now },
 });
-exports.Testspec = mongoose.model('Testspec', testspecSchema);
+exports.Testspec = mongoose.model("Testspec", testspecSchema);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -155,11 +166,11 @@ var archiveSchema = mongoose.Schema({
     archiver: String,
     data: mongoose.Schema.Types.Mixed,
 
-    admins: [ String ], //array of user ids (sub string in auth service)
-    create_date: {type: Date, default: Date.now},
-    update_date: {type: Date, default: Date.now},
+    admins: [String], //array of user ids (sub string in auth service)
+    create_date: { type: Date, default: Date.now },
+    update_date: { type: Date, default: Date.now },
 });
-exports.Archive = mongoose.model('Archive', archiveSchema);
+exports.Archive = mongoose.model("Archive", archiveSchema);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -170,15 +181,15 @@ var testSchema = mongoose.Schema({
     //desc: String, //deprecated?
 
     mesh_type: String,
-    agroup: {type: mongoose.Schema.Types.ObjectId, ref: 'Hostgroup'},
-    bgroup: {type: mongoose.Schema.Types.ObjectId, ref: 'Hostgroup'},
+    agroup: { type: mongoose.Schema.Types.ObjectId, ref: "Hostgroup" },
+    bgroup: { type: mongoose.Schema.Types.ObjectId, ref: "Hostgroup" },
 
-    center: {type: mongoose.Schema.Types.ObjectId, ref: 'Host'}, //only used for mesh_type == star
-    nahosts: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Host'} ], //let's not use hostgroup for this..
+    center: { type: mongoose.Schema.Types.ObjectId, ref: "Host" }, //only used for mesh_type == star
+    nahosts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Host" }], //let's not use hostgroup for this..
 
-    testspec: {type: mongoose.Schema.Types.ObjectId, ref: 'Testspec'},
+    testspec: { type: mongoose.Schema.Types.ObjectId, ref: "Testspec" },
 
-    enabled: {type: Boolean, default: true }, //should I keep this?
+    enabled: { type: Boolean, default: true }, //should I keep this?
 });
 
 var configSchema = mongoose.Schema({
@@ -186,17 +197,15 @@ var configSchema = mongoose.Schema({
     name: String,
     desc: String,
 
-    tests: [ testSchema ],
-    
-    archives: [ {type: mongoose.Schema.Types.ObjectId, ref: 'Archive'} ],
+    tests: [testSchema],
 
-    admins: [ String ], //array of user ids (sub string in auth service)
-    create_date: {type: Date, default: Date.now},
-    update_date: {type: Date, default: Date.now},
-    ma_urls: [ String ], // an array of measurement archive URLs to archive test results to
+    archives: [{ type: mongoose.Schema.Types.ObjectId, ref: "Archive" }],
+
+    admins: [String], //array of user ids (sub string in auth service)
+    create_date: { type: Date, default: Date.now },
+    update_date: { type: Date, default: Date.now },
+    ma_urls: [String], // an array of measurement archive URLs to archive test results to
     ma_custom_json: String,
-    force_endpoint_mas: {type: Boolean, default: false} // bool determining whether to force archiving to MAs on all hosts in the config
-
+    force_endpoint_mas: { type: Boolean, default: false }, // bool determining whether to force archiving to MAs on all hosts in the config
 });
-exports.Config = mongoose.model('Config', configSchema);
-
+exports.Config = mongoose.model("Config", configSchema);
