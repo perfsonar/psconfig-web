@@ -1,21 +1,21 @@
-'use strict';
+"use strict";
 
 //contrib
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const winston = require('winston');
-const jwt = require('express-jwt');
-const async = require('async');
+const winston = require("winston");
+const jwt = require("express-jwt");
+const async = require("async");
 
 //mine
-const config = require('../../config');
+const config = require("../../config");
 const logger = new winston.Logger(config.logger.winston);
-const db = require('../../models');
+const db = require("../../models");
 
 function canedit(user, archive) {
-    if(user) {
-        if(user.scopes.pwa && ~user.scopes.pwa.indexOf('admin')) return true; 
-        if(~archive.admins.indexOf(user.sub.toString())) return true;
+    if (user) {
+        if (user.scopes.pwa && ~user.scopes.pwa.indexOf("admin")) return true;
+        if (~archive.admins.indexOf(user.sub.toString())) return true;
     }
     return false;
 }
@@ -35,38 +35,41 @@ function canedit(user, archive) {
  *
  * @apiSuccess {Object}         hosts: List of archives objects(archives:), count: total number of archives (for paging)
  */
-router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    var find = {};
-    if(req.query.find) find = JSON.parse(req.query.find);
+router.get(
+    "/",
+    jwt({ secret: config.admin.jwt.pub }),
+    function (req, res, next) {
+        var find = {};
+        if (req.query.find) find = JSON.parse(req.query.find);
 
-    
-    //we need to select admins , or can't get _canedit set
-    var select = req.query.select;
-    if(select && !~select.indexOf("admins")) select += " admins";
+        //we need to select admins , or can't get _canedit set
+        var select = req.query.select;
+        if (select && !~select.indexOf("admins")) select += " admins";
 
-    console.log("find", find);
-    console.log("select", select);
-    console.log("limit", req.query.limit);
+        console.log("find", find);
+        console.log("select", select);
+        console.log("limit", req.query.limit);
 
-    db.Archive.find(find)
-    .select(select)
-    .limit(parseInt(req.query.limit) || 500)
-    .skip(parseInt(req.query.skip) || 0)
-    .sort(req.query.sort || '_id')
-    .lean() //so that I can add _canedit later
-    .exec(function(err, archives) {
-        console.log("archives", archives);
-        if(err) return next(err);
-        db.Archive.count(find).exec(function(err, count) { 
-            if(err) return next(err);
-            //set _canedit flag for each specs
-            archives.forEach(function(archive) {
-                archive._canedit = canedit(req.user, archive);
+        db.Archive.find(find)
+            .select(select)
+            .limit(parseInt(req.query.limit) || 500)
+            .skip(parseInt(req.query.skip) || 0)
+            .sort(req.query.sort || "_id")
+            .lean() //so that I can add _canedit later
+            .exec(function (err, archives) {
+                console.log("archives", archives);
+                if (err) return next(err);
+                db.Archive.count(find).exec(function (err, count) {
+                    if (err) return next(err);
+                    //set _canedit flag for each specs
+                    archives.forEach(function (archive) {
+                        archive._canedit = canedit(req.user, archive);
+                    });
+                    res.json({ archives: archives, count: count });
+                });
             });
-            res.json({archives: archives, count: count});
-        });
-    }); 
-});
+    }
+);
 
 /**
  * @api {post} /archives        New archive
@@ -79,19 +82,24 @@ router.get('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
  * @apiParam {Object} data      Archiver details (key/value pairs)
  * @apiParam {String[]} [admins] Array of admin IDs
  *
- * @apiHeader {String} authorization 
+ * @apiHeader {String} authorization
  *                              A valid JWT token "Bearer: xxxxx"
  * @apiSuccess {Object}         Archive registered
  */
-router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    if(!req.user.scopes.pwa || !~req.user.scopes.pwa.indexOf('user')) return res.status(401).end();
-    db.Archive.create(req.body, function(err, archive) {
-        if(err) return next(err);
-        archive = JSON.parse(JSON.stringify(archive));
-        archive._canedit = canedit(req.user, archive);
-        res.json(archive);
-    });
-});
+router.post(
+    "/",
+    jwt({ secret: config.admin.jwt.pub }),
+    function (req, res, next) {
+        if (!req.user.scopes.pwa || !~req.user.scopes.pwa.indexOf("user"))
+            return res.status(401).end();
+        db.Archive.create(req.body, function (err, archive) {
+            if (err) return next(err);
+            archive = JSON.parse(JSON.stringify(archive));
+            archive._canedit = canedit(req.user, archive);
+            res.json(archive);
+        });
+    }
+);
 
 /**
  * @api {put} /archives/:id     Update archive
@@ -103,58 +111,73 @@ router.post('/', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
  * @apiParam {String} [archiver]  Archiver URL (https://example.com)
  * @apiParam {Object} [data]      Archiver details (key/value pairs)
  * @apiParam {String[]} [admins]  Array of admin IDs
-*
+ *
  * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"
  *
  * @apiSuccess {Object}         Archive updated
  */
-router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    db.Archive.findById(req.params.id, function(err, archive) {
-        if(err) return next(err);
-        if(!archive) return next(new Error("can't find a archive with id:"+req.params.id));
-        if(!canedit(req.user, archive)) return res.status(401).end();
+router.put(
+    "/:id",
+    jwt({ secret: config.admin.jwt.pub }),
+    function (req, res, next) {
+        db.Archive.findById(req.params.id, function (err, archive) {
+            if (err) return next(err);
+            if (!archive)
+                return next(
+                    new Error("can't find a archive with id:" + req.params.id)
+                );
+            if (!canedit(req.user, archive)) return res.status(401).end();
 
-        if(req.body.archiver == archive.archiver) update();
-        else {
-            //check to make sure if it's not used by a test
-            db.Config.find({"tests.archive": archive._id}, function(err, tests) {
-                if(err) return next(err);
-                if(tests.length == 0) update();
-                else {
-                    var names = "";
-                    tests.forEach(function(test) { names+=test.name+", "; });
-                    next("You can not change service_type for this archive. It is currently used by "+names);
-                }
-            }); 
-        } 
-
-        function update() {
-            //not used by anyone .. update (field no set won't be updated - unless it's set to undefined explicitly)
-            archive.name = req.body.name;
-            archive.desc = req.body.desc;
-            archive.archiver = req.body.archiver;
-            archive.data = req.body.data;
-            archive.admins = req.body.admins;
-            if ( req.body.verify_ssl ) {
-                archive.data.verify_ssl = req.body.data.verify_ssl;
+            if (req.body.archiver == archive.archiver) update();
+            else {
+                //check to make sure if it's not used by a test
+                db.Config.find(
+                    { "tests.archive": archive._id },
+                    function (err, tests) {
+                        if (err) return next(err);
+                        if (tests.length == 0) update();
+                        else {
+                            var names = "";
+                            tests.forEach(function (test) {
+                                names += test.name + ", ";
+                            });
+                            next(
+                                "You can not change service_type for this archive. It is currently used by " +
+                                    names
+                            );
+                        }
+                    }
+                );
             }
-            archive.update_date = new Date();
-            console.log("updating archive ", archive);
-            archive.save(function(err) {
-                if(err) return next(err);
-                archive = JSON.parse(JSON.stringify(archive));
-                archive._canedit = canedit(req.user, archive);
-                res.json(archive);
-            });
-        } 
-    }); 
-});
+
+            function update() {
+                //not used by anyone .. update (field no set won't be updated - unless it's set to undefined explicitly)
+                archive.name = req.body.name;
+                archive.desc = req.body.desc;
+                archive.archiver = req.body.archiver;
+                archive.data = req.body.data;
+                archive.admins = req.body.admins;
+                if (req.body.verify_ssl) {
+                    archive.data.verify_ssl = req.body.data.verify_ssl;
+                }
+                archive.update_date = new Date();
+                console.log("updating archive ", archive);
+                archive.save(function (err) {
+                    if (err) return next(err);
+                    archive = JSON.parse(JSON.stringify(archive));
+                    archive._canedit = canedit(req.user, archive);
+                    res.json(archive);
+                });
+            }
+        });
+    }
+);
 
 /**
  * @api {delete} /archives/:id  Remove archive
  * @apiGroup                    Archives
  * @apiDescription              Remove archive URL
- * @apiHeader {String} authorization 
+ * @apiHeader {String} authorization
  *                              A valid JWT token "Bearer: xxxxx"
  * @apiSuccessExample {json} Success-Response:
  *     HTTP/1.1 200 OK
@@ -162,46 +185,60 @@ router.put('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next)
  *         "status": "ok"
  *     }
  */
-router.delete('/:id', jwt({secret: config.admin.jwt.pub}), function(req, res, next) {
-    db.Archive.findById(req.params.id, function(err, archive) {
-        if(err) return next(err);
-        if(!archive) return next(new Error("can't find a archive with id:"+req.params.id));
+router.delete(
+    "/:id",
+    jwt({ secret: config.admin.jwt.pub }),
+    function (req, res, next) {
+        db.Archive.findById(req.params.id, function (err, archive) {
+            if (err) return next(err);
+            if (!archive)
+                return next(
+                    new Error("can't find a archive with id:" + req.params.id)
+                );
 
-        async.series([
-            //check access 
-            function(cb) {
-                if(canedit(req.user, archive)) {
-                    cb();
-                } else {
-                    cb("You don't have access to remove this archive");
-                }
-            },
-            
-            //check foreign key dependencies on test
-            function(cb) {
-                db.Config.find({"tests.archive": archive._id}, function(err, tests) {
-                    if(err) return cb(err);
-                    var names = "";
-                    tests.forEach(function(test) {
-                        names+=test.name+", ";
+            async.series(
+                [
+                    //check access
+                    function (cb) {
+                        if (canedit(req.user, archive)) {
+                            cb();
+                        } else {
+                            cb("You don't have access to remove this archive");
+                        }
+                    },
+
+                    //check foreign key dependencies on test
+                    function (cb) {
+                        db.Config.find(
+                            { "tests.archive": archive._id },
+                            function (err, tests) {
+                                if (err) return cb(err);
+                                var names = "";
+                                tests.forEach(function (test) {
+                                    names += test.name + ", ";
+                                });
+                                if (names == "") {
+                                    cb();
+                                } else {
+                                    cb(
+                                        "You can not remove this archive. It is currently used by " +
+                                            names
+                                    );
+                                }
+                            }
+                        );
+                    },
+                ],
+                function (err) {
+                    if (err) return next(err);
+                    //all good.. remove
+                    archive.remove().then(function () {
+                        res.json({ status: "ok" });
                     });
-                    if(names == "") {
-                        cb();
-                    } else {
-                        cb("You can not remove this archive. It is currently used by "+names);
-                    }
-                }); 
-            }
-
-        ], function(err) {
-            if(err) return next(err);
-            //all good.. remove
-            archive.remove().then(function() {
-                res.json({status: "ok"});
-            }); 
+                }
+            );
         });
-    });
-});
+    }
+);
 
 module.exports = router;
-

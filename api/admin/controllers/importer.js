@@ -329,8 +329,10 @@ exports._process_imported_config = function (
                         if ("_agroup" in _testspec) {
                             if (
                                 _testspec._agroup.name == _group.name ||
-                                _testspec._agroup.name == _group.name + " Group" ||
-                                _testspec._agroup.name == _group.name + " Group A"
+                                _testspec._agroup.name ==
+                                    _group.name + " Group" ||
+                                _testspec._agroup.name ==
+                                    _group.name + " Group A"
                             ) {
                                 _testspec._agroup._id = _group._id;
                             }
@@ -341,8 +343,10 @@ exports._process_imported_config = function (
                         if ("_bgroup" in _testspec) {
                             if (
                                 _testspec._bgroup.name == _group.name ||
-                                _testspec._bgroup.name == _group.name + " Group" ||
-                                _testspec._bgroup.name == _group.name + " Group B"
+                                _testspec._bgroup.name ==
+                                    _group.name + " Group" ||
+                                _testspec._bgroup.name ==
+                                    _group.name + " Group B"
                             ) {
                                 _testspec._bgroup._id = _group._id;
                             }

@@ -1,25 +1,24 @@
 //contrib
-var assert = require('assert');
-var chai = require('chai');
+var assert = require("assert");
+var chai = require("chai");
 
 //mine
-var archiveInfo = require('./data/archiveinfo.js');
-var config = require('./etc/config');
-var pubShared = require('../api/pub/pub_shared');
+var archiveInfo = require("./data/archiveinfo.js");
+var config = require("./etc/config");
+var pubShared = require("../api/pub/pub_shared");
 //var publisher = require('../api/pub/meshconfig');
-const winston = require('winston');
+const winston = require("winston");
 const logger = new winston.Logger(config.logger.winston);
-const async = require('async');
-fs = require('fs');
+const async = require("async");
+fs = require("fs");
 
-function formatlog( obj ) {
-    var out = JSON.stringify( obj, null, 3 );
+function formatlog(obj) {
+    var out = JSON.stringify(obj, null, 3);
     return out;
 }
 
 console.log("archiveInfo", archiveInfo);
 testsArr = archiveInfo.archive_checks;
-
 
 /*
 var testsObj = {
@@ -67,90 +66,95 @@ var testsObj = {
 };
 */
 
-function getValueStringPath (obj, path) {
+function getValueStringPath(obj, path) {
     if (!path) return obj;
-    const properties = path.split('.');
-    return getValueStringPath(obj[properties.shift()], properties.join('.'))
+    const properties = path.split(".");
+    return getValueStringPath(obj[properties.shift()], properties.join("."));
+}
 
-};
+function check_expected_values(config, testName) {
+    var expected_values = testsObj[testName].expected_values || {};
+    var should_not_exist = testsObj[testName].should_not_exist || [];
 
-function check_expected_values( config, testName ) {
-    var expected_values = testsObj[ testName ].expected_values || {};
-    var should_not_exist = testsObj[ testName ].should_not_exist || [];
-
-    describe(testName + 'certain values', function() {
-
-        Object.keys( expected_values ).forEach( function( key ) {
-            it( " matches specific values: " + key, function(done) {
+    describe(testName + "certain values", function () {
+        Object.keys(expected_values).forEach(function (key) {
+            it(" matches specific values: " + key, function (done) {
                 //console.log("key", key);
-                var expected_val = expected_values[ key ];
-                var received_val = getValueStringPath( config, key );
+                var expected_val = expected_values[key];
+                var received_val = getValueStringPath(config, key);
                 //console.log("received val", received_val);
-                chai.expect( received_val ).to.equal( expected_val );
+                chai.expect(received_val).to.equal(expected_val);
                 done();
-
             });
-
         });
 
-       should_not_exist.forEach( function( key ) {
-           it( key + " should *not* be set", function(done) {
-               var keyArr = key.split(".");
-               //console.log("config", JSON.stringify(config, null, 3));
-               //console.log("keyArr", keyArr);
-               var lastKey = keyArr.pop();
-               var containerStr = keyArr.join("."); 
-               var obj = getValueStringPath(config, containerStr);
-               done();
-
-
-           });
-
-
-       }); 
-
+        should_not_exist.forEach(function (key) {
+            it(key + " should *not* be set", function (done) {
+                var keyArr = key.split(".");
+                //console.log("config", JSON.stringify(config, null, 3));
+                //console.log("keyArr", keyArr);
+                var lastKey = keyArr.pop();
+                var containerStr = keyArr.join(".");
+                var obj = getValueStringPath(config, containerStr);
+                done();
+            });
+        });
     });
 }
 
-
 function cleanup() {
     //publisher.dbTest.disconnect();
-
 }
 
-describe('publisher_shared', function() {
-    for( let i=0; i<testsArr.length; i++ ) {
+describe("publisher_shared", function () {
+    for (let i = 0; i < testsArr.length; i++) {
         let row = testsArr[i];
         let input = row.in;
         let outputExpected = row.out;
         let name = row.name || "row" + i;
-        let output = pubShared.format_archive( input );
+        let output = pubShared.format_archive(input);
 
-        it( name + " " + " format_archives matches expected output. ", function(done) {
-            chai.expect( output ).to.deep.equal( outputExpected );
-            done();
-            cleanup();
-
-        });
-        it( name + " " + " OVERRIDEN NAME format_archives matches expected output. ", function(done) {
-            let newName = "NAME" + i + "-" + input._id;
-            let overrideOutput = pubShared.format_archive( input, newName );
-            let overrideOutputExpected = transform_expected_output_override_name( outputExpected, newName );
-            //overrideOutputExpected[ newName ] = outputExpected[ Object.keys( outputExpected)[0] ];
-            //console.log("overrideOutputExpected", overrideOutputExpected);
-            chai.expect( overrideOutput ).to.deep.equal( overrideOutputExpected );
-            done();
-            cleanup();
-
-        });
-        function transform_expected_output_override_name( outputExpected, newName ) {
+        it(
+            name + " " + " format_archives matches expected output. ",
+            function (done) {
+                chai.expect(output).to.deep.equal(outputExpected);
+                done();
+                cleanup();
+            }
+        );
+        it(
+            name +
+                " " +
+                " OVERRIDEN NAME format_archives matches expected output. ",
+            function (done) {
+                let newName = "NAME" + i + "-" + input._id;
+                let overrideOutput = pubShared.format_archive(input, newName);
+                let overrideOutputExpected =
+                    transform_expected_output_override_name(
+                        outputExpected,
+                        newName
+                    );
+                //overrideOutputExpected[ newName ] = outputExpected[ Object.keys( outputExpected)[0] ];
+                //console.log("overrideOutputExpected", overrideOutputExpected);
+                chai.expect(overrideOutput).to.deep.equal(
+                    overrideOutputExpected
+                );
+                done();
+                cleanup();
+            }
+        );
+        function transform_expected_output_override_name(
+            outputExpected,
+            newName
+        ) {
             let overridden = {};
-            overridden[ newName ] = outputExpected[ Object.keys( outputExpected)[0] ];
+            overridden[newName] =
+                outputExpected[Object.keys(outputExpected)[0]];
             return overridden;
         }
     }
 });
-    /*
+/*
     Object.keys(testsObj).forEach( function( key ) {
         var item = testsObj[ key ];
         let naem = key;

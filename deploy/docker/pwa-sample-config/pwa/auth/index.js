@@ -1,6 +1,6 @@
 //node
-const fs = require('fs');
-const winston = require('winston');
+const fs = require("fs");
+const winston = require("winston");
 
 exports.auth = {
     //default user object when registered
@@ -9,28 +9,30 @@ exports.auth = {
             sca: ["user"],
             pwa: ["user"], //needed by pwa
         },
-        gids: [ /*1*/ ],
+        gids: [
+            /*1*/
+        ],
     },
 
     //isser to use for generated jwt token
     iss: "https://<pwa_hostname>/auth",
     //ttl for jwt
-    ttl: 24*3600*1000, //1 day
+    ttl: 24 * 3600 * 1000, //1 day
 
-    public_key: fs.readFileSync(__dirname+'/auth.pub'),
-    private_key: fs.readFileSync(__dirname+'/auth.key'),
+    public_key: fs.readFileSync(__dirname + "/auth.pub"),
+    private_key: fs.readFileSync(__dirname + "/auth.key"),
 
     //option for jwt.sign
-    sign_opt: {algorithm: 'RS256'},
+    sign_opt: { algorithm: "RS256" },
 
     //prevent users from registering new accounts (set to true to allow registration)
-    allow_signup: false, 
+    allow_signup: false,
 };
 
 //comment this out if you don't want to confirm email
 exports.email_confirmation = {
-    subject: 'pSConfig Web Admin Account Confirmation',
-    from: '<email_address>',  //most mail server will reject if this is not replyable address
+    subject: "pSConfig Web Admin Account Confirmation",
+    from: "<email_address>", //most mail server will reject if this is not replyable address
 };
 
 //for local user/pass login (you should use either local, or ldap - but not both)
@@ -40,16 +42,16 @@ exports.local = {
 
     //comment this out if you don't want to confirm email
     email_confirmation: {
-	    subject: 'pSConfig Web Admin Account Confirmation',
-	    from: '<email_address>',  //most mail server will reject if this is not replyable address
+        subject: "pSConfig Web Admin Account Confirmation",
+        from: "<email_address>", //most mail server will reject if this is not replyable address
     },
     email_passreset: {
-	    subject: 'pSConfig Web Admin Password Reset',
-	    from: '<email_address>',  //most mail server will reject if this is not replyable address
+        subject: "pSConfig Web Admin Password Reset",
+        from: "<email_address>", //most mail server will reject if this is not replyable address
     },
     mailer: {
-// Example using a separate postfix docker container
-/*
+        // Example using a separate postfix docker container
+        /*
         host: 'postfix',
         secure: false,
         port: 25,
@@ -59,7 +61,7 @@ exports.local = {
         }
 */
         // example config with SMTP server; make sure the pass path exists, or things will break
-/*
+        /*
         host: 'mail-relay.domain.com',
         secure: true,
         auth: {
@@ -67,11 +69,11 @@ exports.local = {
             pass: fs.readFileSync(__dirname+'/smtp.password', {encoding: 'ascii'}).trim(),
         }
 */
-    }
+    },
 };
 
 //comment this out to disable iucas
-exports.iucas = { };
+exports.iucas = {};
 
 //openid connect (cilogon)
 //http://www.cilogon.org/oidc
@@ -95,19 +97,18 @@ exports.oidc = {
 
 //for x509
 exports.x509 = {
-    //http header to look for x509 DN 
+    //http header to look for x509 DN
     //for nginx set proxy_set_header DN $ssl_client_s_dn
     //for apache, SSLOptions +StdEnvVars will set it to SSL_CLIENT_S_DN
-    dn_header: 'dn',
-    allow_origin: '*',
+    dn_header: "dn",
+    allow_origin: "*",
 };
-
 
 exports.db = {
     dialect: "sqlite",
     storage: "/db/auth.sqlite",
-    logging: false
-}
+    logging: false,
+};
 
 exports.express = {
     //web server port
@@ -118,19 +119,23 @@ exports.express = {
 exports.logger = {
     winston: {
         //hide headers which may contain jwt
-        requestWhitelist: ['url', /*'headers',*/ 'method', 'httpVersion', 'originalUrl', 'query'],
+        requestWhitelist: [
+            "url",
+            /*'headers',*/ "method",
+            "httpVersion",
+            "originalUrl",
+            "query",
+        ],
         transports: [
             //display all logs to console
             new winston.transports.Console({
-                timestamp: function() {
+                timestamp: function () {
                     var d = new Date();
                     return d.toString(); //show timestamp
                 },
-                level: 'warn',
-                colorize: true
+                level: "warn",
+                colorize: true,
             }),
-        ]
-    }
-}
-
-
+        ],
+    },
+};

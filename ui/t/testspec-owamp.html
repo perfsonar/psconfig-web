@@ -1,199 +1,348 @@
 <div ng-controller="paramsAccordion">
-
     <accordion close-others="false">
-
         <accordion-group is-open="status.basicOpen">
             <accordion-heading>
-                <h3>Basic Test Parameters
-                    <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.basicOpen, 'glyphicon-chevron-right': !status.basicOpen}"></i>
+                <h3>
+                    Basic Test Parameters
+                    <i
+                        class="pull-right glyphicon"
+                        ng-class="{'glyphicon-chevron-down': status.basicOpen, 'glyphicon-chevron-right': !status.basicOpen}"
+                    ></i>
                 </h3>
             </accordion-heading>
 
-<div class="form-section">
-    <div class="form-group">
-                    <label for="tool" class="col-sm-2 control-label">Tool *</label>
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="tool" class="col-sm-2 control-label"
+                        >Tool *</label
+                    >
                     <div class="col-sm-4">
-                        <select class="form-control" name="tool" 
+                        <select
+                            class="form-control"
+                            name="tool"
                             ng-disabled="!selected._canedit"
-                            ng-model="selected.specs.tool" required>
+                            ng-model="selected.specs.tool"
+                            required
+                        >
                             <option value="owping">owamp</option>
                             <option value="twping">twamp</option>
                         </select>
-                        <p class="help-block">The tool to use in performing the one-way delay test <code>tool</code></p>
-                        <p class="help-block">Any tool other than <code>owamp</code> requires pSConfig and pS 4.1</p>
-                    </div>
-    </div>
-
-        <h4>Schedule Type</h4>
-<div class="form-group schedule">
-        <div class="radio">
-            <label>
-                <input type="radio" ng-model="selected.schedule_type" value="continuous" ng-change="changeSchedule('continuous')" >
-                Continuous (recommended) - runs continuously in the background
-            </label>
-        </div>
-        <div class="radio">
-            <label>
-                <input type="radio" ng-model="selected.schedule_type" value="interval" ng-change="changeSchedule('interval')">
-                Interval (required if tool is <code>twamp</code>) - runs at regularly-scheduled intervals (every <code>n</code> seconds) <p>requires pSConfig and pS 4.1</p>
-            </label>
-        </div>
-
-
-</div>
-            <input type="hidden" ng-name="schedule_type" ng-model="selected.schedule_type" ng-value="selected.schedule_type" />
-
-
-<div class="schedule-section" ng-if="selected.schedule_type == 'interval'">
-
-<div class="form-group">
-        <h4>Test Schedule</h4>
-                                <p>Please configure your test schedule.</p>
-                                <p>Note that continuously streaming one-way delay tests is recommended; otherwise loss events etc may be missed.</p>
-</div>
-                <div class="form-group">
-                    <label for="interval" class="col-sm-2 control-label">Interval *</label>
-                    <div class="col-sm-4">
-                        <div class="input-group">
-                            <input type="number" string-to-number step="1" class="form-control" name="interval" 
-                                ng-disabled="!selected._canedit"
-                                ng-model="selected.specs.interval" required>
-                            <div class="input-group-addon">seconds</div>
-                        </div>
-                        <p class="help-block">The time in between one-way delay tests in seconds <code>test_interval</code></p>
-                    </div>
-                    <label for="duration" class="col-sm-2 control-label">Duration *</label>
-                    <div class="col-sm-4">
-                        <div class="input-group">
-                            <input type="number" string-to-number step="1" class="form-control" name="duration" 
-                                ng-disabled="!selected._canedit"
-                                ng-model="selected.specs.duration" required>
-                            <div class="input-group-addon">seconds</div>
-                        </div>
-                        <p class="help-block">The length to run each one-way delay test in seconds <code>duration</code></p>
+                        <p class="help-block">
+                            The tool to use in performing the one-way delay test
+                            <code>tool</code>
+                        </p>
+                        <p class="help-block">
+                            Any tool other than <code>owamp</code> requires
+                            pSConfig and pS 4.1
+                        </p>
                     </div>
                 </div>
 
-</div>
+                <h4>Schedule Type</h4>
+                <div class="form-group schedule">
+                    <div class="radio">
+                        <label>
+                            <input
+                                type="radio"
+                                ng-model="selected.schedule_type"
+                                value="continuous"
+                                ng-change="changeSchedule('continuous')"
+                            />
+                            Continuous (recommended) - runs continuously in the
+                            background
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input
+                                type="radio"
+                                ng-model="selected.schedule_type"
+                                value="interval"
+                                ng-change="changeSchedule('interval')"
+                            />
+                            Interval (required if tool is <code>twamp</code>) -
+                            runs at regularly-scheduled intervals (every
+                            <code>n</code> seconds)
+                            <p>requires pSConfig and pS 4.1</p>
+                        </label>
+                    </div>
+                </div>
+                <input
+                    type="hidden"
+                    ng-name="schedule_type"
+                    ng-model="selected.schedule_type"
+                    ng-value="selected.schedule_type"
+                />
 
+                <div
+                    class="schedule-section"
+                    ng-if="selected.schedule_type == 'interval'"
+                >
+                    <div class="form-group">
+                        <h4>Test Schedule</h4>
+                        <p>Please configure your test schedule.</p>
+                        <p>
+                            Note that continuously streaming one-way delay tests
+                            is recommended; otherwise loss events etc may be
+                            missed.
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label for="interval" class="col-sm-2 control-label"
+                            >Interval *</label
+                        >
+                        <div class="col-sm-4">
+                            <div class="input-group">
+                                <input
+                                    type="number"
+                                    string-to-number
+                                    step="1"
+                                    class="form-control"
+                                    name="interval"
+                                    ng-disabled="!selected._canedit"
+                                    ng-model="selected.specs.interval"
+                                    required
+                                />
+                                <div class="input-group-addon">seconds</div>
+                            </div>
+                            <p class="help-block">
+                                The time in between one-way delay tests in
+                                seconds <code>test_interval</code>
+                            </p>
+                        </div>
+                        <label for="duration" class="col-sm-2 control-label"
+                            >Duration *</label
+                        >
+                        <div class="col-sm-4">
+                            <div class="input-group">
+                                <input
+                                    type="number"
+                                    string-to-number
+                                    step="1"
+                                    class="form-control"
+                                    name="duration"
+                                    ng-disabled="!selected._canedit"
+                                    ng-model="selected.specs.duration"
+                                    required
+                                />
+                                <div class="input-group-addon">seconds</div>
+                            </div>
+                            <p class="help-block">
+                                The length to run each one-way delay test in
+                                seconds <code>duration</code>
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="form-group">
+                    <label for="bucket_width" class="col-sm-2 control-label"
+                        >Bucket Width *</label
+                    >
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input
+                                type="number"
+                                string-to-number
+                                step="0.0001"
+                                class="form-control"
+                                name="bucket_width"
+                                ng-disabled="!selected._canedit"
+                                ng-model="selected.specs.bucket_width"
+                                required
+                            />
+                            <div class="input-group-addon">Seconds</div>
+                        </div>
+                        <p class="help-block">
+                            The bin size for histogram calculations in terms of
+                            seconds. For example a value such as .001 means all
+                            histogram bins will be in milliseconds.
+                            <code>bucket_width</code>
+                        </p>
+                    </div>
+                    <label for="packet_interval" class="col-sm-2 control-label"
+                        >Packet Interval *</label
+                    >
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input
+                                type="number"
+                                string-to-number
+                                step="0.01"
+                                class="form-control"
+                                name="packet_interval"
+                                ng-disabled="!selected._canedit"
+                                ng-model="selected.specs.packet_interval"
+                                required
+                            />
+                            <div class="input-group-addon">
+                                Packets Per Second
+                            </div>
+                        </div>
+                        <p class="help-block">
+                            The mean average time between packets in seconds.
+                            For example, .1 means send 10 packets per second.
+                            <code>packet_interval</code>
+                        </p>
+                    </div>
+                </div>
 
-<div class="form-group">
+                <div class="form-group">
+                    <label for="sample_count" class="col-sm-2 control-label"
+                        >Sample Count *</label
+                    >
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input
+                                type="number"
+                                string-to-number
+                                step="1"
+                                class="form-control"
+                                name="sample_count"
+                                ng-disabled="!selected._canedit"
+                                ng-model="selected.specs.sample_count"
+                                required
+                            />
+                            <div class="input-group-addon">tests</div>
+                        </div>
+                        <p class="help-block">
+                            The number of packets contained in each summary.
+                            This combined with packet_interval determines how
+                            often data is stored. For example, a packet_interval
+                            of .1 (10 packets per second) and sample_count of
+                            600 stores a result every 60 seconds
+                            <code>sample_count</code>
+                        </p>
+                    </div>
+                    <label for="packet_padding" class="col-sm-2 control-label"
+                        >Packet Padding</label
+                    >
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input
+                                type="number"
+                                string-to-number
+                                step="1"
+                                class="form-control"
+                                name="packet_padding"
+                                ng-disabled="!selected._canedit"
+                                ng-model="selected.specs.packet_padding"
+                                placeholder="0"
+                            />
+                            <div class="input-group-addon">bytes</div>
+                        </div>
+                        <p class="help-block">
+                            The size of the padding added to each packet in
+                            bytes (not including the IP/UDP headers)
+                            <code>packet_padding</code>
+                        </p>
+                    </div>
+                </div>
 
-    <label for="bucket_width" class="col-sm-2 control-label">Bucket Width *</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="number" string-to-number step="0.0001" class="form-control" name="bucket_width" ng-disabled="!selected._canedit" ng-model="selected.specs.bucket_width" required>
-            <div class="input-group-addon">Seconds</div>
-        </div>
-        <p class="help-block">
-            The bin size for histogram calculations in terms of seconds. For example a value such as .001 means all histogram bins will be in milliseconds. 
-            <code>bucket_width</code>
-        </p>
-    </div>
-    <label for="packet_interval" class="col-sm-2 control-label">Packet Interval *</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="number" string-to-number step="0.01" class="form-control" name="packet_interval" ng-disabled="!selected._canedit" ng-model="selected.specs.packet_interval" required>
-            <div class="input-group-addon">Packets Per Second</div>
-        </div>
-        <p class="help-block">
-            The mean average time between packets in seconds. For example, .1 means send 10 packets per second.
-            <code>packet_interval</code>
-        </p>
-    </div>
-</div>
-
-<div class="form-group">
-    <label for="sample_count" class="col-sm-2 control-label">Sample Count *</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="number" string-to-number step="1" class="form-control" name="sample_count" ng-disabled="!selected._canedit" ng-model="selected.specs.sample_count" required>
-            <div class="input-group-addon">tests</div>
-        </div>
-        <p class="help-block">
-            The number of packets contained in each summary. This combined with packet_interval determines how often data is stored. For example, a packet_interval of .1 (10 packets per second) and sample_count of 600 stores a result every 60 seconds
-            <code>sample_count</code>
-        </p>
-    </div>
-    <label for="packet_padding" class="col-sm-2 control-label">Packet Padding</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="number" string-to-number step="1" class="form-control" name="packet_padding" ng-disabled="!selected._canedit" ng-model="selected.specs.packet_padding" placeholder="0">
-            <div class="input-group-addon">bytes</div>
-        </div>
-        <p class="help-block">
-            The size of the padding added to each packet in bytes (not including the IP/UDP headers)
-            <code>packet_padding</code>
-        </p>
-    </div>
-</div>
-
-<!-- Common parameters -->
-	<div  ng-if="selected.schedule_type != 'continuous'">
-		<ng-include src="'t/testspec-common.html'"></ng-include>
-	</div>
-	<div  ng-if="selected.schedule_type == 'continuous'">
-		<div class="form-group">
-    		<!--all/common-->
-    			<div class="col-sm-offset-2 col-sm-4">
-        			<div class="checkbox">
-            				<label> <input type="checkbox" name="ipv4_only" ng-disabled="!selected._canedit" ng-model="selected.specs.ipv4_only" /> IPv4 Only</label>
-        			</div>
-        			<div class="checkbox">
-            				<label> <input type="checkbox" name="ipv6_only" ng-disabled="!selected._canedit" ng-model="selected.specs.ipv6_only" /> IPv6 Only</label>
-            				<p class="help-block">Forces each side to use IPv4/IPv6. Test will fail if no IPv4/IPv6 address can be determined for either endpoint <code>ipv4_only/ipv6_only</code></p>
-        			</div>
-    			</div>
-		</div>
-	</div>
-        </div> <!-- end form-section -->
-
+                <!-- Common parameters -->
+                <div ng-if="selected.schedule_type != 'continuous'">
+                    <ng-include src="'t/testspec-common.html'"></ng-include>
+                </div>
+                <div ng-if="selected.schedule_type == 'continuous'">
+                    <div class="form-group">
+                        <!--all/common-->
+                        <div class="col-sm-offset-2 col-sm-4">
+                            <div class="checkbox">
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        name="ipv4_only"
+                                        ng-disabled="!selected._canedit"
+                                        ng-model="selected.specs.ipv4_only"
+                                    />
+                                    IPv4 Only</label
+                                >
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        name="ipv6_only"
+                                        ng-disabled="!selected._canedit"
+                                        ng-model="selected.specs.ipv6_only"
+                                    />
+                                    IPv6 Only</label
+                                >
+                                <p class="help-block">
+                                    Forces each side to use IPv4/IPv6. Test will
+                                    fail if no IPv4/IPv6 address can be
+                                    determined for either endpoint
+                                    <code>ipv4_only/ipv6_only</code>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end form-section -->
         </accordion-group>
-
 
         <accordion-group is-open="status.open">
             <accordion-heading>
-                <h3>Advanced Test Parameters
-                    <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                <h3>
+                    Advanced Test Parameters
+                    <i
+                        class="pull-right glyphicon"
+                        ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"
+                    ></i>
                 </h3>
             </accordion-heading>
 
-
             <div class="form-section">
+                <!-- v4 -->
+                <div class="form-group">
+                    <div ng-if="selected.schedule_type != 'continuous'">
+                        <label for="tos_bits" class="col-sm-2 control-label"
+                            >Type of Service</label
+                        >
+                        <div class="col-sm-4">
+                            <input
+                                type="number"
+                                string-to-number
+                                step="1"
+                                min="0"
+                                max="255"
+                                class="form-control"
+                                name="tos_bits"
+                                ng-disabled="!selected._canedit"
+                                ng-model="selected.specs.tos_bits"
+                            />
+                            <p class="help-block">
+                                The type of service to set in the IP header of
+                                outgoing packets as an integer from 0-255
+                                <code>tos_bits</code>
+                                <minver min="minver.tos_bits"></minver>
+                            </p>
+                        </div>
+                    </div>
 
-<!-- v4 -->
-<div class="form-group">
-    <div  ng-if="selected.schedule_type != 'continuous'">
-        <label for="tos_bits" class="col-sm-2 control-label">Type of Service</label>
-        <div class="col-sm-4">
-            <input type="number" string-to-number step="1" min="0" max="255" class="form-control" name="tos_bits" 
-                ng-disabled="!selected._canedit" 
-                ng-model="selected.specs.tos_bits">
-            <p class="help-block">
-                The type of service to set in the IP header of outgoing packets as an integer from 0-255
-                <code>tos_bits</code>
-                <minver min="minver.tos_bits"></minver>
-            </p>
-        </div>
-    </div>
-
-    <div class="col-sm-offset-2 col-sm-4">
-        <div class="checkbox">
-            <label> <input type="checkbox" name="output_raw" 
-                ng-disabled="!selected._canedit" 
-                ng-model="selected.specs.output_raw"> Output Raw</label>
-            <p class="help-block">
-                This will store the raw owamp results as JSON in the measurement archive
-                <code>output_raw</code>
-                <minver min="minver.output_raw"></minver>
-            </p>
-        </div>
-    </div>
-</div>
-
-</div>  <!-- end form-section -->
-</accordion-group>
-</accordion>
-
+                    <div class="col-sm-offset-2 col-sm-4">
+                        <div class="checkbox">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="output_raw"
+                                    ng-disabled="!selected._canedit"
+                                    ng-model="selected.specs.output_raw"
+                                />
+                                Output Raw</label
+                            >
+                            <p class="help-block">
+                                This will store the raw owamp results as JSON in
+                                the measurement archive
+                                <code>output_raw</code>
+                                <minver min="minver.output_raw"></minver>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end form-section -->
+        </accordion-group>
+    </accordion>
 </div>
