@@ -1,1 +1,98 @@
-{"archives":{"host-archive0":{"archiver":"esmond","data":{"url":"http://uct2-net1.mwt2.org/esmond/perfsonar/archive","measurement-agent":"{% scheduled_by_address %}"}},"host-archive1":{"archiver":"esmond","data":{"url":"http://lat-brandonu.mrnet.mb.ca/esmond/perfsonar/archive","measurement-agent":"{% scheduled_by_address %}"}},"test-archive0":{"archiver":"esmond","data":{"url":"http://perfsonar-testbed-ma.grnoc.iu.edu/asdf/jkl","measurement-agent":"{% scheduled_by_address %}"}}},"addresses":{"uct2-net1.mwt2.org":{"address":"uct2-net1.mwt2.org","host":"uct2-net1.mwt2.org","_meta":{"display-name":"Midwest Tier2","display-url":"auto"}},"perfsonar.ultralight.org":{"address":"perfsonar.ultralight.org","host":"perfsonar.ultralight.org","_meta":{"display-name":"CALTECH","display-url":"auto"}},"perfsonar.nersc.gov":{"address":"perfsonar.nersc.gov","host":"perfsonar.nersc.gov","_meta":{"display-name":"NERSC","display-url":"auto"}},"lat-brandonu.mrnet.mb.ca":{"address":"lat-brandonu.mrnet.mb.ca","host":"lat-brandonu.mrnet.mb.ca","_meta":{"display-name":"MRnet","display-url":"auto"}},"pstest2.geant.carnet.hr":{"address":"pstest2.geant.carnet.hr","host":"pstest2.geant.carnet.hr","_meta":{"display-name":"pstest2.geant.carnet.hr (Debian9, 4.0)","display-url":"auto"}}},"groups":{"owamp test1":{"type":"mesh","addresses":[{"name":"uct2-net1.mwt2.org"},{"name":"perfsonar.ultralight.org"},{"name":"perfsonar.nersc.gov"},{"name":"lat-brandonu.mrnet.mb.ca"},{"name":"pstest2.geant.carnet.hr"}]}},"tests":{"owamp test1":{"type":"latencybg","spec":{"source":"{% address[0] %}","dest":"{% address[1] %}","packet-interval":0.1,"bucket-width":0.001,"packet-count":600,"ip-version":4}}},"schedules":{},"tasks":{"owamp test1":{"group":"owamp test1","test":"owamp test1","archives":["test-archive0"],"_meta":{"display-name":"owamp test1"},"tools":["owping"]}},"_meta":{"display-name":"Owamp Test 11111"},"hosts":{"uct2-net1.mwt2.org":{"archives":["host-archive0"]},"perfsonar.ultralight.org":{},"perfsonar.nersc.gov":{},"lat-brandonu.mrnet.mb.ca":{"archives":["host-archive1"]},"pstest2.geant.carnet.hr":{}}}
+{
+    "archives": {
+        "host-archive0": {
+            "archiver": "esmond",
+            "data": {
+                "url": "http://uct2-net1.mwt2.org/esmond/perfsonar/archive",
+                "measurement-agent": "{% scheduled_by_address %}"
+            }
+        },
+        "host-archive1": {
+            "archiver": "esmond",
+            "data": {
+                "url": "http://lat-brandonu.mrnet.mb.ca/esmond/perfsonar/archive",
+                "measurement-agent": "{% scheduled_by_address %}"
+            }
+        },
+        "test-archive0": {
+            "archiver": "esmond",
+            "data": {
+                "url": "http://perfsonar-testbed-ma.grnoc.iu.edu/asdf/jkl",
+                "measurement-agent": "{% scheduled_by_address %}"
+            }
+        }
+    },
+    "addresses": {
+        "uct2-net1.mwt2.org": {
+            "address": "uct2-net1.mwt2.org",
+            "host": "uct2-net1.mwt2.org",
+            "_meta": { "display-name": "Midwest Tier2", "display-url": "auto" }
+        },
+        "perfsonar.ultralight.org": {
+            "address": "perfsonar.ultralight.org",
+            "host": "perfsonar.ultralight.org",
+            "_meta": { "display-name": "CALTECH", "display-url": "auto" }
+        },
+        "perfsonar.nersc.gov": {
+            "address": "perfsonar.nersc.gov",
+            "host": "perfsonar.nersc.gov",
+            "_meta": { "display-name": "NERSC", "display-url": "auto" }
+        },
+        "lat-brandonu.mrnet.mb.ca": {
+            "address": "lat-brandonu.mrnet.mb.ca",
+            "host": "lat-brandonu.mrnet.mb.ca",
+            "_meta": { "display-name": "MRnet", "display-url": "auto" }
+        },
+        "pstest2.geant.carnet.hr": {
+            "address": "pstest2.geant.carnet.hr",
+            "host": "pstest2.geant.carnet.hr",
+            "_meta": {
+                "display-name": "pstest2.geant.carnet.hr (Debian9, 4.0)",
+                "display-url": "auto"
+            }
+        }
+    },
+    "groups": {
+        "owamp test1": {
+            "type": "mesh",
+            "addresses": [
+                { "name": "uct2-net1.mwt2.org" },
+                { "name": "perfsonar.ultralight.org" },
+                { "name": "perfsonar.nersc.gov" },
+                { "name": "lat-brandonu.mrnet.mb.ca" },
+                { "name": "pstest2.geant.carnet.hr" }
+            ]
+        }
+    },
+    "tests": {
+        "owamp test1": {
+            "type": "latencybg",
+            "spec": {
+                "source": "{% address[0] %}",
+                "dest": "{% address[1] %}",
+                "packet-interval": 0.1,
+                "bucket-width": 0.001,
+                "packet-count": 600,
+                "ip-version": 4
+            }
+        }
+    },
+    "schedules": {},
+    "tasks": {
+        "owamp test1": {
+            "group": "owamp test1",
+            "test": "owamp test1",
+            "archives": ["test-archive0"],
+            "_meta": { "display-name": "owamp test1" },
+            "tools": ["owping"]
+        }
+    },
+    "_meta": { "display-name": "Owamp Test 11111" },
+    "hosts": {
+        "uct2-net1.mwt2.org": { "archives": ["host-archive0"] },
+        "perfsonar.ultralight.org": {},
+        "perfsonar.nersc.gov": {},
+        "lat-brandonu.mrnet.mb.ca": { "archives": ["host-archive1"] },
+        "pstest2.geant.carnet.hr": {}
+    }
+}

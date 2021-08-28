@@ -1,1 +1,247 @@
-{"archives":{"host-additional-archive0":{"archiver":"esmond","data":{"url":"qwerty","measurement-agent":"{% scheduled_by_address %}","schema":1}},"host-archive0":{"archiver":"esmond","data":{"url":"https://perfsonar-dev9.grnoc.iu.edu/esmond/perfsonar/archive","measurement-agent":"{% scheduled_by_address %}","schema":1}},"host-additional-archive1":{"archiver":"esmond","data":{"url":"https://perfsonar-dev99.grnoc.iu.edu/esmond/perfsonar/archive","measurement-agent":"{% scheduled_by_address %}","schema":1}},"host-archive1":{"archiver":"esmond","data":{"url":"https://perf-yamaguchi.sinet.ad.jp/esmond/perfsonar/archive","measurement-agent":"{% scheduled_by_address %}","schema":1}}},"addresses":{"test-pt1.es.net":{"address":"test-pt1.es.net","host":"test-pt1.es.net","_meta":{"display-name":"(OWAMP Server at es.net)","display-url":"https://test-pt1.es.net/toolkit/"}},"perfsonar-dev8.grnoc.iu.edu":{"address":"perfsonar-dev8.grnoc.iu.edu","host":"perfsonar-dev8.grnoc.iu.edu","_meta":{"display-name":"GlobalNOC","display-url":"https://perfsonar-dev8.grnoc.iu.edu/toolkit/"}},"perfsonar.cbio.uct.ac.za":{"address":"perfsonar.cbio.uct.ac.za","host":"perfsonar.cbio.uct.ac.za","_meta":{"display-name":"cbio host descr!!!! use local ma!!!","display-url":"https://perfsonar.cbio.uct.ac.za/toolkit/"}},"snla-opt1.es.net":{"address":"snla-opt1.es.net","host":"snla-opt1.es.net","_meta":{"display-name":"Sandia National Laboratory - Albuquerque","display-url":"https://snla-opt1.es.net/toolkit/"}},"perfsonar-dev9.grnoc.iu.edu":{"address":"perfsonar-dev9.grnoc.iu.edu","host":"perfsonar-dev9.grnoc.iu.edu","_meta":{"display-name":"ps dev 9!!","display-url":"https://perfsonar-dev9.grnoc.iu.edu/toolkit/"}},"perf-yamaguchi.sinet.ad.jp":{"address":"perf-yamaguchi.sinet.ad.jp","host":"perf-yamaguchi.sinet.ad.jp","_meta":{"display-name":"Science Information Network - SINET","display-url":"https://perf-yamaguchi.sinet.ad.jp/toolkit/"}}},"groups":{"throughput3":{"type":"mesh","addresses":[{"name":"test-pt1.es.net"},{"name":"perfsonar-dev8.grnoc.iu.edu"},{"name":"perfsonar.cbio.uct.ac.za"}]},"this little pingy":{"type":"mesh","addresses":[{"name":"snla-opt1.es.net"},{"name":"perfsonar-dev9.grnoc.iu.edu"}]},"lat4 444":{"type":"mesh","addresses":[{"name":"perfsonar-dev8.grnoc.iu.edu"},{"name":"perf-yamaguchi.sinet.ad.jp"}]},"tput4 protocol udp probe_type tcp":{"type":"mesh","addresses":[{"name":"test-pt1.es.net"},{"name":"perfsonar-dev8.grnoc.iu.edu"},{"name":"perfsonar.cbio.uct.ac.za"}]},"throughput5":{"type":"mesh","addresses":[{"name":"test-pt1.es.net"},{"name":"perfsonar-dev8.grnoc.iu.edu"},{"name":"perfsonar.cbio.uct.ac.za"}]}},"tests":{"throughput3":{"type":"throughput","spec":{"duration":"PT20S","source":"{% address[0] %}","dest":"{% address[1] %}","single-ended":true,"omit":"PT5S","ip-version":4,"schema":2}},"this little pingy":{"type":"rtt","spec":{"fragment":true,"source":"{% address[0] %}","dest":"{% address[1] %}","suppress-loopback":true,"schema":3}},"lat4 444":{"type":"latency","spec":{"reverse":true,"source":"{% address[0] %}","dest":"{% address[1] %}","packet-interval":0.1,"bucket-width":0.001,"packet-count":600,"ip-version":4,"schema":2}},"tput4 protocol udp probe_type tcp":{"type":"throughput","spec":{"duration":"PT20S","source":"{% address[0] %}","dest":"{% address[1] %}","udp":true,"ip-version":4,"schema":1}},"throughput5":{"type":"throughput","spec":{"duration":"PT20S","source":"{% address[0] %}","dest":"{% address[1] %}","omit":"PT5S","udp":true,"ip-version":4,"schema":1}}},"schedules":{"sched-0":{"repeat":"PT3H53M18S","sliprand":true},"sched-1":{"repeat":"PT4H10M","sliprand":true},"sched-2":{"repeat":"PT1H","sliprand":true,"slip":"PT20M"},"sched-3":{"repeat":"PT4H","sliprand":true},"sched-4":{"repeat":"PT4H","sliprand":true,"slip":"PT26M41S"}},"tasks":{"throughput3":{"group":"throughput3","test":"throughput3","archives":[],"_meta":{"display-name":"throughput3"},"schedule":"sched-0","tools":["bwctliperf3","iperf3"]},"this little pingy":{"group":"this little pingy","test":"this little pingy","archives":[],"_meta":{"display-name":"this little pingy"},"schedule":"sched-1"},"lat4 444":{"group":"lat4 444","test":"lat4 444","archives":[],"_meta":{"display-name":"lat4 444"},"schedule":"sched-2","tools":["owping"]},"tput4 protocol udp probe_type tcp":{"group":"tput4 protocol udp probe_type tcp","test":"tput4 protocol udp probe_type tcp","archives":[],"_meta":{"display-name":"tput4 protocol udp probe_type tcp"},"schedule":"sched-3","tools":["bwctliperf3","iperf3"]},"throughput5":{"group":"throughput5","test":"throughput5","archives":[],"_meta":{"display-name":"throughput5"},"schedule":"sched-4","tools":["bwctliperf3","iperf3"]}},"_meta":{"display-name":"in pwa-test1 db"},"hosts":{"test-pt1.es.net":{},"perfsonar-dev8.grnoc.iu.edu":{},"perfsonar.cbio.uct.ac.za":{"archives":["host-additional-archive0"]},"snla-opt1.es.net":{},"perfsonar-dev9.grnoc.iu.edu":{"archives":["host-archive0","host-additional-archive1"]},"perf-yamaguchi.sinet.ad.jp":{"archives":["host-archive1"]}}}
+{
+    "archives": {
+        "host-additional-archive0": {
+            "archiver": "esmond",
+            "data": {
+                "url": "qwerty",
+                "measurement-agent": "{% scheduled_by_address %}",
+                "schema": 1
+            }
+        },
+        "host-archive0": {
+            "archiver": "esmond",
+            "data": {
+                "url": "https://perfsonar-dev9.grnoc.iu.edu/esmond/perfsonar/archive",
+                "measurement-agent": "{% scheduled_by_address %}",
+                "schema": 1
+            }
+        },
+        "host-additional-archive1": {
+            "archiver": "esmond",
+            "data": {
+                "url": "https://perfsonar-dev99.grnoc.iu.edu/esmond/perfsonar/archive",
+                "measurement-agent": "{% scheduled_by_address %}",
+                "schema": 1
+            }
+        },
+        "host-archive1": {
+            "archiver": "esmond",
+            "data": {
+                "url": "https://perf-yamaguchi.sinet.ad.jp/esmond/perfsonar/archive",
+                "measurement-agent": "{% scheduled_by_address %}",
+                "schema": 1
+            }
+        }
+    },
+    "addresses": {
+        "test-pt1.es.net": {
+            "address": "test-pt1.es.net",
+            "host": "test-pt1.es.net",
+            "_meta": {
+                "display-name": "(OWAMP Server at es.net)",
+                "display-url": "https://test-pt1.es.net/toolkit/"
+            }
+        },
+        "perfsonar-dev8.grnoc.iu.edu": {
+            "address": "perfsonar-dev8.grnoc.iu.edu",
+            "host": "perfsonar-dev8.grnoc.iu.edu",
+            "_meta": {
+                "display-name": "GlobalNOC",
+                "display-url": "https://perfsonar-dev8.grnoc.iu.edu/toolkit/"
+            }
+        },
+        "perfsonar.cbio.uct.ac.za": {
+            "address": "perfsonar.cbio.uct.ac.za",
+            "host": "perfsonar.cbio.uct.ac.za",
+            "_meta": {
+                "display-name": "cbio host descr!!!! use local ma!!!",
+                "display-url": "https://perfsonar.cbio.uct.ac.za/toolkit/"
+            }
+        },
+        "snla-opt1.es.net": {
+            "address": "snla-opt1.es.net",
+            "host": "snla-opt1.es.net",
+            "_meta": {
+                "display-name": "Sandia National Laboratory - Albuquerque",
+                "display-url": "https://snla-opt1.es.net/toolkit/"
+            }
+        },
+        "perfsonar-dev9.grnoc.iu.edu": {
+            "address": "perfsonar-dev9.grnoc.iu.edu",
+            "host": "perfsonar-dev9.grnoc.iu.edu",
+            "_meta": {
+                "display-name": "ps dev 9!!",
+                "display-url": "https://perfsonar-dev9.grnoc.iu.edu/toolkit/"
+            }
+        },
+        "perf-yamaguchi.sinet.ad.jp": {
+            "address": "perf-yamaguchi.sinet.ad.jp",
+            "host": "perf-yamaguchi.sinet.ad.jp",
+            "_meta": {
+                "display-name": "Science Information Network - SINET",
+                "display-url": "https://perf-yamaguchi.sinet.ad.jp/toolkit/"
+            }
+        }
+    },
+    "groups": {
+        "throughput3": {
+            "type": "mesh",
+            "addresses": [
+                { "name": "test-pt1.es.net" },
+                { "name": "perfsonar-dev8.grnoc.iu.edu" },
+                { "name": "perfsonar.cbio.uct.ac.za" }
+            ]
+        },
+        "this little pingy": {
+            "type": "mesh",
+            "addresses": [
+                { "name": "snla-opt1.es.net" },
+                { "name": "perfsonar-dev9.grnoc.iu.edu" }
+            ]
+        },
+        "lat4 444": {
+            "type": "mesh",
+            "addresses": [
+                { "name": "perfsonar-dev8.grnoc.iu.edu" },
+                { "name": "perf-yamaguchi.sinet.ad.jp" }
+            ]
+        },
+        "tput4 protocol udp probe_type tcp": {
+            "type": "mesh",
+            "addresses": [
+                { "name": "test-pt1.es.net" },
+                { "name": "perfsonar-dev8.grnoc.iu.edu" },
+                { "name": "perfsonar.cbio.uct.ac.za" }
+            ]
+        },
+        "throughput5": {
+            "type": "mesh",
+            "addresses": [
+                { "name": "test-pt1.es.net" },
+                { "name": "perfsonar-dev8.grnoc.iu.edu" },
+                { "name": "perfsonar.cbio.uct.ac.za" }
+            ]
+        }
+    },
+    "tests": {
+        "throughput3": {
+            "type": "throughput",
+            "spec": {
+                "duration": "PT20S",
+                "source": "{% address[0] %}",
+                "dest": "{% address[1] %}",
+                "single-ended": true,
+                "omit": "PT5S",
+                "ip-version": 4,
+                "schema": 2
+            }
+        },
+        "this little pingy": {
+            "type": "rtt",
+            "spec": {
+                "fragment": true,
+                "source": "{% address[0] %}",
+                "dest": "{% address[1] %}",
+                "suppress-loopback": true,
+                "schema": 3
+            }
+        },
+        "lat4 444": {
+            "type": "latency",
+            "spec": {
+                "reverse": true,
+                "source": "{% address[0] %}",
+                "dest": "{% address[1] %}",
+                "packet-interval": 0.1,
+                "bucket-width": 0.001,
+                "packet-count": 600,
+                "ip-version": 4,
+                "schema": 2
+            }
+        },
+        "tput4 protocol udp probe_type tcp": {
+            "type": "throughput",
+            "spec": {
+                "duration": "PT20S",
+                "source": "{% address[0] %}",
+                "dest": "{% address[1] %}",
+                "udp": true,
+                "ip-version": 4,
+                "schema": 1
+            }
+        },
+        "throughput5": {
+            "type": "throughput",
+            "spec": {
+                "duration": "PT20S",
+                "source": "{% address[0] %}",
+                "dest": "{% address[1] %}",
+                "omit": "PT5S",
+                "udp": true,
+                "ip-version": 4,
+                "schema": 1
+            }
+        }
+    },
+    "schedules": {
+        "sched-0": { "repeat": "PT3H53M18S", "sliprand": true },
+        "sched-1": { "repeat": "PT4H10M", "sliprand": true },
+        "sched-2": { "repeat": "PT1H", "sliprand": true, "slip": "PT20M" },
+        "sched-3": { "repeat": "PT4H", "sliprand": true },
+        "sched-4": { "repeat": "PT4H", "sliprand": true, "slip": "PT26M41S" }
+    },
+    "tasks": {
+        "throughput3": {
+            "group": "throughput3",
+            "test": "throughput3",
+            "archives": [],
+            "_meta": { "display-name": "throughput3" },
+            "schedule": "sched-0",
+            "tools": ["bwctliperf3", "iperf3"]
+        },
+        "this little pingy": {
+            "group": "this little pingy",
+            "test": "this little pingy",
+            "archives": [],
+            "_meta": { "display-name": "this little pingy" },
+            "schedule": "sched-1"
+        },
+        "lat4 444": {
+            "group": "lat4 444",
+            "test": "lat4 444",
+            "archives": [],
+            "_meta": { "display-name": "lat4 444" },
+            "schedule": "sched-2",
+            "tools": ["owping"]
+        },
+        "tput4 protocol udp probe_type tcp": {
+            "group": "tput4 protocol udp probe_type tcp",
+            "test": "tput4 protocol udp probe_type tcp",
+            "archives": [],
+            "_meta": { "display-name": "tput4 protocol udp probe_type tcp" },
+            "schedule": "sched-3",
+            "tools": ["bwctliperf3", "iperf3"]
+        },
+        "throughput5": {
+            "group": "throughput5",
+            "test": "throughput5",
+            "archives": [],
+            "_meta": { "display-name": "throughput5" },
+            "schedule": "sched-4",
+            "tools": ["bwctliperf3", "iperf3"]
+        }
+    },
+    "_meta": { "display-name": "in pwa-test1 db" },
+    "hosts": {
+        "test-pt1.es.net": {},
+        "perfsonar-dev8.grnoc.iu.edu": {},
+        "perfsonar.cbio.uct.ac.za": {
+            "archives": ["host-additional-archive0"]
+        },
+        "snla-opt1.es.net": {},
+        "perfsonar-dev9.grnoc.iu.edu": {
+            "archives": ["host-archive0", "host-additional-archive1"]
+        },
+        "perf-yamaguchi.sinet.ad.jp": { "archives": ["host-archive1"] }
+    }
+}

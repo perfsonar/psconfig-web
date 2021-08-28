@@ -1,1 +1,83 @@
-{"archives":{"host-archive0":{"archiver":"esmond","data":{"url":"http://srv.newa.ilight.net/esmond/perfsonar/archive","measurement-agent":"{% scheduled_by_address %}"}},"host-additional-archive0":{"archiver":"esmond","data":{"url":"asdf","measurement-agent":"{% scheduled_by_address %}"}},"test-archive0":{"archiver":"esmond","data":{"url":"https://centrallama/","measurement-agent":"{% scheduled_by_address %}"}}},"addresses":{"test-pt1-bw.es.net":{"address":"test-pt1-bw.es.net","host":"test-pt1-bw.es.net","_meta":{"display-name":"(BWCTL Server at es.net)","display-url":"auto"}},"srv.newa.ilight.net":{"address":"srv.newa.ilight.net","host":"srv.newa.ilight.net","_meta":{"display-name":"(BWCTL Measurement Point at 2027.srv.newa.ilight.net)","display-url":"auto"}}},"groups":{"tput test":{"type":"mesh","addresses":[{"name":"test-pt1-bw.es.net"},{"name":"srv.newa.ilight.net"}]}},"tests":{"tput test":{"type":"throughput","spec":{"duration":"PT20S","source":"{% address[0] %}","dest":"{% address[1] %}","ip-version":4}}},"schedules":{"repeat-PT4H":{"repeat":"PT4H","sliprand":true,"slip":"PT1H"}},"tasks":{"tput test":{"group":"tput test","test":"tput test","archives":["test-archive0"],"_meta":{"display-name":"tput test"},"schedule":"repeat-PT4H","tools":["bwctliperf3","iperf3"]}},"_meta":{"display-name":"testz"},"hosts":{"test-pt1-bw.es.net":{},"srv.newa.ilight.net":{"archives":["host-archive0","host-additional-archive0"]}}}
+{
+    "archives": {
+        "host-archive0": {
+            "archiver": "esmond",
+            "data": {
+                "url": "http://srv.newa.ilight.net/esmond/perfsonar/archive",
+                "measurement-agent": "{% scheduled_by_address %}"
+            }
+        },
+        "host-additional-archive0": {
+            "archiver": "esmond",
+            "data": {
+                "url": "asdf",
+                "measurement-agent": "{% scheduled_by_address %}"
+            }
+        },
+        "test-archive0": {
+            "archiver": "esmond",
+            "data": {
+                "url": "https://centrallama/",
+                "measurement-agent": "{% scheduled_by_address %}"
+            }
+        }
+    },
+    "addresses": {
+        "test-pt1-bw.es.net": {
+            "address": "test-pt1-bw.es.net",
+            "host": "test-pt1-bw.es.net",
+            "_meta": {
+                "display-name": "(BWCTL Server at es.net)",
+                "display-url": "auto"
+            }
+        },
+        "srv.newa.ilight.net": {
+            "address": "srv.newa.ilight.net",
+            "host": "srv.newa.ilight.net",
+            "_meta": {
+                "display-name": "(BWCTL Measurement Point at 2027.srv.newa.ilight.net)",
+                "display-url": "auto"
+            }
+        }
+    },
+    "groups": {
+        "tput test": {
+            "type": "mesh",
+            "addresses": [
+                { "name": "test-pt1-bw.es.net" },
+                { "name": "srv.newa.ilight.net" }
+            ]
+        }
+    },
+    "tests": {
+        "tput test": {
+            "type": "throughput",
+            "spec": {
+                "duration": "PT20S",
+                "source": "{% address[0] %}",
+                "dest": "{% address[1] %}",
+                "ip-version": 4
+            }
+        }
+    },
+    "schedules": {
+        "repeat-PT4H": { "repeat": "PT4H", "sliprand": true, "slip": "PT1H" }
+    },
+    "tasks": {
+        "tput test": {
+            "group": "tput test",
+            "test": "tput test",
+            "archives": ["test-archive0"],
+            "_meta": { "display-name": "tput test" },
+            "schedule": "repeat-PT4H",
+            "tools": ["bwctliperf3", "iperf3"]
+        }
+    },
+    "_meta": { "display-name": "testz" },
+    "hosts": {
+        "test-pt1-bw.es.net": {},
+        "srv.newa.ilight.net": {
+            "archives": ["host-archive0", "host-additional-archive0"]
+        }
+    }
+}
