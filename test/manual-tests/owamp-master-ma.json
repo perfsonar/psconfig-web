@@ -1,1 +1,168 @@
-{"organizations":[{"sites":[{"hosts":[{"addresses":["uct2-net1.mwt2.org"],"measurement_archives":[{"read_url":"http://uct2-net1.mwt2.org/esmond/perfsonar/archive","write_url":"http://uct2-net1.mwt2.org/esmond/perfsonar/archive","type":"traceroute"},{"read_url":"http://uct2-net1.mwt2.org/esmond/perfsonar/archive","write_url":"http://uct2-net1.mwt2.org/esmond/perfsonar/archive","type":"pinger"},{"read_url":"http://uct2-net1.mwt2.org/esmond/perfsonar/archive","write_url":"http://uct2-net1.mwt2.org/esmond/perfsonar/archive","type":"perfsonarbuoy/owamp"}],"description":"Midwest Tier2","toolkit_url":"auto"}],"location":{"country":"US","city":"Chicago","state":"IL","latitude":"41.789889","longitude":"-87.600453","postal_code":"60637"}},{"hosts":[{"addresses":["perfsonar.ultralight.org"],"description":"CALTECH","toolkit_url":"auto"}],"location":{"country":"US","city":"Pasadena","state":"CA","latitude":"34.1377","longitude":"118.1253","postal_code":"91125"}},{"hosts":[{"addresses":["perfsonar.nersc.gov"],"description":"NERSC","toolkit_url":"auto"}],"location":{"country":"US","city":"Berkeley","state":"CA","latitude":"37.8668","longitude":"-122.2536","postal_code":"94720"}},{"hosts":[{"addresses":["lat-brandonu.mrnet.mb.ca"],"measurement_archives":[{"read_url":"http://lat-brandonu.mrnet.mb.ca/esmond/perfsonar/archive","write_url":"http://lat-brandonu.mrnet.mb.ca/esmond/perfsonar/archive","type":"traceroute"},{"read_url":"http://lat-brandonu.mrnet.mb.ca/esmond/perfsonar/archive","write_url":"http://lat-brandonu.mrnet.mb.ca/esmond/perfsonar/archive","type":"pinger"},{"read_url":"http://lat-brandonu.mrnet.mb.ca/esmond/perfsonar/archive","write_url":"http://lat-brandonu.mrnet.mb.ca/esmond/perfsonar/archive","type":"perfsonarbuoy/bwctl"}],"description":"MRnet","toolkit_url":"auto"}],"location":{"country":"CA","city":"Brandon","state":"Manitoba","latitude":"49.8143","longitude":"-97.1531"}},{"hosts":[{"addresses":["pstest2.geant.carnet.hr"],"description":"pstest2.geant.carnet.hr (Debian9, 4.0)","toolkit_url":"auto"}],"location":{}}]}],"tests":[{"members":{"type":"mesh","members":["uct2-net1.mwt2.org","perfsonar.ultralight.org","perfsonar.nersc.gov","lat-brandonu.mrnet.mb.ca","pstest2.geant.carnet.hr"]},"parameters":{"packet_interval":0.1,"sample_count":600,"bucket_width":0.001,"ipv4_only":true,"type":"perfsonarbuoy/owamp"},"description":"owamp test1"}],"description":"Owamp Test 11111: An owamp test","measurement_archives":[{"read_url":"http://perfsonar-testbed-ma.grnoc.iu.edu/asdf/jkl","write_url":"http://perfsonar-testbed-ma.grnoc.iu.edu/asdf/jkl","type":"traceroute"},{"read_url":"http://perfsonar-testbed-ma.grnoc.iu.edu/asdf/jkl","write_url":"http://perfsonar-testbed-ma.grnoc.iu.edu/asdf/jkl","type":"pinger"},{"read_url":"http://perfsonar-testbed-ma.grnoc.iu.edu/asdf/jkl","write_url":"http://perfsonar-testbed-ma.grnoc.iu.edu/asdf/jkl","type":"perfsonarbuoy/owamp"},{"read_url":"http://perfsonar-testbed-ma.grnoc.iu.edu/asdf/jkl","write_url":"http://perfsonar-testbed-ma.grnoc.iu.edu/asdf/jkl","type":"perfsonarbuoy/bwctl"}],"administrators":[{"name":"Michael Johnson","email":"mj82@globalnoc.iu.edu"},{"name":"Apertome","email":"apertome@gmail.com"}]}
+{
+    "organizations": [
+        {
+            "sites": [
+                {
+                    "hosts": [
+                        {
+                            "addresses": ["uct2-net1.mwt2.org"],
+                            "measurement_archives": [
+                                {
+                                    "read_url": "http://uct2-net1.mwt2.org/esmond/perfsonar/archive",
+                                    "write_url": "http://uct2-net1.mwt2.org/esmond/perfsonar/archive",
+                                    "type": "traceroute"
+                                },
+                                {
+                                    "read_url": "http://uct2-net1.mwt2.org/esmond/perfsonar/archive",
+                                    "write_url": "http://uct2-net1.mwt2.org/esmond/perfsonar/archive",
+                                    "type": "pinger"
+                                },
+                                {
+                                    "read_url": "http://uct2-net1.mwt2.org/esmond/perfsonar/archive",
+                                    "write_url": "http://uct2-net1.mwt2.org/esmond/perfsonar/archive",
+                                    "type": "perfsonarbuoy/owamp"
+                                }
+                            ],
+                            "description": "Midwest Tier2",
+                            "toolkit_url": "auto"
+                        }
+                    ],
+                    "location": {
+                        "country": "US",
+                        "city": "Chicago",
+                        "state": "IL",
+                        "latitude": "41.789889",
+                        "longitude": "-87.600453",
+                        "postal_code": "60637"
+                    }
+                },
+                {
+                    "hosts": [
+                        {
+                            "addresses": ["perfsonar.ultralight.org"],
+                            "description": "CALTECH",
+                            "toolkit_url": "auto"
+                        }
+                    ],
+                    "location": {
+                        "country": "US",
+                        "city": "Pasadena",
+                        "state": "CA",
+                        "latitude": "34.1377",
+                        "longitude": "118.1253",
+                        "postal_code": "91125"
+                    }
+                },
+                {
+                    "hosts": [
+                        {
+                            "addresses": ["perfsonar.nersc.gov"],
+                            "description": "NERSC",
+                            "toolkit_url": "auto"
+                        }
+                    ],
+                    "location": {
+                        "country": "US",
+                        "city": "Berkeley",
+                        "state": "CA",
+                        "latitude": "37.8668",
+                        "longitude": "-122.2536",
+                        "postal_code": "94720"
+                    }
+                },
+                {
+                    "hosts": [
+                        {
+                            "addresses": ["lat-brandonu.mrnet.mb.ca"],
+                            "measurement_archives": [
+                                {
+                                    "read_url": "http://lat-brandonu.mrnet.mb.ca/esmond/perfsonar/archive",
+                                    "write_url": "http://lat-brandonu.mrnet.mb.ca/esmond/perfsonar/archive",
+                                    "type": "traceroute"
+                                },
+                                {
+                                    "read_url": "http://lat-brandonu.mrnet.mb.ca/esmond/perfsonar/archive",
+                                    "write_url": "http://lat-brandonu.mrnet.mb.ca/esmond/perfsonar/archive",
+                                    "type": "pinger"
+                                },
+                                {
+                                    "read_url": "http://lat-brandonu.mrnet.mb.ca/esmond/perfsonar/archive",
+                                    "write_url": "http://lat-brandonu.mrnet.mb.ca/esmond/perfsonar/archive",
+                                    "type": "perfsonarbuoy/bwctl"
+                                }
+                            ],
+                            "description": "MRnet",
+                            "toolkit_url": "auto"
+                        }
+                    ],
+                    "location": {
+                        "country": "CA",
+                        "city": "Brandon",
+                        "state": "Manitoba",
+                        "latitude": "49.8143",
+                        "longitude": "-97.1531"
+                    }
+                },
+                {
+                    "hosts": [
+                        {
+                            "addresses": ["pstest2.geant.carnet.hr"],
+                            "description": "pstest2.geant.carnet.hr (Debian9, 4.0)",
+                            "toolkit_url": "auto"
+                        }
+                    ],
+                    "location": {}
+                }
+            ]
+        }
+    ],
+    "tests": [
+        {
+            "members": {
+                "type": "mesh",
+                "members": [
+                    "uct2-net1.mwt2.org",
+                    "perfsonar.ultralight.org",
+                    "perfsonar.nersc.gov",
+                    "lat-brandonu.mrnet.mb.ca",
+                    "pstest2.geant.carnet.hr"
+                ]
+            },
+            "parameters": {
+                "packet_interval": 0.1,
+                "sample_count": 600,
+                "bucket_width": 0.001,
+                "ipv4_only": true,
+                "type": "perfsonarbuoy/owamp"
+            },
+            "description": "owamp test1"
+        }
+    ],
+    "description": "Owamp Test 11111: An owamp test",
+    "measurement_archives": [
+        {
+            "read_url": "http://perfsonar-testbed-ma.grnoc.iu.edu/asdf/jkl",
+            "write_url": "http://perfsonar-testbed-ma.grnoc.iu.edu/asdf/jkl",
+            "type": "traceroute"
+        },
+        {
+            "read_url": "http://perfsonar-testbed-ma.grnoc.iu.edu/asdf/jkl",
+            "write_url": "http://perfsonar-testbed-ma.grnoc.iu.edu/asdf/jkl",
+            "type": "pinger"
+        },
+        {
+            "read_url": "http://perfsonar-testbed-ma.grnoc.iu.edu/asdf/jkl",
+            "write_url": "http://perfsonar-testbed-ma.grnoc.iu.edu/asdf/jkl",
+            "type": "perfsonarbuoy/owamp"
+        },
+        {
+            "read_url": "http://perfsonar-testbed-ma.grnoc.iu.edu/asdf/jkl",
+            "write_url": "http://perfsonar-testbed-ma.grnoc.iu.edu/asdf/jkl",
+            "type": "perfsonarbuoy/bwctl"
+        }
+    ],
+    "administrators": [
+        { "name": "Michael Johnson", "email": "mj82@globalnoc.iu.edu" },
+        { "name": "Apertome", "email": "apertome@gmail.com" }
+    ]
+}

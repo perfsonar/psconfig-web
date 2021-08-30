@@ -1,1 +1,136 @@
-{"archives":{"host-archive0":{"archiver":"esmond","data":{"url":"https://perf-tokyo.sinet.ad.jp/esmond/perfsonar/archive","measurement-agent":"{% scheduled_by_address %}"}},"host-archive1":{"archiver":"esmond","data":{"url":"https://perfsonar.cbio.uct.ac.za/esmond/perfsonar/archive","measurement-agent":"{% scheduled_by_address %}"}},"test-archive0":{"archiver":"esmond","data":{"url":"http://asdf/","measurement-agent":"{% scheduled_by_address %}"}}},"addresses":{"perf-tokyo.sinet.ad.jp":{"address":"perf-tokyo.sinet.ad.jp","host":"perf-tokyo.sinet.ad.jp","_meta":{"display-name":"Science Information Network - SINET","display-url":"https://perf-tokyo.sinet.ad.jp/toolkit/"}},"perfsonar-dev8.grnoc.iu.edu":{"address":"perfsonar-dev8.grnoc.iu.edu","host":"perfsonar-dev8.grnoc.iu.edu","_meta":{"display-name":"GlobalNOC","display-url":"https://perfsonar-dev8.grnoc.iu.edu/toolkit/"}},"em-4.of-proxy.newy32aoa.net.internet2.edu":{"address":"em-4.of-proxy.newy32aoa.net.internet2.edu","host":"em-4.of-proxy.newy32aoa.net.internet2.edu","_meta":{"display-name":"(OWAMP Server at internet2.edu)","display-url":"https://em-4.of-proxy.newy32aoa.net.internet2.edu/toolkit/"}},"test-pt1.es.net":{"address":"test-pt1.es.net","host":"test-pt1.es.net","_meta":{"display-name":"(OWAMP Server at es.net)","display-url":"https://test-pt1.es.net/toolkit/"}},"perfsonar.cbio.uct.ac.za":{"address":"perfsonar.cbio.uct.ac.za","host":"perfsonar.cbio.uct.ac.za","_meta":{"display-name":"cbio host descr!!!! use local ma!!!","display-url":"https://perfsonar.cbio.uct.ac.za/toolkit/"}}},"groups":{"LatentSeeTestname":{"type":"mesh","addresses":[{"name":"perf-tokyo.sinet.ad.jp"},{"name":"perfsonar-dev8.grnoc.iu.edu"}]},"Throughputtestname":{"type":"mesh","addresses":[{"name":"em-4.of-proxy.newy32aoa.net.internet2.edu"},{"name":"perfsonar-dev8.grnoc.iu.edu"},{"name":"test-pt1.es.net"},{"name":"perfsonar.cbio.uct.ac.za"}]}},"tests":{"LatentSeeTestname":{"type":"latencybg","spec":{"source":"{% address[0] %}","dest":"{% address[1] %}","packet-interval":0.1,"bucket-width":0.001,"packet-count":600,"ip-version":4}},"Throughputtestname":{"type":"throughput","spec":{"duration":"PT20S","source":"{% address[0] %}","dest":"{% address[1] %}","omit-interval":5,"ip-version":4}}},"schedules":{"repeat-PT4H":{"repeat":"PT4H","sliprand":true,"slip":"PT24M"}},"tasks":{"LatentSeeTestname":{"group":"LatentSeeTestname","test":"LatentSeeTestname","archives":["test-archive0"],"_meta":{"display-name":"LatentSeeTestname"},"tools":["owping"]},"Throughputtestname":{"group":"Throughputtestname","test":"Throughputtestname","archives":["test-archive0"],"_meta":{"display-name":"Throughputtestname"},"schedule":"repeat-PT4H","tools":["bwctliperf3","iperf3"]}},"_meta":{"display-name":"Latent See"},"hosts":{"perf-tokyo.sinet.ad.jp":{"archives":["host-archive0"]},"perfsonar-dev8.grnoc.iu.edu":{},"em-4.of-proxy.newy32aoa.net.internet2.edu":{},"test-pt1.es.net":{},"perfsonar.cbio.uct.ac.za":{"archives":["host-archive1"]}}}
+{
+    "archives": {
+        "host-archive0": {
+            "archiver": "esmond",
+            "data": {
+                "url": "https://perf-tokyo.sinet.ad.jp/esmond/perfsonar/archive",
+                "measurement-agent": "{% scheduled_by_address %}"
+            }
+        },
+        "host-archive1": {
+            "archiver": "esmond",
+            "data": {
+                "url": "https://perfsonar.cbio.uct.ac.za/esmond/perfsonar/archive",
+                "measurement-agent": "{% scheduled_by_address %}"
+            }
+        },
+        "test-archive0": {
+            "archiver": "esmond",
+            "data": {
+                "url": "http://asdf/",
+                "measurement-agent": "{% scheduled_by_address %}"
+            }
+        }
+    },
+    "addresses": {
+        "perf-tokyo.sinet.ad.jp": {
+            "address": "perf-tokyo.sinet.ad.jp",
+            "host": "perf-tokyo.sinet.ad.jp",
+            "_meta": {
+                "display-name": "Science Information Network - SINET",
+                "display-url": "https://perf-tokyo.sinet.ad.jp/toolkit/"
+            }
+        },
+        "perfsonar-dev8.grnoc.iu.edu": {
+            "address": "perfsonar-dev8.grnoc.iu.edu",
+            "host": "perfsonar-dev8.grnoc.iu.edu",
+            "_meta": {
+                "display-name": "GlobalNOC",
+                "display-url": "https://perfsonar-dev8.grnoc.iu.edu/toolkit/"
+            }
+        },
+        "em-4.of-proxy.newy32aoa.net.internet2.edu": {
+            "address": "em-4.of-proxy.newy32aoa.net.internet2.edu",
+            "host": "em-4.of-proxy.newy32aoa.net.internet2.edu",
+            "_meta": {
+                "display-name": "(OWAMP Server at internet2.edu)",
+                "display-url": "https://em-4.of-proxy.newy32aoa.net.internet2.edu/toolkit/"
+            }
+        },
+        "test-pt1.es.net": {
+            "address": "test-pt1.es.net",
+            "host": "test-pt1.es.net",
+            "_meta": {
+                "display-name": "(OWAMP Server at es.net)",
+                "display-url": "https://test-pt1.es.net/toolkit/"
+            }
+        },
+        "perfsonar.cbio.uct.ac.za": {
+            "address": "perfsonar.cbio.uct.ac.za",
+            "host": "perfsonar.cbio.uct.ac.za",
+            "_meta": {
+                "display-name": "cbio host descr!!!! use local ma!!!",
+                "display-url": "https://perfsonar.cbio.uct.ac.za/toolkit/"
+            }
+        }
+    },
+    "groups": {
+        "LatentSeeTestname": {
+            "type": "mesh",
+            "addresses": [
+                { "name": "perf-tokyo.sinet.ad.jp" },
+                { "name": "perfsonar-dev8.grnoc.iu.edu" }
+            ]
+        },
+        "Throughputtestname": {
+            "type": "mesh",
+            "addresses": [
+                { "name": "em-4.of-proxy.newy32aoa.net.internet2.edu" },
+                { "name": "perfsonar-dev8.grnoc.iu.edu" },
+                { "name": "test-pt1.es.net" },
+                { "name": "perfsonar.cbio.uct.ac.za" }
+            ]
+        }
+    },
+    "tests": {
+        "LatentSeeTestname": {
+            "type": "latencybg",
+            "spec": {
+                "source": "{% address[0] %}",
+                "dest": "{% address[1] %}",
+                "packet-interval": 0.1,
+                "bucket-width": 0.001,
+                "packet-count": 600,
+                "ip-version": 4
+            }
+        },
+        "Throughputtestname": {
+            "type": "throughput",
+            "spec": {
+                "duration": "PT20S",
+                "source": "{% address[0] %}",
+                "dest": "{% address[1] %}",
+                "omit-interval": 5,
+                "ip-version": 4
+            }
+        }
+    },
+    "schedules": {
+        "repeat-PT4H": { "repeat": "PT4H", "sliprand": true, "slip": "PT24M" }
+    },
+    "tasks": {
+        "LatentSeeTestname": {
+            "group": "LatentSeeTestname",
+            "test": "LatentSeeTestname",
+            "archives": ["test-archive0"],
+            "_meta": { "display-name": "LatentSeeTestname" },
+            "tools": ["owping"]
+        },
+        "Throughputtestname": {
+            "group": "Throughputtestname",
+            "test": "Throughputtestname",
+            "archives": ["test-archive0"],
+            "_meta": { "display-name": "Throughputtestname" },
+            "schedule": "repeat-PT4H",
+            "tools": ["bwctliperf3", "iperf3"]
+        }
+    },
+    "_meta": { "display-name": "Latent See" },
+    "hosts": {
+        "perf-tokyo.sinet.ad.jp": { "archives": ["host-archive0"] },
+        "perfsonar-dev8.grnoc.iu.edu": {},
+        "em-4.of-proxy.newy32aoa.net.internet2.edu": {},
+        "test-pt1.es.net": {},
+        "perfsonar.cbio.uct.ac.za": { "archives": ["host-archive1"] }
+    }
+}

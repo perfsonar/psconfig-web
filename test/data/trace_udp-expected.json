@@ -1,1 +1,59 @@
-{"archives":{},"addresses":{"dtcc-denvcr5.es.net":{"address":"dtcc-denvcr5.es.net","host":"dtcc-denvcr5.es.net","_meta":{"display-name":"(Ping Responder at es.net)","display-url":"https://dtcc-denvcr5.es.net/toolkit/"}},"lhcone-star-opt1-mgt.es.net":{"address":"lhcone-star-opt1-mgt.es.net","host":"lhcone-star-opt1-mgt.es.net","_meta":{"display-name":"(OWAMP Measurement Point at es.net)","display-url":"https://lhcone-star-opt1-mgt.es.net/toolkit/"}}},"groups":{"tr1":{"type":"mesh","addresses":[{"name":"dtcc-denvcr5.es.net"},{"name":"lhcone-star-opt1-mgt.es.net"}]}},"tests":{"tr1":{"type":"trace","spec":{"source":"{% address[0] %}","dest":"{% address[1] %}","first-ttl":1,"probe-type":"udp","wait":"PT1M","length":1209,"schema":1}}},"schedules":{"sched-0":{"repeat":"PT11M6S","slip": "PT5M33S","sliprand":true}},"tasks":{"tr1":{"group":"tr1","test":"tr1","archives":[],"_meta":{"display-name":"tr1"},"schedule":"sched-0","tools":["bwctltraceroute","traceroute"]}},"_meta":{"display-name":"trace udp1"},"hosts":{"dtcc-denvcr5.es.net":{},"lhcone-star-opt1-mgt.es.net":{}}}
+{
+    "archives": {},
+    "addresses": {
+        "dtcc-denvcr5.es.net": {
+            "address": "dtcc-denvcr5.es.net",
+            "host": "dtcc-denvcr5.es.net",
+            "_meta": {
+                "display-name": "(Ping Responder at es.net)",
+                "display-url": "https://dtcc-denvcr5.es.net/toolkit/"
+            }
+        },
+        "lhcone-star-opt1-mgt.es.net": {
+            "address": "lhcone-star-opt1-mgt.es.net",
+            "host": "lhcone-star-opt1-mgt.es.net",
+            "_meta": {
+                "display-name": "(OWAMP Measurement Point at es.net)",
+                "display-url": "https://lhcone-star-opt1-mgt.es.net/toolkit/"
+            }
+        }
+    },
+    "groups": {
+        "tr1": {
+            "type": "mesh",
+            "addresses": [
+                { "name": "dtcc-denvcr5.es.net" },
+                { "name": "lhcone-star-opt1-mgt.es.net" }
+            ]
+        }
+    },
+    "tests": {
+        "tr1": {
+            "type": "trace",
+            "spec": {
+                "source": "{% address[0] %}",
+                "dest": "{% address[1] %}",
+                "first-ttl": 1,
+                "probe-type": "udp",
+                "wait": "PT1M",
+                "length": 1209,
+                "schema": 1
+            }
+        }
+    },
+    "schedules": {
+        "sched-0": { "repeat": "PT11M6S", "slip": "PT5M33S", "sliprand": true }
+    },
+    "tasks": {
+        "tr1": {
+            "group": "tr1",
+            "test": "tr1",
+            "archives": [],
+            "_meta": { "display-name": "tr1" },
+            "schedule": "sched-0",
+            "tools": ["bwctltraceroute", "traceroute"]
+        }
+    },
+    "_meta": { "display-name": "trace udp1" },
+    "hosts": { "dtcc-denvcr5.es.net": {}, "lhcone-star-opt1-mgt.es.net": {} }
+}

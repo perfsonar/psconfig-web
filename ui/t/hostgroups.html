@@ -1,178 +1,365 @@
 <ng-include src="'t/sidebar.html'"></ng-include>
 <div class="sca-sidebar-page">
     <div class="subbar">
-        <div style="padding-left: 20px; margin-bottom: 10px;">
+        <div style="padding-left: 20px; margin-bottom: 10px">
             <h2>Host Groups</h2>
             <p class="help-block">Create reusable groups of hosts</p>
             <span class="text-muted">{{hostgroups.length}} Hostgroups</span>
         </div>
         <div class="filterbox" ng-class="{active: filter}">
             <i class="fa fa-times pull-right remove" ng-click="filter = ''"></i>
-            <input type="text" class="form-control"
-                ng-model="filter" ng-model-options="{debounce: 200}" placeholder="Filter"></input>
+            <input
+                type="text"
+                class="form-control"
+                ng-model="filter"
+                ng-model-options="{debounce: 200}"
+                placeholder="Filter"
+            />
         </div>
 
         <div class="subbar-list" style="top: 159px">
-            <p class="alert alert-default" ng-if="loading"><i class="fa fa-circle-o-notch fa-spin"></i> Loading..</p>
-            <p class="alert alert-info" ng-if="hostgroups.length == 0">Please register a hostgroup.</p>
-            <div class="subbar-list-item" 
+            <p class="alert alert-default" ng-if="loading">
+                <i class="fa fa-circle-o-notch fa-spin"></i> Loading..
+            </p>
+            <p class="alert alert-info" ng-if="hostgroups.length == 0">
+                Please register a hostgroup.
+            </p>
+            <div
+                class="subbar-list-item"
                 id="{{hostgroup._id}}"
-                ng-repeat="hostgroup in filter_hostgroups(hostgroups)" 
+                ng-repeat="hostgroup in filter_hostgroups(hostgroups)"
                 ng-class="{active: selected == hostgroup}"
-                ng-click="select(hostgroup)">
-                <time class="help-block pull-right">{{hostgroup.create_date|date}}</time>
+                ng-click="select(hostgroup)"
+            >
+                <time class="help-block pull-right"
+                    >{{hostgroup.create_date|date}}</time
+                >
                 <div class="list-header">
                     <small>
-                        <span class="label label-default">{{hostgroup.service_type}}</span> {{hostgroup.name}}
-                        <i ng-if="!hostgroup._canedit" class="fa fa-lock text-muted" title="Readonly"></i>
-                        <i ng-if="hostgroup.type == 'dynamic'" class="fa fa-fire" title="Dynamic Hostgroup"></i>
+                        <span class="label label-default"
+                            >{{hostgroup.service_type}}</span
+                        >
+                        {{hostgroup.name}}
+                        <i
+                            ng-if="!hostgroup._canedit"
+                            class="fa fa-lock text-muted"
+                            title="Readonly"
+                        ></i>
+                        <i
+                            ng-if="hostgroup.type == 'dynamic'"
+                            class="fa fa-fire"
+                            title="Dynamic Hostgroup"
+                        ></i>
                     </small>
                 </div>
             </div>
-            <div class="list-addbutton animated" ng-class="{bounceInLeft: hostgroups.length == 0}" ng-click="add()" title="Add New Hostgroup">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> 
+            <div
+                class="list-addbutton animated"
+                ng-class="{bounceInLeft: hostgroups.length == 0}"
+                ng-click="add()"
+                title="Add New Hostgroup"
+            >
+                <i class="fa fa-plus-circle" aria-hidden="true"></i>
                 <div class="add-text">New hostgroup</div>
             </div>
         </div>
-    </div><!--subbar-->
-    
+    </div>
+    <!--subbar-->
+
     <div class="subbar-content">
-        <p class="alert alert-info" ng-if="!selected">Please select hostgroup</p>
-        <form name="form" class="form-horizontal margin30" ng-submit="submit()" ng-show="selected" confirm-on-exit>
+        <p class="alert alert-info" ng-if="!selected">
+            Please select hostgroup
+        </p>
+        <form
+            name="form"
+            class="form-horizontal margin30"
+            ng-submit="submit()"
+            ng-show="selected"
+            confirm-on-exit
+        >
             <div class="fixed-top">
                 <h2>
-                    <i class="fa fa-trash-o clickable" aria-hidden="true" ng-if="selected._id && selected._canedit"
+                    <i
+                        class="fa fa-trash-o clickable"
+                        aria-hidden="true"
+                        ng-if="selected._id && selected._canedit"
                         ng-confirm-click="Are you sure you want to remove this hostgroup?"
-                        confirmed-click="remove()"></i>&nbsp;&nbsp;&nbsp;
+                        confirmed-click="remove()"
+                    ></i
+                    >&nbsp;&nbsp;&nbsp;
                     <!--
                     <i class="fa fa-info-circle" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
                     <i class="fa fa-star-o" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
                     <i class="fa fa-share-alt" aria-hidden="true"></i>&nbsp;&nbsp;&nbsp;
                     -->
 
-                    <div class="pull-right" style="padding-right: 20px;">
-                        <i class="fa fa-lock" ng-if="!selected._canedit" title="Read Only"></i>
-                        <div ng-if="form.$dirty && selected._canedit" class="display: inline-block;">
-                            <button type="submit" class="btn btn-primary" ng-if="selected._id">Update</button>
-                            <button type="submit" class="btn btn-primary" ng-if="!selected._id">Create</button>
-                            <button type="button" class="btn" ng-click="cancel()">Cancel</button>
+                    <div class="pull-right" style="padding-right: 20px">
+                        <i
+                            class="fa fa-lock"
+                            ng-if="!selected._canedit"
+                            title="Read Only"
+                        ></i>
+                        <div
+                            ng-if="form.$dirty && selected._canedit"
+                            class="display: inline-block;"
+                        >
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                                ng-if="selected._id"
+                            >
+                                Update
+                            </button>
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                                ng-if="!selected._id"
+                            >
+                                Create
+                            </button>
+                            <button
+                                type="button"
+                                class="btn"
+                                ng-click="cancel()"
+                            >
+                                Cancel
+                            </button>
                         </div>
                     </div>
                 </h2>
 
-                <br clear="right">
+                <br clear="right" />
                 <div class="form-group">
-                    <label for="name" class="col-sm-2 control-label"><strong>Name *</strong></label>
+                    <label for="name" class="col-sm-2 control-label"
+                        ><strong>Name *</strong></label
+                    >
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="name" ng-model="selected.name" 
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="name"
+                            ng-model="selected.name"
                             ng-disabled="!selected._canedit"
-                            placeholder="Name for this hostgroup" required>
+                            placeholder="Name for this hostgroup"
+                            required
+                        />
                     </div>
                 </div>
-                <hr style="margin-bottom: 0px;">
-            </div><!--fixed-top-->
+                <hr style="margin-bottom: 0px" />
+            </div>
+            <!--fixed-top-->
 
             <div class="fixed-top-under">
                 <div class="form-group">
-                    <label for="admins" class="col-sm-2 control-label">Admins</label>
+                    <label for="admins" class="col-sm-2 control-label"
+                        >Admins</label
+                    >
                     <div class="col-sm-10">
-                        <ui-select multiple ng-model="selected.admins" ng-disabled="!selected._canedit">
-                            <ui-select-match placeholder="Select admins who can update this test spec">
-                                <img gravatar-src="$item.email" gravatar-size="17"/>
-                                <b>{{$item.fullname}}</b> <span class="email">&lt;{{$item.email}}&gt;</span>
+                        <ui-select
+                            multiple
+                            ng-model="selected.admins"
+                            ng-disabled="!selected._canedit"
+                        >
+                            <ui-select-match
+                                placeholder="Select admins who can update this test spec"
+                            >
+                                <img
+                                    gravatar-src="$item.email"
+                                    gravatar-size="17"
+                                />
+                                <b>{{$item.fullname}}</b>
+                                <span class="email"
+                                    >&lt;{{$item.email}}&gt;</span
+                                >
                             </ui-select-match>
-                            <ui-select-choices repeat="user.id as user in users | propsFilter: {fullname: $select.search, email: $select.search}">
-                              <img gravatar-src="user.email" gravatar-size="17"/>
-                              <b>{{user.fullname}}</b> <small>&lt;{{user.email}}&gt;</small>
+                            <ui-select-choices
+                                repeat="user.id as user in users | propsFilter: {fullname: $select.search, email: $select.search}"
+                            >
+                                <img
+                                    gravatar-src="user.email"
+                                    gravatar-size="17"
+                                />
+                                <b>{{user.fullname}}</b>
+                                <small>&lt;{{user.email}}&gt;</small>
                             </ui-select-choices>
                         </ui-select>
-                        <p class="help-block">Users who can update this hostgroup</p>
+                        <p class="help-block">
+                            Users who can update this hostgroup
+                        </p>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="type" class="col-sm-2 control-label">Service Type *</label>
+                    <label for="type" class="col-sm-2 control-label"
+                        >Service Type *</label
+                    >
                     <div class="col-sm-10">
-                        <select class="form-control" 
+                        <select
+                            class="form-control"
                             ng-disabled="!selected._canedit"
                             ng-change="run_dynamic()"
-                            ng-model="selected.service_type" required>
-                            <option ng-repeat="(sid, item) in serverconf.service_types" value="{{sid}}">{{item.label}}</option>
+                            ng-model="selected.service_type"
+                            required
+                        >
+                            <option
+                                ng-repeat="(sid, item) in serverconf.service_types"
+                                value="{{sid}}"
+                            >
+                                {{item.label}}
+                            </option>
                         </select>
                     </div>
                 </div>
 
                 <div class="form-group" ng-show="selected.service_type">
-                    <label for="admins" class="col-sm-2 control-label">Hosts</label>
+                    <label for="admins" class="col-sm-2 control-label"
+                        >Hosts</label
+                    >
                     <div class="col-sm-10">
                         <tabset>
-                            <tab heading="Static" 
+                            <tab
+                                heading="Static"
                                 select="changetype('static',$event)"
-                                active="tabs['static'].active">
-                                <ui-select ng-cloak multiple ng-model="selected.hosts" style="margin-top: 5px;" ng-disabled="!selected._canedit" class="button-flat">
-                                <ui-select-match placeholder="Enter hostname">
-                                        <span class="label label-default" ng-if="$item.lsid">{{$item.lsid}}</span>
-                                        <span class="label label-warning" ng-if="!$item.lsid">Adhoc</span>
+                                active="tabs['static'].active"
+                            >
+                                <ui-select
+                                    ng-cloak
+                                    multiple
+                                    ng-model="selected.hosts"
+                                    style="margin-top: 5px"
+                                    ng-disabled="!selected._canedit"
+                                    class="button-flat"
+                                >
+                                    <ui-select-match
+                                        placeholder="Enter hostname"
+                                    >
+                                        <span
+                                            class="label label-default"
+                                            ng-if="$item.lsid"
+                                            >{{$item.lsid}}</span
+                                        >
+                                        <span
+                                            class="label label-warning"
+                                            ng-if="!$item.lsid"
+                                            >Adhoc</span
+                                        >
                                         <!--<b>{{$item.sitename}}</b>-->
-                                        <span>{{$item.hostname||'removed'}}</span>
+                                        <span
+                                            >{{$item.hostname||'removed'}}</span
+                                        >
                                     </ui-select-match>
-                                    <ui-select-choices 
+                                    <ui-select-choices
                                         group-by="'sitename'"
                                         refresh-delay="200"
-                                        refresh="refreshHosts($select.search)" 
-                                        repeat="host._id as host in hosts">
-                                        <span class="label label-default" ng-if="host.lsid">{{host.lsid}}</span>
-                                        <span class="label label-warning" ng-if="!host.lsid">Adhoc</span>
-                                        <span>{{host.hostname||'removed'}}</span>
+                                        refresh="refreshHosts($select.search)"
+                                        repeat="host._id as host in hosts"
+                                    >
+                                        <span
+                                            class="label label-default"
+                                            ng-if="host.lsid"
+                                            >{{host.lsid}}</span
+                                        >
+                                        <span
+                                            class="label label-warning"
+                                            ng-if="!host.lsid"
+                                            >Adhoc</span
+                                        >
+                                        <span
+                                            >{{host.hostname||'removed'}}</span
+                                        >
                                     </ui-select-choices>
                                 </ui-select>
-                                <button class="btn btn-xs pull-right" type="button"
+                                <button
+                                    class="btn btn-xs pull-right"
+                                    type="button"
                                     ng-if="selected.hosts.length > 0"
-                                    ng-click="selected.hosts = []; form.$setDirty();">
-                                    Clear All {{selected.hosts.length}} Hosts</button>
+                                    ng-click="selected.hosts = []; form.$setDirty();"
+                                >
+                                    Clear All {{selected.hosts.length}} Hosts
+                                </button>
 
                                 <!-- <p class="help-block">Map only shows sites that has location information published.</p> -->
-
                             </tab>
-                            <tab heading="Dynamic" 
+                            <tab
+                                heading="Dynamic"
                                 select="changetype($event,'dynamic')"
-                                active="tabs['dynamic'].active">
-                                <div style="margin-top: 5px; border: 1px solid #ccc; padding: 5px;">
-                                    <div name="host_filter"
-                                        ui-ace="{ mode: 'javascript' }" 
+                                active="tabs['dynamic'].active"
+                            >
+                                <div
+                                    style="
+                                        margin-top: 5px;
+                                        border: 1px solid #ccc;
+                                        padding: 5px;
+                                    "
+                                >
+                                    <div
+                                        name="host_filter"
+                                        ui-ace="{ mode: 'javascript' }"
                                         ng-change="run_dynamic()"
-                                        ng-model="selected.host_filter" 
-                                        ng-model-options="{ debounce: 250 }" 
+                                        ng-model="selected.host_filter"
+                                        ng-model-options="{ debounce: 250 }"
                                         ng-readonly="!selected._canedit"
-                                        style="margin-bottom: 5px;" required></div>
-                                    <alert type="danger" ng-if="selected.host_filter_alert" style="margin-bottom: 0px;">{{selected.host_filter_alert}}</alert>
-                                    <alert type="warning" ng-if="selected.host_filter_console[0]" style="margin-bottom: 0px;">{{selected.host_filter_console[0]}}</alert>
-                                    <div ng-if="selected.hosts" style="max-height: 150px; overflow: auto; margin-bottom: 0px; opacity:0.85;" class="well well-sm">
-                                        <p class="help-block">{{selected.hosts.length}} hosts match above query</p>
-                                        <mc-hostlist hostids="selected.hosts"></mc-hostlist>
+                                        style="margin-bottom: 5px"
+                                        required
+                                    ></div>
+                                    <alert
+                                        type="danger"
+                                        ng-if="selected.host_filter_alert"
+                                        style="margin-bottom: 0px"
+                                        >{{selected.host_filter_alert}}</alert
+                                    >
+                                    <alert
+                                        type="warning"
+                                        ng-if="selected.host_filter_console[0]"
+                                        style="margin-bottom: 0px"
+                                        >{{selected.host_filter_console[0]}}</alert
+                                    >
+                                    <div
+                                        ng-if="selected.hosts"
+                                        style="
+                                            max-height: 150px;
+                                            overflow: auto;
+                                            margin-bottom: 0px;
+                                            opacity: 0.85;
+                                        "
+                                        class="well well-sm"
+                                    >
+                                        <p class="help-block">
+                                            {{selected.hosts.length}} hosts
+                                            match above query
+                                        </p>
+                                        <mc-hostlist
+                                            hostids="selected.hosts"
+                                        ></mc-hostlist>
                                     </div>
                                 </div>
-                                <p class="help-block">Please see <a target="_target" href="http://docs.perfsonar.net/pwa_userguide_hostgroup.html#dynamic-host-groups">Dynamic Host Groups</a> for more detail.</p>
+                                <p class="help-block">
+                                    Please see
+                                    <a
+                                        target="_target"
+                                        href="http://docs.perfsonar.net/pwa_userguide_hostgroup.html#dynamic-host-groups"
+                                        >Dynamic Host Groups</a
+                                    >
+                                    for more detail.
+                                </p>
                             </tab>
                         </tabset>
-
                     </div>
                 </div>
-                <br>
-                <br>
+                <br />
+                <br />
 
                 <!-- don't remove this or ui-select won't be displayed correctly (containing div trims it?)-->
-                <div ng-if="!appconf.debug" style="height: 300px">
-                </div> 
+                <div ng-if="!appconf.debug" style="height: 300px"></div>
 
                 <div ng-if="appconf.debug">
                     <h3>Debug</h3>
                     <pre>{{selected|json}}</pre>
                 </div>
-            </div><!--non fixed-->
+            </div>
+            <!--non fixed-->
         </form>
-
-    </div><!--subbar-content-->
-</div><!--sca-sidebar-page-->
-
-
+    </div>
+    <!--subbar-content-->
+</div>
+<!--sca-sidebar-page-->

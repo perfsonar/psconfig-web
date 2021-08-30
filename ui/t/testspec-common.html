@@ -2,21 +2,51 @@
     <!--all/common-->
     <div class="col-sm-offset-2 col-sm-4">
         <div class="checkbox">
-            <label> <input type="checkbox" name="ipv4_only" ng-disabled="!selected._canedit" ng-model="selected.specs.ipv4_only" /> IPv4 Only</label>
+            <label>
+                <input
+                    type="checkbox"
+                    name="ipv4_only"
+                    ng-disabled="!selected._canedit"
+                    ng-model="selected.specs.ipv4_only"
+                />
+                IPv4 Only</label
+            >
         </div>
         <div class="checkbox">
-            <label> <input type="checkbox" name="ipv6_only" ng-disabled="!selected._canedit" ng-model="selected.specs.ipv6_only" /> IPv6 Only</label>
-            <p class="help-block">Forces each side to use IPv4/IPv6. Test will fail if no IPv4/IPv6 address can be determined for either endpoint <code>ipv4_only/ipv6_only</code></p>
+            <label>
+                <input
+                    type="checkbox"
+                    name="ipv6_only"
+                    ng-disabled="!selected._canedit"
+                    ng-model="selected.specs.ipv6_only"
+                />
+                IPv6 Only</label
+            >
+            <p class="help-block">
+                Forces each side to use IPv4/IPv6. Test will fail if no
+                IPv4/IPv6 address can be determined for either endpoint
+                <code>ipv4_only/ipv6_only</code>
+            </p>
         </div>
     </div>
     <label for="slip" class="col-sm-2 control-label">Slip</label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="number" string-to-number step="1" class="form-control" name="slip"
-                   ng-disabled="!selected._canedit"
-                   ng-model="selected.specs.slip">
+            <input
+                type="number"
+                string-to-number
+                step="1"
+                class="form-control"
+                name="slip"
+                ng-disabled="!selected._canedit"
+                ng-model="selected.specs.slip"
+            />
             <div class="input-group-addon">seconds</div>
         </div>
-        <p class="help-block"> When scheduling tasks, allow the time to vary by up to $SLIP seconds. If left blank, this defaults to half the test interval.<code>slip</code></p>
-     </div>
+        <p class="help-block">
+            When scheduling tasks, allow the time to vary by up to $SLIP
+            seconds. If left blank, this defaults to half the test
+            interval.<code>slip</code>
+        </p>
+    </div>
 </div>

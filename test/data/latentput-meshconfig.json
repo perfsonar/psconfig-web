@@ -1,1 +1,159 @@
-{"organizations":[{"sites":[{"hosts":[{"addresses":["perf-tokyo.sinet.ad.jp"],"measurement_archives":[{"read_url":"https://perf-tokyo.sinet.ad.jp/esmond/perfsonar/archive","write_url":"https://perf-tokyo.sinet.ad.jp/esmond/perfsonar/archive","type":"perfsonarbuoy/owamp"},{"read_url":"https://perf-tokyo.sinet.ad.jp/esmond/perfsonar/archive","write_url":"https://perf-tokyo.sinet.ad.jp/esmond/perfsonar/archive","type":"perfsonarbuoy/bwctl"}],"description":"Science Information Network - SINET","toolkit_url":"auto"}],"location":{"country":"JP","city":"Chiyoda","state":"Tokyo","latitude":"35.693944","longitude":"139.753611"}},{"hosts":[{"addresses":["perfsonar-dev8.grnoc.iu.edu"],"description":"GlobalNOC","toolkit_url":"auto"}],"location":{"country":"US","city":"Bloomington","state":"IN","latitude":"39.2499","longitude":"-86.4555","postal_code":"47408"}},{"hosts":[{"addresses":["em-4.of-proxy.newy32aoa.net.internet2.edu"],"description":"(OWAMP Server at internet2.edu)","toolkit_url":"auto"}],"location":{}},{"hosts":[{"addresses":["test-pt1.es.net"],"description":"(OWAMP Server at es.net)","toolkit_url":"auto"}],"location":{}},{"hosts":[{"addresses":["perfsonar.cbio.uct.ac.za"],"measurement_archives":[{"read_url":"https://perfsonar.cbio.uct.ac.za/esmond/perfsonar/archive","write_url":"https://perfsonar.cbio.uct.ac.za/esmond/perfsonar/archive","type":"perfsonarbuoy/owamp"},{"read_url":"https://perfsonar.cbio.uct.ac.za/esmond/perfsonar/archive","write_url":"https://perfsonar.cbio.uct.ac.za/esmond/perfsonar/archive","type":"perfsonarbuoy/bwctl"}],"description":"cbio host descr!!!! use local ma!!!","toolkit_url":"auto"}],"location":{"country":"ZA","city":"Cape Town","state":"Western Cape","postal_code":"8000"}}]}],"tests":[{"members":{"type":"mesh","members":["perf-tokyo.sinet.ad.jp","perfsonar-dev8.grnoc.iu.edu"]},"parameters":{"packet_interval":0.1,"sample_count":600,"bucket_width":0.001,"ipv4_only":true,"type":"perfsonarbuoy/owamp"},"description":"LatentSeeTestname"},{"members":{"type":"mesh","members":["em-4.of-proxy.newy32aoa.net.internet2.edu","perfsonar-dev8.grnoc.iu.edu","test-pt1.es.net","perfsonar.cbio.uct.ac.za"]},"parameters":{"ipv4_only":true,"omit_interval":5,"random_start_percentage":10,"duration":20,"interval":14400,"protocol":"tcp","tool":"bwctl/iperf3","type":"perfsonarbuoy/bwctl"},"description":"Throughputtestname"}],"description":"Latent See: New Config","measurement_archives":[{"read_url":"http://asdf/","write_url":"http://asdf/","type":"perfsonarbuoy/owamp"},{"read_url":"http://asdf/","write_url":"http://asdf/","type":"perfsonarbuoy/bwctl"}],"administrators":[{"name":"Michael Johnson","email":"mj82@globalnoc.iu.edu"}]}
+{
+    "organizations": [
+        {
+            "sites": [
+                {
+                    "hosts": [
+                        {
+                            "addresses": ["perf-tokyo.sinet.ad.jp"],
+                            "measurement_archives": [
+                                {
+                                    "read_url": "https://perf-tokyo.sinet.ad.jp/esmond/perfsonar/archive",
+                                    "write_url": "https://perf-tokyo.sinet.ad.jp/esmond/perfsonar/archive",
+                                    "type": "perfsonarbuoy/owamp"
+                                },
+                                {
+                                    "read_url": "https://perf-tokyo.sinet.ad.jp/esmond/perfsonar/archive",
+                                    "write_url": "https://perf-tokyo.sinet.ad.jp/esmond/perfsonar/archive",
+                                    "type": "perfsonarbuoy/bwctl"
+                                }
+                            ],
+                            "description": "Science Information Network - SINET",
+                            "toolkit_url": "auto"
+                        }
+                    ],
+                    "location": {
+                        "country": "JP",
+                        "city": "Chiyoda",
+                        "state": "Tokyo",
+                        "latitude": "35.693944",
+                        "longitude": "139.753611"
+                    }
+                },
+                {
+                    "hosts": [
+                        {
+                            "addresses": ["perfsonar-dev8.grnoc.iu.edu"],
+                            "description": "GlobalNOC",
+                            "toolkit_url": "auto"
+                        }
+                    ],
+                    "location": {
+                        "country": "US",
+                        "city": "Bloomington",
+                        "state": "IN",
+                        "latitude": "39.2499",
+                        "longitude": "-86.4555",
+                        "postal_code": "47408"
+                    }
+                },
+                {
+                    "hosts": [
+                        {
+                            "addresses": [
+                                "em-4.of-proxy.newy32aoa.net.internet2.edu"
+                            ],
+                            "description": "(OWAMP Server at internet2.edu)",
+                            "toolkit_url": "auto"
+                        }
+                    ],
+                    "location": {}
+                },
+                {
+                    "hosts": [
+                        {
+                            "addresses": ["test-pt1.es.net"],
+                            "description": "(OWAMP Server at es.net)",
+                            "toolkit_url": "auto"
+                        }
+                    ],
+                    "location": {}
+                },
+                {
+                    "hosts": [
+                        {
+                            "addresses": ["perfsonar.cbio.uct.ac.za"],
+                            "measurement_archives": [
+                                {
+                                    "read_url": "https://perfsonar.cbio.uct.ac.za/esmond/perfsonar/archive",
+                                    "write_url": "https://perfsonar.cbio.uct.ac.za/esmond/perfsonar/archive",
+                                    "type": "perfsonarbuoy/owamp"
+                                },
+                                {
+                                    "read_url": "https://perfsonar.cbio.uct.ac.za/esmond/perfsonar/archive",
+                                    "write_url": "https://perfsonar.cbio.uct.ac.za/esmond/perfsonar/archive",
+                                    "type": "perfsonarbuoy/bwctl"
+                                }
+                            ],
+                            "description": "cbio host descr!!!! use local ma!!!",
+                            "toolkit_url": "auto"
+                        }
+                    ],
+                    "location": {
+                        "country": "ZA",
+                        "city": "Cape Town",
+                        "state": "Western Cape",
+                        "postal_code": "8000"
+                    }
+                }
+            ]
+        }
+    ],
+    "tests": [
+        {
+            "members": {
+                "type": "mesh",
+                "members": [
+                    "perf-tokyo.sinet.ad.jp",
+                    "perfsonar-dev8.grnoc.iu.edu"
+                ]
+            },
+            "parameters": {
+                "packet_interval": 0.1,
+                "sample_count": 600,
+                "bucket_width": 0.001,
+                "ipv4_only": true,
+                "type": "perfsonarbuoy/owamp"
+            },
+            "description": "LatentSeeTestname"
+        },
+        {
+            "members": {
+                "type": "mesh",
+                "members": [
+                    "em-4.of-proxy.newy32aoa.net.internet2.edu",
+                    "perfsonar-dev8.grnoc.iu.edu",
+                    "test-pt1.es.net",
+                    "perfsonar.cbio.uct.ac.za"
+                ]
+            },
+            "parameters": {
+                "ipv4_only": true,
+                "omit_interval": 5,
+                "random_start_percentage": 10,
+                "duration": 20,
+                "interval": 14400,
+                "protocol": "tcp",
+                "tool": "bwctl/iperf3",
+                "type": "perfsonarbuoy/bwctl"
+            },
+            "description": "Throughputtestname"
+        }
+    ],
+    "description": "Latent See: New Config",
+    "measurement_archives": [
+        {
+            "read_url": "http://asdf/",
+            "write_url": "http://asdf/",
+            "type": "perfsonarbuoy/owamp"
+        },
+        {
+            "read_url": "http://asdf/",
+            "write_url": "http://asdf/",
+            "type": "perfsonarbuoy/bwctl"
+        }
+    ],
+    "administrators": [
+        { "name": "Michael Johnson", "email": "mj82@globalnoc.iu.edu" }
+    ]
+}

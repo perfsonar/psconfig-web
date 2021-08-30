@@ -144,3 +144,9 @@ deploy/docker/pwa-pub/tmp/
 ## From grigutis (2021-07-30)
 
 **/package-lock.json
+
+
+## Additions for Prettier (2021-08-19)
+
+*.min.*
+ui/apidoc

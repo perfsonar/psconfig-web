@@ -1,112 +1,112 @@
 body {
-  color: #383838;
-  font-size: 14px;
+    color: #383838;
+    font-size: 14px;
 }
 h2,
 h3 {
-  color: #878787;
-  font-weight: bold;
+    color: #878787;
+    font-weight: bold;
 }
 h2 {
-  font-size: 21px;
+    font-size: 21px;
 }
 h2.page-heading {
-  padding-bottom: 8px;
-  padding-right: 20px;
-  border-bottom: 1px solid #ddd;
-  color: #008cba;
+    padding-bottom: 8px;
+    padding-right: 20px;
+    border-bottom: 1px solid #ddd;
+    color: #008cba;
 }
 h3 {
-  text-transform: uppercase;
-  font-size: 18px;
-  font-weight: bold;
+    text-transform: uppercase;
+    font-size: 18px;
+    font-weight: bold;
 }
 i[onclick] {
-  cursor: hover;
+    cursor: hover;
 }
 .center-block {
-  display: block;
-  margin-top: 50px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 30px;
-  max-width: 500px;
-  background-color: white;
-  box-shadow: 0px 0px 15px #666;
-  border-radius: 5px;
+    display: block;
+    margin-top: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 30px;
+    max-width: 500px;
+    background-color: white;
+    box-shadow: 0px 0px 15px #666;
+    border-radius: 5px;
 }
 .list-group .list-group-item-heading {
-  margin-bottom: 0px;
+    margin-bottom: 0px;
 }
 .list-group .list-group-item {
-  margin-top: 10px;
+    margin-top: 10px;
 }
 .list-group .list-group-item h4 {
-  margin-top: 0px;
+    margin-top: 0px;
 }
 .header {
-  padding: 10px;
-  padding-left: 20px;
-  background-color: #eee;
+    padding: 10px;
+    padding-left: 20px;
+    background-color: #eee;
 }
 .header h2 {
-  margin: 5px;
+    margin: 5px;
 }
 .settings li.heading {
-  background-color: #eee;
+    background-color: #eee;
 }
 .clickable:hover {
-  cursor: pointer;
-  background-color: #eee;
+    cursor: pointer;
+    background-color: #eee;
 }
 .disabled {
-  background-color: #ccc;
+    background-color: #ccc;
 }
 span.email {
-  color: #666;
-  font-family: Monaco, Menlo, Consolas, 'Courier New', monospace;
+    color: #666;
+    font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
 }
 .table thead tr th {
-  vertical-align: top;
+    vertical-align: top;
 }
 th.specname {
-  text-transform: capitalize;
+    text-transform: capitalize;
 }
 li.test h5 {
-  margin-top: 0px;
+    margin-top: 0px;
 }
 ul.specs,
 ul.admins,
 ul.hosts {
-  padding: 0px;
-  list-style: none;
-  font-size: 12px;
-  margin-bottom: 0px;
+    padding: 0px;
+    list-style: none;
+    font-size: 12px;
+    margin-bottom: 0px;
 }
 ul.specs li,
 ul.admins li,
 ul.hosts li {
-  /*border: 1px solid #ccc;*/
-  background-color: #f0f0f0;
-  padding: 4px 6px;
-  display: inline-block;
-  margin: 1px 3px;
-  /*line-height: 140%;*/
+    /*border: 1px solid #ccc;*/
+    background-color: #f0f0f0;
+    padding: 4px 6px;
+    display: inline-block;
+    margin: 1px 3px;
+    /*line-height: 140%;*/
 }
 .edit_button {
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  z-order: 1;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    z-order: 1;
 }
 .ui-select-match-close {
-  color: #222;
+    color: #222;
 }
 .ui-select-match-close:hover {
-  color: #008cba;
+    color: #008cba;
 }
 .ui-select-multiple {
-  /*
+    /*
     > div {
         max-height: 300px;
         overflow-y: auto;
@@ -114,180 +114,178 @@ ul.hosts li {
     */
 }
 .ui-select-multiple.ui-select-bootstrap .ui-select-match-item {
-  margin: 0 2px 1px 0;
+    margin: 0 2px 1px 0;
 }
 .ui-select-multiple.ui-select-bootstrap {
-  padding: 2px 2px 1px;
+    padding: 2px 2px 1px;
 }
 .ui-select-multiple span.btn-xs {
-  padding: 2px;
+    padding: 2px;
 }
 .ui-select-match .btn-default {
-  background-color: inherit;
-  color: #333;
+    background-color: inherit;
+    color: #333;
 }
 .btn-compact {
     padding: 8px 6px;
-    margin:0 4px;
+    margin: 0 4px;
 }
 .host {
-  background-color: #f0f0f0;
-  padding: 4px 6px;
-  display: inline-block;
-  margin: 1px 3px;
+    background-color: #f0f0f0;
+    padding: 4px 6px;
+    display: inline-block;
+    margin: 1px 3px;
 }
 div.well-detail {
-  background-color: #ddd;
-  margin-bottom: 0px;
+    background-color: #ddd;
+    margin-bottom: 0px;
 }
 .ace_editor {
-  height: 100px;
+    height: 100px;
 }
 .subbar-content {
-  margin-left: 350px;
-  overflow-x: hidden;
+    margin-left: 350px;
+    overflow-x: hidden;
 }
 .subbar-content .fixed-top {
-  left: 450px;
+    left: 450px;
 }
 .subbar-content .workflow .workflow-item .item-header {
-  font-size: 20px;
-  font-weight: bold;
-  text-transform: uppercase;
+    font-size: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
 }
 .subbar-list-item {
-  min-height: 30px;
+    min-height: 30px;
 }
 .margin30 {
-  margin: 0px 20px;
+    margin: 0px 20px;
 }
 .list-addbutton {
-  font-size: 50px;
-  position: fixed;
-  bottom: 10px;
-  left: 125px;
-  cursor: pointer;
-  color: #17a2b8;
-  background-color: white;
-  border-radius: 25px;
-  line-height: 100%;
-  transition: 0.2s ease all;
+    font-size: 50px;
+    position: fixed;
+    bottom: 10px;
+    left: 125px;
+    cursor: pointer;
+    color: #17a2b8;
+    background-color: white;
+    border-radius: 25px;
+    line-height: 100%;
+    transition: 0.2s ease all;
 }
 .list-addbutton:hover {
-  bottom: 10px;
-  font-size: 50px;
-  left: 125px;
-  color: #008cba;
+    bottom: 10px;
+    font-size: 50px;
+    left: 125px;
+    color: #008cba;
 }
 .list-addbutton .add-text {
-  font-size: 30px;
-  float: left;
-  margin-right:10px;
-  width:225px;
-  text-align:right;
-
+    font-size: 30px;
+    float: left;
+    margin-right: 10px;
+    width: 225px;
+    text-align: right;
 }
 .list-addbutton .add-text:hover {
-  font-size: 30px;
-  width:225px;
-
+    font-size: 30px;
+    width: 225px;
 }
 .autoconfig {
-  position: fixed;
-  bottom: 0px;
-  width: 350px;
-  height: 160px;
-  background-color: #eee;
-  padding: 5px 15px;
-  box-shadow: inset 0px 4px 10px #ccc;
+    position: fixed;
+    bottom: 0px;
+    width: 350px;
+    height: 160px;
+    background-color: #eee;
+    padding: 5px 15px;
+    box-shadow: inset 0px 4px 10px #ccc;
 }
 @media screen and (max-width: 1000px) {
-  .list-addbutton {
-    left: 320px;
-  }
-  .list-addbutton:hover {
-    left: 310px;
-  }
+    .list-addbutton {
+        left: 320px;
+    }
+    .list-addbutton:hover {
+        left: 310px;
+    }
 }
 .filterbox {
-  background-color: #eee;
-  padding: 5px;
-  height: 49px;
-  position: relative;
+    background-color: #eee;
+    padding: 5px;
+    height: 49px;
+    position: relative;
 }
 .filterbox .remove {
-  position: absolute;
-  right: 15px;
-  top: 13px;
-  color: #008cba;
-  font-size: 150%;
-  cursor: pointer;
-  display: none;
+    position: absolute;
+    right: 15px;
+    top: 13px;
+    color: #008cba;
+    font-size: 150%;
+    cursor: pointer;
+    display: none;
 }
 .filterbox.active input {
-  background-color: #d5eff7;
+    background-color: #d5eff7;
 }
 .filterbox.active .remove {
-  display: block;
+    display: block;
 }
 .angular-google-map-container {
-  height: 325px;
+    height: 325px;
 }
 .form-horizontal .form-group {
-  margin-left: 0;
-  margin-right: 0;
-  margin: 0 0 0.25em 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin: 0 0 0.25em 0;
 }
 .form-group h3 {
-  margin-bottom: 0.25em;
-  padding-left: 0.5em;
+    margin-bottom: 0.25em;
+    padding-left: 0.5em;
 }
 .form-section {
-  border-color: #ddd;
-  padding: 1em 0.5em 0.5em;
+    border-color: #ddd;
+    padding: 1em 0.5em 0.5em;
 }
 .panel-heading h3 {
-  margin: 0;
+    margin: 0;
 }
 .panel-default > .panel-heading {
-  background-color: #ddd;
-  border-color: #ccc;
+    background-color: #ddd;
+    border-color: #ccc;
 }
 .panel-group .panel,
 .panel-group .panel + .panel {
-  margin-top: 2em;
-  background-color: #f5f5f5;
-  border-color: #ccc;
+    margin-top: 2em;
+    background-color: #f5f5f5;
+    border-color: #ccc;
 }
 .panel-group .panel-heading + .panel-collapse > .panel-body,
 .panel-group .panel-heading + .panel-collapse > .list-group {
-  border-color: #ccc;
+    border-color: #ccc;
 }
 .panel-default > .panel-heading + .panel-collapse > .panel-body {
-  border-color: #ccc;
+    border-color: #ccc;
 }
 .host-addresses i.fa {
-  float: left;
-  font-size: 20px;
+    float: left;
+    font-size: 20px;
 }
 .sca-sidebar .menu a {
-  text-decoration: none;
+    text-decoration: none;
 }
 .sca-sidebar .menu.active a {
-  color: #fff;
+    color: #fff;
 }
 .schedule-section {
-  background-color: #dedede;
-  margin-bottom: 1em;
-  padding: 0.5em;
+    background-color: #dedede;
+    margin-bottom: 1em;
+    padding: 0.5em;
 }
 .form-group.schedule {
-  margin-bottom: 1em;
+    margin-bottom: 1em;
 }
 .input-group-addon {
     padding: 8px 6px;
     padding-left: 4px;
 }
 .input-group-btn {
-    padding-left:4px;
+    padding-left: 4px;
 }

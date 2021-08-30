@@ -29,7 +29,7 @@ angular.module('app.config', []).constant('appconf', {
     //authentication service API to refresh token, etc.
     auth_api: base_url + '/api/auth',
     //authentication service URL to jump if user needs to login
-    auth_url: base_url + '/auth',
+    auth_url: base_url + '/auth/',
 
     google_map_api: 'AIzaSyBhCVWYLcFh8NSpy4bRSuJpdE962x4KUpE',
 

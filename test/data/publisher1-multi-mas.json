@@ -1,1 +1,138 @@
-{"archives":{"host-archive0":{"archiver":"esmond","data":{"url":"https://perfsonar-dev9.grnoc.iu.edu/esmond/perfsonar/archive","measurement-agent":"{% scheduled_by_address %}"}},"host-additional-archive0":{"archiver":"esmond","data":{"url":"https://perfsonar-dev99.grnoc.iu.edu/esmond/perfsonar/archive","measurement-agent":"{% scheduled_by_address %}"}},"host-archive1":{"archiver":"esmond","data":{"url":"https://nms1-10g.jp.apan.net/esmond/perfsonar/archive","measurement-agent":"{% scheduled_by_address %}"}},"test-archive0":{"archiver":"esmond","data":{"url":"https://perfsonar-dev8.grnoc.iu.edu/esmond/perfsonar/archive/","measurement-agent":"{% scheduled_by_address %}"}}},"addresses":{"perfsonar-dev9.grnoc.iu.edu":{"address":"perfsonar-dev9.grnoc.iu.edu","host":"perfsonar-dev9.grnoc.iu.edu","_meta":{"display-name":"ps dev 9!!","display-url":"https://perfsonar-dev9.grnoc.iu.edu/toolkit/"}},"nms1-10g.jp.apan.net":{"address":"nms1-10g.jp.apan.net","host":"nms1-10g.jp.apan.net","_meta":{"display-name":"APAN-JP","display-url":"https://nms1-10g.jp.apan.net/toolkit/"}},"perfsonar-dev.grnoc.iu.edu":{"address":"perfsonar-dev.grnoc.iu.edu","host":"perfsonar-dev.grnoc.iu.edu","_meta":{"display-name":"perfsonar-dev.grnoc (EL7, 4.0)","display-url":"https://perfsonar-dev.grnoc.iu.edu/toolkit/"}},"198.128.151.17":{"address":"198.128.151.17","host":"198.128.151.17","_meta":{"display-name":"(OWAMP Server at es.net)","display-url":"https://198.128.151.17/toolkit/"}},"perfsonar-dev5.grnoc.iu.edu":{"address":"perfsonar-dev5.grnoc.iu.edu","host":"perfsonar-dev5.grnoc.iu.edu","_meta":{"display-name":"description","display-url":"http://perfsonar-dev5.grnoc.iu.edu/toolkit"}}},"groups":{"throughput1":{"type":"mesh","addresses":[{"name":"perfsonar-dev9.grnoc.iu.edu"},{"name":"nms1-10g.jp.apan.net"},{"name":"perfsonar-dev.grnoc.iu.edu"},{"name":"198.128.151.17"},{"name":"perfsonar-dev5.grnoc.iu.edu"},{"name":"perfsonar-dev9.grnoc.iu.edu"},{"name":"nms1-10g.jp.apan.net"},{"name":"perfsonar-dev.grnoc.iu.edu"},{"name":"198.128.151.17"},{"name":"perfsonar-dev5.grnoc.iu.edu"},{"name":"perfsonar-dev9.grnoc.iu.edu"},{"name":"nms1-10g.jp.apan.net"},{"name":"perfsonar-dev.grnoc.iu.edu"},{"name":"198.128.151.17"},{"name":"perfsonar-dev5.grnoc.iu.edu"}]}},"tests":{"throughput1":{"type":"throughput","spec":{"duration":"PT20S","source":"{% address[0] %}","dest":"{% address[1] %}","ip-version":4}}},"schedules":{"repeat-PT3H53M19S":{"repeat":"PT3H53M19S","sliprand":true,"slip":"PT23M19.9S"}},"tasks":{"throughput1":{"group":"throughput1","test":"throughput1","archives":["test-archive0"],"_meta":{"display-name":"throughput1"},"schedule":"repeat-PT3H53M19S","tools":["bwctliperf3","iperf3"]}},"_meta":{"display-name":"Throughput1 based on toolkit8"},"hosts":{"perfsonar-dev9.grnoc.iu.edu":{"archives":["host-archive0","host-additional-archive0"]},"nms1-10g.jp.apan.net":{"archives":["host-archive1"]},"perfsonar-dev.grnoc.iu.edu":{"archives":["host-additional-archive0"]},"198.128.151.17":{},"perfsonar-dev5.grnoc.iu.edu":{"archives":["host-archive0","host-archive1"]}}}
+{
+    "archives": {
+        "host-archive0": {
+            "archiver": "esmond",
+            "data": {
+                "url": "https://perfsonar-dev9.grnoc.iu.edu/esmond/perfsonar/archive",
+                "measurement-agent": "{% scheduled_by_address %}"
+            }
+        },
+        "host-additional-archive0": {
+            "archiver": "esmond",
+            "data": {
+                "url": "https://perfsonar-dev99.grnoc.iu.edu/esmond/perfsonar/archive",
+                "measurement-agent": "{% scheduled_by_address %}"
+            }
+        },
+        "host-archive1": {
+            "archiver": "esmond",
+            "data": {
+                "url": "https://nms1-10g.jp.apan.net/esmond/perfsonar/archive",
+                "measurement-agent": "{% scheduled_by_address %}"
+            }
+        },
+        "test-archive0": {
+            "archiver": "esmond",
+            "data": {
+                "url": "https://perfsonar-dev8.grnoc.iu.edu/esmond/perfsonar/archive/",
+                "measurement-agent": "{% scheduled_by_address %}"
+            }
+        }
+    },
+    "addresses": {
+        "perfsonar-dev9.grnoc.iu.edu": {
+            "address": "perfsonar-dev9.grnoc.iu.edu",
+            "host": "perfsonar-dev9.grnoc.iu.edu",
+            "_meta": {
+                "display-name": "ps dev 9!!",
+                "display-url": "https://perfsonar-dev9.grnoc.iu.edu/toolkit/"
+            }
+        },
+        "nms1-10g.jp.apan.net": {
+            "address": "nms1-10g.jp.apan.net",
+            "host": "nms1-10g.jp.apan.net",
+            "_meta": {
+                "display-name": "APAN-JP",
+                "display-url": "https://nms1-10g.jp.apan.net/toolkit/"
+            }
+        },
+        "perfsonar-dev.grnoc.iu.edu": {
+            "address": "perfsonar-dev.grnoc.iu.edu",
+            "host": "perfsonar-dev.grnoc.iu.edu",
+            "_meta": {
+                "display-name": "perfsonar-dev.grnoc (EL7, 4.0)",
+                "display-url": "https://perfsonar-dev.grnoc.iu.edu/toolkit/"
+            }
+        },
+        "198.128.151.17": {
+            "address": "198.128.151.17",
+            "host": "198.128.151.17",
+            "_meta": {
+                "display-name": "(OWAMP Server at es.net)",
+                "display-url": "https://198.128.151.17/toolkit/"
+            }
+        },
+        "perfsonar-dev5.grnoc.iu.edu": {
+            "address": "perfsonar-dev5.grnoc.iu.edu",
+            "host": "perfsonar-dev5.grnoc.iu.edu",
+            "_meta": {
+                "display-name": "description",
+                "display-url": "http://perfsonar-dev5.grnoc.iu.edu/toolkit"
+            }
+        }
+    },
+    "groups": {
+        "throughput1": {
+            "type": "mesh",
+            "addresses": [
+                { "name": "perfsonar-dev9.grnoc.iu.edu" },
+                { "name": "nms1-10g.jp.apan.net" },
+                { "name": "perfsonar-dev.grnoc.iu.edu" },
+                { "name": "198.128.151.17" },
+                { "name": "perfsonar-dev5.grnoc.iu.edu" },
+                { "name": "perfsonar-dev9.grnoc.iu.edu" },
+                { "name": "nms1-10g.jp.apan.net" },
+                { "name": "perfsonar-dev.grnoc.iu.edu" },
+                { "name": "198.128.151.17" },
+                { "name": "perfsonar-dev5.grnoc.iu.edu" },
+                { "name": "perfsonar-dev9.grnoc.iu.edu" },
+                { "name": "nms1-10g.jp.apan.net" },
+                { "name": "perfsonar-dev.grnoc.iu.edu" },
+                { "name": "198.128.151.17" },
+                { "name": "perfsonar-dev5.grnoc.iu.edu" }
+            ]
+        }
+    },
+    "tests": {
+        "throughput1": {
+            "type": "throughput",
+            "spec": {
+                "duration": "PT20S",
+                "source": "{% address[0] %}",
+                "dest": "{% address[1] %}",
+                "ip-version": 4
+            }
+        }
+    },
+    "schedules": {
+        "repeat-PT3H53M19S": {
+            "repeat": "PT3H53M19S",
+            "sliprand": true,
+            "slip": "PT23M19.9S"
+        }
+    },
+    "tasks": {
+        "throughput1": {
+            "group": "throughput1",
+            "test": "throughput1",
+            "archives": ["test-archive0"],
+            "_meta": { "display-name": "throughput1" },
+            "schedule": "repeat-PT3H53M19S",
+            "tools": ["bwctliperf3", "iperf3"]
+        }
+    },
+    "_meta": { "display-name": "Throughput1 based on toolkit8" },
+    "hosts": {
+        "perfsonar-dev9.grnoc.iu.edu": {
+            "archives": ["host-archive0", "host-additional-archive0"]
+        },
+        "nms1-10g.jp.apan.net": { "archives": ["host-archive1"] },
+        "perfsonar-dev.grnoc.iu.edu": {
+            "archives": ["host-additional-archive0"]
+        },
+        "198.128.151.17": {},
+        "perfsonar-dev5.grnoc.iu.edu": {
+            "archives": ["host-archive0", "host-archive1"]
+        }
+    }
+}

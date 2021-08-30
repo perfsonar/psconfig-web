@@ -1,72 +1,81 @@
+app.controller(
+    "HeaderController",
+    function (
+        $scope,
+        appconf,
+        $route,
+        serverconf,
+        jwtHelper,
+        $location,
+        toaster
+    ) {
+        $scope.title = appconf.title; //used?
+        serverconf.then(function (_c) {
+            $scope.serverconf = _c;
+        });
+        $scope.active_menu = "unknown";
+        $scope.appconf = appconf;
 
-app.controller('HeaderController', function($scope, appconf, $route, serverconf, jwtHelper, $location, toaster) {
-    $scope.title = appconf.title; //used?
-    serverconf.then(function(_c) { $scope.serverconf = _c; });
-    $scope.active_menu = "unknown";
-    $scope.appconf = appconf;
-
-    var jwt = localStorage.getItem(appconf.jwt_id);
-    if(jwt) {
-        var expdate = jwtHelper.getTokenExpirationDate(jwt);
-        if(expdate < Date.now()) {
-            localStorage.removeItem(appconf.jwt_id);
-        } else {
-            $scope.user = jwtHelper.decodeToken(jwt);
+        var jwt = localStorage.getItem(appconf.jwt_id);
+        if (jwt) {
+            var expdate = jwtHelper.getTokenExpirationDate(jwt);
+            if (expdate < Date.now()) {
+                localStorage.removeItem(appconf.jwt_id);
+            } else {
+                $scope.user = jwtHelper.decodeToken(jwt);
+            }
         }
-    }
 
-    //open another page inside the app.
-    $scope.openpage = function(page) {
-        //hide subbar if it's hidden optionally for narrow view
-        if($(".subbar").hasClass("subbar-shown")) {
-            $(".subbar").removeClass("subbar-shown");
-        }
+        //open another page inside the app.
+        $scope.openpage = function (page) {
+            //hide subbar if it's hidden optionally for narrow view
+            if ($(".subbar").hasClass("subbar-shown")) {
+                $(".subbar").removeClass("subbar-shown");
+            }
 
-        $location.path(page);
-        window.scrollTo(0,0);
+            $location.path(page);
+            window.scrollTo(0, 0);
+        };
+        $scope.getpageurl = function (page) {
+            var base_url = appconf.base_url;
+            if (!base_url) {
+                base_url = "";
+            }
+            var pageURL = base_url + "/#!" + page;
+            return pageURL;
+        };
+        $scope.back = function () {
+            window.history.back();
+        };
 
-    }
-    $scope.getpageurl = function(page) {
-        var base_url = appconf.base_url;
-        if ( !base_url ) {
-            base_url = "";
-        }
-        var pageURL = base_url + "/#!" + page;
-        return pageURL;
+        //relocate out of the app..
+        $scope.relocate = function (url, newtab) {
+            if (newtab) return window.open(url, "_blank");
+            document.location = url;
+        };
 
-    }
-    $scope.back = function() {
-        window.history.back();
-    }
+        //when page is narrow, this button shows up and allows sidebar to be displayed
+        $scope.opensubbar = function () {
+            $(".subbar").toggleClass("animated slideInLeft subbar-shown");
+        };
+        $scope.closesubbar = function () {
+            if ($(".subbar").hasClass("subbar-shown")) {
+                $(".subbar").removeClass("subbar-shown");
+            }
+        };
 
-    //relocate out of the app..
-    $scope.relocate = function(url, newtab) {
-        if(newtab) return window.open(url, '_blank');
-        document.location = url;
+        $scope.toast_error = function (res) {
+            if (res.data) {
+                if (res.data.message) toaster.error(res.data.message);
+                if (res.data.errmsg) toaster.error(res.data.errmsg);
+            } else if (res.statusText) {
+                toaster.error(res.statusText);
+            } else {
+                toaster.error(res);
+            }
+        };
     }
-
-    //when page is narrow, this button shows up and allows sidebar to be displayed
-    $scope.opensubbar = function() {
-        $(".subbar").toggleClass('animated slideInLeft subbar-shown');
-    }
-    $scope.closesubbar = function() {
-        if($(".subbar").hasClass("subbar-shown")) {
-            $(".subbar").removeClass("subbar-shown");
-        }
-    }
-
-    $scope.toast_error = function(res) {
-        if(res.data) {
-            if(res.data.message) toaster.error(res.data.message);
-            if(res.data.errmsg) toaster.error(res.data.errmsg);
-        } else if(res.statusText) {
-            toaster.error(res.statusText);
-        } else {
-            toaster.error(res);
-        } 
-    }
-
-});
+);
 
 /*
 app.controller('AboutController', 
@@ -76,4 +85,3 @@ function($scope, appconf, serverconf, scaMessage, toaster) {
     $scope.active_menu = "about";
 });
 */
-
