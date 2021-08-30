@@ -1,10 +1,10 @@
 <ng-include src="'t/sidebar.html'"></ng-include>
 <div class="sca-sidebar-page">
     <div class="subbar">
-        <div style="padding-left: 20px; margin-bottom: 10px;">
+        <div style="padding-left: 20px; margin-bottom: 10px">
             <h2>Configs</h2>
             <p class="help-block">Showing registered configs</p>
-            <br>
+            <br />
             <!--
             <div class="btn-group pull-right" style="left: -20px;top: -5px;">
                 <button class="btn btn-xs btn-default dropdown-toggle" 
@@ -23,138 +23,268 @@
             -->
             <span class="text-muted">{{configs.length}} Configs</span>
         </div>
-        <hr style="margin: 0px;">
+        <hr style="margin: 0px" />
 
-        <div class="subbar-list" style="bottom: 160px;">
-            <p class="alert alert-info" ng-if="configs.length == 0">Please register a config.</p>
-            <div class="subbar-list-item" 
-                ng-repeat="config in configs" 
+        <div class="subbar-list" style="bottom: 160px">
+            <p class="alert alert-info" ng-if="configs.length == 0">
+                Please register a config.
+            </p>
+            <div
+                class="subbar-list-item"
+                ng-repeat="config in configs"
                 ng-class="{active: selected == config}"
-                ng-click="select(config)">
-                <time class="help-block pull-right">{{config.create_date|date}}</time>
+                ng-click="select(config)"
+            >
+                <time class="help-block pull-right"
+                    >{{config.create_date|date}}</time
+                >
                 <div class="list-header">
                     <small>
-                        <span class="label label-default">/{{config.url}}</span> {{config.name}}
-                        <i ng-if="!config._canedit" class="fa fa-lock text-muted"></i>
+                        <span class="label label-default">/{{config.url}}</span>
+                        {{config.name}}
+                        <i
+                            ng-if="!config._canedit"
+                            class="fa fa-lock text-muted"
+                        ></i>
                     </small>
                 </div>
             </div>
-            <div class="list-addbutton animated" ng-class="{bounceInLeft: configs.length == 0}" ng-click="add()" title="Add new config" style="bottom: 180px">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> 
+            <div
+                class="list-addbutton animated"
+                ng-class="{bounceInLeft: configs.length == 0}"
+                ng-click="add()"
+                title="Add new config"
+                style="bottom: 180px"
+            >
+                <i class="fa fa-plus-circle" aria-hidden="true"></i>
                 <div class="add-text">New config</div>
             </div>
         </div>
 
         <div class="autoconfig">
-            <h3 style="margin-top: 15px;">Auto Config</h3>
-            <p class="help-block">Enter hostname of perfSONAR node to generate a Config URL containing tests for that instance as test endpoints.</p>
+            <h3 style="margin-top: 15px">Auto Config</h3>
+            <p class="help-block">
+                Enter hostname of perfSONAR node to generate a Config URL
+                containing tests for that instance as test endpoints.
+            </p>
             <ui-select ng-model="autoconf_select" on-select="autoconf($item)">
                 <ui-select-match placeholder="Enter hostname">
                     <div style="padding-top: 2px; font-size: 12px">
-                        <b>{{$select.selected.sitename}}</b> ({{$select.selected.hostname}})
+                        <b>{{$select.selected.sitename}}</b>
+                        ({{$select.selected.hostname}})
                     </div>
                 </ui-select-match>
-                <ui-select-choices 
+                <ui-select-choices
                     position="auto"
                     group-by="'sitename'"
                     refresh-delay="200"
                     refresh="refreshAutoHosts($select.search)"
-                    repeat="host._id as host in hosts">
-                    <span class="label label-default" ng-if="host.lsid">{{host.lsid}}</span>
-                    <span class="label label-warning" ng-if="!host.lsid">Adhoc</span>
+                    repeat="host._id as host in hosts"
+                >
+                    <span class="label label-default" ng-if="host.lsid"
+                        >{{host.lsid}}</span
+                    >
+                    <span class="label label-warning" ng-if="!host.lsid"
+                        >Adhoc</span
+                    >
                     <code>{{host.hostname|trim_locator}}</code>
                     <!--<b>{{host.sitename}}</b> (<span ng-if="host.hostname">{{host.hostname}}</span><span ng-if="!host.hostname && host.ip">{{host.ip}}</span>)-->
                 </ui-select-choices>
             </ui-select>
         </div>
-    </div><!--subbar-->
+    </div>
+    <!--subbar-->
 
     <div class="subbar-content">
         <p class="alert alert-info" ng-if="!selected">Please select config</p>
-        <form name="form" class="form-horizontal margin30" 
-            ng-submit="form.$valid && submit()" ng-show="selected" confirm-on-exit>
+        <form
+            name="form"
+            class="form-horizontal margin30"
+            ng-submit="form.$valid && submit()"
+            ng-show="selected"
+            confirm-on-exit
+        >
             <div class="fixed-top">
                 <h2>
-                    <i class="fa fa-trash-o clickable" aria-hidden="true" ng-if="selected._id && selected._canedit"
+                    <i
+                        class="fa fa-trash-o clickable"
+                        aria-hidden="true"
+                        ng-if="selected._id && selected._canedit"
                         ng-confirm-click="Are you sure you want to remove this test spec?"
-                        confirmed-click="remove()"></i>&nbsp;&nbsp;&nbsp;
-                    <div class="pull-right" style="padding-right: 20px;">
-                         <i class="fa fa-lock" ng-if="!selected._canedit" title="Read Only"></i>
-                         <div ng-if="form.$dirty && selected._canedit" class="display: inline-block;">
-                            <button type="submit" class="btn btn-primary" ng-if="selected._id">Update</button>
-                            <button type="submit" class="btn btn-primary" ng-if="!selected._id">Create</button>
-                            <button type="button" class="btn" ng-click="cancel()">Cancel</button>
+                        confirmed-click="remove()"
+                    ></i
+                    >&nbsp;&nbsp;&nbsp;
+                    <div class="pull-right" style="padding-right: 20px">
+                        <i
+                            class="fa fa-lock"
+                            ng-if="!selected._canedit"
+                            title="Read Only"
+                        ></i>
+                        <div
+                            ng-if="form.$dirty && selected._canedit"
+                            class="display: inline-block;"
+                        >
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                                ng-if="selected._id"
+                            >
+                                Update
+                            </button>
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                                ng-if="!selected._id"
+                            >
+                                Create
+                            </button>
+                            <button
+                                type="button"
+                                class="btn"
+                                ng-click="cancel()"
+                            >
+                                Cancel
+                            </button>
                         </div>
                     </div>
                 </h2>
-                <br clear="right">
+                <br clear="right" />
                 <div class="form-group">
                     <label class="col-sm-2 control-label">Config URL</label>
                     <div class="col-sm-10">
                         <div class="input-group">
-                            <span class="input-group-addon"><small>{{appconf.pub_url+'config/'}}</small></span>
-                            <input type="text" name="url" class="form-control" id="url" 
-                                ng-model="selected.url" 
-                                placeholder="Enter path to expose this config" 
-                                ng-disabled="!selected._canedit" required>
+                            <span class="input-group-addon"
+                                ><small
+                                    >{{appconf.pub_url+'config/'}}</small
+                                ></span
+                            >
+                            <input
+                                type="text"
+                                name="url"
+                                class="form-control"
+                                id="url"
+                                ng-model="selected.url"
+                                placeholder="Enter path to expose this config"
+                                ng-disabled="!selected._canedit"
+                                required
+                            />
                             <span class="input-group-btn" ng-if="selected._id">
-                                <button class="btn btn-info btn-compact" type="button" 
+                                <button
+                                    class="btn btn-info btn-compact"
+                                    type="button"
                                     ng-disabled="form.$dirty"
-                                    ng-click="relocate(appconf.pub_url+'config/'+selected.url+'?format=psconfig', true)">
-                                    <i class="fa fa-external-link" aria-hidden="true"></i> pSConfig
-                                </button> 
+                                    ng-click="relocate(appconf.pub_url+'config/'+selected.url+'?format=psconfig', true)"
+                                >
+                                    <i
+                                        class="fa fa-external-link"
+                                        aria-hidden="true"
+                                    ></i>
+                                    pSConfig
+                                </button>
                             </span>
                         </div>
                     </div>
                 </div>
-                <hr style="margin-bottom: 0px;">
-            </div><!--fixed-top-->
+                <hr style="margin-bottom: 0px" />
+            </div>
+            <!--fixed-top-->
 
             <div class="fixed-top-under">
                 <div class="form-group">
-                    <label for="name" class="col-sm-2 control-label"><strong>Name *</strong></label>
+                    <label for="name" class="col-sm-2 control-label"
+                        ><strong>Name *</strong></label
+                    >
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="name" name="name" ng-model="selected.name" 
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="name"
+                            name="name"
+                            ng-model="selected.name"
                             ng-disabled="!selected._canedit"
-                            placeholder="Name for this config" required mesh-name>
-                        <span ng-show="form.name.$error.name" style="color:red">Name cannot include a '/'.</span>
+                            placeholder="Name for this config"
+                            required
+                            mesh-name
+                        />
+                        <span ng-show="form.name.$error.name" style="color: red"
+                            >Name cannot include a '/'.</span
+                        >
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-2 control-label">Description</label>
                     <div class="col-sm-10">
-                        <textarea class="form-control" name="desc" id="desc" ng-model="selected.desc" ng-disabled="!selected._canedit" mesh-name></textarea>
-                        <span ng-show="form.desc.$error.desc" style="color:red">Description cannot include a '/' character.</span>
+                        <textarea
+                            class="form-control"
+                            name="desc"
+                            id="desc"
+                            ng-model="selected.desc"
+                            ng-disabled="!selected._canedit"
+                            mesh-name
+                        ></textarea>
+                        <span ng-show="form.desc.$error.desc" style="color: red"
+                            >Description cannot include a '/' character.</span
+                        >
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label class="col-sm-2 control-label">Admins</label>
                     <div class="col-sm-10">
-                        <ui-select multiple ng-model="selected.admins" ng-disabled="!selected._canedit">
-                            <ui-select-match placeholder="Select admins who can update this mesh config?">
-                                <img gravatar-src="$item.email" gravatar-size="17"/>
-                                <b>{{$item.fullname}}</b> <span class="email">&lt;{{$item.email}}&gt;</span>
+                        <ui-select
+                            multiple
+                            ng-model="selected.admins"
+                            ng-disabled="!selected._canedit"
+                        >
+                            <ui-select-match
+                                placeholder="Select admins who can update this mesh config?"
+                            >
+                                <img
+                                    gravatar-src="$item.email"
+                                    gravatar-size="17"
+                                />
+                                <b>{{$item.fullname}}</b>
+                                <span class="email"
+                                    >&lt;{{$item.email}}&gt;</span
+                                >
                             </ui-select-match>
-                            <ui-select-choices repeat="user.id as user in users | propsFilter: {fullname: $select.search, email: $select.search}">
-                              <img gravatar-src="user.email" gravatar-size="17"/>
-                              <b>{{user.fullname}}</b> <small>&lt;{{user.email}}&gt;</small>
+                            <ui-select-choices
+                                repeat="user.id as user in users | propsFilter: {fullname: $select.search, email: $select.search}"
+                            >
+                                <img
+                                    gravatar-src="user.email"
+                                    gravatar-size="17"
+                                />
+                                <b>{{user.fullname}}</b>
+                                <small>&lt;{{user.email}}&gt;</small>
                             </ui-select-choices>
                         </ui-select>
-                        <p class="help-block">Users who can update this configuration</p>
+                        <p class="help-block">
+                            Users who can update this configuration
+                        </p>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">Central Archives (MAs)</label>
+                    <label class="col-sm-2 control-label"
+                        >Central Archives (MAs)</label
+                    >
                     <div class="col-sm-10">
-
-                        <ui-select multiple ng-model="selected.archives" ng-disabled="!selected._canedit">
-                            <ui-select-match placeholder="Select central measurement archives to which all test results will be submitted">
-                            {{$item.name}}
+                        <ui-select
+                            multiple
+                            ng-model="selected.archives"
+                            ng-disabled="!selected._canedit"
+                        >
+                            <ui-select-match
+                                placeholder="Select central measurement archives to which all test results will be submitted"
+                            >
+                                {{$item.name}}
                             </ui-select-match>
-                            <ui-select-choices repeat="archive._id as archive in all_archives">
-                            <b>{{archive.name}}</b> <small>{{archive.desc}}</small>
+                            <ui-select-choices
+                                repeat="archive._id as archive in all_archives"
+                            >
+                                <b>{{archive.name}}</b>
+                                <small>{{archive.desc}}</small>
                             </ui-select-choices>
                         </ui-select>
                         <p class="help-block">Central archives</p>
@@ -167,25 +297,57 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">Central MA URLs</label>
+                    <label class="col-sm-2 control-label"
+                        >Central MA URLs</label
+                    >
                     <div class="col-sm-10">
-                        <textarea class="form-control" name="ma_urls" id="ma_urls" ng-model="selected.ma_urls" ng-disabled="!selected._canedit" style="" rows="5"></textarea>
-                        <span ng-show="form.ma_urls.$error.ma_urls" style="color:red">Ma_urls validation error: {{form.ma_urls.$error.ma_urls}}.</span>
+                        <textarea
+                            class="form-control"
+                            name="ma_urls"
+                            id="ma_urls"
+                            ng-model="selected.ma_urls"
+                            ng-disabled="!selected._canedit"
+                            style=""
+                            rows="5"
+                        ></textarea>
+                        <span
+                            ng-show="form.ma_urls.$error.ma_urls"
+                            style="color: red"
+                            >Ma_urls validation error:
+                            {{form.ma_urls.$error.ma_urls}}.</span
+                        >
 
-                        <p class="help-block">Providing Measurement Archive URLs (one per line) will allow you to send test results for all tests in the config to one or more central measurement archives.</p>
+                        <p class="help-block">
+                            Providing Measurement Archive URLs (one per line)
+                            will allow you to send test results for all tests in
+                            the config to one or more central measurement
+                            archives.
+                        </p>
                     </div>
                 </div>
-		
 
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">Force endpoint MAs</label>
+                    <label class="col-sm-2 control-label"
+                        >Force endpoint MAs</label
+                    >
                     <div class="col-sm-10">
                         <label class="control-label">
-                                <input type="checkbox" name="force_endpoint_mas" id="force_endpoint_mas"
-                                ng-disabled="!selected._canedit" ng-model="selected.force_endpoint_mas"> Force archiving to the MA on each endpoint
-                            </label>
+                            <input
+                                type="checkbox"
+                                name="force_endpoint_mas"
+                                id="force_endpoint_mas"
+                                ng-disabled="!selected._canedit"
+                                ng-model="selected.force_endpoint_mas"
+                            />
+                            Force archiving to the MA on each endpoint
+                        </label>
 
-                        <p class="help-block">Enabling this option will force the all test results to be stored in the individual MA for each host. This is useful if you don't have a central MA, or if you need to store at each endpoint for some other reason.
+                        <p class="help-block">
+                            Enabling this option will force the all test results
+                            to be stored in the individual MA for each host.
+                            This is useful if you don't have a central MA, or if
+                            you need to store at each endpoint for some other
+                            reason.
                         </p>
                     </div>
                 </div>
@@ -193,116 +355,259 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label">Tests</label>
                     <div class="col-sm-10">
-                        <ul class="list-group" ng-if="selected.tests.length > 0">
-                            <li class="list-group-item" ng-repeat="test in selected.tests" ng-class="{'slide-down': !test._id}">
-                                <ng-include src="'t/testeditor.html'"></ng-include>
+                        <ul
+                            class="list-group"
+                            ng-if="selected.tests.length > 0"
+                        >
+                            <li
+                                class="list-group-item"
+                                ng-repeat="test in selected.tests"
+                                ng-class="{'slide-down': !test._id}"
+                            >
+                                <ng-include
+                                    src="'t/testeditor.html'"
+                                ></ng-include>
                             </li>
                         </ul>
-                        <button type="button" ng-click="addtest()" ng-show="selected._canedit" class="btn btn-primary">Add New Test</button>
+                        <button
+                            type="button"
+                            ng-click="addtest()"
+                            ng-show="selected._canedit"
+                            class="btn btn-primary"
+                        >
+                            Add New Test
+                        </button>
                         <span>or </span>
-                        <button type="button" ng-if="!showimporter" ng-click="$parent.showimporter = true" class="btn btn-primary">Import from existing Config</button>
-                        <br><br>
+                        <button
+                            type="button"
+                            ng-if="!showimporter"
+                            ng-click="$parent.showimporter = true"
+                            class="btn btn-primary"
+                        >
+                            Import from existing Config
+                        </button>
+                        <br /><br />
                         <div class="panel panel-default" ng-if="showimporter">
-                            <div class="panel-heading"><h3>Import existing Config </h3></div>
+                            <div class="panel-heading">
+                                <h3>Import existing Config</h3>
+                            </div>
                             <div class="panel-body">
-                                <p>This tool will register all missing hosts as adhoc hosts and register hostgroup, testspecs (if the same name doesn't exist already). Finally, it will create new config tests and populate here.</p>
-                                <p>Tests from the Config won't be registered automatically - until you click Update on this page. If you import the same Config twice, already imported Tests won't be overriden - you need to remove old tests manually.</p>
-                                <p>Enter pSConfig or MeshConfig URL to Import, *OR* upload a psconfig json file, *OR* paste raw JSON below to import a config. </p>
-		<div ng-controller="paramsAccordion">
-    			<accordion close-others="true" class="panel-tighter">
-        			<accordion-group is-open="importStatus.urlOpen">
-            				<accordion-heading>
-                			<h4> Import from URL 
-                    			<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': importStatus.urlOpen, 'glyphicon-chevron-right': !importStatus.urlOpen}"></i>
-                			</h4>
-            				</accordion-heading>
-                            <p>Paste a Config URL to import. This might be a pSConfig JSON URL, a PWA config URL, etc.</p>
-                                <div class="input-group space">
+                                <p>
+                                    This tool will register all missing hosts as
+                                    adhoc hosts and register hostgroup,
+                                    testspecs (if the same name doesn't exist
+                                    already). Finally, it will create new config
+                                    tests and populate here.
+                                </p>
+                                <p>
+                                    Tests from the Config won't be registered
+                                    automatically - until you click Update on
+                                    this page. If you import the same Config
+                                    twice, already imported Tests won't be
+                                    overriden - you need to remove old tests
+                                    manually.
+                                </p>
+                                <p>
+                                    Enter pSConfig or MeshConfig URL to Import,
+                                    *OR* upload a psconfig json file, *OR* paste
+                                    raw JSON below to import a config.
+                                </p>
+                                <div ng-controller="paramsAccordion">
+                                    <accordion
+                                        close-others="true"
+                                        class="panel-tighter"
+                                    >
+                                        <accordion-group
+                                            is-open="importStatus.urlOpen"
+                                        >
+                                            <accordion-heading>
+                                                <h4>
+                                                    Import from URL
+                                                    <i
+                                                        class="
+                                                            pull-right
+                                                            glyphicon
+                                                        "
+                                                        ng-class="{'glyphicon-chevron-down': importStatus.urlOpen, 'glyphicon-chevron-right': !importStatus.urlOpen}"
+                                                    ></i>
+                                                </h4>
+                                            </accordion-heading>
+                                            <p>
+                                                Paste a Config URL to import.
+                                                This might be a pSConfig JSON
+                                                URL, a PWA config URL, etc.
+                                            </p>
+                                            <div class="input-group space">
+                                                <span
+                                                    class="input-group-addon"
+                                                    id="sizing-addon2"
+                                                    >URL</span
+                                                >
+                                                <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    name="importer_url"
+                                                    onchange="angular.element(this).scope().setImportType(this)"
+                                                    placeholder="http://hostname/mesh_url"
+                                                />
+                                            </div>
+                                        </accordion-group>
+                                        <div
+                                            style="
+                                                margin-left: 1em;
+                                                font-style: italic;
+                                            "
+                                        >
+                                            - OR -
+                                        </div>
+                                        <accordion-group
+                                            is-open="importStatus.uploadOpen"
+                                        >
+                                            <accordion-heading>
+                                                <h4>
+                                                    Import from file
+                                                    <i
+                                                        class="
+                                                            pull-right
+                                                            glyphicon
+                                                        "
+                                                        ng-class="{'glyphicon-chevron-down': importStatus.uploadOpen, 'glyphicon-chevron-right': !importStatus.uploadOpen}"
+                                                    ></i>
+                                                </h4>
+                                            </accordion-heading>
+                                            <p>
+                                                Upload a file to import. This
+                                                should be a JSON file in
+                                                pSConfig format.
+                                            </p>
+                                            <div class="input-group space">
+                                                <!-- <p> -->
+                                                <!-- <label class="col-sm-2 control-label">Upload pSConfig file</label></p> -->
 
-                                    <span class="input-group-addon" id="sizing-addon2">URL</span>
-                                                                        <input type="text" class="form-control" name="importer_url"
-                                                                            onchange="angular.element(this).scope().setImportType(this)"
-                                                                            placeholder="http://hostname/mesh_url"></input>
+                                                <!-- <div class="col-sm-10">  -->
+                                                <span
+                                                    class="input-group-addon"
+                                                    id="sizing-addon3"
+                                                    >Upload pSConfig file</span
+                                                >
+                                                <input
+                                                    type="file"
+                                                    id="importer_file"
+                                                    name="importer_file"
+                                                    class="form-control"
+                                                    onchange="angular.element(this).scope().fileSelected(this)"
+                                                />
+                                                <!-- (change)="handleFileInput($event.target.files)"> -->
+                                            </div>
+                                        </accordion-group>
+                                        <div
+                                            style="
+                                                margin-left: 1em;
+                                                font-style: italic;
+                                            "
+                                        >
+                                            - OR -
+                                        </div>
+                                        <accordion-group
+                                            is-open="importStatus.rawOpen"
+                                        >
+                                            <accordion-heading>
+                                                <h4>
+                                                    Import raw JSON
+                                                    <i
+                                                        class="
+                                                            pull-right
+                                                            glyphicon
+                                                        "
+                                                        ng-class="{'glyphicon-chevron-down': importStatus.rawOpen, 'glyphicon-chevron-right': importStatus.rawOpen}"
+                                                    ></i>
+                                                </h4>
+                                            </accordion-heading>
+                                            <p>
+                                                Paste raw JSON to import, in
+                                                pSConfig format.
+                                            </p>
+                                            <div class="input-group space">
+                                                <span
+                                                    class="input-group-addon"
+                                                    id="sizing-addon3"
+                                                    >Import raw JSON</span
+                                                >
+                                                <textarea
+                                                    class="form-control"
+                                                    name="importer_content"
+                                                    ng-disabled="!selected._canedit"
+                                                    style=""
+                                                    rows="5"
+                                                    onchange="angular.element(this).scope().setImportType(this)"
+                                                ></textarea>
+                                            </div>
+                                            <p class="help-block">
+                                                Paste raw JSON config to import
+                                            </p>
+                                        </accordion-group>
+                                    </accordion>
                                 </div>
-                    </accordion-group>
-                    <div style="margin-left:1em;font-style:italic;">- OR -</div>
-        			<accordion-group is-open="importStatus.uploadOpen">
-            				<accordion-heading>
-                			<h4> Import from file
-                    			<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': importStatus.uploadOpen, 'glyphicon-chevron-right': !importStatus.uploadOpen}"></i>
-                			</h4>
-            				</accordion-heading>
-                            <p>Upload a file to import. This should be a JSON file in pSConfig format. </p>
-                                <div class="input-group space">
-                                    <!-- <p> -->
-                                    <!-- <label class="col-sm-2 control-label">Upload pSConfig file</label></p> -->
-
-                                    <!-- <div class="col-sm-10">  -->
-                                    <span class="input-group-addon" id="sizing-addon3">Upload pSConfig file</span>
-                            <input type="file"
-                                       id="importer_file" name="importer_file"
-                                       class="form-control"
-                                        onchange="angular.element(this).scope().fileSelected(this)"
-                                        ></input>
-                                       <!-- (change)="handleFileInput($event.target.files)"> -->
-
-                                   </div>
-                   </accordion-group>
-                    <div style="margin-left:1em;font-style:italic;">- OR -</div>
-        			<accordion-group is-open="importStatus.rawOpen">
-            				<accordion-heading>
-                			<h4> Import raw JSON
-                    			<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': importStatus.rawOpen, 'glyphicon-chevron-right': importStatus.rawOpen}"></i>
-                			</h4>
-            				</accordion-heading>
-                            <p>Paste raw JSON to import, in pSConfig format.</p>
-                                <div class="input-group space">
-                                    <span class="input-group-addon" id="sizing-addon3">Import raw JSON</span>
-                        <textarea class="form-control" name="importer_content" ng-disabled="!selected._canedit" style="" rows="5"
-                            onchange="angular.element(this).scope().setImportType(this)"
-                            ></textarea>
-                    </div>
-                        <p class="help-block">Paste raw JSON config to import</p>
-                    </accordion-group>
-                   </accordion>
-               </div>
-                                     <span class="input-group-btn"><!-- ng-model="$parent.importer_file" -->
-                                         <button class="btn btn-default" type="button" 
-                                        ng-disabled="!$parent.importer_content && !$parent.importer_url && !$parent.fileIsSelected" ng-click="import()">Go!</button>
-                                    </span>
-                                </div>
+                                <span class="input-group-btn"
+                                    ><!-- ng-model="$parent.importer_file" -->
+                                    <button
+                                        class="btn btn-default"
+                                        type="button"
+                                        ng-disabled="!$parent.importer_content && !$parent.importer_url && !$parent.fileIsSelected"
+                                        ng-click="import()"
+                                    >
+                                        Go!
+                                    </button>
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
-		<!--Archiver configs-->
-		<div ng-controller="paramsAccordion">
-    			<accordion close-others="false">
-        			<accordion-group is-open="status.open">
-            				<accordion-heading>
-                			<h3> Custom Archiver
-                    			<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-                			</h3>
-            				</accordion-heading>
-			                <label class="col-sm-2 control-label">Custom Archive</label>
-                    			<div class="col-sm-6">
-                        			<textarea class="form-control" name="ma_custom_json" id="ma_custom_json" ng-disabled="!selected._canedit" ng-model="selected.ma_custom_json" rows="5"></textarea>
-						<p class="help-block"> * RAW JSON -- be careful, you might break things if you don't know what you're doing</p>
-                    			</div>
-        			</accordion-group>
-    			</accordion>
-		</div>
+            </div>
+            <!--Archiver configs-->
+            <div ng-controller="paramsAccordion">
+                <accordion close-others="false">
+                    <accordion-group is-open="status.open">
+                        <accordion-heading>
+                            <h3>
+                                Custom Archiver
+                                <i
+                                    class="pull-right glyphicon"
+                                    ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"
+                                ></i>
+                            </h3>
+                        </accordion-heading>
+                        <label class="col-sm-2 control-label"
+                            >Custom Archive</label
+                        >
+                        <div class="col-sm-6">
+                            <textarea
+                                class="form-control"
+                                name="ma_custom_json"
+                                id="ma_custom_json"
+                                ng-disabled="!selected._canedit"
+                                ng-model="selected.ma_custom_json"
+                                rows="5"
+                            ></textarea>
+                            <p class="help-block">
+                                * RAW JSON -- be careful, you might break things
+                                if you don't know what you're doing
+                            </p>
+                        </div>
+                    </accordion-group>
+                </accordion>
+            </div>
 
-                <br>
-                <br>
-                <div ng-if="appconf.debug">
-                    <h3>Selected</h3>
-                    <pre>{{selected|json}}</pre>
-                    <h3>HostGroups</h3>
-                    <pre>{{hostgroups|json}}</pre>
-                </div>
+            <br />
+            <br />
+            <div ng-if="appconf.debug">
+                <h3>Selected</h3>
+                <pre>{{selected|json}}</pre>
+                <h3>HostGroups</h3>
+                <pre>{{hostgroups|json}}</pre>
             </div>
         </form>
-    </div><!--subbar-content-->
-</div><!--sca-sidebar-page-->
-
+    </div>
+    <!--subbar-content-->
+</div>
+<!--sca-sidebar-page-->

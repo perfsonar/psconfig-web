@@ -1,384 +1,360 @@
 {
-   "administrators" : [
-      {
-         "email" : "xxx",
-         "name" : "Dan Doyle"
-      },
-      {
-         "email" : "xxx",
-         "name" : "Michael Johnson"
-      },
-      {
-         "email" : "xxx",
-         "name" : "Andy Lake"
-      }
-   ],
-   "organizations" : [
-      {
-         "sites" : [
-            {
-               "hosts" : [
-                  {
-                     "addresses" : [
-                        "perfsonar-dev5.grnoc.iu.edu"
-                     ],
-                     "description" : "perfsonar-dev5.grnoc (Debian7, 3.5)"
-                  },
-                  {
-                     "addresses" : [
-                        "perfsonar-dev.grnoc.iu.edu"
-                     ],
-                     "description" : "perfsonar-dev.grnoc (EL7, 4.0)"
-                  }
-               ]
-            }
-         ],
-         "administrators" : [
-            {
-               "email" : "xxx",
-               "name" : "Dan Doyle"
-            },
-            {
-               "email" : "xxx",
-               "name" : "Michael Johnson"
-            }
-         ],
-         "description" : "GlobalNOC"
-      },
-      {
-         "sites" : [
-            {
-               "hosts" : [
-                  {
-                     "addresses" : [
-                        "ps-dev-deb8-1.es.net"
-                     ]
-                  },
-                  {
-                     "addresses" : [
-                        "ps-dev-el6-1.es.net"
-                     ],
-                     "description" : "ps-dev-el6-1.es.net (EL6, 4.0)"
-                  },
-                  {
-                     "addresses" : [
-                        "ps-dev-el7-1.es.net"
-                     ],
-                     "description" : "ps-dev-el7-1.es.net (EL7, 4.0)"
-                  },
-                  {
-                     "addresses" : [
-                        "ps-dev-deb8-2.es.net"
-                     ],
-                     "description" : "ps-dev-deb8-2.es.net (Debian8, 4.0)"
-                  },
-                  {
-                     "addresses" : [
-                        "perfsonar-liva.lbl.gov"
-                     ],
-                     "description" : "perfsonar-liva.lbl.gov (Docker Testpoint, 4.0)"
-                  },
-                  {
-                     "addresses" : [
-                        "lbl-pt1.es.net",
-                        "lbl-owamp.es.net",
-                        "lbl-pt1-v6.es.net",
-                        "lbl-owamp-v6.es.net"
-                     ],
-                     "description" : "lbl-pt1.es.net (CentOS6, 4.0-production)"
-                  }
-               ]
-            }
-         ],
-         "administrators" : [
-            {
-               "email" : "xxx",
-               "name" : "Brian Tierney"
-            }
-         ],
-         "description" : "ESnet"
-      },
-      {
-         "sites" : [
-            {
-               "hosts" : [
-                  {
-                     "addresses" : [
-                        "perfsonardev0.internet2.edu"
-                     ],
-                     "description" : "perfsonardev0.internet2.edu (EL6, 4.0)"
-                  }
-               ]
-            }
-         ],
-         "administrators" : [
-            {
-               "email" : "xxx",
-               "name" : "Mark Feit"
-            }
-         ],
-         "description" : "Internet2"
-      },
-      {
-         "sites" : [
-            {
-               "hosts" : [
-                  {
-                     "addresses" : [
+    "administrators": [
+        {
+            "email": "xxx",
+            "name": "Dan Doyle"
+        },
+        {
+            "email": "xxx",
+            "name": "Michael Johnson"
+        },
+        {
+            "email": "xxx",
+            "name": "Andy Lake"
+        }
+    ],
+    "organizations": [
+        {
+            "sites": [
+                {
+                    "hosts": [
                         {
-                           "address" : "t2-psdev.rrze.uni-erlangen.de"
+                            "addresses": ["perfsonar-dev5.grnoc.iu.edu"],
+                            "description": "perfsonar-dev5.grnoc (Debian7, 3.5)"
+                        },
+                        {
+                            "addresses": ["perfsonar-dev.grnoc.iu.edu"],
+                            "description": "perfsonar-dev.grnoc (EL7, 4.0)"
                         }
-                     ],
-                     "description" : "t2-psdev.rrze.uni-erlangen.de (EL6, 4.0)"
-                  }
-               ]
+                    ]
+                }
+            ],
+            "administrators": [
+                {
+                    "email": "xxx",
+                    "name": "Dan Doyle"
+                },
+                {
+                    "email": "xxx",
+                    "name": "Michael Johnson"
+                }
+            ],
+            "description": "GlobalNOC"
+        },
+        {
+            "sites": [
+                {
+                    "hosts": [
+                        {
+                            "addresses": ["ps-dev-deb8-1.es.net"]
+                        },
+                        {
+                            "addresses": ["ps-dev-el6-1.es.net"],
+                            "description": "ps-dev-el6-1.es.net (EL6, 4.0)"
+                        },
+                        {
+                            "addresses": ["ps-dev-el7-1.es.net"],
+                            "description": "ps-dev-el7-1.es.net (EL7, 4.0)"
+                        },
+                        {
+                            "addresses": ["ps-dev-deb8-2.es.net"],
+                            "description": "ps-dev-deb8-2.es.net (Debian8, 4.0)"
+                        },
+                        {
+                            "addresses": ["perfsonar-liva.lbl.gov"],
+                            "description": "perfsonar-liva.lbl.gov (Docker Testpoint, 4.0)"
+                        },
+                        {
+                            "addresses": [
+                                "lbl-pt1.es.net",
+                                "lbl-owamp.es.net",
+                                "lbl-pt1-v6.es.net",
+                                "lbl-owamp-v6.es.net"
+                            ],
+                            "description": "lbl-pt1.es.net (CentOS6, 4.0-production)"
+                        }
+                    ]
+                }
+            ],
+            "administrators": [
+                {
+                    "email": "xxx",
+                    "name": "Brian Tierney"
+                }
+            ],
+            "description": "ESnet"
+        },
+        {
+            "sites": [
+                {
+                    "hosts": [
+                        {
+                            "addresses": ["perfsonardev0.internet2.edu"],
+                            "description": "perfsonardev0.internet2.edu (EL6, 4.0)"
+                        }
+                    ]
+                }
+            ],
+            "administrators": [
+                {
+                    "email": "xxx",
+                    "name": "Mark Feit"
+                }
+            ],
+            "description": "Internet2"
+        },
+        {
+            "sites": [
+                {
+                    "hosts": [
+                        {
+                            "addresses": [
+                                {
+                                    "address": "t2-psdev.rrze.uni-erlangen.de"
+                                }
+                            ],
+                            "description": "t2-psdev.rrze.uni-erlangen.de (EL6, 4.0)"
+                        }
+                    ]
+                },
+                {
+                    "hosts": [
+                        {
+                            "addresses": ["pstest2.geant.carnet.hr"],
+                            "description": "pstest2.geant.carnet.hr (Debian9, 4.0)"
+                        }
+                    ]
+                },
+                {
+                    "hosts": [
+                        {
+                            "addresses": ["ps-4-0.qalab.geant.net"],
+                            "description": "ps-4-0.qalab.geant.net (Ubuntu14, 4.0)"
+                        }
+                    ]
+                },
+                {
+                    "hosts": [
+                        {
+                            "addresses": ["ps-4-0-xenial.qalab.geant.net"],
+                            "description": "ps-4-0-xenial.qalab.geant.net (Ubuntu16, 4.0)"
+                        }
+                    ]
+                }
+            ],
+            "administrators": [
+                {
+                    "email": "xxx",
+                    "name": "Ivan Garnizov"
+                }
+            ],
+            "description": "GEANT"
+        },
+        {
+            "sites": [{}],
+            "administrators": [
+                {
+                    "email": "xxx",
+                    "name": "John Simpkins"
+                }
+            ],
+            "description": "UMich"
+        }
+    ],
+    "measurement_archives": [
+        {
+            "read_url": "https://perfsonar-testbed-ma.grnoc.iu.edu/esmond/perfsonar/archive/",
+            "write_url": "https://perfsonar-testbed-ma.grnoc.iu.edu/esmond/perfsonar/archive/",
+            "type": "perfsonarbuoy/bwctl"
+        },
+        {
+            "read_url": "https://perfsonar-testbed-ma.grnoc.iu.edu/esmond/perfsonar/archive/",
+            "write_url": "https://perfsonar-testbed-ma.grnoc.iu.edu/esmond/perfsonar/archive/",
+            "type": "perfsonarbuoy/owamp"
+        },
+        {
+            "read_url": "https://perfsonar-testbed-ma.grnoc.iu.edu/esmond/perfsonar/archive/",
+            "write_url": "https://perfsonar-testbed-ma.grnoc.iu.edu/esmond/perfsonar/archive/",
+            "type": "traceroute"
+        },
+        {
+            "read_url": "https://perfsonar-testbed-ma.grnoc.iu.edu/esmond/perfsonar/archive/",
+            "write_url": "https://perfsonar-testbed-ma.grnoc.iu.edu/esmond/perfsonar/archive/",
+            "type": "pinger"
+        }
+    ],
+    "tests": [
+        {
+            "members": {
+                "members": [
+                    "perfsonar-dev5.grnoc.iu.edu",
+                    "ps-dev-deb8-1.es.net",
+                    "ps-dev-el6-1.es.net",
+                    "ps-dev-el7-1.es.net",
+                    "t2-psdev.rrze.uni-erlangen.de",
+                    "perfsonardev0.internet2.edu",
+                    "perfsonar-dev.grnoc.iu.edu",
+                    "ps-dev-deb8-2.es.net",
+                    "perfsonar-liva.lbl.gov",
+                    "ps-4-0.qalab.geant.net",
+                    "ps-4-0-xenial.qalab.geant.net",
+                    "pstest2.geant.carnet.hr"
+                ],
+                "type": "mesh"
             },
-            {
-               "hosts" : [
-                  {
-                     "addresses" : [
-                        "pstest2.geant.carnet.hr"
-                     ],
-                     "description" : "pstest2.geant.carnet.hr (Debian9, 4.0)"
-                  }
-               ]
+            "parameters": {
+                "protocol": "tcp",
+                "duration": "20",
+                "interval": "14400",
+                "force_bidirectional": "1",
+                "tool": "bwctl/iperf3",
+                "ipv4_only": "1",
+                "random_start_percentage": "25",
+                "type": "perfsonarbuoy/bwctl"
             },
-            {
-               "hosts" : [
-                  {
-                     "addresses" : [
-                        "ps-4-0.qalab.geant.net"
-                     ],
-                     "description" : "ps-4-0.qalab.geant.net (Ubuntu14, 4.0)"
-                  }
-               ]
+            "description": "iperf3 TCP Test Between Testbeds"
+        },
+        {
+            "members": {
+                "members": [
+                    "perfsonar-dev5.grnoc.iu.edu",
+                    "ps-dev-deb8-1.es.net",
+                    "ps-dev-el6-1.es.net",
+                    "ps-dev-el7-1.es.net",
+                    "t2-psdev.rrze.uni-erlangen.de",
+                    "perfsonar-dev.grnoc.iu.edu",
+                    "ps-dev-deb8-2.es.net",
+                    "ps-4-0.qalab.geant.net",
+                    "ps-4-0-xenial.qalab.geant.net",
+                    "pstest2.geant.carnet.hr"
+                ],
+                "type": "mesh"
             },
-            {
-               "hosts" : [
-                  {
-                     "addresses" : [
-                        "ps-4-0-xenial.qalab.geant.net"
-                     ],
-                     "description" : "ps-4-0-xenial.qalab.geant.net (Ubuntu16, 4.0)"
-                  }
-               ]
-            }
-         ],
-         "administrators" : [
-            {
-               "email" : "xxx",
-               "name" : "Ivan Garnizov"
-            }
-         ],
-         "description" : "GEANT"
-      },
-      {
-         "sites" : [
-            {}
-         ],
-         "administrators" : [
-            {
-               "email" : "xxx",
-               "name" : "John Simpkins"
-            }
-         ],
-         "description" : "UMich"
-      }
-   ],
-   "measurement_archives" : [
-      {
-         "read_url" : "https://perfsonar-testbed-ma.grnoc.iu.edu/esmond/perfsonar/archive/",
-         "write_url" : "https://perfsonar-testbed-ma.grnoc.iu.edu/esmond/perfsonar/archive/",
-         "type" : "perfsonarbuoy/bwctl"
-      },
-      {
-         "read_url" : "https://perfsonar-testbed-ma.grnoc.iu.edu/esmond/perfsonar/archive/",
-         "write_url" : "https://perfsonar-testbed-ma.grnoc.iu.edu/esmond/perfsonar/archive/",
-         "type" : "perfsonarbuoy/owamp"
-      },
-      {
-         "read_url" : "https://perfsonar-testbed-ma.grnoc.iu.edu/esmond/perfsonar/archive/",
-         "write_url" : "https://perfsonar-testbed-ma.grnoc.iu.edu/esmond/perfsonar/archive/",
-         "type" : "traceroute"
-      },
-      {
-         "read_url" : "https://perfsonar-testbed-ma.grnoc.iu.edu/esmond/perfsonar/archive/",
-         "write_url" : "https://perfsonar-testbed-ma.grnoc.iu.edu/esmond/perfsonar/archive/",
-         "type" : "pinger"
-      }
-   ],
-   "tests" : [
-      {
-         "members" : {
-            "members" : [
-               "perfsonar-dev5.grnoc.iu.edu",
-               "ps-dev-deb8-1.es.net",
-               "ps-dev-el6-1.es.net",
-               "ps-dev-el7-1.es.net",
-               "t2-psdev.rrze.uni-erlangen.de",
-               "perfsonardev0.internet2.edu",
-               "perfsonar-dev.grnoc.iu.edu",
-               "ps-dev-deb8-2.es.net",
-               "perfsonar-liva.lbl.gov",
-               "ps-4-0.qalab.geant.net",
-               "ps-4-0-xenial.qalab.geant.net",
-               "pstest2.geant.carnet.hr"
-            ],
-            "type" : "mesh"
-         },
-         "parameters" : {
-            "protocol" : "tcp",
-            "duration" : "20",
-            "interval" : "14400",
-            "force_bidirectional" : "1",
-            "tool" : "bwctl/iperf3",
-            "ipv4_only" : "1",
-            "random_start_percentage" : "25",
-            "type" : "perfsonarbuoy/bwctl"
-         },
-         "description" : "iperf3 TCP Test Between Testbeds"
-      },
-      {
-         "members" : {
-            "members" : [
-               "perfsonar-dev5.grnoc.iu.edu",
-               "ps-dev-deb8-1.es.net",
-               "ps-dev-el6-1.es.net",
-               "ps-dev-el7-1.es.net",
-               "t2-psdev.rrze.uni-erlangen.de",
-               "perfsonar-dev.grnoc.iu.edu",
-               "ps-dev-deb8-2.es.net",
-               "ps-4-0.qalab.geant.net",
-               "ps-4-0-xenial.qalab.geant.net",
-               "pstest2.geant.carnet.hr"
-            ],
-            "type" : "mesh"
-         },
-         "parameters" : {
-            "protocol" : "udp",
-            "udp_bandwidth" : "50000000",
-            "duration" : "10",
-            "interval" : "14400",
-            "force_bidirectional" : "1",
-            "ipv4_only" : "1",
-            "tool" : "bwctl/iperf3",
-            "random_start_percentage" : "25",
-            "type" : "perfsonarbuoy/bwctl",
-            "window_size" : "1024000"
-         },
-         "description" : "iperf3 UDP Test Between Testbeds"
-      },
-      {
-         "members" : {
-            "members" : [
-               "ps-dev-el6-1.es.net",
-               "ps-dev-el7-1.es.net",
-               "t2-psdev.rrze.uni-erlangen.de",
-               "perfsonar-dev.grnoc.iu.edu",
-               "ps-dev-deb8-2.es.net",
-               "ps-4-0.qalab.geant.net",
-               "ps-4-0-xenial.qalab.geant.net",
-               "pstest2.geant.carnet.hr"
-            ],
-            "type" : "mesh"
-         },
-         "parameters" : {
-            "protocol" : "udp",
-            "udp_bandwidth" : "50000000",
-            "duration" : "10",
-            "interval" : "14400",
-            "force_bidirectional" : "1",
-            "ipv4_only" : "1",
-            "tool" : "bwctl/nuttcp",
-            "random_start_percentage" : "25",
-            "report_interval" : "1",
-            "type" : "perfsonarbuoy/bwctl"
-         },
-         "description" : "nuttcp UDP Test Between pScheduler Hosts"
-      },
-      {
-         "members" : {
-            "members" : [
-               "perfsonar-dev5.grnoc.iu.edu",
-               "ps-dev-deb8-1.es.net",
-               "ps-dev-el6-1.es.net",
-               "ps-dev-el7-1.es.net",
-               "t2-psdev.rrze.uni-erlangen.de",
-               "perfsonardev0.internet2.edu",
-               "perfsonar-dev.grnoc.iu.edu",
-               "ps-dev-deb8-2.es.net",
-               "perfsonar-liva.lbl.gov",
-               "ps-4-0.qalab.geant.net",
-               "ps-4-0-xenial.qalab.geant.net",
-               "pstest2.geant.carnet.hr"
-            ],
-            "type" : "mesh"
-         },
-         "parameters" : {
-            "ipv4_only" : "1",
-            "timeout" : "30",
-            "tool" : "traceroute",
-            "type" : "traceroute",
-            "waittime" : "5",
-            "test_interval" : "600"
-         },
-         "description" : "Traceroute Between Testbeds"
-      },
-      {
-         "members" : {
-            "members" : [
-               "perfsonar-dev5.grnoc.iu.edu",
-               "ps-dev-deb8-1.es.net",
-               "ps-dev-el6-1.es.net",
-               "ps-dev-el7-1.es.net",
-               "t2-psdev.rrze.uni-erlangen.de",
-               "perfsonardev0.internet2.edu",
-               "perfsonar-dev.grnoc.iu.edu",
-               "ps-dev-deb8-2.es.net",
-               "perfsonar-liva.lbl.gov",
-               "ps-4-0.qalab.geant.net",
-               "ps-4-0-xenial.qalab.geant.net",
-               "pstest2.geant.carnet.hr"
-            ],
-            "type" : "mesh"
-         },
-         "parameters" : {
-            "loss_threshold" : "10",
-            "bucket_width" : "0.001",
-            "sample_count" : "600",
-            "packet_interval" : "0.1",
-            "ipv4_only" : "1",
-            "packet_padding" : "0",
-            "type" : "perfsonarbuoy/owamp",
-            "session_count" : "18000"
-         },
-         "description" : "Powstream Between Testbeds"
-      },
-      {
-         "members" : {
-            "members" : [
-               "ps-dev-el6-1.es.net",
-               "ps-dev-el7-1.es.net",
-               "t2-psdev.rrze.uni-erlangen.de",
-               "perfsonardev0.internet2.edu",
-               "perfsonar-dev.grnoc.iu.edu",
-               "ps-dev-deb8-2.es.net",
-               "ps-4-0.qalab.geant.net",
-               "ps-4-0-xenial.qalab.geant.net",
-               "pstest2.geant.carnet.hr"
-            ],
-            "type" : "mesh"
-         },
-         "parameters" : {
-            "force_bidirectional" : "1",
-            "ipv4_only" : "1",
-            "packet_interval" : "1",
-            "type" : "pinger",
-            "packet_size" : "1000",
-            "test_interval" : "900",
-            "packet_count" : "10"
-         },
-         "description" : "Ping Between Testbeds"
-      }
-   ]
+            "parameters": {
+                "protocol": "udp",
+                "udp_bandwidth": "50000000",
+                "duration": "10",
+                "interval": "14400",
+                "force_bidirectional": "1",
+                "ipv4_only": "1",
+                "tool": "bwctl/iperf3",
+                "random_start_percentage": "25",
+                "type": "perfsonarbuoy/bwctl",
+                "window_size": "1024000"
+            },
+            "description": "iperf3 UDP Test Between Testbeds"
+        },
+        {
+            "members": {
+                "members": [
+                    "ps-dev-el6-1.es.net",
+                    "ps-dev-el7-1.es.net",
+                    "t2-psdev.rrze.uni-erlangen.de",
+                    "perfsonar-dev.grnoc.iu.edu",
+                    "ps-dev-deb8-2.es.net",
+                    "ps-4-0.qalab.geant.net",
+                    "ps-4-0-xenial.qalab.geant.net",
+                    "pstest2.geant.carnet.hr"
+                ],
+                "type": "mesh"
+            },
+            "parameters": {
+                "protocol": "udp",
+                "udp_bandwidth": "50000000",
+                "duration": "10",
+                "interval": "14400",
+                "force_bidirectional": "1",
+                "ipv4_only": "1",
+                "tool": "bwctl/nuttcp",
+                "random_start_percentage": "25",
+                "report_interval": "1",
+                "type": "perfsonarbuoy/bwctl"
+            },
+            "description": "nuttcp UDP Test Between pScheduler Hosts"
+        },
+        {
+            "members": {
+                "members": [
+                    "perfsonar-dev5.grnoc.iu.edu",
+                    "ps-dev-deb8-1.es.net",
+                    "ps-dev-el6-1.es.net",
+                    "ps-dev-el7-1.es.net",
+                    "t2-psdev.rrze.uni-erlangen.de",
+                    "perfsonardev0.internet2.edu",
+                    "perfsonar-dev.grnoc.iu.edu",
+                    "ps-dev-deb8-2.es.net",
+                    "perfsonar-liva.lbl.gov",
+                    "ps-4-0.qalab.geant.net",
+                    "ps-4-0-xenial.qalab.geant.net",
+                    "pstest2.geant.carnet.hr"
+                ],
+                "type": "mesh"
+            },
+            "parameters": {
+                "ipv4_only": "1",
+                "timeout": "30",
+                "tool": "traceroute",
+                "type": "traceroute",
+                "waittime": "5",
+                "test_interval": "600"
+            },
+            "description": "Traceroute Between Testbeds"
+        },
+        {
+            "members": {
+                "members": [
+                    "perfsonar-dev5.grnoc.iu.edu",
+                    "ps-dev-deb8-1.es.net",
+                    "ps-dev-el6-1.es.net",
+                    "ps-dev-el7-1.es.net",
+                    "t2-psdev.rrze.uni-erlangen.de",
+                    "perfsonardev0.internet2.edu",
+                    "perfsonar-dev.grnoc.iu.edu",
+                    "ps-dev-deb8-2.es.net",
+                    "perfsonar-liva.lbl.gov",
+                    "ps-4-0.qalab.geant.net",
+                    "ps-4-0-xenial.qalab.geant.net",
+                    "pstest2.geant.carnet.hr"
+                ],
+                "type": "mesh"
+            },
+            "parameters": {
+                "loss_threshold": "10",
+                "bucket_width": "0.001",
+                "sample_count": "600",
+                "packet_interval": "0.1",
+                "ipv4_only": "1",
+                "packet_padding": "0",
+                "type": "perfsonarbuoy/owamp",
+                "session_count": "18000"
+            },
+            "description": "Powstream Between Testbeds"
+        },
+        {
+            "members": {
+                "members": [
+                    "ps-dev-el6-1.es.net",
+                    "ps-dev-el7-1.es.net",
+                    "t2-psdev.rrze.uni-erlangen.de",
+                    "perfsonardev0.internet2.edu",
+                    "perfsonar-dev.grnoc.iu.edu",
+                    "ps-dev-deb8-2.es.net",
+                    "ps-4-0.qalab.geant.net",
+                    "ps-4-0-xenial.qalab.geant.net",
+                    "pstest2.geant.carnet.hr"
+                ],
+                "type": "mesh"
+            },
+            "parameters": {
+                "force_bidirectional": "1",
+                "ipv4_only": "1",
+                "packet_interval": "1",
+                "type": "pinger",
+                "packet_size": "1000",
+                "test_interval": "900",
+                "packet_count": "10"
+            },
+            "description": "Ping Between Testbeds"
+        }
+    ]
 }

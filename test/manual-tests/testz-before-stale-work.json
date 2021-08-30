@@ -1,1 +1,69 @@
-{"organizations":[{"sites":[{"hosts":[{"addresses":["test-pt1-bw.es.net"],"description":"(BWCTL Server at es.net)","toolkit_url":"auto"}],"location":{}},{"hosts":[{"addresses":["srv.newa.ilight.net"],"measurement_archives":[{"read_url":"http://srv.newa.ilight.net/esmond/perfsonar/archive","write_url":"http://srv.newa.ilight.net/esmond/perfsonar/archive","type":"perfsonarbuoy/bwctl"},{"read_url":"asdf","write_url":"asdf","type":"perfsonarbuoy/bwctl"}],"description":"(BWCTL Measurement Point at 2027.srv.newa.ilight.net)","toolkit_url":"auto"}],"location":{}}]}],"tests":[{"members":{"type":"mesh","members":["test-pt1-bw.es.net","srv.newa.ilight.net"]},"parameters":{"random_start_percentage":"25","ipv4_only":"1","tool":"bwctl/iperf3","interval":"14400","duration":"20","protocol":"tcp","type":"perfsonarbuoy/bwctl"},"description":"tput test"}],"description":"testz: New Config","measurement_archives":[{"read_url":"https://centrallama/","write_url":"https://centrallama/","type":"perfsonarbuoy/bwctl"}],"administrators":[{"name":"Michael Johnson","email":"mj82@globalnoc.iu.edu"}]}
+{
+    "organizations": [
+        {
+            "sites": [
+                {
+                    "hosts": [
+                        {
+                            "addresses": ["test-pt1-bw.es.net"],
+                            "description": "(BWCTL Server at es.net)",
+                            "toolkit_url": "auto"
+                        }
+                    ],
+                    "location": {}
+                },
+                {
+                    "hosts": [
+                        {
+                            "addresses": ["srv.newa.ilight.net"],
+                            "measurement_archives": [
+                                {
+                                    "read_url": "http://srv.newa.ilight.net/esmond/perfsonar/archive",
+                                    "write_url": "http://srv.newa.ilight.net/esmond/perfsonar/archive",
+                                    "type": "perfsonarbuoy/bwctl"
+                                },
+                                {
+                                    "read_url": "asdf",
+                                    "write_url": "asdf",
+                                    "type": "perfsonarbuoy/bwctl"
+                                }
+                            ],
+                            "description": "(BWCTL Measurement Point at 2027.srv.newa.ilight.net)",
+                            "toolkit_url": "auto"
+                        }
+                    ],
+                    "location": {}
+                }
+            ]
+        }
+    ],
+    "tests": [
+        {
+            "members": {
+                "type": "mesh",
+                "members": ["test-pt1-bw.es.net", "srv.newa.ilight.net"]
+            },
+            "parameters": {
+                "random_start_percentage": "25",
+                "ipv4_only": "1",
+                "tool": "bwctl/iperf3",
+                "interval": "14400",
+                "duration": "20",
+                "protocol": "tcp",
+                "type": "perfsonarbuoy/bwctl"
+            },
+            "description": "tput test"
+        }
+    ],
+    "description": "testz: New Config",
+    "measurement_archives": [
+        {
+            "read_url": "https://centrallama/",
+            "write_url": "https://centrallama/",
+            "type": "perfsonarbuoy/bwctl"
+        }
+    ],
+    "administrators": [
+        { "name": "Michael Johnson", "email": "mj82@globalnoc.iu.edu" }
+    ]
+}

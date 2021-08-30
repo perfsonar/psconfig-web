@@ -1,207 +1,318 @@
 <div ng-controller="paramsAccordion">
-
     <accordion close-others="false">
-
         <accordion-group is-open="status.basicOpen">
             <accordion-heading>
-                <h3>Basic Test Parameters
-                <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.basicOpen, 'glyphicon-chevron-right': !status.basicOpen}"></i>
-            </h3>
+                <h3>
+                    Basic Test Parameters
+                    <i
+                        class="pull-right glyphicon"
+                        ng-class="{'glyphicon-chevron-down': status.basicOpen, 'glyphicon-chevron-right': !status.basicOpen}"
+                    ></i>
+                </h3>
             </accordion-heading>
 
-
             <div class="form-section">
+                <div class="form-group">
+                    <label for="test_interval" class="col-sm-2 control-label"
+                        >Test Interval *</label
+                    >
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input
+                                type="number"
+                                string-to-number
+                                class="form-control"
+                                name="test_interval"
+                                ng-disabled="!selected._canedit"
+                                ng-model="selected.specs.test_interval"
+                                required
+                            />
+                            <div class="input-group-addon">seconds</div>
+                        </div>
+                        <p class="help-block">
+                            Number of seconds between each test
+                            <code>test_interval</code>
+                        </p>
+                    </div>
+                    <label
+                        for="random_start_percentage"
+                        class="col-sm-2 control-label"
+                        >Random Start Percentage</label
+                    >
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input
+                                type="number"
+                                string-to-number
+                                class="form-control"
+                                name="random_start_percentage"
+                                ng-disabled="!selected._canedit"
+                                ng-model="selected.specs.random_start_percentage"
+                                placeholder="10"
+                            />
+                            <div class="input-group-addon">%</div>
+                        </div>
+                        <p class="help-block">
+                            The percentage to randomize the start time of test.
+                            Valid values are between 0 and 50 (inclusive).
+                            Example: interval of 7200 (2 hours) and
+                            random_start_percentage 50 means that a test can
+                            start anywhere between 1 hour and 3 hours after the
+                            previous test completes
+                            <code>random_start_percentage</code>
+                        </p>
+                    </div>
+                </div>
 
+                <div class="form-group">
+                    <label for="packet_count" class="col-sm-2 control-label"
+                        >Packet Count</label
+                    >
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input
+                                type="number"
+                                string-to-number
+                                class="form-control"
+                                name="packet_count"
+                                ng-disabled="!selected._canedit"
+                                ng-model="selected.specs.packet_count"
+                            />
+                            <div class="input-group-addon">packets</div>
+                        </div>
+                        <p class="help-block">
+                            The number of packets to send per test. This
+                            multiplied by packet_interval is the duration of the
+                            test
+                            <code>packet_count</code>
+                        </p>
+                    </div>
+                    <label for="packet_interval" class="col-sm-2 control-label"
+                        >Packet Interval</label
+                    >
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input
+                                type="number"
+                                string-to-number
+                                step="0.001"
+                                class="form-control"
+                                name="packet_interval"
+                                ng-disabled="!selected._canedit"
+                                ng-model="selected.specs.packet_interval"
+                            />
+                            <div class="input-group-addon">seconds</div>
+                        </div>
+                        <p class="help-block">
+                            The average time between packets. A decimal value
+                            less than one means to send multiple packets per
+                            second (e.g. .1 means 10 packets per second). This
+                            multiplied by packet_count is the duration of the
+                            test
+                            <code>packet_interval</code>
+                        </p>
+                    </div>
+                </div>
 
-<div class="form-group">
-    <label for="test_interval" class="col-sm-2 control-label">Test Interval *</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="number" string-to-number class="form-control" name="test_interval" 
-                ng-disabled="!selected._canedit"
-                ng-model="selected.specs.test_interval" required>
-            <div class="input-group-addon">seconds</div>
-        </div>
-        <p class="help-block">Number of seconds between each test <code>test_interval</code></p>
-    </div>
-    <label for="random_start_percentage" class="col-sm-2 control-label">Random Start Percentage</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="number" string-to-number class="form-control" name="random_start_percentage" 
-                ng-disabled="!selected._canedit"
-                ng-model="selected.specs.random_start_percentage" placeholder="10">
-            <div class="input-group-addon">%</div>
-        </div>
-        <p class="help-block">
-            The percentage to randomize the start time of test. Valid values are between 0 and 50 (inclusive). Example: interval of 7200 (2 hours) and random_start_percentage 50 means that a test can start anywhere between 1 hour and 3 hours after the previous test completes
-            <code>random_start_percentage</code>
-        </p>
-    </div>
-</div>
+                <div class="form-group">
+                    <label for="packet_size" class="col-sm-2 control-label"
+                        >Packet Size</label
+                    >
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input
+                                type="number"
+                                string-to-number
+                                class="form-control"
+                                name="packet_size"
+                                ng-disabled="!selected._canedit"
+                                ng-model="selected.specs.packet_size"
+                            />
+                            <div class="input-group-addon">bytes</div>
+                        </div>
+                        <p class="help-block">
+                            The size of packets in bytes
+                            <code>packet_size</code>
+                        </p>
+                    </div>
+                    <label for="packet_ttl" class="col-sm-2 control-label"
+                        >Packet TTL</label
+                    >
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input
+                                type="number"
+                                string-to-number
+                                class="form-control"
+                                name="packet_ttl"
+                                ng-disabled="!selected._canedit"
+                                ng-model="selected.specs.packet_ttl"
+                            />
+                            <div class="input-group-addon">hops</div>
+                        </div>
+                        <p class="help-block">
+                            The TTL to set in the IP header of outgoing packets
+                            <code>packet_ttl</code>
+                        </p>
+                    </div>
+                </div>
 
-<div class="form-group">
-    <label for="packet_count" class="col-sm-2 control-label">Packet Count</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="number" string-to-number class="form-control" name="packet_count" 
-                ng-disabled="!selected._canedit"
-                ng-model="selected.specs.packet_count">
-            <div class="input-group-addon">packets</div>
-        </div>
-        <p class="help-block">
-            The number of packets to send per test. This multiplied by packet_interval is the duration of the test
-            <code>packet_count</code>
-        </p>
-    </div>
-    <label for="packet_interval" class="col-sm-2 control-label">Packet Interval</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="number" string-to-number step="0.001" class="form-control" name="packet_interval" 
-                ng-disabled="!selected._canedit"
-                ng-model="selected.specs.packet_interval">
-            <div class="input-group-addon">seconds</div>
-        </div>
-        <p class="help-block">
-            The average time between packets. A decimal value less than one means to send multiple packets per second (e.g. .1 means 10 packets per second). This multiplied by packet_count is the duration of the test
-            <code>packet_interval</code>
-        </p>
-    </div>
-</div>
-
-<div class="form-group">
-    <label for="packet_size" class="col-sm-2 control-label">Packet Size</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="number" string-to-number class="form-control" name="packet_size" 
-                ng-disabled="!selected._canedit"
-                ng-model="selected.specs.packet_size">
-            <div class="input-group-addon">bytes</div>
-        </div>
-        <p class="help-block">The size of packets in bytes <code>packet_size</code></p>
-    </div>
-    <label for="packet_ttl" class="col-sm-2 control-label">Packet TTL</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="number" string-to-number class="form-control" name="packet_ttl" 
-                ng-disabled="!selected._canedit"
-                ng-model="selected.specs.packet_ttl">
-            <div class="input-group-addon">hops</div>
-        </div>
-        <p class="help-block">The TTL to set in the IP header of outgoing packets <code>packet_ttl</code></p>
-    </div>
-</div>
-
-<!-- Common parameters -->
-<ng-include src="'t/testspec-common.html'"></ng-include>
-
-                </div> <!-- end form-section -->             
-
-
+                <!-- Common parameters -->
+                <ng-include src="'t/testspec-common.html'"></ng-include>
+            </div>
+            <!-- end form-section -->
         </accordion-group>
-
 
         <accordion-group is-open="status.open">
             <accordion-heading>
-                <h3>Advanced Test Parameters
-                    <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                <h3>
+                    Advanced Test Parameters
+                    <i
+                        class="pull-right glyphicon"
+                        ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"
+                    ></i>
                 </h3>
             </accordion-heading>
-            
-            
+
             <div class="form-section">
+                <!--v4-->
 
-<!--v4-->
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-4">
+                        <div class="checkbox">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="hostnames"
+                                    ng-disabled="!selected._canedit"
+                                    ng-model="selected.specs.hostnames"
+                                />
+                                Do not try to map IP addresses to host names
+                                when displaying them
+                            </label>
+                            <p class="help-block">
+                                <code>hostnames / ping -n</code>
+                                <minver min="minver.hostnames"></minver>
+                            </p>
+                        </div>
+                    </div>
 
-<div class="form-group">
-    <div class="col-sm-offset-2 col-sm-4">
-        <div class="checkbox">
-            <label> 
-                <input type="checkbox" name="hostnames" 
-                    ng-disabled="!selected._canedit"
-                    ng-model="selected.specs.hostnames"> Do not try to map IP addresses to host names when displaying them
-            </label>
-            <p class="help-block">
-                <code>hostnames / ping -n</code>
-                <minver min="minver.hostnames"></minver>
-            </p>
-        </div>
-    </div>
+                    <div class="col-sm-offset-2 col-sm-4">
+                        <div class="checkbox">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="suppress_loopback"
+                                    ng-disabled="!selected._canedit"
+                                    ng-model="selected.specs.suppress_loopback"
+                                />
+                                Suppress loopback of multicast packets
+                            </label>
+                            <p class="help-block">
+                                <code>suppress_loopback / ping -L</code>
+                                <minver min="minver.suppress_loopback"></minver>
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
-    <div class="col-sm-offset-2 col-sm-4">
-        <div class="checkbox">
-            <label> 
-                <input type="checkbox" name="suppress_loopback" 
-                    ng-disabled="!selected._canedit"
-                    ng-model="selected.specs.suppress_loopback"> Suppress loopback of multicast packets
-            </label>
-            <p class="help-block">
-                <code>suppress_loopback / ping -L</code>
-                <minver min="minver.suppress_loopback"></minver>
-            </p>
-        </div>
-    </div>
-</div>
+                <div class="form-group">
+                    <label for="deadline" class="col-sm-2 control-label"
+                        >Deadline</label
+                    >
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input
+                                type="number"
+                                string-to-number
+                                class="form-control"
+                                name="deadline"
+                                ng-disabled="!selected._canedit"
+                                ng-model="selected.specs.deadline"
+                            />
+                            <div class="input-group-addon">seconds</div>
+                        </div>
+                        <p class="help-block">
+                            Specify a timeout, in seconds, before ping exits
+                            regardless of how many packets have been sent
+                            <code>deadline / ping -w</code>
+                            <minver min="minver.deadline"></minver>
+                        </p>
+                    </div>
+                    <label for="timeout" class="col-sm-2 control-label"
+                        >Timeout</label
+                    >
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input
+                                type="number"
+                                string-to-number
+                                class="form-control"
+                                name="timeout"
+                                ng-disabled="!selected._canedit"
+                                ng-model="selected.specs.timeout"
+                            />
+                            <div class="input-group-addon">seconds</div>
+                        </div>
+                        <p class="help-block">
+                            Time to wait for a response
+                            <code>timeout / ping -W</code>
+                            <minver min="minver.timeout"></minver>
+                        </p>
+                    </div>
+                </div>
 
-<div class="form-group">
-    <label for="deadline" class="col-sm-2 control-label">Deadline</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="number" string-to-number class="form-control" name="deadline" 
-                ng-disabled="!selected._canedit"
-                ng-model="selected.specs.deadline">
-            <div class="input-group-addon">seconds</div>
-        </div>
-        <p class="help-block">
-            Specify a timeout, in seconds, before ping exits regardless of how many packets have been sent
-            <code>deadline / ping -w</code>
-            <minver min="minver.deadline"></minver>
-        </p>
-    </div>
-    <label for="timeout" class="col-sm-2 control-label">Timeout</label>
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input type="number" string-to-number class="form-control" name="timeout" 
-                ng-disabled="!selected._canedit"
-                ng-model="selected.specs.timeout">
-            <div class="input-group-addon">seconds</div>
-        </div>
-        <p class="help-block">
-            Time to wait for a response
-            <code>timeout / ping -W</code>
-            <minver min="minver.timeout"></minver>
-        </p>
-    </div>
-</div>
+                <div class="form-group">
+                    <label for="tos_bits" class="col-sm-2 control-label"
+                        >TOS Bits</label
+                    >
+                    <div class="col-sm-4">
+                        <input
+                            type="number"
+                            string-to-number
+                            step="1"
+                            min="0"
+                            max="255"
+                            class="form-control"
+                            name="tos_bits"
+                            ng-disabled="!selected._canedit"
+                            ng-model="selected.specs.tos_bits"
+                        />
+                        <p class="help-block">
+                            The type of service to set in the IP header of
+                            outgoing packets as an integer from 0-255
+                            <code>tos_bits</code>
+                            <minver min="minver.tos_bits"></minver>
+                        </p>
+                    </div>
 
-<div class="form-group">
-    <label for="tos_bits" class="col-sm-2 control-label">TOS Bits</label>
-    <div class="col-sm-4">
-        <input type="number" string-to-number step="1" min="0" max="255" class="form-control" name="tos_bits" 
-            ng-disabled="!selected._canedit" 
-            ng-model="selected.specs.tos_bits">
-        <p class="help-block">
-            The type of service to set in the IP header of outgoing packets as an integer from 0-255
-            <code>tos_bits</code>
-            <minver min="minver.tos_bits"></minver>
-        </p>
-    </div>
-
-    <label for="flow_label" class="col-sm-2 control-label">Flow Label</label>
-    <div class="col-sm-4">
-        <input type="number" string-to-number class="form-control" name="flow_label" 
-            ng-disabled="!selected._canedit"
-            ng-model="selected.specs.flow_label">
-        <p class="help-block">
-        Set the <a href="https://tools.ietf.org/html/rfc6437#page-4" target="_blank">IPv6 flow label</a>
-            <code>flow_label / iperf3 -L</code>
-            <minver min="minver.flow_label"></minver>
-        </p>
-    </div>
-
-       </div> <!-- end form-section -->
-
+                    <label for="flow_label" class="col-sm-2 control-label"
+                        >Flow Label</label
+                    >
+                    <div class="col-sm-4">
+                        <input
+                            type="number"
+                            string-to-number
+                            class="form-control"
+                            name="flow_label"
+                            ng-disabled="!selected._canedit"
+                            ng-model="selected.specs.flow_label"
+                        />
+                        <p class="help-block">
+                            Set the
+                            <a
+                                href="https://tools.ietf.org/html/rfc6437#page-4"
+                                target="_blank"
+                                >IPv6 flow label</a
+                            >
+                            <code>flow_label / iperf3 -L</code>
+                            <minver min="minver.flow_label"></minver>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- end form-section -->
         </accordion-group>
-
     </accordion>
-
-</div><!-- end paramsAccordion -->
+</div>
+<!-- end paramsAccordion -->

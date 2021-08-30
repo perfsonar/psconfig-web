@@ -1,19 +1,48 @@
-<ul class="specs" ng-show="readonly"><li ng-repeat="(k,v) in specs"><b>{{k}}</b> {{v}}</li></ul>
+<ul class="specs" ng-show="readonly">
+    <li ng-repeat="(k,v) in specs"><b>{{k}}</b> {{v}}</li>
+</ul>
 <div ng-show="!readonly">
     <ul class="specs">
-        <li ng-repeat="(k,v) in specs"> 
-            <b>{{k}}</b> {{v}} <i class="fa fa-trash text-muted" style="cursor: pointer" ng-click="remove(k)"></i>
-        </li> 
-        <li><a class="btn btn-primary btn-xs" ng-show="!adding" ng-click="adding = true;">Add</a></li>
+        <li ng-repeat="(k,v) in specs">
+            <b>{{k}}</b> {{v}}
+            <i
+                class="fa fa-trash text-muted"
+                style="cursor: pointer"
+                ng-click="remove(k)"
+            ></i>
+        </li>
+        <li>
+            <a
+                class="btn btn-primary btn-xs"
+                ng-show="!adding"
+                ng-click="adding = true;"
+                >Add</a
+            >
+        </li>
     </ul>
     <div ng-show="adding">
         <div class="input-group">
             <span class="input-group-addon">key</span>
-            <input type="text" class="form-control" ng-model="k" placeholder="Key"></input>
+            <input
+                type="text"
+                class="form-control"
+                ng-model="k"
+                placeholder="Key"
+            />
             <span class="input-group-addon">Value</span>
-            <input type="text" class="form-control" ng-model="v" placeholder="Value"></input>
+            <input
+                type="text"
+                class="form-control"
+                ng-model="v"
+                placeholder="Value"
+            />
             <div class="input-group-btn">
-                <input type="button" class="form-control btn-primary" ng-click="add()" value="Add"/>
+                <input
+                    type="button"
+                    class="form-control btn-primary"
+                    ng-click="add()"
+                    value="Add"
+                />
             </div>
         </div>
     </div>

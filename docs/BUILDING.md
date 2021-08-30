@@ -1,10 +1,11 @@
 # Building PWA
+
 ## pSConfig Web Administrator
 
-
 ## Tech stack
- * MEAN (MongoDB, Express, Angular, NodeJS)
- * Uses Mongoose, a sort of ORM for Mongo, for modeling object schemas and connecting/querying the Mongo database.
+
+-   MEAN (MongoDB, Express, Angular, NodeJS)
+-   Uses Mongoose, a sort of ORM for Mongo, for modeling object schemas and connecting/querying the Mongo database.
 
 ## Building
 
@@ -16,21 +17,21 @@ There is a `Makefile` with several different build sections. The most important 
 
 This can be done for production with:
 
-```make npm```
+`make npm`
 
 or for development with:
 
-```make npm_dev```
+`make npm_dev`
 
 It's usually a good idea to clean up old build first:
 
-```make clean_all```
+`make clean_all`
 
 See separate documentation in [BUILDING.md](BUILDING.md)
 
 ## Docker build
 
-Currently, the docker build is done manually. This should be added to Jenkins, but there are some. questions we'd have to answer first -- mostly, where do the finished images get pushed? 
+Currently, the docker build is done manually. This should be added to Jenkins, but there are some. questions we'd have to answer first -- mostly, where do the finished images get pushed?
 
 There is a pscheduler docker build already, but that just build pscheduler in a docker container, then handles the RPMs as usual. In this case, the docker images are the build artifacts. Not sure how to deal with those. These scripts push to dockerhub.
 
@@ -39,34 +40,32 @@ There is a pscheduler docker build already, but that just build pscheduler in a 
 1. Checkout the branch or tag you want to build
 1. Change to the docker deploy dir:
 
-    ```cd deploy/docker ```
+    `cd deploy/docker `
 
 1. Edit `version` or `bleeding-version`, depending on what you want to build.
 
 1. run the appropriate script
 
-  ```./build-all.sh```
+`./build-all.sh`
 
-  or
+or
 
-  ```./bleeding-build-all.sh```
-
-
+`./bleeding-build-all.sh`
 
 These scripts build and tag the version you specify in the version file, and push them to Dockerhub.
 
 ## RPM build
 
-* See pS Jenkins for exact details
+-   See pS Jenkins for exact details
 
 The build process is like this:
 
-```make clean_all```
+`make clean_all`
 
-```make npm```
+`make npm`
 
-```make manifest```
+`make manifest`
 
-```make dist```
+`make dist`
 
-```make rpm```
+`make rpm`
