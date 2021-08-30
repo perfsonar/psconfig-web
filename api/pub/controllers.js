@@ -142,13 +142,11 @@ router.get("/config/:url", function (req, res, next) {
             if (err) return next(err);
 
             if (!config) {
-                return res
-                    .status(404)
-                    .json({
-                        error:
-                            "404 error: Couldn't find config with URL:" +
-                            req.params.url,
-                    });
+                return res.status(404).json({
+                    error:
+                        "404 error: Couldn't find config with URL:" +
+                        req.params.url,
+                });
             }
             config._host_version = req.query.host_version;
             //console.log("req.query", req.query);
@@ -198,11 +196,9 @@ router.get("/auto/:address", function (req, res, next) {
                 return next(err);
             }
             if (!host)
-                return res
-                    .status(404)
-                    .json({
-                        message: "no such hostname registered: " + address,
-                    });
+                return res.status(404).json({
+                    message: "no such hostname registered: " + address,
+                });
             var config = {
                 name: "Auto-MeshConfig for " + address,
                 tests: [],

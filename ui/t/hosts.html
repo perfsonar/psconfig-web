@@ -2,185 +2,402 @@
 <ng-include src="'t/sidebar.html'"></ng-include>
 <div class="sca-sidebar-page">
     <div class="subbar">
-        <div style="padding-left: 20px; margin-bottom: 10px;">
+        <div style="padding-left: 20px; margin-bottom: 10px">
             <h2>Hosts</h2>
-            <p class="help-block">List of all toolkit hosts on configured sLS</p>
+            <p class="help-block">
+                List of all toolkit hosts on configured sLS
+            </p>
             <span class="text-muted">{{hosts.length}} Hosts</span>
         </div>
         <div class="filterbox" ng-class="{active: hosts_filter}">
-            <i class="fa fa-times pull-right remove" ng-click="hosts_filter = ''"></i>
-            <input type="text" class="form-control"
-                ng-model="hosts_filter" ng-model-options="{debounce: 200}" placeholder="Filter"></input>
+            <i
+                class="fa fa-times pull-right remove"
+                ng-click="hosts_filter = ''"
+            ></i>
+            <input
+                type="text"
+                class="form-control"
+                ng-model="hosts_filter"
+                ng-model-options="{debounce: 200}"
+                placeholder="Filter"
+            />
         </div>
 
-        <div class="subbar-list" style="top: 159px;">
-            <p class="alert alert-default" ng-if="loading"><i class="fa fa-circle-o-notch fa-spin"></i> Loading..</p>
-            <p class="alert alert-info" ng-if="hosts.length == 0">No Configs found; please create one.</p>
-            <div class="subbar-list-item"
+        <div class="subbar-list" style="top: 159px">
+            <p class="alert alert-default" ng-if="loading">
+                <i class="fa fa-circle-o-notch fa-spin"></i> Loading..
+            </p>
+            <p class="alert alert-info" ng-if="hosts.length == 0">
+                No Configs found; please create one.
+            </p>
+            <div
+                class="subbar-list-item"
                 id="{{host._id}}"
                 ng-repeat="host in filter_hosts(hosts)"
                 ng-class="{'active': selected == host}"
-                ng-click="select(host)">
+                ng-click="select(host)"
+            >
                 <div class="list-header">
                     <small>
-                        <span class="label label-info pull-right" ng-if="host.lsid && !host.url">Simulated</span>
-                        <span class="label label-default" ng-if="host.lsid">{{host.lsid}}</span>
-                        <span class="label label-warning" ng-if="!host.lsid">Adhoc</span>
-                        <span class="label label-danger" ng-if="host.url && host._stale">Stale</span>
-                        {{host.hostname||'removed'}} 
-                        <i ng-if="!host._canedit" class="fa fa-lock text-muted" title="readonly"></i>
+                        <span
+                            class="label label-info pull-right"
+                            ng-if="host.lsid && !host.url"
+                            >Simulated</span
+                        >
+                        <span class="label label-default" ng-if="host.lsid"
+                            >{{host.lsid}}</span
+                        >
+                        <span class="label label-warning" ng-if="!host.lsid"
+                            >Adhoc</span
+                        >
+                        <span
+                            class="label label-danger"
+                            ng-if="host.url && host._stale"
+                            >Stale</span
+                        >
+                        {{host.hostname||'removed'}}
+                        <i
+                            ng-if="!host._canedit"
+                            class="fa fa-lock text-muted"
+                            title="readonly"
+                        ></i>
                     </small>
                 </div>
                 <small class="help-block">{{host.sitename}}</small>
             </div>
-            <div class="list-addbutton animated" ng-class="{bounceInLeft: hosts.length == 0}" ng-click="add()" title="Add new adhoc host">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> 
+            <div
+                class="list-addbutton animated"
+                ng-class="{bounceInLeft: hosts.length == 0}"
+                ng-click="add()"
+                title="Add new adhoc host"
+            >
+                <i class="fa fa-plus-circle" aria-hidden="true"></i>
                 <div class="add-text">New host</div>
             </div>
-        </div><!--subbar-list-->
-    </div><!--subbar-->
+        </div>
+        <!--subbar-list-->
+    </div>
+    <!--subbar-->
 
     <div class="subbar-content">
         <p class="alert alert-info" ng-if="!selected">Please select a host</p>
-        <form name="form" class="form-horizontal margin30" ng-submit="submit()" ng-show="selected" confirm-on-exit>
+        <form
+            name="form"
+            class="form-horizontal margin30"
+            ng-submit="submit()"
+            ng-show="selected"
+            confirm-on-exit
+        >
             <div class="fixed-top">
                 <h2>
-                    <i class="fa fa-trash-o clickable" aria-hidden="true"
+                    <i
+                        class="fa fa-trash-o clickable"
+                        aria-hidden="true"
                         ng-if="selected._id && selected._canedit"
                         ng-confirm-click="Are you sure you want to remove this host?"
-                        confirmed-click="remove()"></i>&nbsp;&nbsp;&nbsp;
-                    <div class="pull-right" style="padding-right: 20px;">
-                         <i class="fa fa-lock" ng-if="!selected._canedit" title="Read Only"></i>
-                         <div ng-if="form.$dirty && selected._canedit" class="display: inline-block;">
-                            <button type="submit" class="btn btn-primary" ng-if="selected._id">Update</button>
-                            <button type="submit" class="btn btn-primary" ng-if="!selected._id">Create</button>
-                            <button type="button" class="btn" ng-click="cancel()">Cancel</button>
+                        confirmed-click="remove()"
+                    ></i
+                    >&nbsp;&nbsp;&nbsp;
+                    <div class="pull-right" style="padding-right: 20px">
+                        <i
+                            class="fa fa-lock"
+                            ng-if="!selected._canedit"
+                            title="Read Only"
+                        ></i>
+                        <div
+                            ng-if="form.$dirty && selected._canedit"
+                            class="display: inline-block;"
+                        >
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                                ng-if="selected._id"
+                            >
+                                Update
+                            </button>
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                                ng-if="!selected._id"
+                            >
+                                Create
+                            </button>
+                            <button
+                                type="button"
+                                class="btn"
+                                ng-click="cancel()"
+                            >
+                                Cancel
+                            </button>
                         </div>
                     </div>
                 </h2>
-                <br clear="right">
+                <br clear="right" />
                 <div class="form-group">
-                    <label for="hostname" class="col-sm-2 control-label"><strong>Hostname *</strong></label>
+                    <label for="hostname" class="col-sm-2 control-label"
+                        ><strong>Hostname *</strong></label
+                    >
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="hostname" ng-model="selected.hostname" 
-                            ng-disabled="!selected._canedit || selected.lsid" 
-                            placeholder="Enter hostname" required>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="hostname"
+                            ng-model="selected.hostname"
+                            ng-disabled="!selected._canedit || selected.lsid"
+                            placeholder="Enter hostname"
+                            required
+                        />
                     </div>
                 </div>
-                <hr style="margin-bottom: 0px;">
-            </div><!--fixed-top-->
+                <hr style="margin-bottom: 0px" />
+            </div>
+            <!--fixed-top-->
 
             <div class="fixed-top-under">
                 <div class="form-group">
                     <label class="col-sm-2 control-label">Datasource</label>
                     <div class="col-sm-10" ng-if="selected.lsid">
                         <div class="input-group" ng-if="selected.url">
-                            <span class="input-group-addon">{{selected.lsid}}</span>
-                            <input type="text" class="form-control" disabled value="{{selected.url||'(Simulated)'}}"></input>
+                            <span class="input-group-addon"
+                                >{{selected.lsid}}</span
+                            >
+                            <input
+                                type="text"
+                                class="form-control"
+                                disabled
+                                value="{{selected.url||'(Simulated)'}}"
+                            />
                         </div>
-                        <p class="help-block" ng-if="selected.url">Information about this host came from above sLS URL</p>
-                        <p class="alert alert-info" ng-if="!selected.url">The host information came from <code>{{selected.lsid}}</code>, however, we were not able to download its toolkit JSON for host details.. We are guessing its content.</p>
-                        <p class="alert alert-danger" ng-if="selected.url && selected._stale">The host information has not been received for more than 7 days. Last update was <time title="{{selected.update_date}}">{{selected.update_date | timeAgo}}</time></p>
+                        <p class="help-block" ng-if="selected.url">
+                            Information about this host came from above sLS URL
+                        </p>
+                        <p class="alert alert-info" ng-if="!selected.url">
+                            The host information came from
+                            <code>{{selected.lsid}}</code>, however, we were not
+                            able to download its toolkit JSON for host details..
+                            We are guessing its content.
+                        </p>
+                        <p
+                            class="alert alert-danger"
+                            ng-if="selected.url && selected._stale"
+                        >
+                            The host information has not been received for more
+                            than 7 days. Last update was
+                            <time title="{{selected.update_date}}"
+                                >{{selected.update_date | timeAgo}}</time
+                            >
+                        </p>
                     </div>
                     <div class="col-sm-10" ng-if="!selected.lsid">
-                        <p class="alert alert-warning" ng-if="!selected.lsid">This is an adhoc host. The information about this host was entered manually by MCA administrators. Once real data for this is delivered via sLS, this host will become read-only.</p>
+                        <p class="alert alert-warning" ng-if="!selected.lsid">
+                            This is an adhoc host. The information about this
+                            host was entered manually by MCA administrators.
+                            Once real data for this is delivered via sLS, this
+                            host will become read-only.
+                        </p>
                     </div>
                 </div>
                 <h3>Basic Information</h3>
                 <div class="form-group">
-                    <label for="sitename" class="col-sm-2 control-label">Site Name *</label>
+                    <label for="sitename" class="col-sm-2 control-label"
+                        >Site Name *</label
+                    >
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="sitename" 
-                            ng-model="selected.sitename" 
-                            ng-disabled="!selected._canedit || selected.lsid" 
-                            placeholder="Include location and/or organization info" required>
-                        <p class="help-block">Comes from the lookup service (or guessed if it's not set)</p>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="sitename"
+                            ng-model="selected.sitename"
+                            ng-disabled="!selected._canedit || selected.lsid"
+                            placeholder="Include location and/or organization info"
+                            required
+                        />
+                        <p class="help-block">
+                            Comes from the lookup service (or guessed if it's
+                            not set)
+                        </p>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">Host Description</label>
+                    <label class="col-sm-2 control-label"
+                        >Host Description</label
+                    >
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" name="desc" 
-                            ng-disabled="!selected._canedit" ng-model="selected.desc" placeholder="Host description used in meshconfig">
-                        <p class="help-block">Host description is used by maddash for host labels. If not set, Site Name will be used instead</p>
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="desc"
+                            ng-disabled="!selected._canedit"
+                            ng-model="selected.desc"
+                            placeholder="Host description used in meshconfig"
+                        />
+                        <p class="help-block">
+                            Host description is used by maddash for host labels.
+                            If not set, Site Name will be used instead
+                        </p>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label class="col-sm-2 control-label">toolkit_url</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" name="toolkit_url" 
-                            ng-disabled="!selected._canedit" ng-model="selected.toolkit_url" placeholder="Auto generate from hostname">
-                        <p class="help-block">For graphical displays that wish to provide a link to more information about this host (such as MadDash)</p>
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="toolkit_url"
+                            ng-disabled="!selected._canedit"
+                            ng-model="selected.toolkit_url"
+                            placeholder="Auto generate from hostname"
+                        />
+                        <p class="help-block">
+                            For graphical displays that wish to provide a link
+                            to more information about this host (such as
+                            MadDash)
+                        </p>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
                         <div class="checkbox">
-                            <label><input type="checkbox" name="no_agent"
-                                ng-disabled="!selected._canedit" ng-model="selected.no_agent"> No Agent</label>
-                            <p class="help-block">If checked, this host will not read the mesh config. This is significant because it means those that test to it are responsible for initiating tests in both directions and storing the results. If un-checked, it means other testers can assume this host is reading the mesh and will initiate its portion of the tests accordingly.</p>
+                            <label
+                                ><input
+                                    type="checkbox"
+                                    name="no_agent"
+                                    ng-disabled="!selected._canedit"
+                                    ng-model="selected.no_agent"
+                                />
+                                No Agent</label
+                            >
+                            <p class="help-block">
+                                If checked, this host will not read the mesh
+                                config. This is significant because it means
+                                those that test to it are responsible for
+                                initiating tests in both directions and storing
+                                the results. If un-checked, it means other
+                                testers can assume this host is reading the mesh
+                                and will initiate its portion of the tests
+                                accordingly.
+                            </p>
                         </div>
                     </div>
                 </div>
 
-
                 <div class="form-group" ng-if="!selected.lsid">
-                    <label for="admins" class="col-sm-2 control-label">Admins</label>
+                    <label for="admins" class="col-sm-2 control-label"
+                        >Admins</label
+                    >
                     <div class="col-sm-10">
                         <!--<mc-admins admins="selected.admins"></mc-admins>-->
-                        <ui-select multiple ng-model="selected.admins" ng-disabled="!selected._canedit || selected.lsid">
-                            <ui-select-match placeholder="Select admins who can update this host">
-                                <img gravatar-src="$item.email" gravatar-size="17"/>
-                                <b>{{$item.fullname}}</b> <span class="email">&lt;{{$item.email}}&gt;</span>
+                        <ui-select
+                            multiple
+                            ng-model="selected.admins"
+                            ng-disabled="!selected._canedit || selected.lsid"
+                        >
+                            <ui-select-match
+                                placeholder="Select admins who can update this host"
+                            >
+                                <img
+                                    gravatar-src="$item.email"
+                                    gravatar-size="17"
+                                />
+                                <b>{{$item.fullname}}</b>
+                                <span class="email"
+                                    >&lt;{{$item.email}}&gt;</span
+                                >
                             </ui-select-match>
-                            <ui-select-choices repeat="user.id as user in users | propsFilter: {fullname: $select.search, email: $select.search}">
-                              <img gravatar-src="user.email" gravatar-size="17"/>
-                              <b>{{user.fullname}}</b> <small>&lt;{{user.email}}&gt;</small>
+                            <ui-select-choices
+                                repeat="user.id as user in users | propsFilter: {fullname: $select.search, email: $select.search}"
+                            >
+                                <img
+                                    gravatar-src="user.email"
+                                    gravatar-size="17"
+                                />
+                                <b>{{user.fullname}}</b>
+                                <small>&lt;{{user.email}}&gt;</small>
                             </ui-select-choices>
                         </ui-select>
-                        <p class="help-block">Users who can update this host. Only for Adhoc hosts.</p>
+                        <p class="help-block">
+                            Users who can update this host. Only for Adhoc
+                            hosts.
+                        </p>
                     </div>
                 </div>
 
                 <h3>Measurement Archive (MA) Settings</h3>
-                <p class="help-block">You can configure whether to store test results in the host's local MA, as well as additional MAs to store results for all tests involving this host.</p>
+                <p class="help-block">
+                    You can configure whether to store test results in the
+                    host's local MA, as well as additional MAs to store results
+                    for all tests involving this host.
+                </p>
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
                         <div class="checkbox">
-                            <label><input type="checkbox" name="local_ma"
-                                ng-disabled="!selected._canedit" ng-model="selected.local_ma"> Use local Esmond MA</label>
-                            <p class="help-block">If checked, test results for all tests involving this host will be written to the host's local Esmond MA. The MA URL is guessed based on the hostname; you can override it in the next field. Not all hosts
-                            run their own MA, so in some cases this may not be desired (disabled by default).</p>
+                            <label
+                                ><input
+                                    type="checkbox"
+                                    name="local_ma"
+                                    ng-disabled="!selected._canedit"
+                                    ng-model="selected.local_ma"
+                                />
+                                Use local Esmond MA</label
+                            >
+                            <p class="help-block">
+                                If checked, test results for all tests involving
+                                this host will be written to the host's local
+                                Esmond MA. The MA URL is guessed based on the
+                                hostname; you can override it in the next field.
+                                Not all hosts run their own MA, so in some cases
+                                this may not be desired (disabled by default).
+                            </p>
                         </div>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">Local esmond URL</label>
+                    <label class="col-sm-2 control-label"
+                        >Local esmond URL</label
+                    >
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" name="local_ma_url" 
-                            ng-disabled="!selected._canedit" ng-model="selected.local_ma_url" placeholder="Auto generate from hostname">
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="local_ma_url"
+                            ng-disabled="!selected._canedit"
+                            ng-model="selected.local_ma_url"
+                            placeholder="Auto generate from hostname"
+                        />
 
-                        <p class="help-block">This allows you to override the local MA URL for this host, in case you need https instead of http, alternative ports, etc.</p>
+                        <p class="help-block">
+                            This allows you to override the local MA URL for
+                            this host, in case you need https instead of http,
+                            alternative ports, etc.
+                        </p>
                     </div>
                 </div>
 
-
-
                 <!-- local ma form group -->
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">Local Archives (MAs)</label>
+                    <label class="col-sm-2 control-label"
+                        >Local Archives (MAs)</label
+                    >
                     <div class="col-sm-10">
-
-                        <ui-select multiple ng-model="selected.local_archives" ng-disabled="!selected._canedit">
-                            <ui-select-match placeholder="Select local measurement archives to which all test results will be submitted">
-                            {{$item.name}}
+                        <ui-select
+                            multiple
+                            ng-model="selected.local_archives"
+                            ng-disabled="!selected._canedit"
+                        >
+                            <ui-select-match
+                                placeholder="Select local measurement archives to which all test results will be submitted"
+                            >
+                                {{$item.name}}
                             </ui-select-match>
-                            <ui-select-choices repeat="archive._id as archive in all_archives">
-                            <b>{{archive.name}}</b> <small>{{archive.desc}}</small>
+                            <ui-select-choices
+                                repeat="archive._id as archive in all_archives"
+                            >
+                                <b>{{archive.name}}</b>
+                                <small>{{archive.desc}}</small>
                             </ui-select-choices>
                         </ui-select>
                         <p class="help-block">Local archives</p>
@@ -188,19 +405,27 @@
                 </div>
                 <!-- end local ma form group -->
 
-
-
                 <!-- other ma form group -->
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">Shared Measurement Archives (MAs)</label>
+                    <label class="col-sm-2 control-label"
+                        >Shared Measurement Archives (MAs)</label
+                    >
                     <div class="col-sm-10">
-
-                        <ui-select multiple ng-model="selected.additional_archives" ng-disabled="!selected._canedit">
-                            <ui-select-match placeholder="Select additional measurement archives to which all test results will be submitted">
-                            {{$item.name}}
+                        <ui-select
+                            multiple
+                            ng-model="selected.additional_archives"
+                            ng-disabled="!selected._canedit"
+                        >
+                            <ui-select-match
+                                placeholder="Select additional measurement archives to which all test results will be submitted"
+                            >
+                                {{$item.name}}
                             </ui-select-match>
-                            <ui-select-choices repeat="archive._id as archive in all_archives">
-                            <b>{{archive.name}}</b> <small>{{archive.desc}}</small>
+                            <ui-select-choices
+                                repeat="archive._id as archive in all_archives"
+                            >
+                                <b>{{archive.name}}</b>
+                                <small>{{archive.desc}}</small>
                             </ui-select-choices>
                         </ui-select>
                         <p class="help-block">Local archives</p>
@@ -208,36 +433,56 @@
                 </div>
                 <!-- end other ma form group -->
 
-
-
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">Additional Esmond MA URLs</label>
+                    <label class="col-sm-2 control-label"
+                        >Additional Esmond MA URLs</label
+                    >
                     <div class="col-sm-10">
-                        <textarea class="form-control" name="ma_urls" id="ma_urls" ng-model="selected.ma_urls" ng-disabled="!selected._canedit" style="" rows="3"></textarea>
+                        <textarea
+                            class="form-control"
+                            name="ma_urls"
+                            id="ma_urls"
+                            ng-model="selected.ma_urls"
+                            ng-disabled="!selected._canedit"
+                            style=""
+                            rows="3"
+                        ></textarea>
 
-                        <p class="help-block">Providing additional MA URLs (one per line) will allow you to send test results for all tests involving this host to additional MAs.</p>
+                        <p class="help-block">
+                            Providing additional MA URLs (one per line) will
+                            allow you to send test results for all tests
+                            involving this host to additional MAs.
+                        </p>
                     </div>
                 </div>
 
-
-                    <div class="col-sm-10" ng-if="service.type == 'ma'">
-                        <div class="input-group">
-                            <span class="input-group-addon">Locator</span>
-                            <input type="text" class="form-control" disabled
-                                value="http://{{selected.hostname}}/esmond/perfsonar/archive/">
-                        </div><!--input-group-->
+                <div class="col-sm-10" ng-if="service.type == 'ma'">
+                    <div class="input-group">
+                        <span class="input-group-addon">Locator</span>
+                        <input
+                            type="text"
+                            class="form-control"
+                            disabled
+                            value="http://{{selected.hostname}}/esmond/perfsonar/archive/"
+                        />
                     </div>
+                    <!--input-group-->
                 </div>
 
                 <!--service adder-->
-                <div ng-if="selected._canedit && !selected.lsid && missing_services.length > 0"> 
-                    <hr>
+                <div
+                    ng-if="selected._canedit && !selected.lsid && missing_services.length > 0"
+                >
+                    <hr />
                     <div class="row">
-                        <div class="col-md-2"> </div>
+                        <div class="col-md-2"></div>
                         <div class="col-md-10">
-                            <select ng-model="$parent.addservice_item" ng-change="addservice()" 
+                            <select
+                                ng-model="$parent.addservice_item"
+                                ng-change="addservice()"
                                 ng-options="service as service.label for service in missing_services track by service.id"
-                                class="form-control">
+                                class="form-control"
+                            >
                                 <option value="">(Add New Service)</option>
                             </select>
                         </div>
@@ -245,17 +490,24 @@
                 </div>
 
                 <h3>Host Detail</h3>
-                <p class="help-block">Host details can be used in a dynamic hostgroup query</p>
+                <p class="help-block">
+                    Host details can be used in a dynamic hostgroup query
+                </p>
 
-                <mc-specs specs="selected.info" form="form" readonly="!selected._canedit || selected.lsid"></mc-specs>
+                <mc-specs
+                    specs="selected.info"
+                    form="form"
+                    readonly="!selected._canedit || selected.lsid"
+                ></mc-specs>
 
                 <h3>Communities</h3>
                 <!--<p class="help-block">Communities that this host is configured to be member of.</p>-->
-                <p class="help-block" ng-if="selected.communities.length == 0">No Communities</p>
+                <p class="help-block" ng-if="selected.communities.length == 0">
+                    No Communities
+                </p>
                 <ul class="specs">
                     <li ng-repeat="com in selected.communities">{{com}}</li>
                 </ul>
-
 
                 <h3>Membership</h3>
                 <!--
@@ -277,18 +529,38 @@
                 </tbody>
                 </table>
                 -->
-                <p ng-if="hostgroups.length > 0" class="help-block">This host is member of following hostgroups</p>
-                <p ng-if="hostgroups.length == 0" class="help-block">This host does not belong to any hostgroups</p>
-                <div class="well well-sm clickable" style="margin-bottom: 5px;" ng-repeat="hostgroup in hostgroups" ng-click="click_hostgroup(hostgroup)">
-                    <span class="label label-default">{{hostgroup.service_type}}</span>
+                <p ng-if="hostgroups.length > 0" class="help-block">
+                    This host is member of following hostgroups
+                </p>
+                <p ng-if="hostgroups.length == 0" class="help-block">
+                    This host does not belong to any hostgroups
+                </p>
+                <div
+                    class="well well-sm clickable"
+                    style="margin-bottom: 5px"
+                    ng-repeat="hostgroup in hostgroups"
+                    ng-click="click_hostgroup(hostgroup)"
+                >
+                    <span class="label label-default"
+                        >{{hostgroup.service_type}}</span
+                    >
                     <b><!--<i class="fa fa-server"></i>-->{{hostgroup.name}}</b>
                     <small>{{hostgroup.desc}}</small>
                 </div>
 
-                <br>
-                <p ng-if="configs.length > 0" class="help-block">Which are used in following Configs</p>
-                <p ng-if="configs.length == 0" class="help-block">Which are not used in any Configs</p>
-                <div class="well well-sm clickable" style="margin-bottom: 5px;" ng-repeat="config in configs" ng-click="click_config(config)">
+                <br />
+                <p ng-if="configs.length > 0" class="help-block">
+                    Which are used in following Configs
+                </p>
+                <p ng-if="configs.length == 0" class="help-block">
+                    Which are not used in any Configs
+                </p>
+                <div
+                    class="well well-sm clickable"
+                    style="margin-bottom: 5px"
+                    ng-repeat="config in configs"
+                    ng-click="click_config(config)"
+                >
                     <span class="label label-default">/{{config.url}}</span>
                     <b>{{config.name}}</b>
                     <small>{{config.desc}}</small>
@@ -304,84 +576,121 @@
                     -->
                 </div>
 
-                <br><br>
+                <br /><br />
 
                 <h3>Addresses</h3>
-                <p ng-if="addresses.length == 0" class="help-block">This host has no addresses associated with it.</p>
-                <p ng-if="addresses.length > 0" class="help-block">This host has {{addresses.length}} address(es)</p>
-
+                <p ng-if="addresses.length == 0" class="help-block">
+                    This host has no addresses associated with it.
+                </p>
+                <p ng-if="addresses.length > 0" class="help-block">
+                    This host has {{addresses.length}} address(es)
+                </p>
 
                 <!-- <li ng-repeat="com in selected.communities">{{com}}</li> -->
-                <div class="form-group host-addresses" ng-repeat="addr in addresses">
-
-                    <label class="col-sm-2 control-label">Address
-                        <i class="fa fa-trash-o clickable ng-scope" ng-if="selected._id && selected._canedit" ng-confirm-click="Are you sure you want to remove this address? {{addr.address}}" confirmed-click="removeAddress({{$index}}); return" style=""></i>
+                <div
+                    class="form-group host-addresses"
+                    ng-repeat="addr in addresses"
+                >
+                    <label class="col-sm-2 control-label"
+                        >Address
+                        <i
+                            class="fa fa-trash-o clickable ng-scope"
+                            ng-if="selected._id && selected._canedit"
+                            ng-confirm-click="Are you sure you want to remove this address? {{addr.address}}"
+                            confirmed-click="removeAddress({{$index}}); return"
+                            style=""
+                        ></i>
                     </label>
                     <div class="col-sm-6">
-                        <input type="text" class="form-control" name="address{{$index}}" 
-                            ng-disabled="!selected._canedit" ng-model="addr.address">
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="address{{$index}}"
+                            ng-disabled="!selected._canedit"
+                            ng-model="addr.address"
+                        />
 
                         <p class="help-block">IP address</p>
                     </div>
                     <label class="col-sm-2 control-label">Protocol</label>
                     <div class="col-sm-2">
-                        <select class="form-control"
+                        <select
+                            class="form-control"
                             name="family{{$index}}"
                             ng-disabled="!selected._canedit"
                             ng-model="selectedFamily[$index]"
                             ng-options="family.name for family in address_families track by family.id"
                             ng-change="setFamilyValue(selectedFamily,{{$index}})"
-                                required>
-                        </select>
+                            required
+                        ></select>
 
                         <p class="help-block">Address family (ipv4 or ipv6)</p>
                     </div>
                 </div>
 
-<div ng-controller="paramsAccordion">
-    <accordion close-others="false">
-        <accordion-group is-open="status.open">
-            <accordion-heading>
-                <h3>Add address
-                    <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-                </h3>
-            </accordion-heading>
+                <div ng-controller="paramsAccordion">
+                    <accordion close-others="false">
+                        <accordion-group is-open="status.open">
+                            <accordion-heading>
+                                <h3>
+                                    Add address
+                                    <i
+                                        class="pull-right glyphicon"
+                                        ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"
+                                    ></i>
+                                </h3>
+                            </accordion-heading>
 
+                            <label class="col-sm-2 control-label"
+                                >Address</label
+                            >
+                            <div class="col-sm-6">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    name="newAddress"
+                                    ng-disabled="!selected._canedit"
+                                    ng-model="newAddress"
+                                />
 
-                    <label class="col-sm-2 control-label">Address</label>
-                    <div class="col-sm-6">
-                        <input type="text" class="form-control" name="newAddress" 
-                            ng-disabled="!selected._canedit" ng-model="newAddress">
+                                <p class="help-block">IP address</p>
+                            </div>
+                            <label class="col-sm-2 control-label"
+                                >Protocol</label
+                            >
+                            <div class="col-sm-2">
+                                <select
+                                    class="form-control"
+                                    name="newAddressFamily"
+                                    ng-disabled="!selected._canedit"
+                                    ng-model="newAddressFamily"
+                                    ng-options="family.name for family in address_families track by family.id"
+                                    required
+                                ></select>
 
-                        <p class="help-block">IP address</p>
-                    </div>
-                    <label class="col-sm-2 control-label">Protocol</label>
-                    <div class="col-sm-2">
-                        <select class="form-control"
-                            name="newAddressFamily"
-                            ng-disabled="!selected._canedit"
-                            ng-model="newAddressFamily"
-                            ng-options="family.name for family in address_families track by family.id"
-                                required>
-                        </select>
-
-                        <p class="help-block">Address family (ipv4 or ipv6)</p>
-                        <p><button name="addAddress" ng-click="addAddress($event, newAddress, newAddressFamily.id);clearNewAddress()">Add address</button></p>
-                    </div>
-
-        </accordion-group>
-    </accordion>
-</div>
-
-
+                                <p class="help-block">
+                                    Address family (ipv4 or ipv6)
+                                </p>
+                                <p>
+                                    <button
+                                        name="addAddress"
+                                        ng-click="addAddress($event, newAddress, newAddressFamily.id);clearNewAddress()"
+                                    >
+                                        Add address
+                                    </button>
+                                </p>
+                            </div>
+                        </accordion-group>
+                    </accordion>
+                </div>
 
                 <div ng-if="appconf.debug">
                     <h3>Debug</h3>
                     <pre>{{selected|json}}</pre>
                 </div>
-            </div><!--padding-top-->
+            </div>
+            <!--padding-top-->
         </form>
-    </div><!--subbar-content-->
+    </div>
+    <!--subbar-content-->
 </div>
-
-
