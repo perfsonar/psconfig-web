@@ -20,7 +20,7 @@
         "express": "^4.15.2",
         "express-jwt": "^5.1.0",
         "express-winston": "^2.3.0",
-        "moment-duration": "0.0.6",
+        "moment-interval": "^0.2.1",
         "mongoose": "^5.7.6",
         "promise": "^7.0.4",
         "request": "^2.81.0",

@@ -1,8 +1,6 @@
 FROM node:8
 #FROM node:6
 
-MAINTAINER Michael Johnson <mj82@globalnoc.iu.edu>
-
 EXPOSE 80 
 EXPOSE 8080
 
