@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "ms-vscode-remote.vscode-remote-extensionpack",
+        "waderyan.nodejs-extension-pack",
+        "donjayamanne.git-extension-pack",
+        "esbenp.prettier-vscode",
+        "editorconfig.editorconfig",
+        "ms-azuretools.vscode-docker",
+        "maty.vscode-mocha-sidebar"
+    ]
+}
