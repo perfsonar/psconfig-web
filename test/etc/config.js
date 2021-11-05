@@ -165,7 +165,7 @@ exports.datasource = {
     },
 };
 
-exports.mongodb = "mongodb://mongo/pwa-test1";
+exports.mongodb = "mongodb://localhost/pwa-test1";
 //exports.mongodb = "mongodb://mongo/mca-osg-2019-03-04";
 //exports.mongodb = "mongodb://mongo/mca-osg";
 
