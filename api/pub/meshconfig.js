@@ -1,17 +1,14 @@
 "use strict";
 
 //contrib
-const express = require("express");
-const router = express.Router();
 const winston = require("winston");
 const async = require("async");
 const _ = require("underscore");
 
 //mine
-var config = require("../config");
+let config = require("../config");
 const logger = new winston.Logger(config.logger.winston);
 const db = require("../models");
-const common = require("../common");
 const pub_shared = require("./pub_shared");
 const rename_underscores_to_dashes = pub_shared.rename_underscores_to_dashes;
 const rename_field = pub_shared.rename_field;
@@ -20,25 +17,13 @@ const shared = require("../sharedFunctions");
 
 //catalog of all hosts referenced in member groups keyed by _id
 
-var profile_cache = null;
-var profile_cache_date = null;
+let profile_cache = null;
+let profile_cache_date = null;
 
-var host_catalog = {};
-var host_groups = {};
-var host_groups_details = {};
-//var defaultSchema = 1;
-//var currentSchema = defaultSchema;
+let host_catalog = {};
+let host_groups_details = {};
 
-var archives_obj = {};
-
-function load_profile(cb) {
-    logger.info("reloading profiles");
-    common.profile.getall(function (err, profiles) {
-        if (err) return logger.error(err);
-        profile_cache = profiles;
-        profile_cache_date = Date.now();
-    });
-}
+let archives_obj = {};
 
 function format_archive_obj(archObj) {
     if (_.isObject(archObj)) {
@@ -53,15 +38,11 @@ function format_archive_obj(archObj) {
             }
         });
     }
-}
-
-//load profile for the first time
-//load_profile();
-//setInterval(load_profile, 10*60*1000); //reload every 10 minutes
+} // okay
 
 exports.health = function () {
-    var status = "ok";
-    var msg = null;
+    let status = "ok";
+    let msg = null;
     if (!profile_cache) {
         status = "failed";
         msg = "profile cache not loaded yet?";
@@ -76,20 +57,20 @@ exports.health = function () {
         }
     }
     return { msg: msg, status: status };
-};
+}; // okay
 
 //convert list of UIDs to list of profile objects
 function resolve_users(uids) {
     if (!profile_cache) return null; //auth profile not loaded yet?
-    var users = [];
+    let users = [];
     uids.forEach(function (uid) {
         users.push(profile_cache[uid]);
     });
     return users;
-}
+} // okay
 
 function convert_tool(tool) {
-    var tool_conversions = {
+    const tool_conversions = {
         "bwctl/nuttcp": "nuttcp",
         "bwctl/iperf": "iperf",
         "bwctl/iperf3": "iperf3",
@@ -99,14 +80,13 @@ function convert_tool(tool) {
         tool = tool_conversions[tool];
     }
     return tool;
-}
+} // okay
 
 function meshconfig_testspec_to_psconfig(testspec, name, psc_tests, schedules) {
-    //var spec = testspec.specs;
-    var test = psc_tests[name];
-    var ps_spec = psc_tests[name].spec;
-    var spec = ps_spec;
-    var service_types = {
+    let test = psc_tests[name];
+    let ps_spec = psc_tests[name].spec;
+    let spec = ps_spec;
+    let service_types = {
         bwctl: "throughput",
         owamp: "latencybg",
         ping: "rtt",
@@ -117,12 +97,9 @@ function meshconfig_testspec_to_psconfig(testspec, name, psc_tests, schedules) {
         test.type = service_types[test.type];
     }
 
-    var schedule_type = test["schedule_type"];
-    if (test.type != "owamp") {
-        //      schedule_type = "interval";
-    }
+    let schedule_type = test["schedule_type"];
 
-    var include_schedule = true;
+    let include_schedule = true;
     if (schedule_type == "continuous") {
         include_schedule = false;
     }
@@ -130,13 +107,8 @@ function meshconfig_testspec_to_psconfig(testspec, name, psc_tests, schedules) {
     // change underscores to dashes in all field names in the "spec" stanza
     rename_underscores_to_dashes(spec);
 
-    var interval_seconds = testspec.interval;
-    if ("test-interval" in testspec) {
-        interval_seconds = testspec["test-interval"];
-    }
-
     // this array is a list of fields we will convert from seconds to iso8601
-    var iso_fields = [
+    let iso_fields = [
         "duration",
         "interval",
         "test-interval",
@@ -146,9 +118,9 @@ function meshconfig_testspec_to_psconfig(testspec, name, psc_tests, schedules) {
         "timeout",
     ];
 
-    var specifics = testspec.specs; //getting the specs object from testspec
-    for (var i in iso_fields) {
-        var field = iso_fields[i];
+    let specifics = testspec.specs; //getting the specs object from testspec
+    for (let i in iso_fields) {
+        let field = iso_fields[i];
         if (specifics[field]) {
             psc_tests[name].spec[field] = seconds_to_iso8601(specifics[field]);
         }
@@ -194,8 +166,8 @@ function meshconfig_testspec_to_psconfig(testspec, name, psc_tests, schedules) {
     delete spec.tool;
     delete spec["force-bidirectional"];
 
-    for (var key in spec) {
-        var val = spec[key];
+    for (let key in spec) {
+        let val = spec[key];
 
         // do not convert true/false to numbers
         if (val !== true && val !== false) {
@@ -207,14 +179,14 @@ function meshconfig_testspec_to_psconfig(testspec, name, psc_tests, schedules) {
         }
     }
 
-    var sched_index = Object.keys(schedules).length;
-    var sched_key = "sched-" + sched_index;
+    let sched_index = Object.keys(schedules).length;
+    let sched_key = "sched-" + sched_index;
+    let interval;
 
     if (spec["test-interval"]) {
         schedule_type = "interval";
         include_schedule = true;
-        var interval = spec["test-interval"];
-        var interval_name = "repeat-" + interval;
+        interval = spec["test-interval"];
         if (!schedules[sched_key]) {
             schedules[sched_key] = {};
         }
@@ -265,7 +237,7 @@ function meshconfig_testspec_to_psconfig(testspec, name, psc_tests, schedules) {
     }
 
     delete spec.type;
-}
+} // okay
 
 function resolve_testspec(id, cb) {
     db.Testspec.findById(id).exec(cb);
@@ -341,14 +313,14 @@ function resolve_hostgroup(id, test_service_types, cb) {
 }
 
 function generate_members(hosts) {
-    var members = [];
+    let members = [];
     if (Array.isArray(hosts)) {
         hosts.forEach(function (host) {
             members.push(host.hostname);
         });
     }
     return members;
-}
+} // okay
 
 function get_type(service_type) {
     switch (service_type) {
@@ -360,17 +332,17 @@ function get_type(service_type) {
             return "pinger";
     }
     return service_type; //no change
-}
+} // okay
 
 function generate_mainfo(service, format) {
-    var locator =
+    let locator =
         "https://" + service.ma.hostname + "/esmond/perfsonar/archive";
 
     if (service.ma.local_ma_url) {
         locator = service.ma.local_ma_url;
     }
 
-    var type = null;
+    let type = null;
     if (format == "pscheduler") {
         switch (service.type) {
             case "bwctl":
@@ -387,10 +359,10 @@ function generate_mainfo(service, format) {
     }
 
     return generate_mainfo_url(locator, format, type);
-}
+} // okay
 
 function generate_mainfo_url(locator, format, type) {
-    var archiveSchema = 1;
+    let archiveSchema = 1;
 
     if (format != "psconfig") {
         return {
@@ -408,22 +380,22 @@ function generate_mainfo_url(locator, format, type) {
             },
         };
     }
-}
+} // okay
 
 function set_test_meta(test, key, value) {
     if (!test._meta) test._meta = {};
     test._meta[key] = value;
-}
+} // okay
 
 function get_test_service_type(test) {
-    var type = test.service_type;
+    let type = test.service_type;
 
-    var service = {
+    let service = {
         type: type,
     };
 
     return service;
-}
+} // okay
 
 const dbTest = require("../models");
 exports.dbTest = dbTest;
@@ -494,7 +466,6 @@ function generate_group_members(
         }
 
         set_test_meta(test, "_hostgroup", test.name);
-        //set_test_meta( test, "_hostgroup", host_groups[ test.name ] );
         set_test_meta(test, "_test", test.name);
 
         if (
@@ -1306,7 +1277,6 @@ exports._process_published_config = function (_config, opts, cb) {
 exports.db = db;
 
 exports.generate = function (_config, opts, cb) {
-    host_groups = {};
     host_groups_details = {};
     host_catalog = {};
 
@@ -1351,8 +1321,4 @@ function _apply_plugin(_config, opts, cb) {
         logger.info("no plugins configured");
         return cb(null, _config);
     }
-}
-
-function log_json(json_text) {
-    logger.debug(JSON.stringify(json_text, null, 3));
 }
