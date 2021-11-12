@@ -16,7 +16,7 @@
         "url": "https://github.com/perfsonar/psconfig-web"
     },
     "dependencies": {
-        "async": "^2.3.0",
+        "async": "^3.2.1",
         "body-parser": "^1.17.1",
         "compression": "^1.6.1",
         "connect-busboy": "0.0.2",
