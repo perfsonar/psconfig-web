@@ -153,6 +153,7 @@ router.get("/config/:url", function (req, res, next) {
             //console.log("req", Object.keys(req));
             meshconfig.generate(config, opts, function (err, m) {
                 if (err) return next(err);
+                var jg_length = JSON.stringify(m).length; // should be 14558 for http://127.0.0.1:8082/config/opn-all
                 res.json(m);
             });
         });
