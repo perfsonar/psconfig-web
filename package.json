@@ -2,6 +2,9 @@
     "name": "psconfig-web-admin",
     "version": "4.4.1",
     "description": "Tools to generate / publish perfSONAR meshconfig/psconfig topologies",
+    "engines": {
+        "node": ">=14"
+    },
     "scripts": {
         "test": "mocha",
         "apidoc": "apidoc -i api/ -o ui/apidoc/"
