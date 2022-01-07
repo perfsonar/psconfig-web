@@ -1,7 +1,9 @@
 version: "2.4"
 services:
     mongo:
-        image: mongo:4.0.3
+        # image: mongo:4.2-bionic
+        image: perfsonar/pwa-mongo:bleeding-edge
+        # image: mongo:4.0.3
         restart: unless-stopped
         volumes:
             - /usr/local/data/mongo:/data/db
