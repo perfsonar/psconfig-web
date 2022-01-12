@@ -1,5 +1,4 @@
-FROM node:8
-#FROM node:6
+FROM node:14
 
 EXPOSE 80 
 EXPOSE 8080
