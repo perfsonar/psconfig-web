@@ -11,16 +11,16 @@ var save_output = false;
 
 // files for testing import
 var testfiles = [];
-testfiles.push("data/testbed.json");
-testfiles.push("data/testbed2-noarchives.json");
-testfiles.push("data/testbed3-nodescription.json");
-testfiles.push("data/testbed4-no_endpoint_description.json");
-testfiles.push("data/latentput-psconfig.json");
+testfiles.push("test/data/testbed.json");
+testfiles.push("test/data/testbed2-noarchives.json");
+testfiles.push("test/data/testbed3-nodescription.json");
+testfiles.push("test/data/testbed4-no_endpoint_description.json");
+testfiles.push("test/data/latentput-psconfig.json");
 
 // files for testing psconfig/meshconfig detection
 var formatFiles = [];
-formatFiles.push("data/latentput-meshconfig.json");
-formatFiles.push("data/latentput-psconfig.json");
+formatFiles.push("test/data/latentput-meshconfig.json");
+formatFiles.push("test/data/latentput-psconfig.json");
 
 function formatlog(obj) {
     var out = JSON.stringify(obj, null, 3);
