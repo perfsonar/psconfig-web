@@ -27,8 +27,6 @@ It's usually a good idea to clean up old build first:
 
 `make clean_all`
 
-See separate documentation in [BUILDING.md](BUILDING.md)
-
 ## Docker build
 
 Currently, the docker build is done manually. This should be added to Jenkins, but there are some. questions we'd have to answer first -- mostly, where do the finished images get pushed?
