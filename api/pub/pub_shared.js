@@ -2,7 +2,7 @@
 // contrib
 const winston = require("winston");
 const _ = require("underscore");
-const moment = require("moment");
+const moment = require("moment-interval");
 
 // mine
 const config = require("../config");
