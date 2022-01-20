@@ -1,4 +1,4 @@
-const moment = require("moment");
+const moment = require("moment-interval");
 
 exports.convert_tool = function (tool, reverse) {
     var tool_conversions = {
