@@ -1,20 +1,16 @@
 console.log("NOTE: db mca copied to pwa-test1");
 //contrib
-var assert = require("assert");
+const deepEqualInAnyOrder = require("deep-equal-in-any-order");
 var chai = require("chai");
+var chaiHttp = require("chai-http");
 
 //mine
 var config = require("./etc/config");
 var publisher = require("../api/pub/meshconfig");
-const winston = require("winston");
-const logger = new winston.Logger(config.logger.winston);
-const async = require("async");
-fs = require("fs");
-
-function formatlog(obj) {
-    var out = JSON.stringify(obj, null, 3);
-    return out;
-}
+var fs = require("fs");
+const fsp = require("fs/promises");
+chai.use(deepEqualInAnyOrder);
+chai.use(chaiHttp);
 
 var testsObj = {
     throughput3: {
@@ -111,7 +107,7 @@ describe("publisher", function () {
                 console.log("testfile_expected", testfile_expected);
                 //var expected_output;
                 fs.readFile(
-                    "data/" + testfile_expected,
+                    "test/data/" + testfile_expected,
                     "utf8",
                     function (err, data) {
                         //console.log("err, data", err, data);
@@ -176,4 +172,32 @@ describe("publisher", function () {
     console.log("Got to end.");
     //nextTest();
     cleanup();
+});
+
+describe("John's Test", function () {
+    let opn_all_expect;
+
+    before(async function () {
+        try {
+            const opn_all_data = await fsp.readFile(
+                "test/data/opn-all-expected.json"
+            );
+            opn_all_expect = JSON.parse(opn_all_data);
+        } catch (err) {
+            console.error("ERROR reading file: ", err);
+        }
+    });
+
+    it("opn-all should match opn_all_expect", async function () {
+        return await chai
+            .request("http://grigutis-dev.grnoc.iu.edu/pwa")
+            .get("/pub/config/opn-all")
+            .then((res) => {
+                chai.expect(res).to.have.status(200);
+                chai.expect(res.body).to.deep.equalInAnyOrder(opn_all_expect);
+            })
+            .catch((err) => {
+                throw err;
+            });
+    });
 });

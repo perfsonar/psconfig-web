@@ -1,6 +1,6 @@
 {
     "name": "psconfig-web-admin",
-    "version": "4.4.1",
+    "version": "4.4.2",
     "description": "Tools to generate / publish perfSONAR meshconfig/psconfig topologies",
     "scripts": {
         "test": "mocha",
@@ -32,6 +32,7 @@
         "apidoc": "^0.17.6",
         "assert": "^1.4.1",
         "chai": "^3.4.1",
+        "chai-http": "^4.3.0",
         "deep-equal-in-any-order": "^1.0.10",
         "eslint": "^7.32.0",
         "eslint-config-prettier": "^8.3.0",
