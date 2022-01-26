@@ -1,4 +1,4 @@
-FROM node:6
+FROM node:14
 
 EXPOSE 8080
 CMD ["node", "/app/api/pwapub.js"]
