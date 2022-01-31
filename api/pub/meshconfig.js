@@ -239,9 +239,9 @@ function meshconfig_testspec_to_psconfig(testspec, name, psc_tests, schedules) {
     delete spec.type;
 } // okay
 
-async function resolve_testspec(id) {
-    return await db.Testspec.findById(id).exec();
-} // okay
+function resolve_testspec(id, cb) {
+    db.Testspec.findById(id).exec(cb);
+}
 
 //doesn't check if the ma host actually provides ma service
 function resolve_ma(host, next, service_types) {
@@ -599,25 +599,24 @@ exports._process_published_config = function (_config, opts, cb) {
                         //testspec
                         if (!test.testspec) return next();
 
-                        try {
-                            test.testspec = resolve_testspec(test.testspec);
-                        } catch (error) {
-                            return next(error);
-                        }
+                        resolve_testspec(test.testspec, function (err, row) {
+                            if (err) return next(err);
+                            test.testspec = row;
 
-                        //suppress testspecs that does't meet min host version
-                        if (!_config._host_version) return next();
-                        let hostv = parseInt(_config._host_version[0]);
-                        let minver =
-                            config.meshconfig.minver[test.service_type];
-                        for (let k in test.testspec.specs) {
-                            //if minver is set for this testspec, make sure host version meets it
-                            if (minver && k in minver) {
-                                if (hostv < minver[k])
-                                    delete test.testspec.specs[k];
+                            //suppress testspecs that does't meet min host version
+                            if (!_config._host_version) return next();
+                            var hostv = parseInt(_config._host_version[0]);
+                            var minver =
+                                config.meshconfig.minver[test.service_type];
+                            for (var k in test.testspec.specs) {
+                                //if minver is set for this testspec, make sure host version meets it
+                                if (minver && k in minver) {
+                                    if (hostv < minver[k])
+                                        delete test.testspec.specs[k];
+                                }
                             }
-                        }
-                        next();
+                            next();
+                        });
                     },
                 ],
                 next_test
