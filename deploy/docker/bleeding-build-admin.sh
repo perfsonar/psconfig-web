@@ -18,7 +18,7 @@ rm -f pwa-admin/tmp/api/auth.pub
 rm -f pwa-admin/tmp/api/auth.key
 rm -f pwa-admin/tmp/api/user.jwt
 
-docker build pwa-admin -t perfsonar/pwa-admin:$VERSION --no-cache --force-rm
+docker build pwa-admin --network host -t perfsonar/pwa-admin:$VERSION --no-cache --force-rm
 if [ ! $? -eq 0 ]; then
     echo "failed to build"
     exit
