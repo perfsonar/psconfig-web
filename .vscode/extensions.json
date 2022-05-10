@@ -6,6 +6,7 @@
         "esbenp.prettier-vscode",
         "editorconfig.editorconfig",
         "ms-azuretools.vscode-docker",
-        "maty.vscode-mocha-sidebar"
+        "maty.vscode-mocha-sidebar",
+        "donjayamanne.python-extension-pack"
     ]
 }
