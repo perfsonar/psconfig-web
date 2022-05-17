@@ -1,8 +1,8 @@
-from sqlalchemy import create_engine, Column, ForeignKey
+from sqlalchemy import create_engine, Column, ForeignKey, Table
 from sqlalchemy.dialects.postgresql import *
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 
-engine = create_engine('postgres://psconfig:psconfig@localhost:5432/psconfig/')
+engine = create_engine('postgresql://psconfig:psconfig@localhost:5432/psconfig')
 
 Base = declarative_base()
 
@@ -36,7 +36,7 @@ templates_tests = Table('templates_tests', Base.metadata,
 groups_addresses = Table('groups_addresses', Base.metadata,
     Column('groups_id', ForeignKey('groups.id'), primary_key=True),
     Column('addresses_id', ForeignKey('addresses.id'), primary_key=True),
-    Column(BOOLEAN, 'b_address')
+    Column('b_address', BOOLEAN)
 )
 
 tasks_archives = Table('tasks_archives', Base.metadata,
@@ -67,7 +67,7 @@ class Address(Base):
     __tablename__ = 'addresses'
     
     id = Column(BIGINT, primary_key=True)
-    name = Column(VARCHAR)
+    name = Column(VARCHAR, nullable=False)
     address = Column(VARCHAR, nullable=False)
     labels = Column(JSONB)
     remote_addresses = Column(JSONB)
@@ -126,7 +126,7 @@ class Test(Base):
 # Optional properties
 
 class Archive(Base):
-    __tablename__ = 'archive'
+    __tablename__ = 'archives'
 
     id = Column(BIGINT, primary_key=True)
     name = Column(VARCHAR)
@@ -161,3 +161,20 @@ class Schedule(Base):
     until = Column(VARCHAR)
     max_runs = Column(INTEGER)
     _meta = Column(JSONB)
+
+Base.metadata.create_all(engine)
+
+def create_session():
+    session = sessionmaker(bind=engine)
+    return session()
+
+if __name__ == "__main__":
+    session = create_session()
+    
+    test_template = Template(name="Test Template")
+    session.add(test_template)
+    session.commit()
+    
+    address = Address(name="123.456.789.012", address="123.456.789.012")
+    session.add(address)
+    session.commit()
