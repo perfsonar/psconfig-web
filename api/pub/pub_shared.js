@@ -126,8 +126,13 @@ exports.rename_field = function (obj, oldname, newname) {
 };
 
 exports.seconds_to_iso8601 = function (dur) {
-    var isoOut = moment.duration(dur * 1000); // moment.duration expects milliseconds
-    isoOut = isoOut.toISOString();
+    var isoOut;
+    if (dur == 0) {
+        isoOut = "PT0S";
+    } else {
+        isoOut = moment.duration(dur * 1000); // moment.duration expects milliseconds
+        isoOut = isoOut.toISOString();
+    }
     return isoOut;
 };
 
