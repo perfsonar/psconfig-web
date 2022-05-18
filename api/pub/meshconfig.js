@@ -1257,6 +1257,13 @@ exports._process_published_config = function (_config, opts, cb) {
                     psc_tasks[name].tools = [test._meta._tool];
                 }
 
+                if (test.keep_after_archive != null) {
+                    psc_tasks[name].schema = 5;
+                    psc_tasks[name]["keep-after-archive"] = seconds_to_iso8601(
+                        test.keep_after_archive
+                    );
+                }
+
                 var parameters = test.testspec.specs;
 
                 if (format != "psconfig")

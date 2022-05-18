@@ -186,6 +186,7 @@ var testSchema = mongoose.Schema({
 
     center: { type: mongoose.Schema.Types.ObjectId, ref: "Host" }, //only used for mesh_type == star
     nahosts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Host" }], //let's not use hostgroup for this..
+    keep_after_archive: Number,
 
     testspec: { type: mongoose.Schema.Types.ObjectId, ref: "Testspec" },
 
