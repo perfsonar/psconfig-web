@@ -10,26 +10,24 @@
 %define perfsonar_auto_relnum 0.b1.1
 %define debug_package %{nil}
 
-Name:			perfsonar-psconfig-web-admin-ui
-Version:		%{perfsonar_auto_version}
-Release:		%{perfsonar_auto_relnum}%{?dist}
-Summary:		perfSONAR pSConfig Web Administrator: UI and API
-License:		ASL 2.0
-Group:			Applications/Communications
-URL:			http://www.perfsonar.net
-Source0:		perfsonar-psconfig-web-admin-ui-%{version}.%{perfsonar_auto_relnum}.tar.gz
-BuildRoot:		%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildArch:		x86_64
+Name:		perfsonar-psconfig-web-admin-ui
+Version:	%{perfsonar_auto_version}
+Release:	%{perfsonar_auto_relnum}%{?dist}
+Summary:	perfSONAR pSConfig Web Administrator: UI and API
+License:	ASL 2.0
+Group:		Applications/Communications
+URL:		http://www.perfsonar.net
+Source0:	perfsonar-psconfig-web-admin-ui-%{version}.tar.gz
+BuildArch:	x86_64
+BuildRequires:  npm
 Requires:       nodejs
-Requires:		httpd
+Requires:	httpd
 Requires:       mod_ssl
-Requires:       mongodb
-Requires:       mongodb-server
-#Requires:       mongodb-org #TODO we may need to use this instead
-#Requires:       mongodb-org-server #TODO we may need to use this instead
-Requires:		perfsonar-psconfig-web-admin-shared
-Requires:		perfsonar-psconfig-web-admin-auth
-Requires:		perfsonar-psconfig-web-admin-publisher
+Requires:       mongodb-org
+Requires:       mongodb-org-server
+Requires:	perfsonar-psconfig-web-admin-shared
+Requires:	perfsonar-psconfig-web-admin-auth
+Requires:	perfsonar-psconfig-web-admin-publisher
 
 %description
 The perfSONAR pSConfig Web Administrator package provides an authenticated, multi-user,
@@ -40,9 +38,10 @@ web-based interface for managing perfSONAR meshes, using pSConfig or MeshConfig 
 /usr/sbin/useradd -g perfsonar -r -s /sbin/nologin -c "perfSONAR User" -d /tmp perfsonar 2> /dev/null || :
 
 %prep
-%setup -q -n perfsonar-psconfig-web-admin-ui-%{version}.%{perfsonar_auto_relnum}
+%setup -q -n perfsonar-psconfig-web-admin-ui-%{version}
 
 %build
+make npm manifest
 
 %install
 rm -rf %{buildroot}

@@ -10,22 +10,20 @@
 %define perfsonar_auto_relnum 0.b1.1
 %define debug_package %{nil}
 
-Name:			perfsonar-psconfig-web-admin-publisher
-Version:		%{perfsonar_auto_version}
-Release:		%{perfsonar_auto_relnum}%{?dist}
-Summary:		perfSONAR pSConfig Web Administrator: Publisher
-License:		ASL 2.0
-Group:			Applications/Communications
-URL:			http://www.perfsonar.net
-Source0:	    perfsonar-psconfig-web-admin-publisher-%{version}.%{perfsonar_auto_relnum}.tar.gz
-BuildRoot:		%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildArch:		x86_64
+Name:		perfsonar-psconfig-web-admin-publisher
+Version:	%{perfsonar_auto_version}
+Release:	%{perfsonar_auto_relnum}%{?dist}
+Summary:	perfSONAR pSConfig Web Administrator: Publisher
+License:	ASL 2.0
+Group:		Applications/Communications
+URL:		http://www.perfsonar.net
+Source0:	perfsonar-psconfig-web-admin-publisher-%{version}.tar.gz
+BuildArch:	x86_64
 Requires:       nodejs
-Requires:		httpd
+Requires:	httpd
 Requires:       mod_ssl
 Requires:       perfsonar-psconfig-web-admin-shared
-Requires:       mongodb-server 
-#Requires:       mongodb-org-server #TODO we may have to change to this
+Requires:       mongodb-org-server 
 
 %description
 The perfSONAR pSConfig Web Administrator Publisher package provides a webservice for
@@ -36,7 +34,7 @@ publishing Configs and host autoconfigs in pSConfig or MeshConfig formats
 /usr/sbin/useradd -g perfsonar -r -s /sbin/nologin -c "perfSONAR User" -d /tmp perfsonar 2> /dev/null || :
 
 %prep
-%setup -q -n perfsonar-psconfig-web-admin-publisher-%{version}.%{perfsonar_auto_relnum}
+%setup -q -n perfsonar-psconfig-web-admin-publisher-%{version}
 
 %build
 
