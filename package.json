@@ -24,9 +24,9 @@
         "mongoose": "^6.3.3",
         "promise": "^8.1.0",
         "request": "^2.88.2",
-        "sandbox": "^0.8.6",
+        "sandbox": "^2.0.0-alpha5",
         "underscore": "^1.13.3",
-        "winston": "^2.4.6"
+        "winston": "^3.7.2"
     },
     "devDependencies": {
         "apidoc": "^0.51.1",
