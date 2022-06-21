@@ -3,7 +3,7 @@ from sqlalchemy.dialects.postgresql import *
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://psconfig:psconfig@localhost:5432/psconfig'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://psconfig:psconfig@localhost:5432/psconfig'
 app.config['SECRET_KEY'] = 'Y\xfd\xb8\xc5\x12\x1e\x1f\xca\x88\x86\xc2\x19\x123v\x05\xae\x80\xa5q\x89\xc0\x190'
 
 db = SQLAlchemy(app)
