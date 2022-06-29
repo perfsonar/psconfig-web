@@ -12,7 +12,7 @@
     "webpack-watch": "run-script-os",
     "webpack-watch:win32": "SET NODE_ENV=debug && webpack --mode development --watch",
     "webpack-watch:default": "NODE_ENV=debug webpack --mode development --watch",
-    "flask-server": "pipenv run flask run --host=0.0.0.0",
+    "flask-server": "pipenv run flask run --host=0.0.0.0 --port=5001",
     "flask-static-digest": "pipenv run flask digest compile",
     "lint": "eslint \"assets/js/*.js\""
   },
