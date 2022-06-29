@@ -1,0 +1,61 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+# Flask
+Flask = "==2.1.2"
+Werkzeug = "==2.1.2"
+click = ">=7.0"
+
+# Database
+Flask-SQLAlchemy = "==2.5.1"
+SQLAlchemy = "==1.4.39"
+psycopg2-binary = "==2.9.3"
+
+# Migrations
+Flask-Migrate = "==3.1.0"
+
+# Forms
+email-validator = "==1.2.1"
+Flask-WTF = "==1.0.1"
+WTForms = "==3.0.1"
+
+# Deployment
+gevent = "==21.12.0"
+gunicorn = ">=19.9.0"
+supervisor = "==4.2.4"
+
+# Flask Static Digest
+Flask-Static-Digest = "==0.2.1"
+
+# Auth
+Flask-Login = "==0.6.1"
+Flask-Bcrypt = "==1.0.1"
+
+# Caching
+Flask-Caching = ">=1.7.2"
+
+# Debug toolbar
+Flask-DebugToolbar = "==0.13.1"
+
+# Environment variable parsing
+environs = "==9.5.0"
+
+[dev-packages]
+# Testing
+pytest = "==7.1.2"
+WebTest = "==3.0.0"
+factory-boy = "==3.2.1"
+pdbpp = "==0.10.3"
+
+# Lint and code style
+black = "==22.6.0"
+flake8 = "==4.0.1"
+flake8-blind-except = "==0.2.1"
+flake8-debugger = "==4.1.2"
+flake8-docstrings = "==1.6.0"
+flake8-isort = "==4.1.1"
+isort = "==5.10.1"
+pep8-naming = "==0.13.0"
