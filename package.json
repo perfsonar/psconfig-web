@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/grigutis/psconfig_web.git"
+    "url": "git+https://github.com/perfsonar/psconfig-web.git"
   },
   "author": "John Grigutis",
   "license": "MIT",
@@ -26,9 +26,9 @@
     "node": ">=16"
   },
   "bugs": {
-    "url": "https://github.com/grigutis/psconfig_web/issues"
+    "url": "https://github.com/perfsonar/psconfig-web/issues"
   },
-  "homepage": "https://github.com/grigutis/psconfig_web#readme",
+  "homepage": "https://github.com/perfsonar/psconfig-web#readme",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.0.0",
     "bootstrap": "^5.0.2",
