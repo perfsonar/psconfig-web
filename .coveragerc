@@ -1,0 +1,6 @@
+[run]
+source = psconfig_web
+omit = 
+    tests/*
+    autoapp.py
+
