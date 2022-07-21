@@ -13,20 +13,20 @@ TEST_PATH = os.path.join(PROJECT_ROOT, "tests")
 
 @click.command()
 @click.option(
-     "-c",
-     "--coverage",
-     default=True,
-     is_flag=True,
-     help="Show coverage report",
- )
- def test(coverage):
+    "-c",
+    "--coverage",
+    default=True,
+    is_flag=True,
+    help="Show coverage report",
+)
+def test(coverage):
     """Run the tests."""
     import pytest
 
     args = [TEST_PATH, "--verbose"]
-     if coverage:
-         args.append("--cov={{cookiecutter.app_name}}")
-     rv = pytest.main(args)
+    if coverage:
+        args.append("--cov={{cookiecutter.app_name}}")
+    rv = pytest.main(args)
     exit(rv)
 
 
