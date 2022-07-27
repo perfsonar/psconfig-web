@@ -161,13 +161,16 @@ as it resolves the correct file name, including the MD5 hash.
 For example
 
 ```html
-<link rel="shortcut icon" href="{{static_url_for('static', filename='build/img/favicon.ico') }}">
+<link
+  rel="shortcut icon"
+  href="{{static_url_for('static', filename='build/favicon.ico') }}"
+/>
 ```
 
 If all of your static files are managed this way, then their filenames will change whenever their
 contents do, and you can ask Flask to tell web browsers that they
 should cache all your assets forever by including the following line
-in ``.env``:
+in `.env`:
 
 ```text
 SEND_FILE_MAX_AGE_DEFAULT=31556926  # one year
