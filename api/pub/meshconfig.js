@@ -993,10 +993,8 @@ exports._process_published_config = function (_config, opts, cb) {
                 org.sites.push(site);
             }
 
-            var ma_prefix = "config-archive";
             // init variables for config archives
             var last_config_ma_number = 0;
-            var last_test_ma_number = 0;
             var test_mas = [];
 
             // Get custom MAs (which are defined as raw JSON in a string in the db)
@@ -1058,7 +1056,7 @@ exports._process_published_config = function (_config, opts, cb) {
                                 );
                                 psc_archives = _.extend(psc_archives, newArch);
                                 psc_archive_ids_included[_id] = true;
-                                test_mas.push(name + "-" + _id);
+                                test_mas.push(Object.keys(newArch)[0]);
                             } else {
                             }
                         } else {
@@ -1070,14 +1068,12 @@ exports._process_published_config = function (_config, opts, cb) {
                 });
             }
 
-            var ma_prefix = "config-archive";
             if ("ma_urls" in _config) {
                 for (var i in _config.ma_urls) {
                     var url = _config.ma_urls[i];
                     if (url == "") continue;
 
                     var maName = "config-archive" + last_config_ma_number;
-                    var maName = "config-archive" + last_test_ma_number;
                     test_mas.push(maName); // TODO: ADAPT FOR NEW MA STYLE
                     var maInfo;
                     var maType = maHash[url];
@@ -1255,6 +1251,13 @@ exports._process_published_config = function (_config, opts, cb) {
                     typeof test._meta._tool != "undefined"
                 ) {
                     psc_tasks[name].tools = [test._meta._tool];
+                }
+
+                if (test.keep_after_archive != null) {
+                    psc_tasks[name].schema = 5;
+                    psc_tasks[name]["keep-after-archive"] = seconds_to_iso8601(
+                        test.keep_after_archive
+                    );
                 }
 
                 var parameters = test.testspec.specs;

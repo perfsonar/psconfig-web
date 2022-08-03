@@ -1,13 +1,13 @@
 {
     "name": "pwa-ui",
-    "version": "4.4.2",
+    "version": "5.0.0",
     "description": "UI components for PWA UI service",
     "main": "config.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "buildcss": "node_modules/node-sass/bin/node-sass --output-style compressed --source-map true --source-map-contents true --precision 6 scss/pwa.scss css/pwa.min.css && node_modules/node-sass/bin/node-sass --output-style expanded --source-map true --source-map-contents true --precision 6 scss/pwa.scss css/pwa.css"
     },
-    "author": "Michael Johnson <mj82@globalnoc.iu.edu> (http://globalnoc.iu.edu)",
+    "author": "",
     "license": "ISC",
     "dependencies": {
         "ace-builds": "^1.2.5",
