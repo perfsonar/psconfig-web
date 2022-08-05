@@ -54,7 +54,7 @@ class PkModel(Model):
     """Base model class that includes CRUD convenience methods, plus adds a 'primary key' column named ``id``."""
 
     __abstract__ = True
-    id = Column(db.Integer, primary_key=True)
+    id = Column(db.BigInteger, primary_key=True)
 
     @classmethod
     def get_by_id(cls: Type[T], record_id) -> Optional[T]:

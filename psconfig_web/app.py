@@ -5,7 +5,7 @@ import sys
 
 from flask import Flask, render_template
 
-from psconfig_web import commands, public, user
+from psconfig_web import commands, public, user, psconfig
 from psconfig_web.extensions import (
     bcrypt,
     cache,
@@ -51,6 +51,7 @@ def register_blueprints(app):
     """Register Flask blueprints."""
     app.register_blueprint(public.views.blueprint)
     app.register_blueprint(user.views.blueprint)
+    app.register_blueprint(psconfig.views.blueprint)
     return None
 
 
