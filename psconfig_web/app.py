@@ -5,7 +5,7 @@ import sys
 
 from flask import Flask, render_template
 
-from psconfig_web import commands, public, user, psconfig
+from psconfig_web import commands, psconfig, public, user
 from psconfig_web.extensions import (
     bcrypt,
     cache,
