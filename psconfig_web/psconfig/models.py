@@ -1,8 +1,15 @@
 # -*- coding: utf-8 -*-
 """pSConfig models."""
-from sqlalchemy.dialects.postgresql import *
+from sqlalchemy.dialects.postgresql import (
+    ARRAY,
+    BOOLEAN,
+    INTEGER,
+    INTERVAL,
+    JSONB,
+    VARCHAR,
+)
 
-from psconfig_web.database import Column, PkModel, db, reference_col, relationship
+from psconfig_web.database import Column, PkModel, db, relationship
 
 # Alias common SQLAlchemy names
 ForeignKey = db.ForeignKey
@@ -112,9 +119,10 @@ templates_tests = Table(
 
 
 class Template(PkModel):
-    """A pSConfig template."""
+    """A description of the task topology in a machine readable format (JSON)."""
 
     __tablename__ = "templates"
+
     name = Column(VARCHAR, nullable=False, unique=True)
     includes = Column(ARRAY(VARCHAR))
     _meta = Column(JSONB)
@@ -138,6 +146,8 @@ class Template(PkModel):
 
 
 class Address(PkModel):
+    """A collection of properties that act as the unit of input to a task."""
+
     __tablename__ = "addresses"
 
     name = Column(VARCHAR, nullable=False)
@@ -159,6 +169,8 @@ class Address(PkModel):
 
 
 class Group(PkModel):
+    """A description of how to combine addresses when building the list of tasks."""
+
     __tablename__ = "groups"
 
     name = Column(VARCHAR, nullable=False)
@@ -173,6 +185,8 @@ class Group(PkModel):
 
 
 class Task(PkModel):
+    """A job to do consisting of a test to be carried out, scheduling information and other options."""
+
     __tablename__ = "tasks"
 
     name = Column(VARCHAR, nullable=False)
@@ -190,6 +204,8 @@ class Task(PkModel):
 
 
 class Test(PkModel):
+    """Defines the parameters of the job to be carried out by the task."""
+
     __tablename__ = "tests"
 
     name = Column(VARCHAR, nullable=False)
@@ -202,6 +218,8 @@ class Test(PkModel):
 
 
 class AddressClass(PkModel):
+    """An optional component …."""
+
     __tablename__ = "address_classes"
 
     name = Column(VARCHAR, nullable=False)
@@ -212,6 +230,8 @@ class AddressClass(PkModel):
 
 
 class Archive(PkModel):
+    """An optional component that tells agents where the results of the described tasks are to be stored."""
+
     __tablename__ = "archives"
 
     name = Column(VARCHAR, nullable=False)
@@ -223,6 +243,8 @@ class Archive(PkModel):
 
 
 class Context(PkModel):
+    """An optional component that allows certain user-specified changes to the execution context."""
+
     __tablename__ = "contexts"
 
     name = Column(VARCHAR, nullable=False)
@@ -232,6 +254,8 @@ class Context(PkModel):
 
 
 class Host(PkModel):
+    """An optional component that contains properties shared between one or more addresses."""
+
     __tablename__ = "hosts"
 
     name = Column(VARCHAR, nullable=False)
@@ -245,6 +269,8 @@ class Host(PkModel):
 
 
 class Schedule(PkModel):
+    """An optional component that tells agents how often to run a task."""
+
     __tablename__ = "schedules"
 
     name = Column(VARCHAR, nullable=False)
@@ -258,6 +284,8 @@ class Schedule(PkModel):
 
 
 class Subtask(PkModel):
+    """An optional component …."""
+
     __tablename__ = "subtasks"
 
     name = Column(VARCHAR, nullable=False)

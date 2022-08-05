@@ -3,8 +3,6 @@
 from flask import Blueprint, render_template
 from flask_login import login_required
 
-from psconfig_web.psconfig.models import *
-
 blueprint = Blueprint(
     "template", __name__, url_prefix="/templates", static_folder="../static"
 )
