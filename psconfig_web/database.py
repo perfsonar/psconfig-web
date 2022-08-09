@@ -11,9 +11,6 @@ T = TypeVar("T", bound="PkModel")
 Column = db.Column
 relationship = db.relationship
 
-# SQLAlchemy does not map BigInt to Int by default on the sqlite dialect.
-BigInt = db.BigInteger().with_variant(db.Integer, "sqlite")
-
 
 class CRUDMixin(object):
     """Mixin that adds convenience methods for CRUD (create, read, update, delete) operations."""
@@ -57,7 +54,7 @@ class PkModel(Model):
     """Base model class that includes CRUD convenience methods, plus adds a 'primary key' column named ``id``."""
 
     __abstract__ = True
-    id = Column(BigInt, primary_key=True)
+    id = Column(db.BigInteger, primary_key=True)
 
     @classmethod
     def get_by_id(cls: Type[T], record_id) -> Optional[T]:
