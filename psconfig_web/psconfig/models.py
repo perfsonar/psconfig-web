@@ -127,11 +127,19 @@ class Template(PkModel):
     includes = Column(ARRAY(VARCHAR))
     _meta = Column(JSONB)
 
+    # Required
     addresses = relationship("Address", secondary=templates_addresses)
     groups = relationship("Group", secondary=templates_groups)
-    hosts = relationship("Host", secondary=templates_hosts)
     tasks = relationship("Task", secondary=templates_tasks)
     tests = relationship("Test", secondary=templates_tests)
+
+    # Optional
+    address_classes = relationship("AddressClass", secondary=templates_address_classes)
+    archives = relationship("Archive", secondary=templates_archives)
+    contexts = relationship("Context", secondary=templates_contexts)
+    hosts = relationship("Host", secondary=templates_hosts)
+    schedules = relationship("Schedule", secondary=templates_schedules)
+    subtasks = relationship("Subtask", secondary=templates_subtasks)
 
     def __init__(self, name, **kwargs):
         """Create instance."""
