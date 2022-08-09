@@ -3,6 +3,8 @@
 from flask import Blueprint, render_template
 from flask_login import login_required
 
+from .models import *  # noqa
+
 blueprint = Blueprint(
     "template", __name__, url_prefix="/templates", static_folder="../static"
 )
