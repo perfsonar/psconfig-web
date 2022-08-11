@@ -4,6 +4,7 @@
 import logging
 
 import pytest
+from sqlalchemy_utils import create_database, database_exists
 from webtest import TestApp
 
 from psconfig_web.app import create_app
@@ -36,6 +37,8 @@ def db(app):
     """Create database for the tests."""
     _db.app = app
     with app.app_context():
+        if not database_exists(_db.engine.url):
+            create_database(_db.engine.url)
         _db.create_all()
 
     yield _db

@@ -2,14 +2,21 @@
 """Database module, including the SQLAlchemy database object and DB-related utilities."""
 from typing import Optional, Type, TypeVar
 
+from sqlalchemy_utils import create_database, database_exists
+
 from .compat import basestring
 from .extensions import db
+from .settings import SQLALCHEMY_DATABASE_URI
 
 T = TypeVar("T", bound="PkModel")
 
 # Alias common SQLAlchemy names
 Column = db.Column
 relationship = db.relationship
+
+# Create the database
+if not database_exists(SQLALCHEMY_DATABASE_URI):
+    create_database(SQLALCHEMY_DATABASE_URI)
 
 
 class CRUDMixin(object):
