@@ -6,13 +6,13 @@ name = "pypi"
 [packages]
 # Flask
 click = ">=7.0"
-Flask = "==2.2.1"
-Werkzeug = "==2.2.1"
+Flask = "==2.2.2"
+Werkzeug = "==2.2.2"
 
 # Database
 Flask-SQLAlchemy = "==2.5.1"
 psycopg2-binary = "==2.9.3"
-SQLAlchemy = "==1.4.39"
+SQLAlchemy = "==1.4.40"
 SQLAlchemy-Utils = "==0.38.3"
 
 # Migrations
@@ -54,10 +54,10 @@ WebTest = "==3.0.0"
 
 # Lint and code style
 black = "==22.6.0"
-flake8 = "==4.0.1"
+flake8 = "==5.0.4"
 flake8-blind-except = "==0.2.1"
 flake8-debugger = "==4.1.2"
 flake8-docstrings = "==1.6.0"
-flake8-isort = "==4.1.2.post0"
+flake8-isort = "==4.2.0"
 isort = "==5.10.1"
 pep8-naming = "==0.13.1"
