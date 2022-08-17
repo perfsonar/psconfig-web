@@ -26,6 +26,24 @@
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('public.about') }}">About</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('psconfig.addresses') }}">Addresses</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('psconfig.archives') }}">Archives</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('psconfig.groups') }}">Groups</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('psconfig.hosts') }}">Hosts</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('psconfig.tasks') }}">Tasks</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('psconfig.tests') }}">Tests</a>
+        </li>
       </ul>
       {% if current_user and current_user.is_authenticated %}
       <ul class="navbar-nav my-auto">

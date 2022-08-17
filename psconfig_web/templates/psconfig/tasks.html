@@ -1,6 +1,64 @@
 {% extends "layout.html" %} {% block content %}
-<div class="container">
-  <h1>pSConfig Tasks</h1>
-  <h3>List of tasks will appear here.</h3>
+<div class="container-narrow">
+  <h1 class="mt-5">Tasks</h1>
+    <br/>
+    <form id="taskForm" class="form form-task" method="POST" action="" role="form">
+           {{ form.csrf_token }}
+            <div class="form-group">
+                {{form.name.label}}
+                {{form.name(placeholder="Name", class_="form-control")}}
+            </div>
+            <div class="form-group">
+                {{form.scheduled_by.label}}
+                {{form.scheduled_by(placeholder="Scheduled By", class_="form-control")}}
+            </div>
+            <div class="form-group">
+                {{form.tools.label}}
+                {{form.tools(placeholder="Tools", class_="form-control")}}
+                <small id="emailHelp" class="form-text text-muted">A comma delimited list of tools.</small>
+            </div>
+            <div class="form-group">
+                {{form.priority.label}}
+                {{form.priority(placeholder="Priority", class_="form-control")}}
+            </div>
+            <div class="form-group">
+              {{form.reference.label}}
+              {{form.reference(placeholder="Reference", class_="form-control")}}
+          </div>
+          <div class="form-group">
+            {{form.disabled.label}}
+            {{form.disabled(placeholder="Disabled")}}
+        </div>
+      <p><input class="btn btn-primary" type="submit" value="Add"></p>
+    </form>
+</div>
+<div>
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Scheduled By</th>
+            <th scope="col">Tools</th>
+            <th scope="col">Priority</th>
+            <th scope="col">Reference</th>
+            <th scope="col">Disabled</th>
+          </tr>
+        </thead>
+          {% for task in tasks %}
+          <tr>
+          <th scope="row">{{task.name}}</a></th>
+          <td>{{task.scheduled_by}}
+          </td>
+          <td>{{task.tools}}
+          </td>
+          <td>{{task.priority}}
+          </td>
+          <td>{{task.reference}}
+          </td>
+          <td>{{task.disabled}}
+          </td>
+          </tr>
+          {% endfor %}
+      </table> 
 </div>
 {% endblock %}

@@ -1,6 +1,56 @@
 {% extends "layout.html" %} {% block content %}
 <div class="container">
-  <h1>pSConfig Archives</h1>
-  <h3>List of archives will appear here.</h3>
+  <h1 class="mt-5">Archives</h1>
+    <br/>
+    <form id="archiveForm" class="form form-archive" method="POST" action="" role="form">
+           {{ form.csrf_token }}
+            <div class="form-group">
+                {{form.name.label}}
+                {{form.name(placeholder="Name", class_="form-control")}}
+            </div>
+            <div class="form-group">
+                {{form.archiver.label}}
+                {{form.archiver(placeholder="Archiver", class_="form-control")}}
+            </div>
+            <div class="form-group">
+                {{form.data.label}}
+                {{form.data(placeholder="JSON", class_="form-control")}}
+            </div>
+            <div class="form-group">
+                {{form.transform.label}}
+                {{form.transform(placeholder="JSON", class_="form-control")}}
+            </div>
+            <div class="form-group">
+              {{form.ttl.label}}
+              {{form.ttl(placeholder="Interval in ISO 8601 format", class_="form-control")}}
+          </div>
+            <p><input class="btn btn-primary" type="submit" value="Add"></p>
+    </form>
+</div>
+<div>
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Archiver</th>
+            <th scope="col">Data</th>
+            <th scope="col">Transform</th>
+            <th scope="col">TTL</th>
+          </tr>
+        </thead>
+          {% for archive in archives %}
+          <tr>
+          <th scope="row">{{archive.name}}</th>
+          <td>{{archive.archiver}}
+          </td>
+          <td>{{archive.data}}
+          </td>
+          <td>{{archive.transform}}
+          </td>
+          <td>{{archive.ttl}}
+          </td>
+          </tr>
+          {% endfor %}
+      </table> 
 </div>
 {% endblock %}

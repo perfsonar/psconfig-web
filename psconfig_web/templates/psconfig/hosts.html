@@ -37,7 +37,7 @@
         </thead>
           {% for host in hosts %}
           <tr>
-          <th scope="row">{{host.name}}</th>
+          <th scope="row"><a href="/hosts/{{host.id}}">{{host.name}}</a></th>
           <td>{{host.tags}}
           </td>
           <td>{{host.no_agent}}
