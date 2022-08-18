@@ -89,7 +89,8 @@ def groups():
 
     groups = Group.query.all()
 
-    form = GroupForm(request.form)
+    form = GroupForm(request.form, type="mesh")
+    form.addresses.query = Address.query.order_by(Address.name)
     if form.validate_on_submit():
         Group.create(
             name=form.name.data,
@@ -98,6 +99,7 @@ def groups():
             type=form.type.data,
             excludes_self=form.excludes_self.data,
             excludes=form.excludes.data,
+            addresses=form.addresses.data,
         )
         flash("Group added.", "success")
         return redirect(url_for("psconfig.groups"))

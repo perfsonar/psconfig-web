@@ -5,11 +5,13 @@ from wtforms import (
     BooleanField,
     Field,
     IntegerField,
+    SelectField,
     StringField,
     TextAreaField,
     widgets,
 )
 from wtforms.validators import DataRequired, IPAddress
+from wtforms_sqlalchemy.fields import QuerySelectMultipleField
 
 from .models import Address, Archive, Group, Host, Task, Test
 
@@ -125,9 +127,21 @@ class GroupForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     default_address_label = StringField("Default Address Label")
     unidirectional = BooleanField("Unidirectional")
-    type = StringField("Type")
-    excludes_self = StringField("Excludes Self")
+    type = SelectField(
+        "Type", choices=[("disjoint", "Disjoint"), ("list", "List"), ("mesh", "Mesh")]
+    )
+    excludes_self = SelectField(
+        "Excludes Self",
+        choices=[
+            ("", ""),
+            ("host", "Host"),
+            ("address", "Address"),
+            ("disabled", "Disabled"),
+        ],
+    )
     excludes = TextAreaField("Excludes")
+
+    addresses = QuerySelectMultipleField("Addresses", get_label="name")
 
     def __init__(self, *args, **kwargs):
         """Create instance."""

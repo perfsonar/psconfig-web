@@ -18,15 +18,19 @@
             </div>
             <div class="form-group">
               {{form.type.label}}
-              {{form.type(placeholder="disjoint, list, or mesh", class_="form-control")}}
+              {{form.type(class_="form-control")}}
             </div>
             <div class="form-group">
               {{form.excludes_self.label}}
-              {{form.excludes_self(placeholder="host, address, or disabled", class_="form-control")}}
+              {{form.excludes_self(class_="form-control")}}
             </div>
             <div class="form-group">
               {{form.excludes.label}}
-              {{form.excludes(placeholder="Excludes", class_="form-control")}}
+              {{form.excludes(placeholder="JSON", class_="form-control")}}
+            </div>
+            <div class="form-group">
+              {{form.addresses.label}}
+              {{form.addresses(class_="form-control")}}
             </div>
       <p><input class="btn btn-primary" type="submit" value="Add"></p>
     </form>
