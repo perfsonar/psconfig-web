@@ -24,12 +24,20 @@
             <div class="form-group">
               {{form.reference.label}}
               {{form.reference(placeholder="Reference", class_="form-control")}}
-          </div>
-          <div class="form-group">
-            {{form.disabled.label}}
-            {{form.disabled(placeholder="Disabled")}}
-        </div>
-      <p><input class="btn btn-primary" type="submit" value="Add"></p>
+            </div>
+            <div class="form-group">
+              {{form.disabled.label}}
+              {{form.disabled(placeholder="Disabled")}}
+            </div>
+            <div class="form-group">
+              {{form.group.label}}
+              {{form.group(class_="form-control")}}
+            </div>
+            <div class="form-group">
+              {{form.test.label}}
+              {{form.test(class_="form-control")}}
+            </div>
+    <p><input class="btn btn-primary" type="submit" value="Add"></p>
     </form>
 </div>
 <div>

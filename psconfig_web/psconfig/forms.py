@@ -11,7 +11,7 @@ from wtforms import (
     widgets,
 )
 from wtforms.validators import DataRequired, IPAddress
-from wtforms_sqlalchemy.fields import QuerySelectMultipleField
+from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 
 from .models import Address, Archive, Group, Host, Task, Test
 
@@ -194,6 +194,9 @@ class TaskForm(FlaskForm):
     disabled = BooleanField("Disabled")
     priority = IntegerField("Priority")
     reference = TextAreaField("Reference")
+
+    group = QuerySelectField("Group", get_label="name")
+    test = QuerySelectField("Test", get_label="name")
 
     def __init__(self, *args, **kwargs):
         """Create instance."""

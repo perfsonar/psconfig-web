@@ -138,6 +138,8 @@ def tasks():
     tasks = Task.query.all()
 
     form = TaskForm(request.form)
+    form.group.query = Group.query.order_by(Group.name)
+    form.test.query = Test.query.order_by(Test.name)
     if form.validate_on_submit():
         Task.create(
             name=form.name.data,
@@ -146,6 +148,8 @@ def tasks():
             priority=form.priority.data,
             reference=form.reference.data,
             disabled=form.disabled.data,
+            group=form.group.data,
+            test=form.test.data,
         )
         flash("Task added.", "success")
         return redirect(url_for("psconfig.tasks"))

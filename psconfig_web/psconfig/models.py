@@ -206,9 +206,12 @@ class Task(PkModel):
     _meta = Column(JSONB)
 
     archives = relationship("Archive", secondary=tasks_archives)
-    group = Column(ForeignKey("groups.id"), nullable=False)
-    schedule = Column(ForeignKey("schedules.id"))
-    test = Column(ForeignKey("tests.id"), nullable=False)
+    group_id = Column(ForeignKey("groups.id"), nullable=False)
+    group = relationship("Group")
+    schedule_id = Column(ForeignKey("schedules.id"))
+    schedule = relationship("Schedule")
+    test_id = Column(ForeignKey("tests.id"), nullable=False)
+    test = relationship("Test")
 
 
 class Test(PkModel):
