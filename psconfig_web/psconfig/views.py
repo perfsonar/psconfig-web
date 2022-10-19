@@ -9,9 +9,18 @@ from psconfig_web.psconfig.forms import (
     GroupForm,
     HostForm,
     TaskForm,
+    TemplateForm,
     TestForm,
 )
-from psconfig_web.psconfig.models import Address, Archive, Group, Host, Task, Test
+from psconfig_web.psconfig.models import (
+    Address,
+    Archive,
+    Group,
+    Host,
+    Task,
+    Template,
+    Test,
+)
 from psconfig_web.utils import flash_errors
 
 from .models import *  # noqa
@@ -156,6 +165,34 @@ def tasks():
     else:
         flash_errors(form)
     return render_template("psconfig/tasks.html", form=form, tasks=tasks)
+
+
+@blueprint.route("/templates/", methods=["GET", "POST"])
+@login_required
+def templates():
+    """List and add templates."""
+
+    templates = Template.query.all()
+
+    form = TemplateForm(request.form)
+    form.addresses.query = Address.query.order_by(Address.name)
+    form.groups.query = Group.query.order_by(Group.name)
+    form.tasks.query = Task.query.order_by(Task.name)
+    form.tests.query = Test.query.order_by(Test.name)
+    if form.validate_on_submit():
+        Template.create(
+            name=form.name.data,
+            includes=form.includes.data,
+            addresses=form.addresses.data,
+            groups=form.groups.data,
+            tasks=form.tasks.data,
+            tests=form.tests.data,
+        )
+        flash("Template added.", "success")
+        return redirect(url_for("psconfig.templates"))
+    else:
+        flash_errors(form)
+    return render_template("psconfig/templates.html", form=form, templates=templates)
 
 
 @blueprint.route("/tests/", methods=["GET", "POST"])

@@ -13,7 +13,7 @@ from wtforms import (
 from wtforms.validators import DataRequired, IPAddress
 from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 
-from .models import Address, Archive, Group, Host, Task, Test
+from .models import Address, Archive, Group, Host, Task, Template, Test
 
 
 class TagListField(Field):
@@ -211,6 +211,34 @@ class TaskForm(FlaskForm):
         task = Task.query.filter_by(name=self.name.data).first()
         if task:
             self.name.errors.append("Task already exists")
+            return False
+        return True
+
+
+class TemplateForm(FlaskForm):
+    """Template form."""
+
+    name = StringField("Name", validators=[DataRequired()])
+    includes = BetterTagListField("Includes")
+
+    addresses = QuerySelectMultipleField("Addresses", get_label="name")
+    groups = QuerySelectMultipleField("Groups", get_label="name")
+    tasks = QuerySelectMultipleField("Tasks", get_label="name")
+    tests = QuerySelectMultipleField("Tests", get_label="name")
+
+    def __init__(self, *args, **kwargs):
+        """Create instance."""
+        super(TemplateForm, self).__init__(*args, **kwargs)
+        self.task = None
+
+    def validate(self):
+        """Validate the form."""
+        initial_validation = super(TemplateForm, self).validate()
+        if not initial_validation:
+            return False
+        template = Template.query.filter_by(name=self.name.data).first()
+        if template:
+            self.name.errors.append("Template already exists")
             return False
         return True
 

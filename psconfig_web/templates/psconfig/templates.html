@@ -1,6 +1,63 @@
 {% extends "layout.html" %} {% block content %}
-<div class="container">
-  <h1>pSConfig Templates</h1>
-  <h3>List of templates will appear here.</h3>
+<div class="container-narrow">
+  <h1 class="mt-5">Templates</h1>
+    <br/>
+    <form id="templateForm" class="form form-template" method="POST" action="" role="form">
+           {{ form.csrf_token }}
+            <div class="form-group">
+              {{form.name.label}}
+              {{form.name(placeholder="Name", class_="form-control")}}
+            </div>
+            <div class="form-group">
+              {{form.includes.label}}
+              {{form.includes(class_="form-control")}}
+            </div>
+            <div class="form-group">
+              {{form.addresses.label}}
+              {{form.addresses(class_="form-control")}}
+            </div>
+            <div class="form-group">
+              {{form.groups.label}}
+              {{form.groups(class_="form-control")}}
+            </div>
+            <div class="form-group">
+              {{form.tasks.label}}
+              {{form.tasks(class_="form-control")}}
+            </div>
+            <div class="form-group">
+              {{form.tests.label}}
+              {{form.tests(class_="form-control")}}
+            </div>
+      <p><input class="btn btn-primary" type="submit" value="Add"></p>
+    </form>
+</div>
+<div>
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Includes</th>
+            <th scope="col">Addresses</th>
+            <th scope="col">Groups</th>
+            <th scope="col">Tasks</th>
+            <th scope="col">Tests</th>
+          </tr>
+        </thead>
+          {% for template in templates %}
+          <tr>
+          <th scope="row">{{template.name}}</a></th>
+          <td>{{template.includes}}
+          </td>
+          <td>{{template.addresses}}
+          </td>
+          <td>{{template.groups}}
+          </td>
+          <td>{{template.tasks}}
+          </td>
+          <td>{{template.tests}}
+          </td>
+          </tr>
+          {% endfor %}
+      </table> 
 </div>
 {% endblock %}
