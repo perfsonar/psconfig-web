@@ -100,13 +100,14 @@ install -D -m 0644 etc/shared/config.js %{buildroot}/etc/perfsonar/psconfig-web/
 install -D -m 0644 api/pub/*.js %{buildroot}/%{install_base}/pub/api/pub
 install -D -m 0644  etc/apache/pwa-pub.conf %{buildroot}/%{apache_base}/pwa-pub.conf
 install -D -m 0644 deploy/systemd/perfsonar-psconfig-web-admin-publisher.service %{buildroot}/%{systemd_base}/perfsonar-psconfig-web-admin-publisher.service
-rm  -f  %{buildroot}%{install_base}/pub/deploy/systemd/perfsonar-psconfig-web-admin-publisher.service
+rm -f  %{buildroot}%{install_base}/pub/deploy/systemd/perfsonar-psconfig-web-admin-publisher.service
 ln -sf /etc/perfsonar/psconfig-web/index.js  %{buildroot}/%{install_base}/pub/api/config.js
 rm -f %{buildroot}/etc/perfsonar/psconfig-web/apache/pwa-pub.conf
 cp -R node_modules/* %{buildroot}/%{install_base}/shared/node_modules/
 
 #ui
 install -D -m 0644 etc/apache/pwa-admin.conf %{buildroot}/%{apache_base}/pwa-admin.conf
+rm -f %{buildroot}/etc/perfsonar/psconfig-web/apache/pwa-admin.conf
 install -D -m 0644 deploy/systemd/perfsonar-psconfig-web-admin-api.service %{buildroot}/%{systemd_base}/perfsonar-psconfig-web-admin-api.service
 install -D -m 0644 deploy/systemd/perfsonar-psconfig-web-admin-cache.service %{buildroot}/%{systemd_base}/perfsonar-psconfig-web-admin-cache.service
 install -D -m 0644  ui/index.html %{buildroot}/%{install_base}/ui/ui/index.html
@@ -166,6 +167,7 @@ systemctl restart perfsonar-psconfig-web-admin-api.service perfsonar-psconfig-we
 %config(noreplace) /etc/perfsonar/psconfig-web/shared/config.js
 %{install_base}/shared/node_modules/*
 %{install_base}/shared/api/*.js
+%{install_base}/shared/api/pub/*.js
 %{install_base}/shared/api/models/*.js
 
 %files publisher
