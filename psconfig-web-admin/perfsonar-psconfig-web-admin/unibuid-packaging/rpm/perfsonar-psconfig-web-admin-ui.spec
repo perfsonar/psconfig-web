@@ -17,9 +17,11 @@ Summary:		perfSONAR pSConfig Web Administrator: UI and API
 License:		ASL 2.0
 Group:			Applications/Communications
 URL:			http://www.perfsonar.net
-Source0:		perfsonar-psconfig-web-admin-ui-%{version}.%{perfsonar_auto_relnum}.tar.gz
-BuildRoot:		%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Source0:		perfsonar-psconfig-web-admin-ui-%{version}.tar.gz
+BuildRoot:		%{_tmppath}/%{name}-%{version}-root-%(%{__id_u} -n)
 BuildArch:		x86_64
+BuildRequires:  nodejs
+BuildRequires:  npm
 Requires:       nodejs
 Requires:		httpd
 Requires:       mod_ssl
@@ -38,14 +40,14 @@ web-based interface for managing perfSONAR meshes, using pSConfig or MeshConfig 
 /usr/sbin/useradd -g perfsonar -r -s /sbin/nologin -c "perfSONAR User" -d /tmp perfsonar 2> /dev/null || :
 
 %prep
-%setup -q -n perfsonar-psconfig-web-admin-ui-%{version}.%{perfsonar_auto_relnum}
+%setup -q -n perfsonar-psconfig-web-admin-ui-%{version}
 
 %build
 
 %install
 rm -rf %{buildroot}
 
-make UI_ROOTPATH=%{buildroot}/%{install_base} CONFIGPATH=%{buildroot}/%{config_base} install_ui
+make UI_ROOTPATH=%{buildroot}/%{install_base} CONFIGPATH=%{buildroot}/%{config_base} npm manifest_files install_ui
 
 rm -rf %{buildroot}/etc/perfsonar/psconfig-web
 

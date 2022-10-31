@@ -144,3 +144,20 @@ deploy/docker/pwa-pub/tmp/
 ## From grigutis (2021-07-30)
 
 **/package-lock.json
+
+#Ignore mac hidden file
+.DS_Store
+#Ignore vs_code
+.vscode
+# Ignore quilt cache directory
+.pc/
+# Ignore vagrant files
+.vagrant
+vagrant-data
+# Ignore coverage data
+cover_db
+# Ignore unibuild files 
+unibuild-log
+unibuild-work/
+unibuild-repo/
+INSTALLED_FILES

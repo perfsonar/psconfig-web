@@ -17,9 +17,11 @@ Summary:		perfSONAR pSConfig Web Administrator: Publisher
 License:		ASL 2.0
 Group:			Applications/Communications
 URL:			http://www.perfsonar.net
-Source0:	    perfsonar-psconfig-web-admin-publisher-%{version}.%{perfsonar_auto_relnum}.tar.gz
-BuildRoot:		%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Source0:	    perfsonar-psconfig-web-admin-publisher-%{version}.tar.gz
+BuildRoot:		%{_tmppath}/%{name}-%{version}-root-%(%{__id_u} -n)
 BuildArch:		x86_64
+BuildRequires:  nodejs
+BuildRequires:  npm
 Requires:       nodejs
 Requires:		httpd
 Requires:       mod_ssl
@@ -35,7 +37,7 @@ publishing Configs and host autoconfigs in pSConfig or MeshConfig formats
 /usr/sbin/useradd -g perfsonar -r -s /sbin/nologin -c "perfSONAR User" -d /tmp perfsonar 2> /dev/null || :
 
 %prep
-%setup -q -n perfsonar-psconfig-web-admin-publisher-%{version}.%{perfsonar_auto_relnum}
+%setup -q -n perfsonar-psconfig-web-admin-publisher-%{version}
 
 %build
 
@@ -45,7 +47,7 @@ rm -rf %{buildroot}
 mkdir -p %{buildroot}/%{install_base}/api/pub
 mkdir -p %{buildroot}/%{systemd_base}
 
-make PUB_ROOTPATH=%{buildroot}/%{install_base} PUB_CONFIGPATH=%{buildroot}/%{config_base} install_pub
+make PUB_ROOTPATH=%{buildroot}/%{install_base} PUB_CONFIGPATH=%{buildroot}/%{config_base} npm manifest_files install_pub
 
 mkdir -p %{buildroot}/etc/httpd/conf.d
 

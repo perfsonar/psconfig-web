@@ -15,9 +15,11 @@ Summary:		perfSONAR pSConfig Web Administrator: Shared components
 License:		ASL 2.0
 Group:			Applications/Communications
 URL:			http://www.perfsonar.net
-Source0:		perfsonar-psconfig-web-admin-shared-%{version}.%{perfsonar_auto_relnum}.tar.gz
-BuildRoot:		%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Source0:		perfsonar-psconfig-web-admin-shared-%{version}.tar.gz
+BuildRoot:		%{_tmppath}/%{name}-%{version}-root-%(%{__id_u} -n)
 BuildArch:		x86_64
+BuildRequires:  nodejs
+BuildRequires:  npm
 Requires:       nodejs
 Requires:		httpd
 Requires:       mod_ssl
@@ -31,14 +33,14 @@ Shared libraries and configs for pSConfig Web Administrator (PWA).
 /usr/sbin/useradd -g perfsonar -r -s /sbin/nologin -c "perfSONAR User" -d /tmp perfsonar 2> /dev/null || :
 
 %prep
-%setup -q -n perfsonar-psconfig-web-admin-shared-%{version}.%{perfsonar_auto_relnum}
+%setup -q -n perfsonar-psconfig-web-admin-shared-%{version}
 
 %build
 
 %install
 rm -rf %{buildroot}
 
-make ROOTPATH=%{buildroot}/%{install_base} CONFIGPATH=%{buildroot}/%{config_base} install
+make ROOTPATH=%{buildroot}/%{install_base} CONFIGPATH=%{buildroot}/%{config_base} npm manifest_files install
 
 rm -rf %{buildroot}/etc/perfsonar/psconfig-web
 
