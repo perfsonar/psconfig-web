@@ -119,6 +119,7 @@ cp -R ui/node_modules/*  %{buildroot}/%{install_base}/ui/ui/node_modules
 
 #Fix all python shebangs from external stuff
 grep -rl 'env python' %{buildroot}/%{install_base} | xargs sed -i -E -e 's@^#!/usr/bin/env python$@#!/usr/bin/env python3@'
+grep -rl '/usr/bin/python' %{buildroot}/%{install_base} | xargs sed -i -E -e 's@^#!/usr/bin/python$@#!/usr/bin/env python3@'
 
 %clean
 rm -rf %{buildroot}
