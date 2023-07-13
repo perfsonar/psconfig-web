@@ -14,7 +14,7 @@ RUN apt-get update && \
     #npm install coffee-script@1.10.0 -g && \
     pm2 install pm2-logrotate
 
-ADD tmp/ /app
-RUN cd /app && npm install --production
-RUN cd /app/ui && npm install --production
+#ADD tmp/ /app
+#RUN cd /app && npm install --production
+#RUN cd /app/ui && npm install --production
 
