@@ -3,7 +3,7 @@ FROM node:16
 EXPOSE 80 
 EXPOSE 8080
 
-ADD start.sh /
+ADD psconfig-web-admin/perfsonar-psconfig-web-admin/deploy/docker/pwa-admin/start.sh /
 CMD ["/start.sh"]
 
 RUN apt-get update && \
