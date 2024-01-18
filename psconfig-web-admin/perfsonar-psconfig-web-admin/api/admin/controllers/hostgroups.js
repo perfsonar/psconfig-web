@@ -30,7 +30,7 @@ function canedit(user, hostgroup) {
  *                              To pass regex, you need to use {$regex: "...."} format instead of js: /.../
  * @apiParam {Object} [sort]    Mongo sort object - defaults to _id. Enter in string format like "-name%20desc"
  * @apiParam {String} [select]  Fields to return (admins will always be added). Multiple fields can be entered with %20 as delimiter
- * @apiParam {Number} [limit]   Maximum number of records to return - defaults to 100
+ * @apiParam {Number} [limit]   Maximum number of records to return - defaults to 500
  * @apiParam {Number} [skip]    Record offset for pagination (default to 0)
  * @apiSuccess {Object} [hostgroups]         hostgroups: list of hostgroups, and count: total number of hostgroup (for paging)
  * @apiHeader {String}          Authorization A valid JWT token "Bearer: xxxxx"
@@ -49,7 +49,7 @@ router.get(
 
         db.Hostgroup.find(find)
             .select(select)
-            .limit(parseInt(req.query.limit) || 100)
+            .limit(parseInt(req.query.limit) || 500)
             .skip(parseInt(req.query.skip) || 0)
             .sort(req.query.sort || "_id")
             .lean() //so that I can add _canedit later
