@@ -35,11 +35,11 @@ Requires:       mod_ssl
 Shared libraries and configs for pSConfig Web Administrator (PWA).
 
 %package publisher
-Summary:        perfSONAR pSConfig Web Administrator: Publisher
+Summary:		perfSONAR pSConfig Web Administrator: Publisher
 BuildRequires:  nodejs
 BuildRequires:  npm
 Requires:       nodejs
-Requires:       httpd
+Requires:		httpd
 Requires:       mod_ssl
 Requires:       perfsonar-psconfig-web-admin-shared
 Requires:       mongodb-org-server <= 4.0.3
@@ -49,17 +49,17 @@ The perfSONAR pSConfig Web Administrator Publisher package provides a webservice
 publishing Configs and host autoconfigs in pSConfig or MeshConfig formats
 
 %package ui
-Summary:        perfSONAR pSConfig Web Administrator: UI and API
+Summary:		perfSONAR pSConfig Web Administrator: UI and API
 BuildRequires:  nodejs
 BuildRequires:  npm
 Requires:       nodejs
-Requires:       httpd
+Requires:		httpd
 Requires:       mod_ssl
 Requires:       mongodb-org <= 4.0.3
 Requires:       mongodb-org-server <= 4.0.3
-Requires:       perfsonar-psconfig-web-admin-shared
-Requires:       perfsonar-psconfig-web-admin-auth
-Requires:       perfsonar-psconfig-web-admin-publisher
+Requires:		perfsonar-psconfig-web-admin-shared
+Requires:		perfsonar-psconfig-web-admin-auth
+Requires:		perfsonar-psconfig-web-admin-publisher
 
 %description ui
 The perfSONAR pSConfig Web Administrator package provides an authenticated, multi-user,
@@ -98,7 +98,7 @@ install -D -m 0644 etc/shared/config.js %{buildroot}/etc/perfsonar/psconfig-web/
 
 #publisher
 install -D -m 0644 api/pub/*.js %{buildroot}/%{install_base}/pub/api/pub
-install -D -m 0644 etc/apache/pwa-pub.conf %{buildroot}/%{apache_base}/pwa-pub.conf
+install -D -m 0644  etc/apache/pwa-pub.conf %{buildroot}/%{apache_base}/pwa-pub.conf
 install -D -m 0644 deploy/systemd/perfsonar-psconfig-web-admin-publisher.service %{buildroot}/%{systemd_base}/perfsonar-psconfig-web-admin-publisher.service
 rm -f  %{buildroot}%{install_base}/pub/deploy/systemd/perfsonar-psconfig-web-admin-publisher.service
 ln -sf /etc/perfsonar/psconfig-web/index.js  %{buildroot}/%{install_base}/pub/api/config.js
@@ -110,12 +110,12 @@ install -D -m 0644 etc/apache/pwa-admin.conf %{buildroot}/%{apache_base}/pwa-adm
 rm -f %{buildroot}/etc/perfsonar/psconfig-web/apache/pwa-admin.conf
 install -D -m 0644 deploy/systemd/perfsonar-psconfig-web-admin-api.service %{buildroot}/%{systemd_base}/perfsonar-psconfig-web-admin-api.service
 install -D -m 0644 deploy/systemd/perfsonar-psconfig-web-admin-cache.service %{buildroot}/%{systemd_base}/perfsonar-psconfig-web-admin-cache.service
-install -D -m 0644 ui/index.html %{buildroot}/%{install_base}/ui/ui/index.html
+install -D -m 0644  ui/index.html %{buildroot}/%{install_base}/ui/ui/index.html
 install -D -m 0644 ui/css/*.css %{buildroot}/%{install_base}/ui/ui/css/
 install -D -m 0644 ui/css/*.css.map %{buildroot}/%{install_base}/ui/ui/css/
 install -D -m 0644 ui/js/*.js %{buildroot}/%{install_base}/ui/ui/js/
 
-cp -R ui/node_modules/* %{buildroot}/%{install_base}/ui/ui/node_modules
+cp -R ui/node_modules/*  %{buildroot}/%{install_base}/ui/ui/node_modules
 
 #Fix all python shebangs from external stuff
 grep -rl 'env python' %{buildroot}/%{install_base} | xargs sed -i -E -e 's@^#!/usr/bin/env python$@#!/usr/bin/env python3@'
