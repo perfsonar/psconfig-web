@@ -968,7 +968,7 @@ exports._process_published_config = function (_config, opts, cb) {
                     delete psc_hosts[_host.hostname].archives;
                 }
 
-                // There are some cases where the host.info object is not defined which causes an exception when laoding mesh config.
+                // There are some cases where the host.info object is not defined which causes an exception when loading mesh config.
                 // ie. 'Adhoc' host added via API. In this case, we need to define the host.info object.
                 if (!_host.info) _host.info = {};
 
