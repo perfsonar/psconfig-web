@@ -5,7 +5,7 @@
 # cron/apache entries are located in the 'etc' directory
 %define apache_base /etc/httpd/conf.d
 
-%define perfsonar_auto_version 5.1.1
+%define perfsonar_auto_version 5.1.2
 %define perfsonar_auto_relnum 1
 %define debug_package %{nil}
 
@@ -42,7 +42,7 @@ Requires:       nodejs
 Requires:		httpd
 Requires:       mod_ssl
 Requires:       perfsonar-psconfig-web-admin-shared
-Requires:       mongodb-org-server <= 4.0.3
+Requires:       mongodb-org-server < 4.1
 
 %description publisher
 The perfSONAR pSConfig Web Administrator Publisher package provides a webservice for
@@ -55,8 +55,8 @@ BuildRequires:  npm
 Requires:       nodejs
 Requires:		httpd
 Requires:       mod_ssl
-Requires:       mongodb-org <= 4.0.3
-Requires:       mongodb-org-server <= 4.0.3
+Requires:       mongodb-org < 4.1
+Requires:       mongodb-org-server < 4.1
 Requires:		perfsonar-psconfig-web-admin-shared
 Requires:		perfsonar-psconfig-web-admin-auth
 Requires:		perfsonar-psconfig-web-admin-publisher
