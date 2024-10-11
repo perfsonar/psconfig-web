@@ -333,8 +333,8 @@
                         </p>
                     </div>
 
-                    <label for="streams" class="col-sm-2 control-label"
-                        >Streams</label
+                    <label for="parallel" class="col-sm-2 control-label"
+                        >Parallel Streams</label
                     >
                     <div class="col-sm-4">
                         <div class="input-group">
@@ -343,16 +343,16 @@
                                 string-to-number
                                 step="1"
                                 class="form-control"
-                                name="streams"
+                                name="parallel"
                                 ng-disabled="!selected._canedit"
-                                ng-model="selected.specs.streams"
+                                ng-model="selected.specs.parallel"
                                 placeholder="1"
                             />
-                            <div class="input-group-addon">Streams</div>
+                            <div class="input-group-addon">Parallel Streams</div>
                         </div>
                         <p class="help-block">
                             The number of parallel streams to use in the test
-                            <code>streams</code>
+                            <code>parallel</code>
                         </p>
                     </div>
                 </div>
