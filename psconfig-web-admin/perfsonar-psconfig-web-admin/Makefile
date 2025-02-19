@@ -7,8 +7,8 @@ PUB_ROOTPATH=/usr/lib/perfsonar/psconfig-web-admin/pub
 CONFIGPATH=/etc/perfsonar/psconfig-web
 PUB_CONFIGPATH=/etc/perfsonar/psconfig-web
 #LIBPATH=/usr/lib/perfsonar/lib
-PERFSONAR_AUTO_VERSION=5.1.4
-PERFSONAR_AUTO_RELNUM=1
+PERFSONAR_AUTO_VERSION=5.1.5
+PERFSONAR_AUTO_RELNUM=0.a1.0
 VERSION=${PERFSONAR_AUTO_VERSION}
 RELEASE=${PERFSONAR_AUTO_RELNUM}
 
