@@ -6,7 +6,7 @@
 %define apache_base /etc/httpd/conf.d
 
 %define perfsonar_auto_version 5.2.0
-%define perfsonar_auto_relnum 0.b1.2
+%define perfsonar_auto_relnum 0.3.b1
 %define debug_package %{nil}
 
 Name:			perfsonar-psconfig-web-admin
