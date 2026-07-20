@@ -56,29 +56,41 @@ function lookup_addresses(address, cb) {
     }
 }
 
-function create_hostrec(service, uri, cb) {
-    //truncate the last 2 path (/lookup/record) which is already part of service-host
-    var pathname_tokens = uri.pathname.split("/");
-    pathname_tokens.splice(-3);
-    var pathname = pathname_tokens.join("/");
-
-    //reconstruct the url for the host record
-    console.log("service['service-host']", service["service-host"]);
-    var url = uri.protocol + "//" + uri.host + "/" + service["service-host"][0];
-    console.log("URL", url);
-    request(
-        { url: url, timeout: 1000 * 10, json: true },
-        function (err, res, host) {
+function create_hostrec(service, lookup_url, cb) {
+    var host_uri = service["service-host"][0];
+    request.get(
+        {
+            url: lookup_url,
+            timeout: 1000 * 10,
+            json: true,
+            body: {
+                query: {
+                    bool: {
+                        must: [{ term: { uri: host_uri } }],
+                        filter: [{ range: { expires: { gt: "now" } } }],
+                    },
+                },
+                size: 1,
+            },
+        },
+        function (err, res, body) {
             if (err) return cb(err);
             if (res.statusCode != 200)
                 return cb(
                     new Error(
-                        "failed to cache host from: " +
-                            url +
+                        "failed to cache host from ES for uri:" +
+                            host_uri +
                             " statusCode:" +
                             res.statusCode
                     )
                 );
+            if (!body.hits || !body.hits.hits || body.hits.hits.length === 0)
+                return cb(
+                    new Error("no host record found in LS for uri:" + host_uri)
+                );
+
+            var host = body.hits.hits[0]._source;
+
             var rec = {
                 info: get_hostinfo(host),
                 communities: host["group-communities"] || [],
@@ -86,7 +98,7 @@ function create_hostrec(service, uri, cb) {
                 update_date: new Date(),
             };
 
-            if (!host["simulated"]) rec.url = url;
+            rec.url = host_uri;
 
             //toolkit v<3.5 didn't have client-uuid
             if (host["client-uuid"]) rec.uuid = host["client-uuid"][0];
@@ -156,9 +168,25 @@ function get_hostinfo(host) {
 
 function cache_ls(hosts, ls, lsid, cb) {
     logger.debug("caching ls:" + lsid + " from " + ls.url);
-    request(
-        { url: ls.url, timeout: 1000 * 10, json: true },
-        function (err, res, services) {
+    request.get(
+        {
+            url: ls.url,
+            timeout: 1000 * 10,
+            json: true,
+            body: {
+                query: {
+                    bool: {
+                        must: [
+                            { term: { type: "service" } },
+                            { term: { "service-type.keyword": "pscheduler" } },
+                        ],
+                        filter: [{ range: { expires: { gt: "now" } } }],
+                    },
+                },
+                size: 10000,
+            },
+        },
+        function (err, res, body) {
             if (err) return cb(err);
             if (res.statusCode != 200)
                 return cb(
@@ -169,16 +197,16 @@ function cache_ls(hosts, ls, lsid, cb) {
                             res.statusCode
                     )
                 );
+            var services = body.hits.hits.map(function (hit) {
+                return hit._source;
+            });
 
             function get_host(uri, service, _cb) {
                 if (hosts[uri] !== undefined) return _cb(null, hosts[uri]);
-                create_hostrec(service, res.request.uri, function (err, host) {
+                create_hostrec(service, ls.url, function (err, host) {
                     if (err) {
-                        var service_url =
-                            ls.url.replace(/lookup\/.+$/, "") + service.uri;
                         logger.error(
                             "failed to create hostrecord for ",
-                            ls.url,
                             service.uri,
                             service["service-locator"],
                             uri
@@ -283,8 +311,7 @@ function cache_global_ls(hosts, service, id, cb) {
                             );
                             return next();
                         }
-                        //massage the service url so that I can use cache_ls to do the rest
-                        service.url = host.locator + service.query;
+                        service.url = service.lookup_url;
                         cache_ls(hosts, service, id, function (err) {
                             if (err) logger.error(err); //continue
                             next();
@@ -347,6 +374,7 @@ function run() {
             );
             switch (service.type) {
                 case "sls":
+                    service.url = service.lookup_url;
                     cache_ls(hosts, service, id, next);
                     break;
                 case "global-sls":
@@ -481,7 +509,7 @@ function run() {
                             (config.admin.host || "localhost") +
                             ":" +
                             config.admin.port;
-                        request.post(
+                        request.get(
                             {
                                 url: pwadmin + "/health/pwacache",
                                 json: { hosts: host_count },
