@@ -58,7 +58,7 @@ function lookup_addresses(address, cb) {
 
 function create_hostrec(service, lookup_url, cb) {
     var host_uri = service["service-host"][0];
-    request.post(
+    request.get(
         {
             url: lookup_url,
             timeout: 1000 * 10,
@@ -168,7 +168,7 @@ function get_hostinfo(host) {
 
 function cache_ls(hosts, ls, lsid, cb) {
     logger.debug("caching ls:" + lsid + " from " + ls.url);
-    request.post(
+    request.get(
         {
             url: ls.url,
             timeout: 1000 * 10,
@@ -509,7 +509,7 @@ function run() {
                             (config.admin.host || "localhost") +
                             ":" +
                             config.admin.port;
-                        request.post(
+                        request.get(
                             {
                                 url: pwadmin + "/health/pwacache",
                                 json: { hosts: host_count },

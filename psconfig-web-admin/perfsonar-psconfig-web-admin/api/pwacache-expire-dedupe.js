@@ -385,7 +385,7 @@ function getHostsFromLS(hostsArr, hostsToQuery, ls, lsid, cb) {
         logger.debug("ALREADY QUERIED LS (skipping): " + ah_url);
         return cb();
     }
-    request.post(
+    request.get(
         {
             url: ah_url,
             timeout: 1000 * 5,
