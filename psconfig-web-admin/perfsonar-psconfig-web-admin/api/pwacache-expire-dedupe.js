@@ -68,6 +68,7 @@ exports.run = function run() {
                     logger.info("lookup service", service);
                     switch (service.type) {
                         case "sls":
+                            service.url = service.lookup_url;
                             var newLSResults = getHostsFromLS(
                                 host_results,
                                 hostsToQuery,
@@ -380,59 +381,53 @@ function expireStaleRecords(callback) {
 
 function getHostsFromLS(hostsArr, hostsToQuery, ls, lsid, cb) {
     var ah_url = ls.url;
-    var query = "?type=host";
-
-    var queryHosts = hostsToQuery;
-    if (hostsToQuery.length == 0) {
-        queryHosts = [{}];
+    if (ah_url in lsQueried) {
+        logger.debug("ALREADY QUERIED LS (skipping): " + ah_url);
+        return cb();
     }
-    async.eachSeries(
-        queryHosts,
-        function (hostQuery, next) {
-            for (var key in hostQuery) {
-                var val = hostQuery[key];
-            }
-
-            var url = ah_url + query;
-            if (ah_url in lsQueried) {
-                logger.debug("ALREADY QUERIED LS (skipping): " + ah_url);
-                return next();
-            }
-            request(url, { timeout: 1000 * 5 }, function (err, res, body) {
-                lsQueried[ah_url] = 1;
-                if (err) return cb(err);
-                if (res.statusCode != 200)
-                    return cb(
-                        new Error(
-                            "failed to download activehosts.json from:" +
-                                service.activehosts_url +
-                                " statusCode:" +
-                                res.statusCode
-                        )
-                    );
-
-                body = JSON.parse(body);
-                var objKey = key + "-" + val;
-                if (body.length > 0) {
-                    var lsBaseUrl = url;
-                    lsBaseUrl = lsBaseUrl.match(/^http.?:\/\/[^\/]+/) + "/";
-                    formatLsHostRecords(body, lsBaseUrl);
-                    lsHostArr = lsHostArr.concat(body);
-                }
-                next();
-            });
+    request.get(
+        {
+            url: ah_url,
+            timeout: 1000 * 5,
+            json: true,
+            body: {
+                query: {
+                    bool: {
+                        must: [{ term: { type: "host" } }],
+                        filter: [{ range: { expires: { gt: "now" } } }],
+                    },
+                },
+                size: 10000,
+            },
         },
-        function (err) {
-            if (err) logger.error(err);
-            if (cb) cb();
+        function (err, res, body) {
+            lsQueried[ah_url] = 1;
+            if (err) return cb(err);
+            if (res.statusCode != 200)
+                return cb(
+                    new Error(
+                        "failed to get hosts from LS:" +
+                            ah_url +
+                            " statusCode:" +
+                            res.statusCode
+                    )
+                );
+            var hosts = body.hits.hits.map(function (hit) {
+                return hit._source;
+            });
+            if (hosts.length > 0) {
+                formatLsHostRecords(hosts);
+                lsHostArr = lsHostArr.concat(hosts);
+            }
+            cb();
         }
     );
 }
 
-function formatLsHostRecords(hosts, ls_url) {
+function formatLsHostRecords(hosts) {
     for (var i in hosts) {
         var host = hosts[i];
-        host._url_full = ls_url + host.uri;
+        host._url_full = host.uri;
     }
     return hosts;
 }
@@ -515,8 +510,7 @@ function getHostsFromGlobalLS(hostsArr, hostsToQuery, service, id, cb) {
                             );
                             return next();
                         }
-                        //massage the service url so I can use cache_ls to do the rest
-                        service.url = host.locator;
+                        service.url = service.lookup_url;
                         getHostsFromLS(
                             hostsArr,
                             hostsToQuery,
