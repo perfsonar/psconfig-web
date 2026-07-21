@@ -509,7 +509,7 @@ function run() {
                             (config.admin.host || "localhost") +
                             ":" +
                             config.admin.port;
-                        request.get(
+                        request.post(
                             {
                                 url: pwadmin + "/health/pwacache",
                                 json: { hosts: host_count },
