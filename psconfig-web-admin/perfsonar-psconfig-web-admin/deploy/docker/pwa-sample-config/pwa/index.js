@@ -144,7 +144,7 @@ exports.datasource = {
             label: "widget",
             type: "global-sls",
             activehosts_url: "http://ps1.es.net:8096/lookup/activehosts.json",
-            query: "?type=service&group-communities=*WIDGET,*widget&group-communities-operator=any",
+            lookup_url: "http://35.223.142.206/lookup/_search",
         },
 */
         // Global LS instance (by default, this is the only LS specified)
@@ -152,16 +152,16 @@ exports.datasource = {
             label: "GLS",
             type: "global-sls",
             activehosts_url: "http://ps1.es.net:8096/lookup/activehosts.json",
-            query: "?type=service",
+            lookup_url: "http://35.223.142.206/lookup/_search",
         },
 
         // Private sLS instance
         // only uncomment this if you are running a private sLS instance
         /*
         "private": {
-            label: "private", 
+            label: "private",
             type: "sls",
-            url: "http://sls:8090/lookup/records/?type=service", 
+            lookup_url: "http://35.223.142.206/lookup/_search",
         },
         */
     },

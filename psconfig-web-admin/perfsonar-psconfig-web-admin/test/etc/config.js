@@ -123,26 +123,26 @@ exports.datasource = {
             label: "ATLAS",
             type: "global-sls",
             activehosts_url: "http://ps1.es.net:8096/lookup/activehosts.json",
-            query: "?type=service&group-communities=*ATLAS,*atlas&group-communities-operator=any",
+            lookup_url: "http://35.223.142.206/lookup/_search",
         },
         /*
         "cms": {
             label: 'CMS',
             type: 'global-sls',
             activehosts_url: 'http://ps1.es.net:8096/lookup/activehosts.json',
-            query: '?type=service&group-communities=*CMS,*cms&group-communities-operator=any',
+            lookup_url: 'http://35.223.142.206/lookup/_search',
         },
         "osg": {
             label: 'OSG',
             type: 'global-sls',
             activehosts_url: 'http://ps1.es.net:8096/lookup/activehosts.json',
-            query: '?type=service&group-communities=OSG,opensciencegrid&group-communities-operator=any',
+            lookup_url: 'http://35.223.142.206/lookup/_search',
         },
         "test": {
             label: 'test',
             type: 'global-sls',
             activehosts_url: 'http://ps1.es.net:8096/lookup/activehosts.json',
-            query: '?type=service&group-communities=pS-Testbed&group-communities-operator=any',
+            lookup_url: 'http://35.223.142.206/lookup/_search',
         },
         */
 
@@ -150,15 +150,15 @@ exports.datasource = {
             label: "GLS",
             type: "global-sls",
             activehosts_url: "http://ps1.es.net:8096/lookup/activehosts.json",
-            query: "?type=service",
+            lookup_url: "http://35.223.142.206/lookup/_search",
         },
         //sLS instance
         //only uncomment this if you are running a private sLS instance
         /*
         "gocdb-oim": {
-            label: 'GOCDB-OIM', 
+            label: 'GOCDB-OIM',
             type: 'sls',
-            url: 'http://sls:8090/lookup/records/?type=service', 
+            lookup_url: 'http://35.223.142.206/lookup/_search',
             //exclude: [], //TODO - allow user to remove certain service from appearing in the UI
         },
         */
